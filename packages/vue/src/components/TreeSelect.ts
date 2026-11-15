@@ -185,7 +185,7 @@ export const TreeSelect = defineComponent({
     defaultOpen: { type: Boolean, default: false },
     treeData: { type: Array as PropType<TreeNode[]>, default: () => [] },
     placeholder: { type: String, default: undefined },
-    size: { type: String as PropType<ComponentSize>, default: 'md' as ComponentSize },
+    size: { type: String as PropType<ComponentSize>, default: undefined },
     disabled: Boolean,
     readOnly: Boolean,
     clearable: { type: Boolean, default: true },
@@ -227,6 +227,7 @@ export const TreeSelect = defineComponent({
   setup(props, { emit, attrs, expose }) {
     const config = useTigerConfig()
     const inputGroup = inject<InputGroupContext | null>(INPUT_GROUP_INJECTION_KEY, null)
+    const effectiveSize = computed(() => props.size ?? inputGroup?.size ?? 'md')
     const formItemControl = inject<VueFormItemControlContext | null>(
       FORM_ITEM_CONTROL_INJECTION_KEY,
       null
@@ -327,7 +328,7 @@ export const TreeSelect = defineComponent({
       })
     )
     const itemHeight = computed(
-      () => props.itemHeight ?? getTreeSelectVirtualItemHeight(props.size)
+      () => props.itemHeight ?? getTreeSelectVirtualItemHeight(effectiveSize.value)
     )
     const overlayHeight = computed(() => resolveTreeSelectListHeight(props.listHeight))
     const virtualRef = ref<VirtualListHandle | null>(null)
@@ -772,7 +773,7 @@ export const TreeSelect = defineComponent({
         multiselectable: props.multiple
       })
       const triggerClasses = getTreeSelectTriggerClasses({
-        size: props.size,
+        size: effectiveSize.value,
         disabled: effectiveDisabled.value,
         isOpen: isOpen.value,
         status: status.value,
@@ -862,7 +863,7 @@ export const TreeSelect = defineComponent({
               isSelected: selectedNode,
               isDisabled: Boolean(item.node.disabled),
               isActive,
-              size: props.size
+              size: effectiveSize.value
             }),
             style: {
               ...getTreeSelectNodeIndentStyle(item.level),

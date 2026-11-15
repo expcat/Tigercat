@@ -8,7 +8,10 @@ import { render, screen } from '@testing-library/vue'
 import { Input } from '@expcat/tigercat-vue/Input'
 import { InputGroup, InputGroupAddon } from '@expcat/tigercat-vue/InputGroup'
 import { InputNumber } from '@expcat/tigercat-vue/InputNumber'
+import { Mentions } from '@expcat/tigercat-vue/Mentions'
 import { Textarea } from '@expcat/tigercat-vue/Textarea'
+import { TimePicker } from '@expcat/tigercat-vue/TimePicker'
+import { TreeSelect } from '@expcat/tigercat-vue/TreeSelect'
 import { expectNoA11yViolations } from '../utils'
 
 describe('InputGroup', () => {
@@ -52,22 +55,34 @@ describe('InputGroup', () => {
     expect(screen.getByTestId('my-group').id).toBe('test-group')
   })
 
-  it('passes size to child inputs that do not set their own size', () => {
+  it.each(['sm', 'lg'] as const)('passes size %s to children without an explicit size', (size) => {
     const { getByLabelText } = render(InputGroup, {
-      props: { size: 'lg' },
+      props: { size },
       attrs: { 'aria-label': 'Sized' },
       slots: {
         default: () => [
           h(Input, { 'aria-label': 'plain input' }),
           h(Textarea, { 'aria-label': 'plain textarea' }),
-          h(InputNumber, { 'aria-label': 'plain number' })
+          h(InputNumber, { 'aria-label': 'plain number' }),
+          h(Mentions, { 'aria-label': 'plain mentions' }),
+          h(TimePicker, { 'aria-label': 'plain time' }),
+          h(TreeSelect, { 'aria-label': 'plain tree' })
         ]
       }
     })
 
-    expect(getByLabelText('plain input').className).toContain('py-3')
-    expect(getByLabelText('plain textarea').className).toContain('py-3')
-    expect(screen.getByRole('spinbutton').className).toContain('text-lg')
+    for (const label of [
+      'plain input',
+      'plain textarea',
+      'plain mentions',
+      'plain time',
+      'plain tree'
+    ]) {
+      expect
+        .soft(getByLabelText(label, { selector: 'input, textarea, [role="combobox"]' }))
+        .toHaveClass(`text-${size}`)
+    }
+    expect(screen.getByRole('spinbutton')).toHaveClass(`text-${size}`)
   })
 
   it('uses focus-within so nested field focus raises compact z-index', () => {

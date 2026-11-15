@@ -62,6 +62,22 @@ describe('TimePicker', () => {
     expect(screen.getByRole('textbox')).toHaveAttribute('placeholder', 'Select time')
   })
 
+  it('emits blur once when focus leaves the Now button for an outside button', () => {
+    const onBlur = vi.fn()
+    render(
+      <>
+        <TimePicker defaultOpen defaultValue="09:30" onBlur={onBlur} />
+        <button type="button">Outside</button>
+      </>
+    )
+    const now = screen.getByRole('button', { name: 'Now' })
+    const outside = screen.getByRole('button', { name: 'Outside' })
+    fireEvent.blur(screen.getByRole('textbox'), { relatedTarget: now })
+    expect(onBlur).not.toHaveBeenCalled()
+    fireEvent.blur(now, { relatedTarget: outside })
+    expect(onBlur).toHaveBeenCalledTimes(1)
+  })
+
   it('uses official locale objects for placeholder copy', () => {
     const { rerender } = render(
       <ConfigProvider locale={zhCN}>

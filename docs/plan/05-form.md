@@ -17,12 +17,11 @@ form 组 30 个组件（C052–C081）。这一组没有截图，视觉与键盘
 ## 依赖与顺序
 
 - S10 波及 13 个表单组件，先做 S10 再做这些组件里其余的受控条目。
-- InputGroup 的尺寸继承（C059-F01、C063-F01）一批做，Mentions、TimePicker、TreeSelect 同验。
 
 ## 概览
 
-本篇 51 条：P1 0、P2 48、P3 3。
-按波次：W3 48、W9 3。
+本篇 49 条：P1 0、P2 46、P3 3。
+按波次：W3 46、W9 3。
 
 已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C056-F01（S10）、C056-F04（S07）、C060-F04（S13）、C061-F05（S13）、C072-F02（S13）、C074-F04（S13）、C080-F03（S13）。
 
@@ -30,11 +29,10 @@ form 组 30 个组件（C052–C081）。这一组没有截图，视觉与键盘
 
 这些条目的行在下面各组件的表里。修的时候把右列的组件一起验。
 
-| 条目                                                                  | 归属           | 同验                             |
-| --------------------------------------------------------------------- | -------------- | -------------------------------- |
-| C059-F01 两端均忽略 InputGroup 的 size                                | DatePicker     | Mentions、TimePicker、TreeSelect |
-| C063-F02 生成文档的「直子必须是 chrome 根」与实际稳定 host 结构矛盾   | InputGroup     | MaskInput、Mentions、Textarea    |
-| C069-F05 FormItem required 被写到不支持 aria-required 的 group/dialog | NumberKeyboard | Transfer、Upload                 |
+| 条目                                                                  | 归属           | 同验                          |
+| --------------------------------------------------------------------- | -------------- | ----------------------------- |
+| C063-F02 生成文档的「直子必须是 chrome 根」与实际稳定 host 结构矛盾   | InputGroup     | MaskInput、Mentions、Textarea |
+| C069-F05 FormItem required 被写到不支持 aria-required 的 group/dialog | NumberKeyboard | Transfer、Upload              |
 
 ## 条目
 
@@ -88,15 +86,6 @@ form 组 30 个组件（C052–C081）。这一组没有截图，视觉与键盘
 
 | 编号 | 级别 | 波次 | 端  | 类别 | 条目 | 验收 |
 | ---- | ---- | ---- | --- | ---- | ---- | ---- |
-
-### C059 DatePicker
-
-报告 `groups/form/DatePicker.md`，队列状态 needs-evidence。另受 S01、S02、S04、S07 影响。
-
-| 编号     | 级别 | 波次 | 端    | 类别 | 条目                                | 验收                                                                         |
-| -------- | ---- | ---- | ----- | ---- | ----------------------------------- | ---------------------------------------------------------------------------- |
-| C059-F01 | P2   | W3   | 双端  | 行为 | 两端均忽略 InputGroup 的 size       | InputGroup sm/lg 内未设 size 的 DatePicker 输出 text-sm / text-lg 对应尺寸类 |
-| C059-F02 | P2   | W3   | React | 行为 | React 离开打开的面板会重复触发 blur | 焦点从面板 Today 按钮移到外部按钮时 React blurCount=1，与 Vue 一致           |
 
 ### C060 Form
 
@@ -156,7 +145,7 @@ form 组 30 个组件（C052–C081）。这一组没有截图，视觉与键盘
 
 ### C068 Mentions
 
-报告 `groups/form/Mentions.md`，队列状态 needs-evidence。另受 S01、S04、S10、C059-F01、C063-F02 影响。
+报告 `groups/form/Mentions.md`，队列状态 needs-evidence。另受 S01、S04、S10、C063-F02 影响。
 
 | 编号     | 级别 | 波次 | 端        | 类别   | 条目                                                                | 验收                                                                                 |
 | -------- | ---- | ---- | --------- | ------ | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
@@ -253,7 +242,7 @@ form 组 30 个组件（C052–C081）。这一组没有截图，视觉与键盘
 
 ### C080 TreeSelect
 
-报告 `groups/form/TreeSelect.md`，队列状态 needs-evidence。另受 S01、S04、S07、C059-F01、C076-F05、C079-F02 影响。
+报告 `groups/form/TreeSelect.md`，队列状态 needs-evidence。另受 S01、S04、S07、C076-F05、C079-F02 影响。
 
 | 编号     | 级别 | 波次 | 端       | 类别 | 条目                                            | 验收                                                                                                   |
 | -------- | ---- | ---- | -------- | ---- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
@@ -275,9 +264,9 @@ form 组 30 个组件（C052–C081）。这一组没有截图，视觉与键盘
 
 报告没有给这些组件立新的编号。右列是并入的既有条目，修那些条目时要在这里复验。
 
-| 任务 | 组件            | 报告                             | 并入的条目                                       |
-| ---- | --------------- | -------------------------------- | ------------------------------------------------ |
-| C064 | InputGroupAddon | `groups/form/InputGroupAddon.md` | S02                                              |
-| C066 | InputOTP        | `groups/form/InputOTP.md`        | S01、S04、S10                                    |
-| C070 | Radio           | `groups/form/Radio.md`           | S01、S04、S08、S10                               |
-| C078 | TimePicker      | `groups/form/TimePicker.md`      | S01、S02、S04、S07、C059-F01、C059-F02、C065-F03 |
+| 任务 | 组件            | 报告                             | 并入的条目                   |
+| ---- | --------------- | -------------------------------- | ---------------------------- |
+| C064 | InputGroupAddon | `groups/form/InputGroupAddon.md` | S02                          |
+| C066 | InputOTP        | `groups/form/InputOTP.md`        | S01、S04、S10                |
+| C070 | Radio           | `groups/form/Radio.md`           | S01、S04、S08、S10           |
+| C078 | TimePicker      | `groups/form/TimePicker.md`      | S01、S02、S04、S07、C065-F03 |

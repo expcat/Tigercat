@@ -96,8 +96,7 @@ export const DatePicker = forwardRef<DatePickerRef, DatePickerProps>(
           )}
           style={overlay.floatingStyles}
           data-positioned={overlay.positioned}
-          data-tiger="datepicker-panel"
-          onBlur={ctx.handleFocusOut}>
+          data-tiger="datepicker-panel">
           <Calendar
             value={ctx.calendarValue}
             now={ctx.now}

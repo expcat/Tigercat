@@ -150,7 +150,7 @@ export const TimePicker = defineComponent({
     },
     open: { type: Boolean, default: undefined },
     defaultOpen: { type: Boolean, default: false },
-    size: { type: String as PropType<ComponentSize>, default: 'md' },
+    size: { type: String as PropType<ComponentSize>, default: undefined },
     format: { type: String as PropType<TimeFormat>, default: '24' },
     showSeconds: Boolean,
     hourStep: { type: Number, default: 1 },

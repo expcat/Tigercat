@@ -8,7 +8,10 @@ import { render, screen } from '@testing-library/react'
 import { Input } from '@expcat/tigercat-react/Input'
 import { InputGroup, InputGroupAddon } from '@expcat/tigercat-react/InputGroup'
 import { InputNumber } from '@expcat/tigercat-react/InputNumber'
+import { Mentions } from '@expcat/tigercat-react/Mentions'
 import { Textarea } from '@expcat/tigercat-react/Textarea'
+import { TimePicker } from '@expcat/tigercat-react/TimePicker'
+import { TreeSelect } from '@expcat/tigercat-react/TreeSelect'
 import { expectNoA11yViolations } from '../utils/react'
 
 describe('InputGroup', () => {
@@ -58,18 +61,30 @@ describe('InputGroup', () => {
     expect(screen.getByTestId('my-group').id).toBe('test')
   })
 
-  it('passes size to child inputs that do not set their own size', () => {
+  it.each(['sm', 'lg'] as const)('passes size %s to children without an explicit size', (size) => {
     render(
-      <InputGroup size="lg" aria-label="Sized">
+      <InputGroup size={size} aria-label="Sized">
         <Input aria-label="plain input" />
         <Textarea aria-label="plain textarea" />
         <InputNumber aria-label="plain number" />
+        <Mentions aria-label="plain mentions" />
+        <TimePicker aria-label="plain time" />
+        <TreeSelect aria-label="plain tree" />
       </InputGroup>
     )
 
-    expect(screen.getByLabelText('plain input').className).toContain('py-3')
-    expect(screen.getByLabelText('plain textarea').className).toContain('py-3')
-    expect(screen.getByRole('spinbutton').className).toContain('text-lg')
+    for (const label of [
+      'plain input',
+      'plain textarea',
+      'plain mentions',
+      'plain time',
+      'plain tree'
+    ]) {
+      expect
+        .soft(screen.getByLabelText(label, { selector: 'input, textarea, [role="combobox"]' }))
+        .toHaveClass(`text-${size}`)
+    }
+    expect(screen.getByRole('spinbutton')).toHaveClass(`text-${size}`)
   })
 
   it('uses focus-within so nested field focus raises compact z-index', () => {

@@ -116,8 +116,7 @@ export const TimePicker = forwardRef<TimePickerRef, TimePickerProps>(
           )}
           style={overlay.floatingStyles}
           data-positioned={overlay.positioned}
-          data-tiger="timepicker-panel"
-          onBlur={ctx.handleFocusOut}>
+          data-tiger="timepicker-panel">
           {ctx.isRangeMode ? (
             <div className={timePickerRangeHeaderClasses} role="tablist">
               <button

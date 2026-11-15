@@ -10,6 +10,7 @@ import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { DatePicker } from '@expcat/tigercat-react/DatePicker'
 import { Form } from '@expcat/tigercat-react/Form'
 import { FormItem } from '@expcat/tigercat-react/FormItem'
+import { InputGroup } from '@expcat/tigercat-react/InputGroup'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 import { expectNoA11yViolations } from '../utils/react'
@@ -41,6 +42,33 @@ describe('DatePicker', () => {
   it('renders a closed field with the locale placeholder', () => {
     const { container } = render(<DatePicker />)
     expect(container.querySelector('input')).toHaveAttribute('placeholder', 'Select date')
+  })
+
+  it.each(['sm', 'lg'] as const)('inherits InputGroup size %s unless size is explicit', (size) => {
+    render(
+      <InputGroup size={size}>
+        <DatePicker aria-label="Inherited" />
+        <DatePicker aria-label="Explicit" size="md" />
+      </InputGroup>
+    )
+    expect(screen.getByRole('textbox', { name: 'Inherited' })).toHaveClass(`text-${size}`)
+    expect(screen.getByRole('textbox', { name: 'Explicit' })).toHaveClass('text-base')
+  })
+
+  it('emits blur once when focus leaves the Today button for an outside button', () => {
+    const onBlur = vi.fn()
+    render(
+      <>
+        <DatePicker defaultOpen now={june} onBlur={onBlur} />
+        <button type="button">Outside</button>
+      </>
+    )
+    const today = screen.getByRole('button', { name: 'Today' })
+    const outside = screen.getByRole('button', { name: 'Outside' })
+    fireEvent.blur(screen.getByRole('textbox'), { relatedTarget: today })
+    expect(onBlur).not.toHaveBeenCalled()
+    fireEvent.blur(today, { relatedTarget: outside })
+    expect(onBlur).toHaveBeenCalledTimes(1)
   })
 
   it('keeps an uncontrolled selection', async () => {

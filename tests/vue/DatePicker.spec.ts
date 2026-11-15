@@ -8,6 +8,7 @@ import userEvent from '@testing-library/user-event'
 import { h } from 'vue'
 import { DatePicker } from '@expcat/tigercat-vue/DatePicker'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
+import { InputGroup } from '@expcat/tigercat-vue/InputGroup'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 import { expectNoA11yViolations } from '../utils'
@@ -38,6 +39,31 @@ describe('DatePicker', () => {
   it('renders a closed field with the locale placeholder', () => {
     const { container } = render(DatePicker)
     expect(container.querySelector('input')).toHaveAttribute('placeholder', 'Select date')
+  })
+
+  it.each(['sm', 'lg'] as const)('inherits InputGroup size %s unless size is explicit', (size) => {
+    render(() =>
+      h(InputGroup, { size }, () => [
+        h(DatePicker, { 'aria-label': 'Inherited' }),
+        h(DatePicker, { 'aria-label': 'Explicit', size: 'md' })
+      ])
+    )
+    expect(screen.getByRole('textbox', { name: 'Inherited' })).toHaveClass(`text-${size}`)
+    expect(screen.getByRole('textbox', { name: 'Explicit' })).toHaveClass('text-base')
+  })
+
+  it('emits blur once when focus leaves the Today button for an outside button', async () => {
+    const onBlur = vi.fn()
+    render(() => [
+      h(DatePicker, { defaultOpen: true, now: june, onBlur }),
+      h('button', { type: 'button' }, 'Outside')
+    ])
+    const today = screen.getByRole('button', { name: 'Today' })
+    const outside = screen.getByRole('button', { name: 'Outside' })
+    await fireEvent.focusOut(screen.getByRole('textbox'), { relatedTarget: today })
+    expect(onBlur).not.toHaveBeenCalled()
+    await fireEvent.focusOut(today, { relatedTarget: outside })
+    expect(onBlur).toHaveBeenCalledTimes(1)
   })
 
   it('keeps an uncontrolled selection without v-model', async () => {

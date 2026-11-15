@@ -137,7 +137,7 @@ export const DatePicker = defineComponent({
     },
     open: { type: Boolean, default: undefined },
     defaultOpen: { type: Boolean, default: false },
-    size: { type: String as PropType<ComponentSize>, default: 'md' },
+    size: { type: String as PropType<ComponentSize>, default: undefined },
     format: { type: String as PropType<DateFormat>, default: 'yyyy-MM-dd' },
     placeholder: { type: String, default: undefined },
     disabled: Boolean,

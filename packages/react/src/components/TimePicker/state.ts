@@ -47,7 +47,7 @@ import { isRangeTimePicker, type TimePickerProps } from './types'
 export function useTimePickerController(props: TimePickerProps) {
   const isRangeMode = isRangeTimePicker(props)
   const {
-    size = 'md',
+    size,
     disabled = false,
     readOnly = false,
     required = false,

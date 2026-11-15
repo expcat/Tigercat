@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **InputGroup 尺寸与面板失焦（Vue / React，C059-F01、C059-F02）**：DatePicker、Mentions、TimePicker、TreeSelect 省略 `size` 时先继承 InputGroup 的 sm/lg，再回退 md；显式 `size` 仍优先。React DatePicker 与 TimePicker 由根节点处理面板离开事件，从 Today / Now 按钮移到外部控件时只通知一次 blur。
+
 - **CronEditor 数字起点步长与只读选择器（Core / Vue / React，C058-F01、C058-F02）**：数字起点的步长（如 `5/2 * * * *`）从起点到字段上限展开，使校验、摘要和下次运行一致；Vue 只读预设与字段模式选择后还原当前显示，表达式与隐藏表单值不变且不触发更新或校验回调。
 
 - **ColorSwatch 选项与列数归一（Core / Vue / React，C057-F04、C057-F05、C057-F06）**：不可解析的颜色选项统一禁用，点击不再触发回调或改写隐藏表单值；保留无 `#` 十六进制的颜色等价语义，并补上有效 CSS 前缀；`columns` 小数截整、低于 1 用 1、非有限值回退 6，双端布局与垂直导航使用相同列数。

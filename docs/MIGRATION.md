@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+双端 DatePicker、Mentions、TimePicker、TreeSelect 在 InputGroup 内省略 `size` 时，现在继承组的 sm/lg。需要在组内保持 md 时，请显式设置 `size="md"`。React DatePicker 与 TimePicker 从面板离开时，`onBlur` 和 FormItem 失焦校验只通知一次。
+
 双端 ColorSwatch 的选中项禁用或焦点项被移除后，Tab 入口回退到当前可用项。垂直导航在本组同列没有可用候选时继续跨组；多个等价颜色（如 `#fff`、`#ffffff`、`rgb(255, 255, 255)`）只选中首个匹配项。调用方式不用改。
 
 ColorPicker 与 ColorSwatch 共用的颜色解析现在把无单位 alpha 大于 1 的值钳制为 1，例如 `rgba(255, 0, 0, 2)` 是不透明红；需要半透明时请传 `0.5` 或 `50%`。`hsl(1..2 100% 50%)`、`rgba(255, 0, 0, 1..2)` 等畸形数值现在解析失败，ColorPicker 将其保留为错误草稿并提交空隐藏域。双端 ColorPicker 的触发按钮及 CronEditor、NumberKeyboard 的 group/dialog 不再输出不支持的 `aria-readonly`；继续使用 `readOnly` 控制只读。

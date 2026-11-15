@@ -92,7 +92,7 @@ export const Mentions = forwardRef<HTMLTextAreaElement, MentionsProps>(
       options = [],
       placeholder,
       disabled = false,
-      size = 'md',
+      size,
       rows = 3,
       autoResize = false,
       maxRows,

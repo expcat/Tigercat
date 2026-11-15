@@ -116,7 +116,7 @@ export const Mentions = defineComponent({
     options: { type: Array as PropType<MentionOption[]>, default: () => [] },
     placeholder: { type: String, default: undefined },
     disabled: Boolean,
-    size: { type: String as PropType<ComponentSize>, default: 'md' },
+    size: { type: String as PropType<ComponentSize>, default: undefined },
     rows: { type: Number, default: 3 },
     autoResize: { type: Boolean, default: false },
     maxRows: { type: Number, default: undefined },

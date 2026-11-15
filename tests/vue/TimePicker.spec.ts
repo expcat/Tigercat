@@ -55,6 +55,20 @@ describe('TimePicker', () => {
     expect(container.querySelector('input')).toHaveAttribute('placeholder', 'Select time')
   })
 
+  it('emits blur once when focus leaves the Now button for an outside button', async () => {
+    const onBlur = vi.fn()
+    render(() => [
+      h(TimePicker, { defaultOpen: true, defaultValue: '09:30', onBlur }),
+      h('button', { type: 'button' }, 'Outside')
+    ])
+    const now = screen.getByRole('button', { name: 'Now' })
+    const outside = screen.getByRole('button', { name: 'Outside' })
+    await fireEvent.focusOut(screen.getByRole('textbox'), { relatedTarget: now })
+    expect(onBlur).not.toHaveBeenCalled()
+    await fireEvent.focusOut(now, { relatedTarget: outside })
+    expect(onBlur).toHaveBeenCalledTimes(1)
+  })
+
   it('keeps an uncontrolled selection without v-model', async () => {
     const { container } = render(TimePicker, { props: { defaultValue: '10:00' } })
     await fireEvent.click(screen.getByLabelText('Toggle time picker'))

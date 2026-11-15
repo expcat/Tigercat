@@ -43,7 +43,7 @@ import { isRangeDatePicker, type DatePickerProps, type DatePickerRangeResolvedVa
 export function useDatePickerController(props: DatePickerProps) {
   const isRangeMode = isRangeDatePicker(props)
   const {
-    size = 'md',
+    size,
     disabled = false,
     readOnly = false,
     required = false,

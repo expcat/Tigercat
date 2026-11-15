@@ -64,7 +64,7 @@ const EMPTY_MULTIPLE_VALUE: (string | number)[] = []
 export function useTreeSelectController(props: TreeSelectProps) {
   const {
     treeData: treeDataProp = EMPTY_TREE_DATA,
-    size = 'md',
+    size: sizeProp,
     disabled = false,
     placeholder,
     searchable = false,
@@ -109,6 +109,7 @@ export function useTreeSelectController(props: TreeSelectProps) {
   } = props
 
   const inputGroup = useInputGroupContext()
+  const size = sizeProp ?? inputGroup?.size ?? 'md'
   const formItemControl = useFormItemControlContext()
   const config = useTigerConfig()
   const dir: 'ltr' | 'rtl' = config.direction === 'rtl' ? 'rtl' : 'ltr'
