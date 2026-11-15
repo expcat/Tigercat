@@ -120,8 +120,11 @@ export const ColorSwatch = markFormItemGroupControl(
       const firstEnabledIndex = computed(() =>
         options.value.findIndex((option) => !option.disabled)
       )
-      const activeIndex = computed(() =>
-        selectedIndex.value >= 0 ? selectedIndex.value : firstEnabledIndex.value
+      const activeIndex = computed(
+        () =>
+          [focusIndex.value, selectedIndex.value].find(
+            (index) => options.value[index] && !options.value[index].disabled
+          ) ?? firstEnabledIndex.value
       )
 
       function commit(option: ColorSwatchNormalizedOption) {
@@ -166,8 +169,7 @@ export const ColorSwatch = markFormItemGroupControl(
 
       expose({
         focus: () => {
-          const index = focusIndex.value >= 0 ? focusIndex.value : activeIndex.value
-          ;(optionRefs.value[index] ?? rootRef.value)?.focus()
+          ;(optionRefs.value[activeIndex.value] ?? rootRef.value)?.focus()
         }
       })
 
@@ -258,14 +260,9 @@ export const ColorSwatch = markFormItemGroupControl(
                     group.colors.map((option) => {
                       const optionIndex = flatIndex
                       flatIndex += 1
-                      const selected = isColorSwatchSelected(option.value, selectedValue.value)
+                      const selected = optionIndex === selectedIndex.value
                       const optionDisabled = effectiveDisabled.value || !!option.disabled
-                      const tabIndex =
-                        !optionDisabled &&
-                        optionIndex ===
-                          (focusIndex.value >= 0 ? focusIndex.value : activeIndex.value)
-                          ? 0
-                          : -1
+                      const tabIndex = !optionDisabled && optionIndex === activeIndex.value ? 0 : -1
                       const tone = getColorSwatchCheckTone(option.value)
 
                       return h(

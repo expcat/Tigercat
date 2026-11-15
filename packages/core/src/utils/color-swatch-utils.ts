@@ -234,24 +234,16 @@ function stepGroupGrid(
   const col = local % cols
   const nextLocal = local + rowDelta * cols
 
-  if (nextLocal >= 0 && nextLocal < group.colors.length) {
-    const candidate = group.colors[nextLocal]
-    const flat = options.findIndex(
-      (option) => option.groupIndex === candidate.groupIndex && option.index === candidate.index
-    )
-    if (flat >= 0 && !options[flat].disabled) return flat
-    return findEnabledColorSwatchIndex(options, flat, rowDelta, false) >= 0
-      ? findEnabledInGroupColumn(
-          groups,
-          options,
-          current.groupIndex,
-          col,
-          cols,
-          rowDelta,
-          nextLocal
-        )
-      : stepAcrossGroups(groups, options, current.groupIndex, col, cols, rowDelta)
-  }
+  const next = findEnabledInGroupColumn(
+    groups,
+    options,
+    current.groupIndex,
+    col,
+    cols,
+    rowDelta,
+    nextLocal
+  )
+  if (next >= 0) return next
 
   return stepAcrossGroups(groups, options, current.groupIndex, col, cols, rowDelta)
 }

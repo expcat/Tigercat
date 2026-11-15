@@ -154,6 +154,12 @@ describe('ColorSwatch', () => {
       expect(screen.getByRole('radio', { name: '#abcdef' })).toHaveAttribute('aria-checked', 'true')
     })
 
+    it('checks only one option when multiple colors match the selected value', () => {
+      render(<ColorSwatch value="#ffffff" colors={['#fff', '#ffffff', 'rgb(255, 255, 255)']} />)
+
+      expect(screen.getAllByRole('radio', { checked: true })).toHaveLength(1)
+    })
+
     it('matches rgb to hex and does not paint an unparseable swatch string', () => {
       render(<ColorSwatch value="rgb(255, 0, 0)" colors={['#f00', 'not-a-color']} />)
 
@@ -176,6 +182,36 @@ describe('ColorSwatch', () => {
 
       expect(screen.getByRole('radio', { name: '#111111' })).toHaveAttribute('tabindex', '-1')
       expect(screen.getByRole('radio', { name: '#222222' })).toHaveAttribute('tabindex', '0')
+    })
+
+    it('keeps one enabled tab entry when the selected option is disabled', () => {
+      render(
+        <ColorSwatch
+          value="#111111"
+          colors={[{ value: '#111111', disabled: true }, '#222222', '#333333']}
+        />
+      )
+
+      expect(
+        screen
+          .getAllByRole('radio')
+          .filter((radio) => !radio.hasAttribute('disabled') && radio.tabIndex === 0)
+      ).toHaveLength(1)
+    })
+
+    it('keeps one enabled tab entry after the focused option is removed', () => {
+      const { rerender } = render(<ColorSwatch colors={['#111111', '#222222', '#333333']} />)
+      const third = screen.getByRole('radio', { name: '#333333' })
+      act(() => third.focus())
+      expect(third).toHaveFocus()
+
+      rerender(<ColorSwatch colors={['#111111', '#222222']} />)
+
+      expect(
+        screen
+          .getAllByRole('radio')
+          .filter((radio) => !radio.hasAttribute('disabled') && radio.tabIndex === 0)
+      ).toHaveLength(1)
     })
   })
 })

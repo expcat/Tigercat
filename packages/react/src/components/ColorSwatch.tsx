@@ -129,7 +129,9 @@ const ColorSwatchInner = forwardRef<HTMLDivElement, ColorSwatchProps>(function C
     isColorSwatchSelected(option.value, selectedValue)
   )
   const firstEnabledIndex = options.findIndex((option) => !option.disabled)
-  const activeIndex = selectedIndex >= 0 ? selectedIndex : firstEnabledIndex
+  const activeIndex =
+    [focusIndex, selectedIndex].find((index) => options[index] && !options[index].disabled) ??
+    firstEnabledIndex
 
   const handleSelect = useCallback(
     (option: ColorSwatchNormalizedOption) => {
@@ -235,12 +237,9 @@ const ColorSwatchInner = forwardRef<HTMLDivElement, ColorSwatchProps>(function C
               {group.colors.map((option) => {
                 const optionIndex = flatIndex
                 flatIndex += 1
-                const selected = isColorSwatchSelected(option.value, selectedValue)
+                const selected = optionIndex === selectedIndex
                 const optionDisabled = effectiveDisabled || !!option.disabled
-                const tabIndex =
-                  !optionDisabled && optionIndex === (focusIndex >= 0 ? focusIndex : activeIndex)
-                    ? 0
-                    : -1
+                const tabIndex = !optionDisabled && optionIndex === activeIndex ? 0 : -1
                 const tone = getColorSwatchCheckTone(option.value)
 
                 return (

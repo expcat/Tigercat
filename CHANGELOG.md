@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **ColorSwatch 键盘与单选语义（Core / Vue / React，C057-F01、C057-F02、C057-F03）**：双端在选中项禁用或焦点项被移除后，仍为可用色块保留唯一 Tab 入口；垂直导航遇到本组同列禁用项且无后续候选时，继续跨组寻找可用项；多个等价颜色只由首个匹配项输出选中状态。
+
 - **颜色解析与只读无障碍（Core / Vue / React，C056-F02、C056-F03、C056-F05）**：CSS 无单位 alpha 按 0–1 钳制，`rgba(255, 0, 0, 2)` 与 `rgb(255 0 0 / 2)` 解析为不透明红，百分数仍按百分比处理。共享解析拒绝畸形小数与非有限数值，ColorPicker 保留错误草稿且隐藏域为空，ColorSwatch 复用同一解析。双端 ColorPicker 按钮及 CronEditor、NumberKeyboard 的 group/dialog 移除不支持的 `aria-readonly`，只读时仍可打开、聚焦且不改值。
 
 - **组错误承载项更新（Vue / React，C055-F01）**：CheckboxGroup 与归并的 RadioGroup 按实际渲染的可用子项维护错误 owner，卸载、换值或禁用时释放候选，children / slot 不再受被忽略的 options 干扰。移除 a 后 b 接续 `aria-invalid` 与错误描述，首项禁用时首次错误聚焦落到 b；RadioGroup 只在选中项仍可用时优先使用它。

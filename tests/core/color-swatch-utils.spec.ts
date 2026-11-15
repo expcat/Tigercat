@@ -84,6 +84,18 @@ describe('color-swatch-utils', () => {
     expect(getNextColorSwatchIndex(groups, a3, 'ArrowDown', 6)).toBe(b3)
   })
 
+  it('continues into the next group when the remaining column is disabled', () => {
+    const groups = normalizeColorSwatchGroups([
+      {
+        label: 'A',
+        colors: ['#111111', '#222222', { value: '#333333', disabled: true }, '#444444']
+      },
+      { label: 'B', colors: ['#aaaaaa', '#bbbbbb'] }
+    ])
+
+    expect(getNextColorSwatchIndex(groups, 0, 'ArrowDown', 2)).toBe(4)
+  })
+
   it('uses a dark check on light swatches and a light check on dark swatches', () => {
     expect(getColorSwatchCheckTone('#f59e0b')).toBe('dark')
     expect(getColorSwatchCheckTone('#eab308')).toBe('dark')
