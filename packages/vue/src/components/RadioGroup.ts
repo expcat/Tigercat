@@ -229,6 +229,8 @@ export const RadioGroup = markFormItemGroupControl(
             'aria-labelledby': labelledby,
             'aria-describedby': describedBy,
             'aria-disabled': effectiveDisabled.value || undefined,
+            'aria-required':
+              restAttrs['aria-required'] ?? (formItemControl?.required.value || undefined),
             onKeydown: handleKeyDown,
             onFocusout: (event: FocusEvent) => {
               const next = event.relatedTarget as Node | null

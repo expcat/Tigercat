@@ -179,6 +179,7 @@ const RadioGroupInner: React.FC<RadioGroupProps> = ({
         aria-labelledby={labelledby}
         aria-describedby={describedBy}
         aria-disabled={effectiveDisabled || undefined}
+        aria-required={props['aria-required'] ?? (formItemControl?.required || undefined)}
         onKeyDown={handleKeyDown}
         onBlur={handleFocusOut}>
         {Children.count(children) > 0
