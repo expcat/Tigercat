@@ -38,6 +38,7 @@ import {
   CONTEXT_MENU_ENTER_CLASS,
   CONTEXT_MENU_SUB_HIDE_DELAY_MS,
   CONTEXT_MENU_SUB_CHEVRON_PATH,
+  isBrowser,
   isContextMenuKeyboardEvent,
   resolvePopupMenuItemType,
   popupMenuItemHref,
@@ -761,25 +762,13 @@ export const ContextMenu = defineComponent({
     const setVisible = (visible: boolean) => {
       if (props.disabled && visible) return
 
-      if (visible && !currentVisible.value) {
-        previousActiveElement.value = captureActiveElement()
-      }
-
       if (props.open === undefined) {
         internalVisible.value = visible
       }
       emit('update:open', visible)
       emit('open-change', visible)
 
-      if (visible) {
-        nextTick(() => {
-          requestAnimationFrame(() => {
-            if (floatingRef.value) {
-              focusFirstMenuItem(floatingRef.value)
-            }
-          })
-        })
-      } else {
+      if (!visible) {
         hasExplicitPoint.value = false
         restoreFocus(previousActiveElement.value)
         previousActiveElement.value = null
@@ -794,7 +783,16 @@ export const ContextMenu = defineComponent({
     watch(
       currentVisible,
       (visible) => {
-        if (visible) ensurePoint()
+        if (!visible || !isBrowser()) return
+        previousActiveElement.value = captureActiveElement()
+        ensurePoint()
+        nextTick(() => {
+          requestAnimationFrame(() => {
+            if (currentVisible.value && floatingRef.value) {
+              focusFirstMenuItem(floatingRef.value)
+            }
+          })
+        })
       },
       { immediate: true }
     )

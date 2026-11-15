@@ -173,7 +173,11 @@ export function getMenuItems(container: HTMLElement): HTMLElement[] {
     ? container
     : (container.querySelector<HTMLElement>(':scope [role="menu"]') ?? container)
 
-  return Array.from(menu.querySelectorAll<HTMLElement>('[role="menuitem"]')).filter((el) => {
+  return Array.from(
+    menu.querySelectorAll<HTMLElement>(
+      '[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]'
+    )
+  ).filter((el) => {
     const owner = el.closest<HTMLElement>('[role="menu"]')
     if (owner && owner !== menu) return false
     const ariaDisabled = el.getAttribute('aria-disabled')

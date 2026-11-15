@@ -275,27 +275,35 @@ describe('Dropdown', () => {
       expect(document.querySelectorAll('[aria-haspopup]')).toHaveLength(1)
     })
 
-    it('trigger has aria-controls pointing to menu id when open', async () => {
-      render(
-        <Dropdown trigger="click">
-          <button>Trigger</button>
-          <DropdownMenu>
-            <DropdownItem>Item 1</DropdownItem>
-          </DropdownMenu>
-        </Dropdown>
-      )
+    it.each(['declarative', 'items'] as const)(
+      'trigger has aria-controls pointing to the %s menu id when open',
+      async (mode) => {
+        render(
+          <Dropdown
+            trigger="click"
+            items={mode === 'items' ? [{ key: 'item', label: 'Item 1' }] : undefined}>
+            <button>Trigger</button>
+            {mode === 'declarative' ? (
+              <DropdownMenu>
+                <DropdownItem>Item 1</DropdownItem>
+              </DropdownMenu>
+            ) : null}
+          </Dropdown>
+        )
 
-      const trigger = screen.getByRole('button', { name: 'Trigger' })
-      expect(trigger).not.toHaveAttribute('aria-controls')
+        const trigger = screen.getByRole('button', { name: 'Trigger' })
+        expect(trigger).not.toHaveAttribute('aria-controls')
 
-      await fireEvent.click(screen.getByText('Trigger'))
-      const controlsId = trigger.getAttribute('aria-controls')
-      expect(controlsId).toBeTruthy()
+        await fireEvent.click(screen.getByText('Trigger'))
+        const controlsId = trigger.getAttribute('aria-controls')
+        expect(controlsId).toBeTruthy()
 
-      const menu = document.querySelector(`[id="${controlsId}"]`)
-      expect(menu).toBeInTheDocument()
-      expect(menu).toHaveAttribute('role', 'menu')
-    })
+        const menu = document.getElementById(controlsId!)
+        expect(menu).toBeInTheDocument()
+        expect(menu).toHaveAttribute('role', 'menu')
+        expect(document.querySelectorAll(`[id="${controlsId}"]`)).toHaveLength(1)
+      }
+    )
 
     it('menu items have role="menuitem" and tabIndex={-1}', () => {
       render(
@@ -510,23 +518,33 @@ describe('Dropdown', () => {
   })
 
   describe('Edge Cases', () => {
-    it('does not close on item click when closeOnClick is false', async () => {
-      render(
-        <Dropdown trigger="click" closeOnClick={false}>
-          <button>Trigger</button>
-          <DropdownMenu>
-            <DropdownItem>Item 1</DropdownItem>
-          </DropdownMenu>
-        </Dropdown>
-      )
+    it.each(['declarative', 'items'] as const)(
+      'does not close on %s item click when closeOnClick is false',
+      async (mode) => {
+        const onOpenChange = vi.fn()
+        render(
+          <Dropdown
+            trigger="click"
+            closeOnClick={false}
+            onOpenChange={onOpenChange}
+            items={mode === 'items' ? [{ key: 'item', label: 'Item 1' }] : undefined}>
+            <button>Trigger</button>
+            {mode === 'declarative' ? (
+              <DropdownMenu>
+                <DropdownItem>Item 1</DropdownItem>
+              </DropdownMenu>
+            ) : null}
+          </Dropdown>
+        )
 
-      const wrapper = document.querySelector('[data-tiger-dropdown-menu]')
-      await fireEvent.click(screen.getByText('Trigger'))
-      expect(document.querySelector('[data-tiger-dropdown-menu]')).toBeTruthy()
+        await fireEvent.click(screen.getByText('Trigger'))
+        expect(document.querySelector('[data-tiger-dropdown-menu]')).toBeTruthy()
 
-      await fireEvent.click(screen.getByText('Item 1'))
-      expect(document.querySelector('[data-tiger-dropdown-menu]')).toBeTruthy()
-    })
+        await fireEvent.click(screen.getByText('Item 1'))
+        expect(document.querySelector('[data-tiger-dropdown-menu]')).toBeTruthy()
+        expect(onOpenChange).not.toHaveBeenCalledWith(false)
+      }
+    )
 
     it('keeps the menu open when an item sets closeOnClick false under parent default true', async () => {
       render(

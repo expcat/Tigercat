@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { act, render, screen, fireEvent } from '@testing-library/react'
+import { act, render, screen, fireEvent, waitFor } from '@testing-library/react'
 import React from 'react'
 import {
   ContextMenu,
@@ -147,6 +147,24 @@ describe('ContextMenu', () => {
     expect(getMenu()).not.toHaveAttribute('hidden')
   })
 
+  it('keeps items open without a close request when closeOnClick is false', () => {
+    const onOpenChange = vi.fn()
+    render(
+      <ContextMenu
+        defaultOpen
+        portal={false}
+        closeOnClick={false}
+        items={[{ key: 'action', label: 'Action' }]}
+        onOpenChange={onOpenChange}>
+        <div>Surface</div>
+      </ContextMenu>
+    )
+
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Action' }))
+    expect(screen.getByRole('menu')).toBeInTheDocument()
+    expect(onOpenChange).not.toHaveBeenCalled()
+  })
+
   describe('portal', () => {
     it('renders the menu into document.body by default', () => {
       const { container } = render(<Demo defaultOpen />)
@@ -164,6 +182,39 @@ describe('ContextMenu', () => {
   })
 
   describe('keyboard', () => {
+    it('focuses the first available item when open changes externally', async () => {
+      const { rerender } = render(<Demo open={false} />)
+      const trigger = document.querySelector<HTMLElement>('[data-tiger-context-menu-trigger]')!
+      trigger.focus()
+      expect(trigger).toHaveFocus()
+
+      rerender(<Demo open />)
+      await waitFor(() => expect(screen.getByRole('menuitem', { name: 'Copy' })).toHaveFocus())
+    })
+
+    it('moves through checkbox and radio items with ArrowDown', () => {
+      render(
+        <ContextMenu
+          defaultOpen
+          items={[
+            { key: 'alpha', label: 'Alpha' },
+            { key: 'check', label: 'Check', type: 'checkbox' },
+            { key: 'radio', label: 'Radio', type: 'radio' },
+            { key: 'zulu', label: 'Zulu' }
+          ]}>
+          <div>Surface</div>
+        </ContextMenu>
+      )
+
+      const alpha = screen.getByRole('menuitem', { name: 'Alpha' })
+      alpha.focus()
+      fireEvent.keyDown(alpha, { key: 'ArrowDown' })
+      const check = screen.getByRole('menuitemcheckbox', { name: 'Check' })
+      expect(check).toHaveFocus()
+      fireEvent.keyDown(check, { key: 'ArrowDown' })
+      expect(screen.getByRole('menuitemradio', { name: 'Radio' })).toHaveFocus()
+    })
+
     it('moves typeahead focus past separators in items', () => {
       render(
         <ContextMenu
@@ -191,7 +242,7 @@ describe('ContextMenu', () => {
       const wrapper = document.querySelector('[data-tiger-context-menu]')
       expect(wrapper).not.toHaveAttribute('hidden')
 
-      screen.getByRole('menuitem', { name: 'Copy' }).focus()
+      await waitFor(() => expect(screen.getByRole('menuitem', { name: 'Copy' })).toHaveFocus())
       await fireEvent.keyDown(wrapper!, { key: 'ArrowDown' })
       expect(document.activeElement).toHaveTextContent('Delete')
     })
@@ -231,6 +282,18 @@ describe('ContextMenu', () => {
   })
 
   describe('a11y', () => {
+    it('links aria-controls to the items menu', () => {
+      render(
+        <ContextMenu defaultOpen items={[{ key: 'action', label: 'Action' }]}>
+          <div>Surface</div>
+        </ContextMenu>
+      )
+      const trigger = document.querySelector('[data-tiger-context-menu-trigger]')!
+      const controlsId = trigger.getAttribute('aria-controls')!
+      expect(controlsId).toBeTruthy()
+      expect(document.getElementById(controlsId)).toBe(screen.getByRole('menu'))
+    })
+
     it('exposes menu roles and aria-expanded on the trigger', () => {
       render(<Demo />)
       const trigger = screen.getByText('Surface').closest('[aria-haspopup]')
@@ -244,6 +307,7 @@ describe('ContextMenu', () => {
       expect(controlsId).toBeTruthy()
       const menu = document.querySelector(`[id="${controlsId}"]`)
       expect(menu).toHaveAttribute('role', 'menu')
+      expect(document.querySelectorAll(`[id="${controlsId}"]`)).toHaveLength(1)
 
       const items = screen.getAllByRole('menuitem')
       expect(items.length).toBeGreaterThan(0)

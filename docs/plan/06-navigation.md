@@ -16,14 +16,13 @@ navigation 组 35 个组件（C082–C116）。审查时这一组同样没有浏
 
 ## 依赖与顺序
 
-- ContextMenu 与 Dropdown 共用实现：C088-F03、C088-F06 一起做。
 - NavigationMenu：先 C102-F03，再做 Item、Link、List、Trigger 的条目。
 - Affix 的 16 格没有任何浏览器证据，见 [13](13-evidence.md) 的 E03。
 
 ## 概览
 
-本篇 63 条：P2 47、P3 16。
-按波次：W4 47、W9 16。
+本篇 59 条：P2 43、P3 16。
+按波次：W4 43、W9 16。
 
 已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C086-F03（S13）、C088-F05（S13）、C095-F02（S13）、C109-F06（S13）、C112-F01（S13）、C113-F01（S13）、C114-F04（S13）、C116-F05（S13）。
 
@@ -33,8 +32,6 @@ navigation 组 35 个组件（C082–C116）。审查时这一组同样没有浏
 
 | 条目                                                    | 归属           | 同验                                   |
 | ------------------------------------------------------- | -------------- | -------------------------------------- |
-| C088-F03 React items 分支忽略 closeOnClick=false        | ContextMenu    | Dropdown、DropdownItem                 |
-| C088-F06 schema 菜单方向键跳过 checkbox 和 radio 项     | ContextMenu    | Dropdown、DropdownItem                 |
 | C102-F03 React 现有 axe 用例命中 menubar 必需子角色违规 | NavigationMenu | NavigationMenuLink、NavigationMenuList |
 
 ## 条目
@@ -47,17 +44,6 @@ navigation 组 35 个组件（C082–C116）。审查时这一组同样没有浏
 | -------- | ---- | ---- | ---- | ---- | ----------------------------------------- | ------------------------------------------------------------------------- |
 | C085-F01 | P3   | W9   | Core | 行为 | `update()` 使待执行帧脱离 `cancel()` 管理 | 阈值 400、scrollTop=450 时 schedule→update→cancel 后 pendingAfterCancel=0 |
 
-### C088 ContextMenu
-
-报告 `groups/navigation/ContextMenu.md`，队列状态 needs-evidence。另受 S01 影响。
-
-| 编号     | 级别 | 波次 | 端    | 类别   | 条目                                                 | 验收                                                                                           |
-| -------- | ---- | ---- | ----- | ------ | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| C088-F02 | P2   | W4   | 双端  | 键盘   | 外部受控 open 打开时没有把焦点移入菜单               | 父级把 open 从 false 改为 true 后，activeElement 为首个可用菜单项，与非受控 Shift+F10 打开一致 |
-| C088-F03 | P2   | W4   | React | 行为   | React items 分支忽略 closeOnClick=false              | closeOnClick=false、items=[Action] 点击 Action 后 React 菜单保留且无关闭请求                   |
-| C088-F04 | P2   | W4   | React | 无障碍 | React items 菜单没有与触发器 aria-controls 对应的 id | React items 菜单打开后，按 aria-controls 值 getElementById 能取到 role=menu 节点               |
-| C088-F06 | P2   | W4   | Core  | 键盘   | schema 菜单方向键跳过 checkbox 和 radio 项           | items 为 Alpha、Check、Radio、Zulu 时在 Alpha 按 ArrowDown，双端焦点进入 Check                 |
-
 ### C089 ContextMenuItem
 
 报告 `groups/navigation/ContextMenuItem.md`，队列状态 needs-evidence。另受 S02 影响。
@@ -68,7 +54,7 @@ navigation 组 35 个组件（C082–C116）。审查时这一组同样没有浏
 
 ### C092 Dropdown
 
-报告 `groups/navigation/Dropdown.md`，队列状态 needs-evidence。另受 S01、C088-F03、C088-F04、C088-F06 影响。
+报告 `groups/navigation/Dropdown.md`，队列状态 needs-evidence。另受 S01 影响。
 
 | 编号     | 级别 | 波次 | 端   | 类别 | 条目                                                   | 验收                                                                               |
 | -------- | ---- | ---- | ---- | ---- | ------------------------------------------------------ | ---------------------------------------------------------------------------------- |
@@ -79,7 +65,7 @@ navigation 组 35 个组件（C082–C116）。审查时这一组同样没有浏
 
 ### C093 DropdownItem
 
-报告 `groups/navigation/DropdownItem.md`，队列状态 needs-evidence。另受 S01、S02、C088-F03、C088-F06、C092-F01 影响。
+报告 `groups/navigation/DropdownItem.md`，队列状态 needs-evidence。另受 S01、S02、C092-F01 影响。
 
 | 编号     | 级别 | 波次 | 端    | 类别 | 条目                                                                 | 验收                                                                              |
 | -------- | ---- | ---- | ----- | ---- | -------------------------------------------------------------------- | --------------------------------------------------------------------------------- |

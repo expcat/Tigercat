@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **ContextMenu 打开焦点与 schema 菜单（Core / Vue / React，C088-F02、C088-F03、C088-F04、C088-F06）**：双端外部受控 `open` 打开后聚焦首个可用菜单项。React ContextMenu / Dropdown 的 `items` 遵守 `closeOnClick=false`，菜单 id 与触发器 `aria-controls` 对应；共享方向键导航按 DOM 顺序包含 checkbox / radio，保留层级、隐藏和禁用筛选。
+
 - **Breadcrumb 折叠菜单键盘（Vue / React，C086-F02）**：打开后聚焦首项，复用既有菜单方向键导航；Escape 关闭并回焦省略号，Tab 离开时关闭菜单。Enter / Space 激活原项并关闭菜单，触发器支持上下键打开首项或末项。
 
 - **AnchorLink 原生 rel 与规范化 href（Vue / React，C084-F01、C084-F02）**：双端保留调用方 rel，`_blank` 继续由现有 helper 补齐 `noopener noreferrer`；Breadcrumb 可见项与折叠项同步修复同一遗漏。Vue 注册、动态更新和注销统一使用规范化 href，首尾带空白的锚点也能被父级观察。

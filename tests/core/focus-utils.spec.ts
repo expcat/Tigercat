@@ -2,7 +2,7 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, expect, it, beforeEach, afterEach } from 'vitest'
+import { describe, expect, it, afterEach } from 'vitest'
 import {
   captureActiveElement,
   focusElement,
@@ -252,22 +252,23 @@ describe('focus-utils', () => {
   })
 
   describe('getMenuItems', () => {
-    it('returns only non-disabled menuitems', () => {
+    it('returns enabled menuitem, checkbox, and radio items in DOM order', () => {
       const container = document.createElement('div')
       const item1 = document.createElement('button')
       item1.setAttribute('role', 'menuitem')
       const item2 = document.createElement('button')
-      item2.setAttribute('role', 'menuitem')
+      item2.setAttribute('role', 'menuitemradio')
       item2.setAttribute('disabled', '')
       const item3 = document.createElement('button')
-      item3.setAttribute('role', 'menuitem')
-      container.append(item1, item2, item3)
+      item3.setAttribute('role', 'menuitemcheckbox')
+      const item4 = document.createElement('button')
+      item4.setAttribute('role', 'menuitemradio')
+      container.append(item1, item2, item3, item4)
       document.body.appendChild(container)
       cleanup.push(container)
 
       const items = getMenuItems(container)
-      expect(items).toHaveLength(2)
-      expect(items).toEqual([item1, item3])
+      expect(items).toEqual([item1, item3, item4])
     })
 
     it('skips menuitems with aria-disabled even when the value is empty', () => {

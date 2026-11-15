@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/vue'
+import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
 import { defineComponent, h, nextTick, ref } from 'vue'
 import {
   ContextMenu,
@@ -165,6 +165,38 @@ describe('ContextMenu', () => {
   })
 
   describe('keyboard', () => {
+    it('focuses the first available item when open changes externally', async () => {
+      const { rerender } = renderMenu({ open: false })
+      const trigger = document.querySelector<HTMLElement>('[data-tiger-context-menu-trigger]')!
+      trigger.focus()
+      expect(trigger).toHaveFocus()
+
+      await rerender({ open: true })
+      await waitFor(() => expect(screen.getByRole('menuitem', { name: 'Copy' })).toHaveFocus())
+    })
+
+    it('moves through checkbox and radio items with ArrowDown', async () => {
+      render(ContextMenu, {
+        props: {
+          defaultOpen: true,
+          items: [
+            { key: 'alpha', label: 'Alpha' },
+            { key: 'check', label: 'Check', type: 'checkbox' },
+            { key: 'radio', label: 'Radio', type: 'radio' },
+            { key: 'zulu', label: 'Zulu' }
+          ]
+        }
+      })
+
+      const alpha = screen.getByRole('menuitem', { name: 'Alpha' })
+      alpha.focus()
+      await fireEvent.keyDown(alpha, { key: 'ArrowDown' })
+      const check = screen.getByRole('menuitemcheckbox', { name: 'Check' })
+      expect(check).toHaveFocus()
+      await fireEvent.keyDown(check, { key: 'ArrowDown' })
+      expect(screen.getByRole('menuitemradio', { name: 'Radio' })).toHaveFocus()
+    })
+
     it('opens on Shift+F10 and moves focus with arrows', async () => {
       renderMenu()
       const trigger = screen.getByText('Surface').closest('[data-tiger-context-menu-trigger]')!
@@ -172,7 +204,7 @@ describe('ContextMenu', () => {
       const wrapper = document.querySelector('[data-tiger-context-menu]')
       expect(wrapper).toBeTruthy()
 
-      screen.getByRole('menuitem', { name: 'Copy' }).focus()
+      await waitFor(() => expect(screen.getByRole('menuitem', { name: 'Copy' })).toHaveFocus())
       await fireEvent.keyDown(wrapper!, { key: 'ArrowDown' })
       expect(document.activeElement).toHaveTextContent('Delete')
     })

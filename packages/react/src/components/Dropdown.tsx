@@ -407,6 +407,7 @@ export const Dropdown = forwardRef<HTMLElement, DropdownProps>(function Dropdown
     visible && (menuElement || (items && items.length > 0)) ? (
       <div
         ref={floatingRef}
+        id={items && items.length > 0 && !menuElement ? menuId : undefined}
         className={classNames(overlay.floatingClasses, DROPDOWN_ENTER_CLASS)}
         style={overlay.floatingStyles}
         data-positioned={overlay.positioned}
@@ -420,7 +421,7 @@ export const Dropdown = forwardRef<HTMLElement, DropdownProps>(function Dropdown
             items={items}
             onCheck={onCheck}
             onSelect={onItemSelect}
-            onClose={() => setVisible(false)}
+            onClose={closeOnClick ? handleItemClick : undefined}
           />
         ) : null}
         {menuElement && React.isValidElement(menuElement)

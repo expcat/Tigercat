@@ -434,35 +434,31 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
     (newVisible: boolean) => {
       if (disabled && newVisible) return
 
-      if (newVisible && !visible) {
-        previousActiveElementRef.current = captureActiveElement()
-      }
-
       if (controlledOpen === undefined) {
         setInternalVisible(newVisible)
       }
 
       onOpenChange?.(newVisible)
 
-      if (newVisible) {
-        requestAnimationFrame(() => {
-          if (floatingRef.current) {
-            focusFirstMenuItem(floatingRef.current)
-          }
-        })
-      } else {
+      if (!newVisible) {
         explicitPointRef.current = false
         restoreFocus(previousActiveElementRef.current)
         previousActiveElementRef.current = null
       }
     },
-    [disabled, visible, controlledOpen, onOpenChange]
+    [disabled, controlledOpen, onOpenChange]
   )
 
   useLayoutEffect(() => {
-    if (!visible || explicitPointRef.current) return
-    if (!triggerRef.current) return
-    setPoint(getContextMenuOpenPoint(null, triggerRef.current))
+    if (!visible) return
+    previousActiveElementRef.current = captureActiveElement()
+    if (!explicitPointRef.current && triggerRef.current) {
+      setPoint(getContextMenuOpenPoint(null, triggerRef.current))
+    }
+    const frame = requestAnimationFrame(() => {
+      if (floatingRef.current) focusFirstMenuItem(floatingRef.current)
+    })
+    return () => cancelAnimationFrame(frame)
   }, [visible])
 
   const handleItemClick = useCallback(() => {
@@ -565,6 +561,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
     visible && (menuElement || (items && items.length > 0)) ? (
       <div
         ref={floatingRef}
+        id={items && items.length > 0 && !menuElement ? menuId : undefined}
         className={menuWrapperClasses}
         style={overlay.floatingStyles}
         data-positioned={overlay.positioned}
@@ -577,7 +574,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
             items={items}
             onCheck={onCheck}
             onSelect={onItemSelect}
-            onClose={() => setVisible(false)}
+            onClose={handleItemClick}
           />
         ) : null}
         {React.isValidElement(menuElement)
