@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useRef, useState } from 'react'
+import React, { forwardRef, useEffect, useId, useRef, useState } from 'react'
 import {
   SHAKE_CLASS,
   TIGER_CHROME_ATTR,
@@ -14,6 +14,7 @@ import {
   getTagsInputInnerInputClasses,
   getTagsInputLabels,
   mergeAriaDescribedBy,
+  moveTag,
   moveTagsHighlight,
   removeTagAt,
   resolveTagsPaste,
@@ -86,6 +87,9 @@ export const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(function T
   const effectiveDisabled = Boolean(disabled) || Boolean(formItemControl?.disabled)
   const isReadOnly = readOnly
   const effectiveId = id ?? formItemControl?.id
+  const uid = useId()
+  const fieldId = effectiveId ?? `tags-${uid}`
+  const listId = `${fieldId}-list`
   const effectiveName = name ?? formItemControl?.name
   const formBoundValue = formItemControl?.value
   const emptyTags = useRef<string[]>([]).current
@@ -272,7 +276,7 @@ export const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(function T
   const describedBy = mergeAriaDescribedBy(
     mergeAriaDescribedBy(
       typeof rest['aria-describedby'] === 'string' ? rest['aria-describedby'] : undefined,
-      rejection ? `${effectiveId ?? 'tags'}-rejection` : undefined
+      rejection ? `${fieldId}-rejection` : undefined
     ),
     formItemControl?.describedBy
   )
@@ -293,12 +297,23 @@ export const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(function T
       onClick={handleContainerClick}
       onAnimationEnd={() => containerRef.current?.classList.remove(SHAKE_CLASS)}
       {...{ [TIGER_CHROME_ATTR]: '' }}>
-      <span role="list" className="contents">
+      <span id={listId} role="list" className="contents">
         {tags.map((tag, index) => (
           <span
             key={`${tag}-${index}`}
-            id={`${effectiveId ?? 'tags'}-tag-${index}`}
-            role="listitem">
+            id={`${fieldId}-tag-${index}`}
+            role="listitem"
+            draggable={isInteractive}
+            onDragStart={(event) => {
+              event.dataTransfer?.setData('text/plain', String(index))
+            }}
+            onDragOver={(event) => event.preventDefault()}
+            onDrop={(event) => {
+              event.preventDefault()
+              const from = Number(event.dataTransfer?.getData('text/plain'))
+              if (!Number.isInteger(from)) return
+              setTags(moveTag(tags, from, index))
+            }}>
             <Tag
               size={effectiveSize === 'lg' ? 'md' : 'sm'}
               closable={isInteractive}
@@ -324,8 +339,9 @@ export const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(function T
         aria-invalid={status === 'error' ? true : undefined}
         aria-required={formItemControl?.required ? true : undefined}
         aria-describedby={describedBy}
+        aria-owns={tags.length > 0 ? listId : undefined}
         aria-activedescendant={
-          highlightedIndex !== null ? `${effectiveId ?? 'tags'}-tag-${highlightedIndex}` : undefined
+          highlightedIndex !== null ? `${fieldId}-tag-${highlightedIndex}` : undefined
         }
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}
@@ -353,7 +369,7 @@ export const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(function T
         )
       ) : null}
       {rejection ? (
-        <span id={`${effectiveId ?? 'tags'}-rejection`} className="sr-only" aria-live="polite">
+        <span id={`${fieldId}-rejection`} className="sr-only" aria-live="polite">
           {rejection}
         </span>
       ) : null}

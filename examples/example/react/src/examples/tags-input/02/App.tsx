@@ -7,6 +7,7 @@ export default function App() {
   return (
     <div className="w-full max-w-md space-y-2">
       <TagsInput
+        aria-label="受控标签"
         value={tags}
         onChange={setTags}
         delimiters={[',', ';']}

@@ -13,7 +13,7 @@ description: Compact generated Tigercat Form props reference
 
 `packages/core/src/types/tags-input.ts` · `TagsInputProps` · 4/17 compact props · [Complete props](#remaining-props-complete-public-api)
 
-Note: 只读用 `readOnly`。粘贴在光标处插入后再按分隔符切开。错误只走 FormItem。拒绝重复或超限时给一句实时说明。
+Note: 只读用 `readOnly`。Vue 与 React 均可拖拽标签排序，拖放后通过值更新事件提交新数组；禁用或只读时不能拖拽。粘贴在光标处插入后再按分隔符切开。错误只走 FormItem。拒绝重复或超限时给一句实时说明。
 
 | Prop               | Type       | Default | Notes                                                                                      |
 | ------------------ | ---------- | ------- | ------------------------------------------------------------------------------------------ |

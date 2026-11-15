@@ -288,6 +288,7 @@ export const TagsInput = defineComponent({
         formItemControl?.describedBy.value
       )
       const fieldId = effectiveId.value ?? `tags-${uid}`
+      const listId = `${fieldId}-list`
       const activeDescendant =
         highlightedIndex.value !== null ? `${fieldId}-tag-${highlightedIndex.value}` : undefined
 
@@ -296,7 +297,7 @@ export const TagsInput = defineComponent({
         children.push(
           h(
             'span',
-            { key: 'tag-list', role: 'list', class: 'contents' },
+            { key: 'tag-list', id: listId, role: 'list', class: 'contents' },
             tags.value.map((tag, index) =>
               h(
                 'span',
@@ -359,6 +360,7 @@ export const TagsInput = defineComponent({
           'aria-invalid': status.value === 'error' ? true : undefined,
           'aria-required': formItemControl?.required.value ? true : undefined,
           'aria-describedby': describedBy,
+          'aria-owns': tags.value.length > 0 ? listId : undefined,
           'aria-activedescendant': activeDescendant,
           onInput: handleInput,
           onKeydown: handleKeydown,

@@ -3,9 +3,10 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render } from '@testing-library/react'
+import { render, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
+import { renderToString } from 'react-dom/server'
 import { TagsInput } from '@expcat/tigercat-react/TagsInput'
 import { Form } from '@expcat/tigercat-react/Form'
 import { FormItem } from '@expcat/tigercat-react/FormItem'
@@ -26,6 +27,35 @@ describe('TagsInput', () => {
       expect(getByPlaceholderText('Add tag')).toBeInTheDocument()
       rerender(<TagsInput placeholder="Add tag" value={['x']} />)
       expect(queryByPlaceholderText('Add tag')).not.toBeInTheDocument()
+    })
+
+    it('keeps ids unique for two unnamed instances in SSR and after rejections', async () => {
+      const instances = (
+        <>
+          <TagsInput defaultValue={['a']} aria-label="First tags" />
+          <TagsInput defaultValue={['b']} aria-label="Second tags" />
+        </>
+      )
+      const ssr = document.createElement('div')
+      ssr.innerHTML = renderToString(instances)
+      const ssrIds = [...ssr.querySelectorAll('[id]')].map((node) => node.id)
+      expect(ssrIds.length).toBeGreaterThanOrEqual(2)
+      expect(new Set(ssrIds).size).toBe(ssrIds.length)
+
+      const user = userEvent.setup()
+      const { container, getAllByRole } = render(instances)
+      const inputs = getAllByRole('textbox')
+      for (const [index, tag] of ['a', 'b'].entries()) {
+        await user.click(inputs[index])
+        await user.keyboard(`${tag}{Enter}`)
+        const rejectionId = inputs[index].getAttribute('aria-describedby')
+        expect(rejectionId).toBeTruthy()
+        expect(document.getElementById(rejectionId!)).toBe(
+          inputs[index].parentElement?.querySelector('[aria-live="polite"]')
+        )
+      }
+      const ids = [...container.querySelectorAll('[id]')].map((node) => node.id)
+      expect(new Set(ids).size).toBe(ids.length)
     })
   })
 
@@ -124,7 +154,41 @@ describe('TagsInput', () => {
     })
   })
 
+  describe('Sorting tags', () => {
+    it('commits the reordered array when a tag is dropped on another tag', () => {
+      const onChange = vi.fn()
+      const { getAllByRole } = render(
+        <TagsInput defaultValue={['a', 'b', 'c']} onChange={onChange} />
+      )
+      const items = getAllByRole('listitem')
+      items.forEach((item) => expect(item).toHaveAttribute('draggable', 'true'))
+      const dataTransfer = new DataTransfer()
+      fireEvent.dragStart(items[0], { dataTransfer })
+      expect(dataTransfer.getData('text/plain')).toBe('0')
+      fireEvent.dragOver(items[2], { dataTransfer })
+      fireEvent.drop(items[2], { dataTransfer })
+      expect(onChange).toHaveBeenCalledExactlyOnceWith(['b', 'c', 'a'])
+      expect(getAllByRole('listitem').map((item) => item.textContent)).toEqual(['b', 'c', 'a'])
+    })
+  })
+
   describe('Accessibility', () => {
+    it('owns the list containing the active tag after Backspace', async () => {
+      const user = userEvent.setup()
+      const { getByRole, getAllByRole } = render(
+        <TagsInput defaultValue={['a', 'b']} aria-label="Tags" />
+      )
+      const input = getByRole('textbox', { name: 'Tags' })
+      await user.click(input)
+      await user.keyboard('{Backspace}')
+      const activeTag = document.getElementById(input.getAttribute('aria-activedescendant')!)
+      expect(activeTag).toBe(getAllByRole('listitem')[1])
+      const list = getByRole('list')
+      expect(list.id).not.toBe('')
+      expect(input).toHaveAttribute('aria-owns', list.id)
+      expect(list).toContainElement(activeTag)
+    })
+
     it.each(['{Enter}', ' '])(
       'clears once with %s after Tab and returns focus to the input',
       async (key) => {
@@ -168,9 +232,10 @@ describe('TagsInput', () => {
     })
 
     it('has no a11y violations', async () => {
-      const { container } = render(
+      const { container, getByRole } = render(
         <TagsInput defaultValue={['a']} placeholder="Add" aria-label="Tags" />
       )
+      fireEvent.keyDown(getByRole('textbox'), { key: 'Backspace' })
       await expectNoA11yViolationsIsolated(container)
     })
 

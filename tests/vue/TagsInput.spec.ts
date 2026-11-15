@@ -85,6 +85,21 @@ describe('TagsInput', () => {
   })
 
   describe('Accessibility', () => {
+    it('owns the list containing the active tag after Backspace', async () => {
+      const { getByRole, getAllByRole } = render(TagsInput, {
+        props: { defaultValue: ['a', 'b'] },
+        attrs: { 'aria-label': 'Tags' }
+      })
+      const input = getByRole('textbox', { name: 'Tags' })
+      await fireEvent.keyDown(input, { key: 'Backspace' })
+      const activeTag = document.getElementById(input.getAttribute('aria-activedescendant')!)
+      expect(activeTag).toBe(getAllByRole('listitem')[1])
+      const list = getByRole('list')
+      expect(list.id).not.toBe('')
+      expect(input).toHaveAttribute('aria-owns', list.id)
+      expect(list).toContainElement(activeTag)
+    })
+
     it.each(['{Enter}', ' '])(
       'clears once with %s after Tab and returns focus to the input',
       async (key) => {
@@ -114,10 +129,11 @@ describe('TagsInput', () => {
     )
 
     it('has no a11y violations', async () => {
-      const { container } = render(TagsInput, {
+      const { container, getByRole } = render(TagsInput, {
         props: { modelValue: ['a'], placeholder: 'Add' },
         attrs: { 'aria-label': 'Tags' }
       })
+      await fireEvent.keyDown(getByRole('textbox'), { key: 'Backspace' })
       await expectNoA11yViolationsIsolated(container)
     })
   })

@@ -9,6 +9,7 @@ const toLower = (tag: string) => tag.toLowerCase()
 <template>
   <div class="w-full max-w-md space-y-2">
     <TagsInput
+      aria-label="受控标签"
       v-model="tags"
       :delimiters="[',', ';']"
       :before-add="toLower"

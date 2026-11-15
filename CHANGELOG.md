@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **TagsInput 实例 ID、活动项关联与排序（Vue / React / Demo，C076-F01、C076-F02、C076-F04、C076-F05）**：React 无显式 id 时使用稳定实例前缀，标签、活跃项和拒绝提示不再跨实例重号；双端输入通过 `aria-owns` 拥有标签列表，Backspace 高亮保持有效关联。React 复用 Core `moveTag` 提交拖拽后的新数组，与 Vue 对齐，并同步排序文档；双端 Demo 02 与 03 前两个输入补上持久可访问名称。
+
 - **Switch 取消点击后恢复切换（Vue，C075-F01）**：每次点击按当前事件重置取消标记，首次 `onClick` 取消后，第二次正常点击会发出 `true` 并同步原生 checked 与 `aria-checked`；连续取消仍保持原值，不再吞掉后续正常切换。
 
 - **Slider 提示格式、范围标签与 mark 提交（Vue / React，C074-F01、C074-F02、C074-F03）**：React 可见气泡与 `aria-valuetext` 共用 `formatTooltip` 结果；Vue 无显式 id 的 Slider 为每个实例生成稳定 ID，范围 thumb 与后缀标签引用保持唯一且有效。双端自定义 mark 在提交前复用现有步进与边界归一化，`min=0 max=100 step=10 marks={105:'outside'}` 点击后只提交 100。
