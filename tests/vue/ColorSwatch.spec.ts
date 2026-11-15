@@ -157,6 +157,45 @@ describe('ColorSwatch', () => {
       expect(bad.style.backgroundColor).not.toBe('not-a-color')
     })
 
+    it('does not submit an unparseable option', async () => {
+      const onUpdate = vi.fn()
+      const { container } = render(ColorSwatch, {
+        props: {
+          colors: ['not-a-color', '#ffffff'],
+          defaultValue: '#ffffff',
+          name: 'theme',
+          'onUpdate:modelValue': onUpdate
+        }
+      })
+
+      await fireEvent.click(screen.getByRole('radio', { name: 'not-a-color' }))
+
+      expect(onUpdate).not.toHaveBeenCalled()
+      expect(container.querySelector('input[name="theme"]')).toHaveValue('#ffffff')
+      expect(screen.getByRole('radio', { name: 'not-a-color' })).toBeDisabled()
+    })
+
+    it('paints a selected hashless hex color', () => {
+      renderWithProps(ColorSwatch, { modelValue: 'fff', colors: ['fff'] })
+
+      const white = screen.getByRole('radio', { name: 'fff' }) as HTMLElement
+      expect(white).toHaveAttribute('aria-checked', 'true')
+      expect(white.style.backgroundColor).toBe('#fff')
+    })
+
+    it.each([1.5, 0])(
+      'uses the same valid columns for layout and navigation with %s',
+      async (columns) => {
+        renderWithProps(ColorSwatch, { columns, colors: ['#111111', '#222222', '#333333'] })
+        const first = screen.getByRole('radio', { name: '#111111' }) as HTMLElement
+
+        expect(first.parentElement?.style.gridTemplateColumns).toBe('repeat(1, minmax(0, 1fr))')
+        first.focus()
+        await fireEvent.keyDown(first, { key: 'ArrowDown' })
+        expect(screen.getByRole('radio', { name: '#222222' })).toHaveFocus()
+      }
+    )
+
     it('ignores keyboard selection when disabled', async () => {
       const onUpdate = vi.fn()
       render(ColorSwatch, {

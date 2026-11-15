@@ -41,6 +41,7 @@ export interface ColorSwatchProps {
   groups?: ColorSwatchGroup[]
   /**
    * Visual columns of the **current group** grid. ArrowUp/Down stay in that grid.
+   * Fractions are truncated, values below 1 use 1, and non-finite values use 6.
    * @default 6
    */
   columns?: number

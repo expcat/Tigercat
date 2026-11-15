@@ -6,7 +6,7 @@ import type {
   ColorSwatchOptionInput
 } from '../types/color-swatch'
 import type { ComponentSize } from '../types/base'
-import { parseColorParts } from './color-picker-utils'
+import { isValidHex, parseColorParts } from './color-picker-utils'
 
 export const COLOR_SWATCH_CHECK_PATH = 'M5 10.5 8 13.5 15 6.5'
 
@@ -119,6 +119,10 @@ export function normalizeColorSwatchValue(value: string): string {
   return value.trim().toLowerCase()
 }
 
+export function normalizeColorSwatchColumns(columns: number): number {
+  return Number.isFinite(columns) ? Math.max(1, Math.trunc(columns)) : 6
+}
+
 function sameSwatchAlpha(left: number, right: number): boolean {
   return Math.abs(left - right) < 0.002
 }
@@ -139,7 +143,8 @@ export function isColorSwatchSelected(value: string, selectedValue?: string): bo
 
 /** Paint only a parsed color. Unparseable strings use a neutral token, not the raw text. */
 export function getColorSwatchPaint(color: string): string {
-  return parseColorParts(color) ? color : 'var(--tiger-surface-muted)'
+  if (!parseColorParts(color)) return 'var(--tiger-surface-muted)'
+  return isValidHex(color) ? `#${color.trim().replace(/^#/, '')}` : color
 }
 
 export function getColorSwatchOptionKey(option: ColorSwatchNormalizedOption): string {
@@ -180,9 +185,12 @@ function normalizeColorSwatchOption(
   groupIndex: number,
   index: number
 ): ColorSwatchNormalizedOption {
-  return typeof color === 'string'
-    ? { value: color, label: color, groupIndex, index }
-    : { ...color, label: color.label ?? color.value, groupIndex, index }
+  const option: ColorSwatchNormalizedOption =
+    typeof color === 'string'
+      ? { value: color, label: color, groupIndex, index }
+      : { ...color, label: color.label ?? color.value, groupIndex, index }
+  if (!parseColorParts(option.value)) option.disabled = true
+  return option
 }
 
 function findEnabledColorSwatchIndex(
@@ -226,7 +234,7 @@ function stepGroupGrid(
 ): number {
   const current = options[currentIndex]
   if (!current) return currentIndex
-  const cols = Math.max(1, columns)
+  const cols = normalizeColorSwatchColumns(columns)
   const group = groups[current.groupIndex]
   if (!group) return currentIndex
 

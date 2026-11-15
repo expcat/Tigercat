@@ -3614,6 +3614,7 @@
       "normalizeAutoplayInterval",
       "normalizeCascaderValue",
       "normalizeChartPadding",
+      "normalizeColorSwatchColumns",
       "normalizeColorSwatchGroups",
       "normalizeColorSwatchValue",
       "normalizeCronExpression",

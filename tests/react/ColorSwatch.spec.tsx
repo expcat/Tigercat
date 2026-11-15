@@ -168,6 +168,45 @@ describe('ColorSwatch', () => {
       expect(bad.style.backgroundColor).toContain('tiger-surface-muted')
     })
 
+    it('does not submit an unparseable option', () => {
+      const onChange = vi.fn()
+      const { container } = render(
+        <ColorSwatch
+          colors={['not-a-color', '#ffffff']}
+          defaultValue="#ffffff"
+          name="theme"
+          onChange={onChange}
+        />
+      )
+
+      fireEvent.click(screen.getByRole('radio', { name: 'not-a-color' }))
+
+      expect(onChange).not.toHaveBeenCalled()
+      expect(container.querySelector('input[name="theme"]')).toHaveValue('#ffffff')
+      expect(screen.getByRole('radio', { name: 'not-a-color' })).toBeDisabled()
+    })
+
+    it('paints a selected hashless hex color', () => {
+      render(<ColorSwatch value="fff" colors={['fff']} />)
+
+      const white = screen.getByRole('radio', { name: 'fff' })
+      expect(white).toHaveAttribute('aria-checked', 'true')
+      expect(white.style.backgroundColor).toBe('#fff')
+    })
+
+    it.each([1.5, 0])(
+      'uses the same valid columns for layout and navigation with %s',
+      (columns) => {
+        render(<ColorSwatch columns={columns} colors={['#111111', '#222222', '#333333']} />)
+        const first = screen.getByRole('radio', { name: '#111111' })
+
+        expect(first.parentElement?.style.gridTemplateColumns).toBe('repeat(1, minmax(0, 1fr))')
+        act(() => first.focus())
+        fireEvent.keyDown(first, { key: 'ArrowDown' })
+        expect(screen.getByRole('radio', { name: '#222222' })).toHaveFocus()
+      }
+    )
+
     it('ignores keyboard selection when disabled', () => {
       const onChange = vi.fn()
       render(<ColorSwatch disabled colors={['#111111', '#222222']} onChange={onChange} />)

@@ -15,7 +15,7 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 
 Runnable modules: `examples/example/vue3/src/examples/color-swatch/01/`, `examples/example/vue3/src/examples/color-swatch/02/`, `examples/example/vue3/src/examples/color-swatch/03/`, `examples/example/react/src/examples/color-swatch/01/`, `examples/example/react/src/examples/color-swatch/02/`, `examples/example/react/src/examples/color-swatch/03/`.
 
-Note: 选中比较走和取色器同一套解析。`#fff` 与 `#ffffff`、hex 与 `rgb()` 可以是同一支。解析不了的字符串不涂成颜色。只读用 `readOnly`。
+Note: 选中比较走和取色器同一套解析。`#fff` 与 `#ffffff`、hex 与 `rgb()` 可以是同一支，无 `#` 的 hex 也能涂色。解析不了的选项禁用，不提交。`columns` 小数截整，低于 1 用 1，非有限值用 6；布局与导航共用该列数。只读用 `readOnly`。
 
 Vue: `<ColorSwatch v-model="value" :colors="colors" />`
 

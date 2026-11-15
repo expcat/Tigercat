@@ -30,6 +30,18 @@ describe('color-swatch-utils', () => {
     })
   })
 
+  it('disables unparseable string and object options', () => {
+    const groups = normalizeColorSwatchGroups(undefined, [
+      'not-a-color',
+      { value: 'invalid', disabled: false },
+      '#ffffff'
+    ])
+
+    expect(groups[0].colors[0].disabled).toBe(true)
+    expect(groups[0].colors[1].disabled).toBe(true)
+    expect(groups[0].colors[2].disabled).toBeFalsy()
+  })
+
   it('flattens groups and builds stable keys', () => {
     const options = flattenColorSwatchGroups(
       normalizeColorSwatchGroups([{ colors: ['#111111'] }, { colors: ['#222222'] }])
@@ -48,6 +60,11 @@ describe('color-swatch-utils', () => {
     expect(isColorSwatchSelected('#ABCDEF', undefined)).toBe(false)
     expect(getColorSwatchPaint('nope')).toBe('var(--tiger-surface-muted)')
     expect(getColorSwatchPaint('#fff')).toBe('#fff')
+  })
+
+  it('paints hashless hex colors accepted by selection', () => {
+    expect(isColorSwatchSelected('fff', '#ffffff')).toBe(true)
+    expect(getColorSwatchPaint('fff')).toBe('#fff')
   })
 
   it('moves to the next enabled option and wraps', () => {
@@ -94,6 +111,25 @@ describe('color-swatch-utils', () => {
     ])
 
     expect(getNextColorSwatchIndex(groups, 0, 'ArrowDown', 2)).toBe(4)
+  })
+
+  it.each([
+    [1.5, 1],
+    [0, 1],
+    [NaN, 6],
+    [Infinity, 6]
+  ])('uses valid integer columns for vertical navigation with %s', (columns, nextIndex) => {
+    const groups = normalizeColorSwatchGroups(undefined, [
+      '#111111',
+      '#222222',
+      '#333333',
+      '#444444',
+      '#555555',
+      '#666666',
+      '#777777'
+    ])
+
+    expect(getNextColorSwatchIndex(groups, 0, 'ArrowDown', columns)).toBe(nextIndex)
   })
 
   it('uses a dark check on light swatches and a light check on dark swatches', () => {

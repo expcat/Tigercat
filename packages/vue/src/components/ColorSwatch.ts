@@ -41,6 +41,7 @@ import {
   markFormItemGroupControl,
   mergeAriaDescribedBy,
   mergeTigerLocale,
+  normalizeColorSwatchColumns,
   normalizeColorSwatchGroups
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './tiger-config'
@@ -105,6 +106,7 @@ export const ColorSwatch = markFormItemGroupControl(
         normalizeColorSwatchGroups(props.groups, props.colors, fallbackGroups.value)
       )
       const options = computed(() => flattenColorSwatchGroups(normalizedGroups.value))
+      const effectiveColumns = computed(() => normalizeColorSwatchColumns(props.columns))
       const selectedValue = computed(() => {
         if (props.modelValue !== undefined) return props.modelValue
         if (formItemControl?.value.value !== undefined) {
@@ -150,7 +152,7 @@ export const ColorSwatch = markFormItemGroupControl(
           normalizedGroups.value,
           optionIndex,
           event.key,
-          props.columns,
+          effectiveColumns.value,
           dir
         )
         if (nextIndex < 0 || nextIndex === optionIndex) return
@@ -255,7 +257,9 @@ export const ColorSwatch = markFormItemGroupControl(
                     'div',
                     {
                       class: colorSwatchGridClasses,
-                      style: { gridTemplateColumns: `repeat(${props.columns}, minmax(0, 1fr))` }
+                      style: {
+                        gridTemplateColumns: `repeat(${effectiveColumns.value}, minmax(0, 1fr))`
+                      }
                     },
                     group.colors.map((option) => {
                       const optionIndex = flatIndex
