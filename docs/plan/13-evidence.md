@@ -143,7 +143,7 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | C076 | TagsInput       | needs-evidence | 视觉、真实键盘各 0/24 blocked，截图 0；F01/F02/F04/F05 已修复，ID/拥有关系/React 拖放回归通过，双端 30 pass（含 axe）；SSR draggable 均 2，Demo 名称、类型/文档/示例检查通过；浏览器、读屏、拖放与 hydration 待补  |
 | C077 | Textarea        | needs-evidence | 视觉/真实键盘各 0/24 blocked，截图 0；F01–F04 已修复，SSR 123、动态焦点回归通过；Textarea/SSR 52 pass（含 axe），Input/InputGroup 同验；Demo 14/12、六个名称与类型/示例检查通过；浏览器、读屏与 hydration 待补     |
 | C078 | TimePicker      | needs-evidence | 视觉 0/16 blocked；键盘 0/16 blocked；截图 0（IAB browsers 为空）；定向测试 4 文件 56 通过；SSR、happy-dom 探针与 docs/exports/example-sources 检查退出 0；未跑 E2E、hydration、真实读屏                           |
-| C079 | Transfer        | needs-evidence | 视觉 0/16 blocked；键盘 0/16 blocked；截图 0（browsers=[]，未建视觉子代理）；定向测试 37 加 custom-text 6 通过；SSR、happy-dom 与限定 axe 探针已跑；未跑构建、E2E、完整 a11y 专项、真实读屏                        |
+| C079 | Transfer        | needs-evidence | 视觉、真实键盘各 0/16 blocked，截图 0；F01–F03 已修复（F02 方向 A，接通 ARIA 模板）；双端 35 项、Core/文案 16 项通过（含 axe/SSR）；类型、API 文档与示例来源检查通过；浏览器、读屏与 hydration 待补                |
 | C080 | TreeSelect      | needs-evidence | 视觉 0/24 blocked；键盘 0/24 blocked；页面 0/6、截图 0（browsers=[]，未建视觉子代理）；定向测试 3 文件 36 通过；SSR 与 happy-dom 探针已跑；picker-focus E2E 未执行；未跑 hydration、原生 IME、真实读屏             |
 | C081 | Upload          | needs-evidence | 视觉 0/32 blocked；键盘 0/32 blocked；截图 0（browsers=[]，未建视觉子代理）；定向测试 3 文件 129 通过；Core、happy-dom、限定 axe 与 SSR 诊断已跑；无 Upload 专属 SSR/E2E；未验 hydration、真实网络、分片合并、读屏 |
 
@@ -319,7 +319,7 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | C052 | AutoComplete          | 02 Demo 未显示原始 value 也未配 name，恢复时不能凭 label 声称读回底层值；受控父级拒绝选中时两端 hidden 保持原值（未登记缺陷）；恢复预留端口 Vue 8774 / React 8775                                                                                       |
 | C054 | Checkbox              | 未升级观察：固定 indeterminate=true 时 happy-dom click 后 input.indeterminate 变 false 而 aria-checked 仍 mixed，待真实浏览器判断；axe helper 关闭 label 等 5 条规则；恢复端口 8778/8779                                                                |
 | C056 | ColorPicker           | 契约澄清建议（未立项）：Core ColorPickerRef 为 focus/open/close，Vue expose 三方法，React forwardRef 实际返回 HTMLButtonElement；运行时模型未核验；恢复端口 8782/8783                                                                                   |
-| C079 | Transfer              | PLAN 完成条件为 false；待验证观察：Vue focus() 带 name 时先命中 hidden input、React ref 返回无 tabindex 的根 div，真实聚焦未验；虚拟列表估算行高与真实 CSS、跨窗口 Tab、窄屏布局未验；默认不设 TIGER_A11Y 时组件内 axe 被跳过                           |
+| C079 | Transfer              | 已编号的 F01–F03 已修复；待验证观察：Vue focus() 带 name 时先命中 hidden input、React ref 返回无 tabindex 的根 div，真实聚焦未验；虚拟列表估算行高与真实 CSS、跨窗口 Tab、窄屏布局未验；默认不设 TIGER_A11Y 时组件内 axe 被跳过                         |
 | C080 | TreeSelect            | PLAN 完成条件 false；SchemaForm 是遗漏的真实消费者；组件测试 axe 只扫 container，portal 树在外；待验证观察：popup tree 自身无 aria-label/aria-labelledby，未立项；懒加载在途时 React 树项 busy=true、Vue 无；勾选策略、加载失败、数据替换竞争未逐一执行 |
 | C081 | Upload                | PLAN 完成条件 false；Demo 04 双端 customRequest 不返回 abort handle、成功响应无 URL，记为示例能力限制未立项；未传 allowedPreviewOrigins 时放行其他 http(s)，该默认政策应写入文档；SchemaForm 与 form/01 是真实消费者                                    |
 | C082 | Affix                 | INVENTORY 关联为空不完整：Anchor 启用 affix 时用 Affix 包裹 nav 且只传 offsetTop。待验证观察：自定义滚动根移动后仅发 window scroll 未更新固定 top，原生 IntersectionObserver 是否补通知未验证，未登记为缺陷                                             |

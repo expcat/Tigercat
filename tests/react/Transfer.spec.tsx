@@ -6,11 +6,13 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
+import { renderToStaticMarkup } from 'react-dom/server'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { Transfer } from '@expcat/tigercat-react/Transfer'
 import { Form } from '@expcat/tigercat-react/Form'
 import { FormItem } from '@expcat/tigercat-react/FormItem'
 import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { axe, expectNoA11yViolations } from '../utils/react'
 
 const dataSource = [
@@ -27,6 +29,51 @@ describe('Transfer', () => {
       render(<Transfer dataSource={dataSource} />)
       expect(screen.getByRole('group', { name: 'Source' })).toBeInTheDocument()
       expect(screen.getByRole('group', { name: 'Target' })).toBeInTheDocument()
+    })
+
+    it('resolves SSR titles from labels before locales and after dedicated props', () => {
+      const labels = { sourceTitle: 'Labels source', targetTitle: 'Labels target' }
+      const html = renderToStaticMarkup(<Transfer dataSource={dataSource} labels={labels} />)
+      expect(html).toContain('Labels source (0/5)')
+      expect(html).toContain('Labels target (0/0)')
+
+      for (const titleProps of [
+        {},
+        { sourceTitle: 'Dedicated source', targetTitle: 'Dedicated target' }
+      ]) {
+        const localized = renderToStaticMarkup(
+          <ConfigProvider locale={zhTW}>
+            <Transfer dataSource={dataSource} locale={zhCN} labels={labels} {...titleProps} />
+          </ConfigProvider>
+        )
+        expect(localized).toContain(`${titleProps.sourceTitle ?? labels.sourceTitle} (0/5)`)
+        expect(localized).toContain(`${titleProps.targetTitle ?? labels.targetTitle} (0/0)`)
+      }
+
+      const partial = renderToStaticMarkup(
+        <ConfigProvider locale={zhTW}>
+          <Transfer
+            dataSource={dataSource}
+            locale={zhCN}
+            labels={{ sourceTitle: labels.sourceTitle }}
+          />
+        </ConfigProvider>
+      )
+      expect(partial).toContain('Labels source (0/5)')
+      expect(partial).toContain('目标列表 (0/0)')
+    })
+
+    it('counts equivalent selected keys once in SSR titles', () => {
+      for (const selectionProp of ['selectedKeys', 'defaultSelectedKeys'] as const) {
+        const html = renderToStaticMarkup(
+          <Transfer
+            dataSource={[{ key: 1, label: 'One' }]}
+            {...{ [selectionProp]: { source: [1, '1'], target: [] } }}
+          />
+        )
+        expect(html).toContain('Source (1/1)')
+        expect(html).not.toContain('Source (2/1)')
+      }
     })
 
     it('should apply custom className', () => {
@@ -124,6 +171,24 @@ describe('Transfer', () => {
   })
 
   describe('Accessibility', () => {
+    it('uses custom select-all and items ARIA templates on both panels', () => {
+      render(
+        <Transfer
+          dataSource={dataSource}
+          labels={{
+            selectAllAriaLabel: 'Select all custom {title}',
+            itemsAriaLabel: 'Custom items {title}'
+          }}
+        />
+      )
+      for (const title of ['Source', 'Target']) {
+        expect(
+          screen.getByRole('checkbox', { name: `Select all custom ${title}` })
+        ).toBeInTheDocument()
+        expect(screen.getByRole('group', { name: `Custom items ${title}` })).toBeInTheDocument()
+      }
+    })
+
     it('uses allowed ARIA in a required FormItem', async () => {
       const { container } = render(
         <Form>

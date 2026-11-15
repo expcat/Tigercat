@@ -68,10 +68,12 @@ import { useTigerConfig } from './tiger-config'
 function TransferItemList({
   items,
   size,
+  ariaLabel,
   renderItem
 }: {
   items: TransferItem[]
   size: ComponentSize
+  ariaLabel: string
   renderItem: (item: TransferItem) => React.ReactNode
 }) {
   const [scrollTop, setScrollTop] = useState(0)
@@ -88,6 +90,8 @@ function TransferItemList({
       ref={scrollerRef}
       className={transferPanelBodyClasses}
       style={getTransferPanelBodyStyle()}
+      role="group"
+      aria-label={ariaLabel}
       onScroll={(event) => setScrollTop(event.currentTarget.scrollTop)}>
       {needsWindow && range ? (
         <div style={{ height: range.totalHeight, position: 'relative' }}>
@@ -130,6 +134,7 @@ function TransferCheckbox({
   indeterminate,
   disabled,
   size,
+  ariaLabel,
   onChange,
   children
 }: {
@@ -137,6 +142,7 @@ function TransferCheckbox({
   indeterminate?: boolean
   disabled?: boolean
   size: 'sm' | 'md' | 'lg'
+  ariaLabel?: string
   onChange: () => void
   children?: React.ReactNode
 }): React.ReactElement {
@@ -153,6 +159,7 @@ function TransferCheckbox({
         className="sr-only peer"
         checked={checked}
         disabled={disabled}
+        aria-label={ariaLabel}
         aria-checked={indeterminate ? 'mixed' : checked}
         onChange={() => {
           if (!disabled) onChange()
@@ -223,8 +230,8 @@ const TransferInner = forwardRef<HTMLDivElement, TransferProps>(function Transfe
     () =>
       getTransferLabels(mergedLocale, {
         ...labelsOverride,
-        sourceTitle,
-        targetTitle
+        sourceTitle: sourceTitle ?? labelsOverride?.sourceTitle,
+        targetTitle: targetTitle ?? labelsOverride?.targetTitle
       }),
     [mergedLocale, labelsOverride, sourceTitle, targetTitle]
   )
@@ -374,9 +381,7 @@ const TransferInner = forwardRef<HTMLDivElement, TransferProps>(function Transfe
     query: string
   ) {
     const selectedKeys = selected[panel]
-    const selectedCount = selectedKeys.filter((key) =>
-      allItems.some((item) => transferKeyId(item.key) === transferKeyId(key))
-    ).length
+    const selectedCount = partitionTransferSelection(selectedKeys, allItems).visible.length
     const selectState = getTransferSelectAllState(visibleItems, selectedKeys)
     return (
       <div className={transferPanelClasses} role="group" aria-label={title}>
@@ -386,6 +391,7 @@ const TransferInner = forwardRef<HTMLDivElement, TransferProps>(function Transfe
             indeterminate={selectState.indeterminate}
             disabled={effectiveDisabled || selectState.enabledKeys.length === 0}
             size={size}
+            ariaLabel={labels.selectAllAriaLabel.replace('{title}', title)}
             onChange={() => selectAll(panel, visibleItems, !selectState.checked)}>
             <span className="font-medium text-[var(--tiger-text)]">
               {title} ({selectedCount}/{allItems.length})
@@ -414,6 +420,7 @@ const TransferInner = forwardRef<HTMLDivElement, TransferProps>(function Transfe
           <TransferItemList
             items={visibleItems}
             size={size}
+            ariaLabel={labels.itemsAriaLabel.replace('{title}', title)}
             renderItem={(item) => {
               const isSelected = hasTransferKey(selectedKeys, item.key)
               const itemDisabled = effectiveDisabled || Boolean(item.disabled)
@@ -438,7 +445,11 @@ const TransferInner = forwardRef<HTMLDivElement, TransferProps>(function Transfe
             }}
           />
         ) : (
-          <div className={transferPanelBodyClasses} style={getTransferPanelBodyStyle()}>
+          <div
+            className={transferPanelBodyClasses}
+            style={getTransferPanelBodyStyle()}
+            role="group"
+            aria-label={labels.itemsAriaLabel.replace('{title}', title)}>
             <div className={transferEmptyClasses}>
               {resolveLocaleText('No data', emptyText, mergedLocale?.common?.emptyText)}
             </div>

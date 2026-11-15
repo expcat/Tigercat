@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Transfer 标题、ARIA 文案与选中计数（Vue / React，C079-F01、C079-F02、C079-F03）**：双端保留 `labels` 中的标题，仅由有值的专用 prop 覆盖，并继续按实例 locale、ConfigProvider 和英语逐字段回退。F02 采用方向 A，保留公开模板，将 `selectAllAriaLabel` 接到全选 checkbox、`itemsAriaLabel` 接到列表 group，均以当前标题替换 `{title}`；标题计数复用 Core 字符串键分区去重，`[1, '1']` 只计一项。
+
 - **Textarea 数值初值、稳定节点与示例名称（Vue / React / Demo，C077-F01、C077-F02、C077-F03、C077-F04）**：Vue 初始化与后续更新复用同一 FormItem 文本解析，数值初值 123 在 SSR 首屏显示为 123。双端始终保留稳定 host，错误文案与计数出现或消失时保留 textarea 节点、值与焦点，错误描述继续合并；双端 Demo 03 初值改为 14/12，六个 Demo 均补上持久可访问名称。
 
 - **TagsInput 实例 ID、活动项关联与排序（Vue / React / Demo，C076-F01、C076-F02、C076-F04、C076-F05）**：React 无显式 id 时使用稳定实例前缀，标签、活跃项和拒绝提示不再跨实例重号；双端输入通过 `aria-owns` 拥有标签列表，Backspace 高亮保持有效关联。React 复用 Core `moveTag` 提交拖拽后的新数组，与 Vue 对齐，并同步排序文档；双端 Demo 02 与 03 前两个输入补上持久可访问名称。

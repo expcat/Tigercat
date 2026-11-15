@@ -77,6 +77,7 @@ function TransferCheckbox(options: {
   indeterminate?: boolean
   disabled?: boolean
   size: ComponentSize
+  ariaLabel?: string
   onChange: () => void
   children?: VNode
 }) {
@@ -87,6 +88,7 @@ function TransferCheckbox(options: {
       checked: options.checked,
       indeterminate: Boolean(options.indeterminate),
       disabled: options.disabled,
+      'aria-label': options.ariaLabel,
       'aria-checked': options.indeterminate ? 'mixed' : options.checked,
       onChange: (event: Event) => {
         if (options.disabled) return
@@ -174,8 +176,8 @@ export const Transfer = markFormItemGroupControl(
       const labels = computed(() =>
         getTransferLabels(mergedLocale.value, {
           ...props.labels,
-          sourceTitle: props.sourceTitle,
-          targetTitle: props.targetTitle
+          sourceTitle: props.sourceTitle ?? props.labels?.sourceTitle,
+          targetTitle: props.targetTitle ?? props.labels?.targetTitle
         })
       )
       const formBound = computed(
@@ -376,9 +378,7 @@ export const Transfer = markFormItemGroupControl(
         query: string
       ) {
         const selectedKeys = selected.value[panel]
-        const selectedCount = selectedKeys.filter((key) =>
-          allItems.some((item) => transferKeyId(item.key) === transferKeyId(key))
-        ).length
+        const selectedCount = partitionTransferSelection(selectedKeys, allItems).visible.length
         const selectState = getTransferSelectAllState(visibleItems, selectedKeys)
         return h('div', { class: transferPanelClasses, role: 'group', 'aria-label': title }, [
           h('div', { class: transferPanelHeaderClasses }, [
@@ -387,6 +387,7 @@ export const Transfer = markFormItemGroupControl(
               indeterminate: selectState.indeterminate,
               disabled: effectiveDisabled.value || selectState.enabledKeys.length === 0,
               size: props.size,
+              ariaLabel: labels.value.selectAllAriaLabel.replace('{title}', title),
               onChange: () => {
                 if (!canMutate.value) return
                 setSelected({
@@ -431,6 +432,8 @@ export const Transfer = markFormItemGroupControl(
             {
               class: transferPanelBodyClasses,
               style: getTransferPanelBodyStyle(),
+              role: 'group',
+              'aria-label': labels.value.itemsAriaLabel.replace('{title}', title),
               onScroll: (event: Event) => {
                 const top = (event.target as HTMLElement).scrollTop
                 if (panel === 'source') sourceScroll.value = top

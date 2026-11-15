@@ -4,9 +4,14 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
+import { createSSRApp, h } from 'vue'
+import { renderToString } from '@vue/server-renderer'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { Transfer } from '@expcat/tigercat-vue/Transfer'
 import { Form } from '@expcat/tigercat-vue/Form'
 import { FormItem } from '@expcat/tigercat-vue/FormItem'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { axe, expectNoA11yViolations } from '../utils'
 
 const dataSource = [
@@ -27,6 +32,52 @@ describe('Transfer', () => {
       expect(container.querySelector('[aria-label="Source"]')).toBeInTheDocument()
       expect(container.querySelector('[aria-label="Target"]')).toBeInTheDocument()
     })
+
+    it('resolves SSR titles from labels before locales and after dedicated props', async () => {
+      const labels = { sourceTitle: 'Labels source', targetTitle: 'Labels target' }
+      const html = await renderToString(createSSRApp(Transfer, { dataSource, labels }))
+      expect(html).toContain('Labels source (0/5)')
+      expect(html).toContain('Labels target (0/0)')
+
+      for (const titleProps of [
+        {},
+        { sourceTitle: 'Dedicated source', targetTitle: 'Dedicated target' }
+      ]) {
+        const localized = await renderToString(
+          createSSRApp(() =>
+            h(ConfigProvider, { locale: zhTW }, () =>
+              h(Transfer, { dataSource, locale: zhCN, labels, ...titleProps })
+            )
+          )
+        )
+        expect(localized).toContain(`${titleProps.sourceTitle ?? labels.sourceTitle} (0/5)`)
+        expect(localized).toContain(`${titleProps.targetTitle ?? labels.targetTitle} (0/0)`)
+      }
+
+      const partial = await renderToString(
+        createSSRApp(() =>
+          h(ConfigProvider, { locale: zhTW }, () =>
+            h(Transfer, { dataSource, locale: zhCN, labels: { sourceTitle: labels.sourceTitle } })
+          )
+        )
+      )
+      expect(partial).toContain('Labels source (0/5)')
+      expect(partial).toContain('目标列表 (0/0)')
+    })
+
+    it('counts equivalent selected keys once in SSR titles', async () => {
+      for (const selectionProp of ['selectedKeys', 'defaultSelectedKeys'] as const) {
+        const html = await renderToString(
+          createSSRApp(Transfer, {
+            dataSource: [{ key: 1, label: 'One' }],
+            [selectionProp]: { source: [1, '1'], target: [] }
+          })
+        )
+        expect(html).toContain('Source (1/1)')
+        expect(html).not.toContain('Source (2/1)')
+      }
+    })
+
     it('should render items in source panel', () => {
       const { getByText } = render(Transfer, {
         props: { dataSource }
@@ -182,6 +233,22 @@ describe('Transfer', () => {
   })
 
   describe('Accessibility', () => {
+    it('uses custom select-all and items ARIA templates on both panels', () => {
+      const { getByRole } = render(Transfer, {
+        props: {
+          dataSource,
+          labels: {
+            selectAllAriaLabel: 'Select all custom {title}',
+            itemsAriaLabel: 'Custom items {title}'
+          }
+        }
+      })
+      for (const title of ['Source', 'Target']) {
+        expect(getByRole('checkbox', { name: `Select all custom ${title}` })).toBeInTheDocument()
+        expect(getByRole('group', { name: `Custom items ${title}` })).toBeInTheDocument()
+      }
+    })
+
     it('uses allowed ARIA in a required FormItem', async () => {
       const { container, getByRole } = render({
         components: { Form, FormItem, Transfer },
