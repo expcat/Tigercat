@@ -25,6 +25,7 @@ import {
   getFixedVirtualRange,
   getTreeSelectVirtualItemHeight,
   getTreeSelectVisibleIndex,
+  isImeCompositionEvent,
   isSelectTypeaheadCharacter,
   isTreeNodeExpandable,
   isTreeSelectValueEmpty,
@@ -605,6 +606,7 @@ export function useTreeSelectController(props: TreeSelectProps) {
   const handleTriggerKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
     if (effectiveDisabled) return
     if (isReadOnly) return
+    if (isImeCompositionEvent(event.nativeEvent)) return
     const fromSearchInput = event.currentTarget.tagName === 'INPUT'
     if (!isOpen && isSelectTypeaheadCharacter(event.key, event)) {
       event.preventDefault()
@@ -689,6 +691,7 @@ export function useTreeSelectController(props: TreeSelectProps) {
   const comboboxAria = getPickerComboboxAria({
     expanded: isOpen,
     listboxId: treeId,
+    listMounted: visibleItems.length > 0,
     activeOptionId,
     haspopup: 'tree'
   })

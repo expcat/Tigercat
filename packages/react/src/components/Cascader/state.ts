@@ -34,6 +34,7 @@ import {
   initialCascaderColumnActiveIndices,
   isCascaderOptionExpandable,
   isCascaderValueEmpty,
+  isImeCompositionEvent,
   isSelectTypeaheadCharacter,
   mergeAriaDescribedBy,
   mergeTigerLocale,
@@ -93,7 +94,17 @@ export function useCascaderController(props: CascaderProps) {
     name,
     locale,
     id,
-    onBlur
+    onBlur,
+    'aria-label': ariaLabelProp,
+    'aria-labelledby': ariaLabelledBy,
+    'aria-describedby': ariaDescribedBy,
+    'aria-details': ariaDetails,
+    tabIndex,
+    placement: _placement,
+    offset: _offset,
+    dropdownClassName: _dropdownClassName,
+    getPopupContainer: _getPopupContainer,
+    ...rootProps
   } = props
 
   const inputGroup = useInputGroupContext()
@@ -121,17 +132,15 @@ export function useCascaderController(props: CascaderProps) {
   const effectiveId = id ?? formItemControl?.id
   const effectiveName = name ?? formItemControl?.name
   const describedBy = mergeAriaDescribedBy(
-    typeof props['aria-describedby'] === 'string' ? props['aria-describedby'] : undefined,
+    typeof ariaDescribedBy === 'string' ? ariaDescribedBy : undefined,
     formItemControl?.describedBy
   )
   const labelledby =
-    typeof props['aria-labelledby'] === 'string' && props['aria-labelledby'].trim()
-      ? props['aria-labelledby']
+    typeof ariaLabelledBy === 'string' && ariaLabelledBy.trim()
+      ? ariaLabelledBy
       : formItemControl?.labelId
   const ariaLabel =
-    typeof props['aria-label'] === 'string' && props['aria-label'].trim()
-      ? props['aria-label']
-      : undefined
+    typeof ariaLabelProp === 'string' && ariaLabelProp.trim() ? ariaLabelProp : undefined
   const required = Boolean(formItemControl?.required)
 
   const formNamed = Boolean(formItemControl?.name)
@@ -498,6 +507,7 @@ export function useCascaderController(props: CascaderProps) {
   const handleTriggerKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
     if (effectiveDisabled) return
     if (isReadOnly) return
+    if (isImeCompositionEvent(event.nativeEvent)) return
     const fromSearchInput = event.currentTarget.tagName === 'INPUT'
     if (!isOpen && isSelectTypeaheadCharacter(event.key, event)) {
       event.preventDefault()
@@ -625,6 +635,7 @@ export function useCascaderController(props: CascaderProps) {
   const comboboxAria = getPickerComboboxAria({
     expanded: isOpen,
     listboxId,
+    listMounted: isSearchMode ? searchResults.length > 0 : columns.length > 0,
     activeOptionId
   })
   const listboxAria = getPickerListboxAria({
@@ -673,6 +684,7 @@ export function useCascaderController(props: CascaderProps) {
     : undefined
 
   return {
+    rootProps,
     rootRef,
     triggerRef,
     searchInputRef,
@@ -714,6 +726,8 @@ export function useCascaderController(props: CascaderProps) {
     describedBy,
     labelledby,
     ariaLabel,
+    ariaDetails,
+    tabIndex,
     required,
     size,
     virtual,

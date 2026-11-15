@@ -62,6 +62,7 @@ import {
   initialCascaderColumnActiveIndices,
   isCascaderOptionExpandable,
   isCascaderValueEmpty,
+  isImeCompositionEvent,
   isSelectTypeaheadCharacter,
   mergeAriaDescribedBy,
   mergeTigerLocale,
@@ -516,6 +517,7 @@ export const Cascader = defineComponent({
 
     function handleKeyDown(event: KeyboardEvent, fromSearchInput = false) {
       if (effectiveDisabled.value || isReadOnly.value) return
+      if (isImeCompositionEvent(event)) return
       if (!isOpen.value && isSelectTypeaheadCharacter(event.key, event)) {
         event.preventDefault()
         openDropdown()
@@ -755,6 +757,7 @@ export const Cascader = defineComponent({
       const comboboxAria = getPickerComboboxAria({
         expanded: isOpen.value,
         listboxId: listboxId.value,
+        listMounted: isSearchMode.value ? searchResults.value.length > 0 : columns.value.length > 0,
         activeOptionId
       })
       const listboxAria = getPickerListboxAria({

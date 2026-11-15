@@ -60,6 +60,8 @@ export const Cascader = forwardRef<CascaderRef, CascaderProps>(function Cascader
     'aria-label': ctx.ariaLabel,
     'aria-labelledby': ctx.labelledby,
     'aria-describedby': ctx.describedBy,
+    'aria-details': ctx.ariaDetails,
+    tabIndex: ctx.effectiveDisabled ? -1 : (ctx.tabIndex ?? 0),
     'aria-invalid': ctx.status === 'error' ? true : undefined,
     'aria-required': ctx.required ? true : undefined,
     'aria-autocomplete': ctx.searchable ? ('list' as const) : ('none' as const)
@@ -89,7 +91,6 @@ export const Cascader = forwardRef<CascaderRef, CascaderProps>(function Cascader
       ref={(node) => {
         ctx.triggerRef.current = node
       }}
-      tabIndex={ctx.effectiveDisabled ? -1 : 0}
       aria-disabled={ctx.effectiveDisabled || undefined}
       aria-readonly={ctx.readOnly || undefined}
       className={ctx.triggerClasses}
@@ -126,10 +127,11 @@ export const Cascader = forwardRef<CascaderRef, CascaderProps>(function Cascader
 
   return (
     <div
+      data-testid="cascader"
+      {...ctx.rootProps}
       ref={rootRef}
       className={ctx.className}
       style={props.style}
-      data-testid="cascader"
       {...{ [ctx.chromeAttr]: '' }}
       onAnimationEnd={() => rootRef.current?.classList.remove(SHAKE_CLASS)}>
       <div className="relative">

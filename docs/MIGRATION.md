@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+双端 Cascader 与 TreeSelect 在空列表或搜索无结果时不再输出悬空的 `aria-controls`，组合输入期间的 Enter 不再提交选项或关闭面板。React Cascader 的 `title`、`data-*` 等原生属性传到根节点，`aria-details` 与 `tabIndex` 传到 combobox，切换为搜索输入框后仍然保留。调用方式不用改。
+
 双端 Cascader 的 `isLeaf: true` 现在优先于 children，点击或 Enter 会提交该项并关闭面板。Vue 初始打开时会显示已选路径的各列并活动到叶子，ArrowDown→ArrowRight→Enter 可直接提交首个子项。Cascader 收窄搜索、Mentions 缩减候选和 TreeSelect 过滤节点后，键盘活动项会回到有效结果，Enter 不再卡住或提交已隐藏节点。调用方式不用改。
 
 双端 AutoComplete 在只读时跳过失焦与关层的查询提交。`readOnly` 配 `defaultSearchValue='draft'` 聚焦再失焦后，查询保持 draft，hidden 保持空且不发值变更。Vue 传 `modelValue=''` 和 `defaultValue='apple'` 时，可见 input 与 hidden 均为空，`defaultValue` 仅在未受控时使用。调用方式不用改。

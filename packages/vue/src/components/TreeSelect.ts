@@ -48,6 +48,7 @@ import {
   getFixedVirtualRange,
   getTreeSelectVirtualItemHeight,
   getTreeSelectVisibleIndex,
+  isImeCompositionEvent,
   isSelectTypeaheadCharacter,
   isTreeNodeExpandable,
   isTreeSelectValueEmpty,
@@ -599,6 +600,7 @@ export const TreeSelect = defineComponent({
 
     function handleKeyDown(event: KeyboardEvent, fromSearchInput = false) {
       if (effectiveDisabled.value || isReadOnly.value) return
+      if (isImeCompositionEvent(event)) return
       if (!isOpen.value && isSelectTypeaheadCharacter(event.key, event)) {
         event.preventDefault()
         openDropdown()
@@ -761,6 +763,7 @@ export const TreeSelect = defineComponent({
       const comboboxAria = getPickerComboboxAria({
         expanded: isOpen.value,
         listboxId: treeId.value,
+        listMounted: visibleItems.value.length > 0,
         activeOptionId,
         haspopup: 'tree'
       })

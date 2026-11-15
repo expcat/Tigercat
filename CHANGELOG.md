@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Cascader 空态、原生属性与输入法键盘（Vue / React，C053-F04、C053-F05、C053-F06）**：Cascader 与 TreeSelect 空列表或搜索无结果时不再输出悬空的 `aria-controls`，组合输入期间的 Enter 不提交选项也不关闭面板。React Cascader 的 `title`、`data-*` 等原生属性透传到根节点，`aria-details` 与 `tabIndex` 保留在实际 combobox 上，打开搜索后仍然生效。
+
 - **Cascader 叶子提交与键盘活动项（Vue / React，C053-F01、C053-F02、C053-F03）**：双端 `isLeaf: true` 即使保留 children，点击或 Enter 也会提交该项并关闭面板。Vue 在初始打开时定位已有路径，展开新列后可直接 Enter 提交首项。Cascader 收窄搜索、Mentions 缩减候选和 TreeSelect 过滤节点后，活动项同步到有效结果，ARIA 不再引用已移除项，Enter 提交当前可见项。
 
 - **AutoComplete 只读提交与受控空值（Vue / React，C052-F01、C052-F02、C052-F03）**：双端失焦与关层的提交入口遵守只读状态，`readOnly` 配 `defaultSearchValue='draft'` 聚焦再失焦后，hidden 保持空且不发值变更。Vue 的受控 `modelValue=''` 不再回退到 `defaultValue` 显示标签，可见 input 与 hidden 均为空；两端 01–03 Demo 说明选择、Enter 或失焦/关层会按规则提交或还原。

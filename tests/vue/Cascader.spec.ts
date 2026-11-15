@@ -33,6 +33,43 @@ const simpleOptions = [
 ]
 
 describe('Cascader', () => {
+  it.each(['empty options', 'no search matches'])(
+    'omits aria-controls for %s',
+    async (emptyState) => {
+      const { getByRole, queryByRole } = render(Cascader, {
+        props: {
+          options: emptyState === 'empty options' ? [] : simpleOptions,
+          searchable: true
+        }
+      })
+      await fireEvent.click(getByRole('combobox'))
+      const input = getByRole('combobox')
+      if (emptyState === 'no search matches') await fireEvent.update(input, 'missing')
+      expect(input).toHaveAttribute('aria-expanded', 'true')
+      expect(queryByRole('listbox')).not.toBeInTheDocument()
+      expect(input).not.toHaveAttribute('aria-controls')
+      expect(input).not.toHaveAttribute('aria-activedescendant')
+    }
+  )
+
+  it('ignores Enter while composing a search query', async () => {
+    const { getByRole, emitted } = render(Cascader, {
+      props: { options: [{ label: 'Alpha', value: 'a' }], searchable: true }
+    })
+    await fireEvent.click(getByRole('combobox'))
+    const input = getByRole('combobox')
+    await fireEvent.update(input, 'Alpha')
+    expect(input).toHaveAttribute(
+      'aria-activedescendant',
+      getByRole('option', { name: 'Alpha' }).id
+    )
+    await fireEvent.keyDown(input, { key: 'Enter', isComposing: true, keyCode: 229 })
+    expect.soft(emitted()['update:modelValue']).toBeUndefined()
+    expect(getByRole('combobox')).toHaveAttribute('aria-expanded', 'true')
+    await fireEvent.keyDown(input, { key: 'Enter' })
+    expect(emitted()['update:modelValue']).toEqual([[['a']]])
+  })
+
   it.each(['click', 'Enter'])('commits an explicit leaf with children via %s', async (action) => {
     const { getByRole, emitted } = render(Cascader, {
       props: {

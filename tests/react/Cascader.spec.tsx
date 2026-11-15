@@ -41,6 +41,63 @@ describe('Cascader', () => {
     )
   })
   afterEach(() => vi.restoreAllMocks())
+
+  it.each(['empty options', 'no search matches'])('omits aria-controls for %s', (emptyState) => {
+    const { getByRole, queryByRole } = render(
+      <Cascader options={emptyState === 'empty options' ? [] : simpleOptions} searchable />
+    )
+    fireEvent.click(getByRole('combobox'))
+    const input = getByRole('combobox')
+    if (emptyState === 'no search matches') {
+      fireEvent.change(input, { target: { value: 'missing' } })
+    }
+    expect(input).toHaveAttribute('aria-expanded', 'true')
+    expect(queryByRole('listbox')).not.toBeInTheDocument()
+    expect(input).not.toHaveAttribute('aria-controls')
+    expect(input).not.toHaveAttribute('aria-activedescendant')
+  })
+
+  it('forwards native root attributes and combobox focus attributes', () => {
+    const { getByRole, getByTestId } = render(
+      <Cascader
+        options={simpleOptions}
+        searchable
+        title="Region picker"
+        data-probe="cascader-native"
+        aria-details="region-details"
+        tabIndex={-1}
+      />
+    )
+    const root = getByTestId('cascader')
+    expect.soft(root).toHaveAttribute('title', 'Region picker')
+    expect.soft(root).toHaveAttribute('data-probe', 'cascader-native')
+    expect.soft(getByRole('combobox')).toHaveAttribute('aria-details', 'region-details')
+    expect.soft(getByRole('combobox')).toHaveAttribute('tabindex', '-1')
+    fireEvent.click(getByRole('combobox'))
+    expect(getByRole('combobox').tagName).toBe('INPUT')
+    expect.soft(getByRole('combobox')).toHaveAttribute('aria-details', 'region-details')
+    expect(getByRole('combobox')).toHaveAttribute('tabindex', '-1')
+  })
+
+  it('ignores Enter while composing a search query', () => {
+    const onChange = vi.fn()
+    const { getByRole } = render(
+      <Cascader options={[{ label: 'Alpha', value: 'a' }]} searchable onChange={onChange} />
+    )
+    fireEvent.click(getByRole('combobox'))
+    const input = getByRole('combobox')
+    fireEvent.change(input, { target: { value: 'Alpha' } })
+    expect(input).toHaveAttribute(
+      'aria-activedescendant',
+      getByRole('option', { name: 'Alpha' }).id
+    )
+    fireEvent.keyDown(input, { key: 'Enter', isComposing: true, keyCode: 229 })
+    expect.soft(onChange).not.toHaveBeenCalled()
+    expect(getByRole('combobox')).toHaveAttribute('aria-expanded', 'true')
+    fireEvent.keyDown(input, { key: 'Enter' })
+    expect(onChange).toHaveBeenCalledWith(['a'])
+  })
+
   it.each(['click', 'Enter'])('commits an explicit leaf with children via %s', async (action) => {
     const onChange = vi.fn()
     const { getByRole } = render(

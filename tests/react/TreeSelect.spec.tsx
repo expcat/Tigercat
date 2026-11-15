@@ -33,6 +33,40 @@ describe('TreeSelect', () => {
     )
   })
   afterEach(() => vi.restoreAllMocks())
+  it.each(['empty options', 'no search matches'])('omits aria-controls for %s', (emptyState) => {
+    const { getByRole, queryByRole } = render(
+      <TreeSelect treeData={emptyState === 'empty options' ? [] : treeData} searchable />
+    )
+    fireEvent.click(getByRole('combobox'))
+    const input = getByRole('combobox')
+    if (emptyState === 'no search matches') {
+      fireEvent.change(input, { target: { value: 'missing' } })
+    }
+    expect(input).toHaveAttribute('aria-expanded', 'true')
+    expect(queryByRole('tree')).not.toBeInTheDocument()
+    expect(input).not.toHaveAttribute('aria-controls')
+    expect(input).not.toHaveAttribute('aria-activedescendant')
+  })
+
+  it('ignores Enter while composing a search query', () => {
+    const onChange = vi.fn()
+    const { getByRole } = render(
+      <TreeSelect treeData={[{ key: 'a', label: 'Alpha' }]} searchable onChange={onChange} />
+    )
+    fireEvent.click(getByRole('combobox'))
+    const input = getByRole('combobox')
+    fireEvent.change(input, { target: { value: 'Alpha' } })
+    expect(input).toHaveAttribute(
+      'aria-activedescendant',
+      getByRole('treeitem', { name: 'Alpha' }).id
+    )
+    fireEvent.keyDown(input, { key: 'Enter', isComposing: true, keyCode: 229 })
+    expect.soft(onChange).not.toHaveBeenCalled()
+    expect(getByRole('combobox')).toHaveAttribute('aria-expanded', 'true')
+    fireEvent.keyDown(input, { key: 'Enter' })
+    expect(onChange).toHaveBeenCalledWith('a')
+  })
+
   it('keeps an active visible node after narrowing the search', () => {
     const onChange = vi.fn()
     const nodes = [
