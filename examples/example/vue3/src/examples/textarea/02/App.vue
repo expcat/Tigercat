@@ -7,6 +7,7 @@ const value = ref('')
 
 <template>
   <Textarea
+    aria-label="说明"
     v-model="value"
     auto-resize
     :min-rows="2"

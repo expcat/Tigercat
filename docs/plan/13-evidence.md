@@ -141,7 +141,7 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | C074 | Slider          | needs-evidence | 视觉、真实键盘各 0/40 blocked，截图 0；C074-F01–F03 已修复，格式化气泡、Vue 多实例 ID 与后缀引用、双端越界 mark happy-dom 回归通过，双端定向 65 pass（含 axe）；类型检查通过；真实浏览器、读屏与 hydration 待补    |
 | C075 | Switch          | needs-evidence | 视觉 0/24、键盘 0/24 全 blocked，截图 0；C075-F01 已修复，取消一次或连续取消后再切换、React 对照与受控拒收 happy-dom 回归通过，双端定向 32 pass；类型检查通过；真实键盘、亮暗主题、读屏与 hydration 待补           |
 | C076 | TagsInput       | needs-evidence | 视觉、真实键盘各 0/24 blocked，截图 0；F01/F02/F04/F05 已修复，ID/拥有关系/React 拖放回归通过，双端 30 pass（含 axe）；SSR draggable 均 2，Demo 名称、类型/文档/示例检查通过；浏览器、读屏、拖放与 hydration 待补  |
-| C077 | Textarea        | needs-evidence | 视觉 0/24 blocked；键盘 0/24 blocked；截图 0（IAB browsers 为空）；定向测试 3 文件 50 passed；SSR、happy-dom 探针与 docs:api/exports 检查退出 0；未跑 E2E、hydration、真实读屏                                     |
+| C077 | Textarea        | needs-evidence | 视觉/真实键盘各 0/24 blocked，截图 0；F01–F04 已修复，SSR 123、动态焦点回归通过；Textarea/SSR 52 pass（含 axe），Input/InputGroup 同验；Demo 14/12、六个名称与类型/示例检查通过；浏览器、读屏与 hydration 待补     |
 | C078 | TimePicker      | needs-evidence | 视觉 0/16 blocked；键盘 0/16 blocked；截图 0（IAB browsers 为空）；定向测试 4 文件 56 通过；SSR、happy-dom 探针与 docs/exports/example-sources 检查退出 0；未跑 E2E、hydration、真实读屏                           |
 | C079 | Transfer        | needs-evidence | 视觉 0/16 blocked；键盘 0/16 blocked；截图 0（browsers=[]，未建视觉子代理）；定向测试 37 加 custom-text 6 通过；SSR、happy-dom 与限定 axe 探针已跑；未跑构建、E2E、完整 a11y 专项、真实读屏                        |
 | C080 | TreeSelect      | needs-evidence | 视觉 0/24 blocked；键盘 0/24 blocked；页面 0/6、截图 0（browsers=[]，未建视觉子代理）；定向测试 3 文件 36 通过；SSR 与 happy-dom 探针已跑；picker-focus E2E 未执行；未跑 hydration、原生 IME、真实读屏             |

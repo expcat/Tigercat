@@ -127,7 +127,6 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     }, [status, shakeTrigger])
 
     const activeError = status === 'error' && !!errorMessage
-    const hasExtras = activeError || showCount
 
     const textareaClasses = useMemo(
       () =>
@@ -135,13 +134,11 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           'block',
           getInputClasses({
             size: effectiveSize,
-            status,
-            inGroup: inGroup && !hasExtras
+            status
           }),
-          autoResize ? 'resize-none' : 'resize-y',
-          !hasExtras ? className : undefined
+          autoResize ? 'resize-none' : 'resize-y'
         ),
-      [effectiveSize, status, autoResize, className, inGroup, hasExtras]
+      [effectiveSize, status, autoResize]
     )
 
     const handleInput = (event: React.FormEvent<HTMLTextAreaElement>) => {
@@ -194,8 +191,6 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       />
     )
 
-    if (!hasExtras) return textarea
-
     const messages = (
       <>
         {activeError ? (
@@ -225,11 +220,13 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     return (
       <div className={hostClassName}>
         {textarea}
-        <div
-          className={getGroupedFieldExtraStackClasses()}
-          {...{ [FIELD_EXTRA_ATTR]: fieldExtraKind(messageCount) }}>
-          {messages}
-        </div>
+        {messageCount > 0 ? (
+          <div
+            className={getGroupedFieldExtraStackClasses()}
+            {...{ [FIELD_EXTRA_ATTR]: fieldExtraKind(messageCount) }}>
+            {messages}
+          </div>
+        ) : null}
       </div>
     )
   }

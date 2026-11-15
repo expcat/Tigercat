@@ -179,32 +179,26 @@ export const Textarea = defineComponent({
     )
     const textareaRef = ref<HTMLTextAreaElement | null>(null)
     const errorMsgId = `tiger-textarea-error-${useId()}`
-    const localValue = ref<string>(
-      props.modelValue ??
-        (typeof formValue.value === 'string' ? formValue.value : (props.defaultValue ?? ''))
+    const resolvedValue = computed(() =>
+      props.modelValue !== undefined
+        ? coerceTextFormValue(props.modelValue)
+        : formItemControl?.name.value
+          ? coerceTextFormValue(formValue.value)
+          : undefined
     )
+    const localValue = ref<string>(resolvedValue.value ?? props.defaultValue ?? '')
 
     expose({
       focus: () => textareaRef.value?.focus(),
       textarea: textareaRef
     })
 
-    watch(
-      () => [props.modelValue, formValue.value] as const,
-      ([modelValue, controlValue]) => {
-        const source =
-          modelValue !== undefined
-            ? coerceTextFormValue(modelValue)
-            : formItemControl?.name.value
-              ? coerceTextFormValue(controlValue)
-              : undefined
-        if (source === undefined) return
-        if (source !== localValue.value) localValue.value = source
-      }
-    )
+    watch(resolvedValue, (source) => {
+      if (source === undefined) return
+      if (source !== localValue.value) localValue.value = source
+    })
 
     const activeError = computed(() => effectiveStatus.value === 'error' && !!props.errorMessage)
-    const hasExtras = computed(() => activeError.value || props.showCount)
     const resolvedMinRows = computed(() => props.minRows ?? props.rows)
 
     const textareaClasses = computed(() =>
@@ -212,12 +206,9 @@ export const Textarea = defineComponent({
         'block',
         getInputClasses({
           size: effectiveSize.value,
-          status: effectiveStatus.value,
-          inGroup: inGroup.value && !hasExtras.value
+          status: effectiveStatus.value
         }),
-        props.autoResize ? 'resize-none' : 'resize-y',
-        !hasExtras.value ? props.className : undefined,
-        !hasExtras.value ? coerceClassValue(attrs.class) : undefined
+        props.autoResize ? 'resize-none' : 'resize-y'
       )
     )
 
@@ -324,8 +315,6 @@ export const Textarea = defineComponent({
         onAnimationend: () => textareaRef.value?.classList.remove(SHAKE_CLASS)
       })
 
-      if (!hasExtras.value) return field
-
       const extras: ReturnType<typeof h>[] = [field]
       if (activeError.value) {
         extras.push(
@@ -359,7 +348,7 @@ export const Textarea = defineComponent({
         props.className,
         coerceClassValue(attrClass)
       )
-      if (!inGroup.value) return h('div', { class: hostClass }, extras)
+      if (!inGroup.value || extras.length === 1) return h('div', { class: hostClass }, extras)
 
       const [fieldNode, ...messages] = extras
       return h('div', { class: hostClass }, [

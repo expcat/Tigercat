@@ -6,6 +6,7 @@ export default function App() {
 
   return (
     <Textarea
+      aria-label="说明"
       value={value}
       onChange={setValue}
       autoResize

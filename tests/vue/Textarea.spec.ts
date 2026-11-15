@@ -39,15 +39,16 @@ describe('Textarea', () => {
 
     it('merges the className prop with class from attrs', () => {
       render(Textarea, { props: { className: 'from-prop' }, attrs: { class: 'from-attr' } })
-      const textarea = getTextarea()
-      expect(textarea).toHaveClass('from-prop')
-      expect(textarea).toHaveClass('from-attr')
+      const host = getTextarea().parentElement
+      expect(host).toHaveClass('from-prop')
+      expect(host).toHaveClass('from-attr')
     })
 
-    it('renders the textarea as the chrome root when showCount is off', () => {
+    it('renders the textarea chrome inside a stable host when showCount is off', () => {
       const { container } = render(Textarea)
       const textarea = getTextarea()
-      expect(container.firstElementChild).toBe(textarea)
+      expect(container.firstElementChild?.firstElementChild).toBe(textarea)
+      expect(textarea).toHaveAttribute('data-tiger-chrome', '')
       expect(textarea.className).toContain('border')
       expect(textarea.className).toContain('rounded-[var(--tiger-radius-md')
     })
@@ -200,6 +201,36 @@ describe('Textarea', () => {
   })
 
   describe('status', () => {
+    it('preserves the textarea, value and focus when error and count appear or disappear', async () => {
+      const { rerender } = render(Textarea, {
+        props: { defaultValue: 'draft', status: 'default', errorMessage: 'Too short' },
+        attrs: { 'aria-describedby': 'help' }
+      })
+      const textarea = getTextarea()
+      await userEvent.click(textarea)
+
+      await rerender({ status: 'error' })
+      const error = screen.getByText('Too short')
+      expect(getTextarea()).toBe(textarea)
+      expect(textarea).toHaveFocus()
+      expect(textarea).toHaveValue('draft')
+      expect(textarea).toHaveAttribute('aria-invalid', 'true')
+      expect(textarea).toHaveAttribute('aria-describedby', `help ${error.id}`)
+
+      await rerender({ status: 'default', showCount: true })
+      expect(screen.queryByText('Too short')).not.toBeInTheDocument()
+      expect(screen.getByText('5')).toBeInTheDocument()
+      expect(getTextarea()).toBe(textarea)
+      expect(textarea).toHaveFocus()
+      expect(textarea).toHaveAttribute('aria-describedby', 'help')
+
+      await rerender({ showCount: false })
+      expect(screen.queryByText('5')).not.toBeInTheDocument()
+      expect(getTextarea()).toBe(textarea)
+      expect(textarea).toHaveFocus()
+      expect(textarea).toHaveValue('draft')
+    })
+
     it('marks error status on the native field', () => {
       render(Textarea, { props: { status: 'error', errorMessage: 'Too short' } })
       const field = screen.getByRole('textbox')

@@ -20,8 +20,8 @@ form 组 30 个组件（C052–C081）。这一组没有截图，视觉与键盘
 
 ## 概览
 
-本篇 15 条：P1 0、P2 12、P3 3。
-按波次：W3 12、W9 3。
+本篇 11 条：P1 0、P2 8、P3 3。
+按波次：W3 8、W9 3。
 
 已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C056-F01（S10）、C056-F04（S07）、C060-F04（S13）、C061-F05（S13）、C072-F02（S13）、C074-F04（S13）、C080-F03（S13）。
 
@@ -77,17 +77,6 @@ form 组 30 个组件（C052–C081）。这一组没有截图，视觉与键盘
 
 | 编号 | 级别 | 波次 | 端  | 类别 | 条目 | 验收 |
 | ---- | ---- | ---- | --- | ---- | ---- | ---- |
-
-### C077 Textarea
-
-报告 `groups/form/Textarea.md`，队列状态 needs-evidence。另受 S01、S04、S10 影响。
-
-| 编号     | 级别 | 波次 | 端   | 类别 | 条目                                     | 验收                                                                                                  |
-| -------- | ---- | ---- | ---- | ---- | ---------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| C077-F01 | P2   | W3   | Vue  | 行为 | Vue FormItem 数值初值 SSR 为空           | Form/FormItem name=bio、初值 { bio: 123 } 且 Textarea 不传值时，Vue SSR 首屏文本为 123，与 React 一致 |
-| C077-F02 | P2   | W3   | 双端 | 键盘 | 双端动态错误状态替换 textarea 并丢失焦点 | status=default 且带 errorMessage 时聚焦，再改 status=error，双端 textarea 为同一节点且仍持有焦点      |
-| C077-F03 | P2   | W3   | Demo | 示例 | 双端 Demo03 的超额计数变色不可达         | 打开双端 Demo 03 时计数的 currentLength 大于 maxLength 并呈现超额变色，或说明不再宣称该状态           |
-| C077-F04 | P2   | W3   | Demo | 示例 | 六个主责 Demo 都没有持久可访问名称       | 双端 textarea 01–03 共六个 Demo 的文本框都有 FormItem label 或 aria-label/aria-labelledby             |
 
 ### C079 Transfer
 

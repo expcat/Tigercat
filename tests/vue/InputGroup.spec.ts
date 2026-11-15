@@ -139,7 +139,7 @@ describe('InputGroup', () => {
     expect(last.tagName).toBe('BUTTON')
   })
 
-  it('keeps compact Textarea as the chrome group child when showCount is off', () => {
+  it('joins compact Textarea chrome inside its stable group-child host', () => {
     render(InputGroup, {
       props: { compact: true },
       attrs: { 'aria-label': 'Notes' },
@@ -152,9 +152,9 @@ describe('InputGroup', () => {
     })
     const group = screen.getByRole('group')
     const textarea = screen.getByLabelText('notes')
-    expect(group.firstElementChild).toBe(textarea)
+    expect(group.firstElementChild).toBe(textarea.parentElement)
     expect(textarea).toHaveAttribute('data-tiger-chrome')
-    expect(textarea.parentElement).toBe(group)
+    expect(textarea.parentElement?.parentElement).toBe(group)
   })
 
   it('still marks chrome when showCount wraps extras below the field', () => {

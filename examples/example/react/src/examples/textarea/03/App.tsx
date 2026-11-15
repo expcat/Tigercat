@@ -2,10 +2,11 @@ import { useState } from 'react'
 import { Textarea } from '@expcat/tigercat-react/Textarea'
 
 export default function App() {
-  const [value, setValue] = useState('这段说明太长了，超过上限')
+  const [value, setValue] = useState('这段说明太长了，已经超过上限')
 
   return (
     <Textarea
+      aria-label="说明"
       value={value}
       onChange={setValue}
       status="error"

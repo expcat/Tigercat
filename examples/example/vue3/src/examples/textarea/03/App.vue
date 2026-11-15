@@ -2,11 +2,12 @@
 import { ref } from 'vue'
 import { Textarea } from '@expcat/tigercat-vue/Textarea'
 
-const value = ref('这段说明太长了，超过上限')
+const value = ref('这段说明太长了，已经超过上限')
 </script>
 
 <template>
   <Textarea
+    aria-label="说明"
     v-model="value"
     status="error"
     error-message="请缩短说明"
