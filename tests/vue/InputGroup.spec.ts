@@ -5,6 +5,8 @@
 import { describe, it, expect } from 'vitest'
 import { h } from 'vue'
 import { render, screen } from '@testing-library/vue'
+import { Button } from '@expcat/tigercat-vue/Button'
+import { ButtonGroup } from '@expcat/tigercat-vue/ButtonGroup'
 import { Input } from '@expcat/tigercat-vue/Input'
 import { InputGroup, InputGroupAddon } from '@expcat/tigercat-vue/InputGroup'
 import { InputNumber } from '@expcat/tigercat-vue/InputNumber'
@@ -83,6 +85,26 @@ describe('InputGroup', () => {
         .toHaveClass(`text-${size}`)
     }
     expect(screen.getByRole('spinbutton')).toHaveClass(`text-${size}`)
+  })
+
+  it.each(['sm', 'lg'] as const)('passes size %s to buttons while preserving overrides', (size) => {
+    render(InputGroup, {
+      props: { size },
+      attrs: { 'aria-label': 'Sized buttons' },
+      slots: {
+        default: () => [
+          h(Button, null, () => 'Inherited'),
+          h(Button, { size: 'md' }, () => 'Explicit'),
+          h(ButtonGroup, { size: 'md', 'aria-label': 'Actions' }, () =>
+            h(Button, null, () => 'Button group')
+          )
+        ]
+      }
+    })
+
+    expect(screen.getByRole('button', { name: 'Inherited' })).toHaveClass(`text-${size}`)
+    expect(screen.getByRole('button', { name: 'Explicit' })).toHaveClass('text-base')
+    expect(screen.getByRole('button', { name: 'Button group' })).toHaveClass('text-base')
   })
 
   it('uses focus-within so nested field focus raises compact z-index', () => {

@@ -13,6 +13,7 @@ import {
   type ButtonSize
 } from '@expcat/tigercat-core'
 import { useButtonGroupContext } from './ButtonGroup'
+import { useInputGroupContext } from './InputGroup'
 import { useTigerConfig } from './tiger-config'
 
 export interface ButtonProps
@@ -82,8 +83,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
 ) {
   const domRest = rest
   const group = useButtonGroupContext()
+  const inputGroup = useInputGroupContext()
   const config = useTigerConfig()
-  const resolvedSize = size ?? group?.size ?? 'md'
+  const resolvedSize = size ?? group?.size ?? inputGroup?.size ?? 'md'
   const resolvedType = resolveButtonType(type)
   const hasLabel = hasLabelContent(children)
   warnMissingAccessibleName('Button', { text: hasLabel ? 'named' : '', ariaLabel, ariaLabelledby })

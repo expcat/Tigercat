@@ -36,7 +36,7 @@ export interface ButtonProps {
   variant?: ButtonVariant
 
   /**
-   * Button size. When omitted, uses the enclosing ButtonGroup size, then `md`.
+   * Button size. When omitted, uses ButtonGroup size, then InputGroup size, then `md`.
    * Passing `undefined` is the same as omitting the prop.
    */
   size?: ButtonSize

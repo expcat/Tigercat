@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **InputGroup 按钮尺寸与组成文档（Vue / React / 文档生成器，C063-F01、C063-F02）**：Button 省略 `size` 时继承 InputGroup 的 sm/lg，显式 `size` 与 ButtonGroup 尺寸仍优先。生成说明允许直子为 chrome 根或包含 chrome 的稳定 host，带计数的 Input 不再被错误排除；同验 MaskInput、Mentions、Textarea 文档。
+
 - **Input 只读示例（Vue，C062-F01）**：input/05 改用已声明的 `readOnly` prop 对应的 `read-only` 模板写法。只读框现在原生 `readOnly=true`，可聚焦且输入后保持「只读」，与 Demo 说明一致。
 
 - **FormItem 注册与帮助文本（Vue / React，C061-F01、C061-F02、C061-F03、C061-F04）**：切换 Form controller 时，字段规则、条件与 disabled 注册从旧引擎完整迁移到新引擎，Vue 动态改名同步清理旧字段 disabled。无字段绑定的原生 checkbox/radio 保留显式 checked；extra 通过稳定 id 关联控件，并与错误及消费者的 `aria-describedby` 合并。

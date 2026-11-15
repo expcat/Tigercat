@@ -127,7 +127,7 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | C060 | Form            | needs-evidence | 视觉与键盘均 0/32，32 blocked（browsers:[]）；截图 0、主责 Demo 操作 0/8；Form 相关 373 项测试通过；未记录 E2E、SSR 执行；外部 controller debounce、挂载选项与切换订阅 happy-dom 回归通过，真实浏览器复验待补      |
 | C061 | FormItem        | needs-evidence | 视觉/键盘 0/32 blocked，截图 0；无独立 Demo（8 个组合 Demo owner=C060）；387 项测试通过；SSR 已跑，无水合/读屏/E2E；controller 迁移、改名清理、无名 checked 与 extra 关联 happy-dom 回归通过，真实浏览器复验待补   |
 | C062 | Input           | needs-evidence | 视觉/真实键盘 0/40 blocked，截图 0；既有定向 143 项、a11y 131 项通过；SSR 无 hydration；本轮 Vue Input 与 Demo 探针 74 项通过，原生 readOnly=true、可聚焦且输入后保持「只读」；真实浏览器复验待补                  |
-| C063 | InputGroup      | needs-evidence | 视觉 0/32、键盘 0/32 全 blocked，截图 0（IAB browsers: []）；真实页面 0/8；定向测试 30 pass；未跑 E2E、全仓测试、完整构建、读屏、hydration                                                                         |
+| C063 | InputGroup      | needs-evidence | 视觉/键盘 0/32 blocked，截图 0；真实页面 0/8；按钮尺寸继承与显式/ButtonGroup 优先级 happy-dom 回归通过，双端定向测试 225 pass；稳定 host 文档同步检查通过；真实浏览器复验待补                                      |
 | C064 | InputGroupAddon | needs-evidence | 视觉 0/32、键盘 0/32 全 blocked，截图 0（IAB browsers: []）；真实页面 0/8；定向测试 5 passed/19 skipped；Node SSR 探针完成；无读屏与计算样式验收                                                                   |
 | C065 | InputNumber     | needs-evidence | 视觉 0/24、键盘 0/24 全 blocked，截图 0（IAB browsers: []）；定向测试 71 pass；SSR+happy-dom 探针；未跑 E2E、全仓测试、完整构建、读屏、hydration                                                                   |
 | C066 | InputOTP        | needs-evidence | 视觉 0/24、键盘 0/24 全 blocked，截图 0（IAB browsers: []）；定向测试 48 pass；SSR+happy-dom 探针；未跑 E2E、全仓测试、完整构建、读屏、hydration                                                                   |

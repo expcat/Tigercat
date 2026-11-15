@@ -28,6 +28,7 @@ import {
   type ButtonHtmlType
 } from '@expcat/tigercat-core'
 import { BUTTON_GROUP_INJECTION_KEY, type ButtonGroupContext } from './ButtonGroup'
+import { INPUT_GROUP_INJECTION_KEY, type InputGroupContext } from './InputGroup'
 import { useTigerConfig } from './tiger-config'
 
 export interface VueButtonProps {
@@ -109,8 +110,11 @@ export const Button = defineComponent({
   emits: ['click'],
   setup(props, { slots, emit, attrs }) {
     const group = inject<ButtonGroupContext | null>(BUTTON_GROUP_INJECTION_KEY, null)
+    const inputGroup = inject<InputGroupContext | null>(INPUT_GROUP_INJECTION_KEY, null)
     const config = useTigerConfig()
-    const resolvedSize = computed<ButtonSize>(() => props.size ?? group?.size ?? 'md')
+    const resolvedSize = computed<ButtonSize>(
+      () => props.size ?? group?.size ?? inputGroup?.size ?? 'md'
+    )
 
     const mergedStyle = computed(() => mergeStyleValues(attrs.style, props.style))
 

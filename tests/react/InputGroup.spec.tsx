@@ -5,6 +5,8 @@
 import { describe, it, expect } from 'vitest'
 import React from 'react'
 import { render, screen } from '@testing-library/react'
+import { Button } from '@expcat/tigercat-react/Button'
+import { ButtonGroup } from '@expcat/tigercat-react/ButtonGroup'
 import { Input } from '@expcat/tigercat-react/Input'
 import { InputGroup, InputGroupAddon } from '@expcat/tigercat-react/InputGroup'
 import { InputNumber } from '@expcat/tigercat-react/InputNumber'
@@ -85,6 +87,22 @@ describe('InputGroup', () => {
         .toHaveClass(`text-${size}`)
     }
     expect(screen.getByRole('spinbutton')).toHaveClass(`text-${size}`)
+  })
+
+  it.each(['sm', 'lg'] as const)('passes size %s to buttons while preserving overrides', (size) => {
+    render(
+      <InputGroup size={size} aria-label="Sized buttons">
+        <Button>Inherited</Button>
+        <Button size="md">Explicit</Button>
+        <ButtonGroup size="md" aria-label="Actions">
+          <Button>Button group</Button>
+        </ButtonGroup>
+      </InputGroup>
+    )
+
+    expect(screen.getByRole('button', { name: 'Inherited' })).toHaveClass(`text-${size}`)
+    expect(screen.getByRole('button', { name: 'Explicit' })).toHaveClass('text-base')
+    expect(screen.getByRole('button', { name: 'Button group' })).toHaveClass('text-base')
   })
 
   it('uses focus-within so nested field focus raises compact z-index', () => {
