@@ -5,6 +5,6 @@ import { Input } from '@expcat/tigercat-vue/Input'
 <template>
   <div class="w-full max-w-md space-y-3">
     <Input model-value="禁用" disabled />
-    <Input model-value="只读" readonly />
+    <Input model-value="只读" read-only />
   </div>
 </template>
