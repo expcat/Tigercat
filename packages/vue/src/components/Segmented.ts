@@ -48,7 +48,6 @@ export const Segmented = defineComponent({
   setup(props, { emit, attrs }) {
     const config = useTigerConfig()
     const autoName = useId()
-    const rtl = computed(() => getLocaleDirection(config.value.locale) === 'rtl')
     const groupLabels = computed(() => getSegmentedLabels(mergeTigerLocale(config.value.locale)))
     const isControlled = computed(() => props.modelValue !== undefined)
     const innerValue = ref<string | number | undefined>(props.defaultValue)
@@ -85,7 +84,11 @@ export const Segmented = defineComponent({
         if (!opt.disabled) acc.push(i)
         return acc
       }, [])
-      const target = getSegmentedKeyboardTarget(e.key, index, enabledIdxs, rtl.value)
+      const direction =
+        config.value.direction ??
+        (e.currentTarget as HTMLElement).closest('[dir]')?.getAttribute('dir') ??
+        getLocaleDirection(config.value.locale)
+      const target = getSegmentedKeyboardTarget(e.key, index, enabledIdxs, direction === 'rtl')
       if (target == null) return
       e.preventDefault()
       const container = (e.currentTarget as HTMLElement).closest<HTMLElement>('[role="radiogroup"]')

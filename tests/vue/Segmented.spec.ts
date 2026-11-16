@@ -4,7 +4,9 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
+import { h } from 'vue'
 import { Segmented } from '@expcat/tigercat-vue/Segmented'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
 const defaultOptions = [
@@ -112,6 +114,29 @@ describe('Segmented', () => {
     const radios = container.querySelectorAll('[role="radio"]')
     await fireEvent.keyDown(radios[0], { key: 'ArrowRight' })
     expect(onChange).toHaveBeenCalledWith('c')
+  })
+  it.each(['DOM', 'Provider'])('uses the %s RTL direction for arrow navigation', async (source) => {
+    render({
+      render: () => {
+        const segmented = () =>
+          h(Segmented, {
+            defaultValue: 'a',
+            options: [
+              { value: 'a', label: 'A' },
+              { value: 'b', label: 'B', disabled: true },
+              { value: 'c', label: 'C' },
+              { value: 'd', label: 'D' }
+            ]
+          })
+        return source === 'DOM'
+          ? h('div', { dir: 'rtl' }, [segmented()])
+          : h(ConfigProvider, { dir: 'rtl', document: false }, segmented)
+      }
+    })
+
+    await fireEvent.keyDown(screen.getByRole('radio', { name: 'A' }), { key: 'ArrowRight' })
+    expect(screen.getByRole('radio', { name: 'D' })).toHaveAttribute('aria-checked', 'true')
+    expect(screen.getByRole('radio', { name: 'D' })).toHaveFocus()
   })
 
   it('forwards aria-label to the radiogroup root', () => {

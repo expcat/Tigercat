@@ -82,7 +82,7 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | C025 | QRCode         | complete       | C025-F01/F02/F04/F05 已修复（F03 此前 S02 完成）。刷新按钮不再包在图像角色里；显式 aria-label 保留并附状态；token 覆写后对比为 1:1；滚到容器底部高亮末节。修复前视觉 32 格 28 pass / 4 finding；读屏、独立扫码未执行 |
 | C026 | Rate           | complete       | C026-F01/F02/F03/V02/V03 已修复。视觉 24 格 10 pass / 14 finding / 0 blocked；键盘 8 pass / 16 finding / 0 blocked；29 项 spec 通过；SSR 探针已跑；无 E2E；读屏、精确半星命中未测                                    |
 | C027 | Result         | complete       | C027-F02 已修复（F01 此前 S11 完成）。2026-11-13 二次补采：视觉 24 pass / 0 blocked；键盘 16 pass / 8 not-applicable（Demo02 无可聚焦控件）；48 项 spec 通过（未重跑）；SSR 探针已跑；读屏未执行                     |
-| C028 | Segmented      | complete       | 视觉 24 格 10 pass / 14 finding / 0 blocked；键盘 16 pass / 8 finding / 0 blocked；640 次真实按键；31 项 spec 通过；禁用项点击 16 blocked；读屏未测                                                                  |
+| C028 | Segmented      | complete       | C028-F01/V01/V02 已修复。38 项 spec（含 axe）与 types:check 通过；DOM/Provider RTL、两套暗色 token 和窄屏几何回归通过。IAB 不可用，待人工视觉复验；读屏未测                                                          |
 | C029 | SplitButton    | needs-evidence | 视觉 24 格 19 fail / 5 partial；键盘 24 fail；r4 七格 1,577 张原图亲审，0–16 沿用 r3；补拍额度用尽；38 项 spec 通过；禁用点击送达与第二次 Tab 去向未知；读屏未测                                                     |
 | C030 | Statistic      | complete       | 2026-11-13 glm-r1：视觉 24/24 pass / 0 blocked；键盘 pass（亮色 6 组实测，暗色沿用）；动画 2 组；33 项 spec 通过；未运行 hydration、StrictMode 动画专项                                                              |
 | C031 | Tag            | complete       | 2026-11-13 glm-r1：视觉/键盘 32/32 格 pass、0 blocked；React 16 格全审、Vue 抽查 8 格；22 + 10 项 spec 通过；未跑 hydration、读屏                                                                                    |

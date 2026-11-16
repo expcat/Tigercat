@@ -42,6 +42,7 @@ export function getSegmentedIndicatorClasses(size: ComponentSize): string {
   return classNames(
     'pointer-events-none absolute z-0 rounded-[var(--tiger-radius-md)]',
     'bg-[var(--tiger-surface-raised)] shadow-sm',
+    'dark:bg-[color-mix(in_srgb,var(--tiger-surface-raised)_80%,var(--tiger-text))]',
     'tiger-motion-aware transition-[inset-inline-start,width] duration-[var(--tiger-motion-duration-base)] ease-[var(--tiger-motion-ease-standard)]',
     insetClasses[size]
   )
@@ -80,7 +81,7 @@ export function getSegmentedOptionClasses(
   const sizePad: Record<ComponentSize, string> = {
     sm: 'px-2 py-0.5',
     md: 'px-3 py-1',
-    lg: 'px-4 py-1.5'
+    lg: 'px-2 py-1.5 sm:px-4'
   }
 
   return classNames(

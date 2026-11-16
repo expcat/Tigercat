@@ -46,7 +46,6 @@ export const Segmented = forwardRef<
 ) {
   const config = useTigerConfig()
   const autoName = useId()
-  const rtl = getLocaleDirection(config.locale) === 'rtl'
   const groupLabels = useMemo(
     () => getSegmentedLabels(mergeTigerLocale(config.locale)),
     [config.locale]
@@ -88,7 +87,11 @@ export const Segmented = forwardRef<
       handleSelect(options[index])
       return
     }
-    const target = getSegmentedKeyboardTarget(e.key, index, enabledIdxs, rtl)
+    const direction =
+      config.direction ??
+      e.currentTarget.closest('[dir]')?.getAttribute('dir') ??
+      getLocaleDirection(config.locale)
+    const target = getSegmentedKeyboardTarget(e.key, index, enabledIdxs, direction === 'rtl')
     if (target == null) return
     e.preventDefault()
     const container = (e.currentTarget as HTMLElement).closest<HTMLElement>('[role="radiogroup"]')

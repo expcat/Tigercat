@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Segmented 方向、暗色底板与窄屏标签（Core / React / Vue，C028-F01、C028-V01、C028-V02）**：两端键盘优先使用 Provider 显式方向，否则读取最近 DOM `dir`。暗色选中底板混入前景色以区分轨道；lg 在窄屏缩小水平内边距，图标后的「日」字完整显示，桌面内边距保留。
+
 - **Result 条件空标题（Vue，C027-F02）**：按本次 title slot 的实际内容决定标题，空 slot 回退到 title prop；没有标题时不生成空 heading，HTTP 数字保留可访问文本，条件切换时同步更新。
 
 - **Rate 只读说明、原生事件、悬停预览与空星对比（Core / React / Vue / Demo / 文档，C026-F01、C026-F02、C026-F03、C026-V02、C026-V03）**：生成笔记与 MCP 只承诺 `readOnly`。两端根节点先调用调用方的按键和 mouseleave，已取消的 ArrowRight 不改分。悬停后切到 readOnly 或 disabled 时结束预览，离开和解锁后只显示真实分。启用空星改用 `--tiger-text-secondary`，禁用仍用 `--tiger-text-disabled`。Demo03 心形改为随颜色变化的文本 ♥。
