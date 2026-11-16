@@ -167,7 +167,7 @@ export const GaugeChart = defineComponent({
             className: classNames(coerceClassValue(attrs.class), props.className)
           }),
           role: 'meter',
-          'aria-valuenow': Number.isFinite(props.value) ? props.value : undefined,
+          'aria-valuenow': Number.isFinite(props.value) ? geometry.value.value : undefined,
           'aria-valuemin': props.min,
           'aria-valuemax': props.max,
           'aria-valuetext': formattedValue.value,

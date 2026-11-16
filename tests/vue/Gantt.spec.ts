@@ -22,6 +22,17 @@ const data: GanttTask[] = [
 ]
 
 describe('Gantt', () => {
+  it.each([undefined, false, true])(
+    'passes responsive=%s to the shell and canvas',
+    (responsive) => {
+      const { container } = render(Gantt, { props: { data, responsive } })
+      const shell = container.firstElementChild
+      const canvasHost = container.querySelector('svg')?.parentElement
+      expect(shell?.classList.contains('w-full')).toBe(responsive === true)
+      expect(canvasHost?.classList.contains('h-full')).toBe(responsive === true)
+    }
+  )
+
   it('moves the task tab stop with arrow keys', async () => {
     const { container } = render(Gantt, { props: { data, selectable: true } })
     const [first, second] = container.querySelectorAll<SVGElement>('[data-gantt-task-id]')

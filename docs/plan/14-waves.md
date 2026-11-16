@@ -13,13 +13,13 @@
 | W3   | 表单                   |    0 |   0 |   0 |   0 | 05                                         |
 | W4   | 导航与反馈             |    0 |   0 |   0 |   0 | 06、07                                     |
 | W5   | 基础与布局             |    0 |   0 |   0 |   0 | 03、04                                     |
-| W6   | 数据、图表与高级       |   40 |   0 |  40 |   0 | 08、09、10                                 |
+| W6   | 数据、图表与高级       |   35 |   0 |  35 |   0 | 08、09、10                                 |
 | W7   | 组合组件               |   39 |   0 |  39 |   0 | 11                                         |
 | W8   | 工具链、文档与示例平台 |    7 |   0 |   7 |   0 | 12                                         |
 | W9   | P3 收尾                |   99 |   0 |   0 |  99 | 02、03、04、05、06、07、08、09、10、11、12 |
 | W10  | 证据补采与复验         |   11 |   — |   — |   — | 13                                         |
 
-W1–W9 合计 185 条 Review 发现（P2 86、P3 99）。W10 的 11 条是 E01–E11。已完成条目见 [CHANGELOG.md](../../CHANGELOG.md)。
+W1–W9 合计 180 条 Review 发现（P2 81、P3 99）。W10 的 11 条是 E01–E11。已完成条目见 [CHANGELOG.md](../../CHANGELOG.md)。
 
 ## 各波在收什么
 
@@ -51,7 +51,6 @@ W1–W9 合计 185 条 Review 发现（P2 86、P3 99）。W10 的 11 条是 E01�
 | C111-F05 | Spotlight            | [06](06-navigation.md) | 有查询时仍让命中的 recentIds 排在其余命中前，或把注释改为只约束空查询；未命中的 recent 不硬插回 |
 | C117-F04 | Alert                | [07](07-feedback.md)   | defaultPrevented 时停止关闭，或不再把事件标成 cancelable                                        |
 | C118-F06 | Drawer               | [07](07-feedback.md)   | 让分隔条可聚焦并响应方向键；做到之前不要把它标成可操作的 separator                              |
-| C147-F05 | Gantt                | [09](09-charts.md)     | React 02 加上 draggable，或去掉无效的 onDataChange，并让 demo.json 与源码一致                   |
 | C151-F01 | OrgChart             | [09](09-charts.md)     | Demo 改用允许的 https 或站内路径，或不再把这页叫成头像演示；不为这个 Demo 放行 data:            |
 | C169-F03 | VirtualTable         | [10](10-advanced.md)   | 要么包装层把 virtualItemHeight 缺省写成 48，要么把类型注释和生成文档改成 40；不要两处各写一个数 |
 | C173-F01 | ChatWindow           | [11](11-composite.md)  | 二选一：改类型注释与生成说明写明传 false 才关并重跑 docs:api；或删两端 ?? 阈值判断              |

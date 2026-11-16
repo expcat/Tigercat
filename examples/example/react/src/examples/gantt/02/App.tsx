@@ -77,12 +77,13 @@ export default function App() {
         minDate="2026-01-01"
         maxDate="2026-02-01"
         dateFormatter={formatDate}
+        draggable
         selectable
         selectedId={selectedId}
         onSelectedIdChange={handleSelectedIdChange}
         onDataChange={setTasks}
         title="R34 delivery plan"
-        desc="Switchable time scale with controlled task selection"
+        desc="Switchable time scale with controlled task selection and dragging"
       />
     </div>
   )

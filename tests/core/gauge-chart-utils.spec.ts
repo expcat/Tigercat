@@ -33,6 +33,28 @@ describe('createGaugeArcPath', () => {
     expect(path).toContain(' 1 1 ')
   })
 
+  it('reverses the outer and inner sweep for decreasing angles and segments', () => {
+    const reverse = createGaugeArcPath(100, 100, 80, 135, -135, 20)
+    expect(reverse).toContain('A80,80 0 1 0 ')
+    expect(reverse).toContain('A60,60 0 1 1 ')
+    const laid = layoutGauge({
+      innerWidth: 200,
+      innerHeight: 200,
+      value: 50,
+      min: 0,
+      max: 100,
+      segments: [{ range: [80, 20], color: 'red' }]
+    })
+    expect(laid.segmentPaths[0].path).toContain('A80,80 0 0 0 ')
+    expect(laid.segmentPaths[0].path).toContain('A60,60 0 0 1 ')
+  })
+
+  it('draws a full circle in parts and rejects spans beyond one turn', () => {
+    expect(createGaugeArcPath(100, 100, 80, 0, 360, 20).match(/A/g)).toHaveLength(4)
+    expect(createGaugeArcPath(100, 100, 80, 0, 400, 20)).toBe('')
+    expect(createGaugeArcPath(100, 100, 80, 0, -400, 20)).toBe('')
+  })
+
   it('produces different paths for different arc widths', () => {
     const narrow = createGaugeArcPath(100, 100, 80, 0, 180, 10)
     const wide = createGaugeArcPath(100, 100, 80, 0, 180, 30)
@@ -221,6 +243,21 @@ describe('createGaugeAnimation', () => {
 })
 
 describe('layoutGauge', () => {
+  it.each([
+    [150, 100],
+    [-10, 0]
+  ])('formats the clamped value for %s', (value, expected) => {
+    const laid = layoutGauge({
+      innerWidth: 232,
+      innerHeight: 152,
+      value,
+      min: 0,
+      max: 100,
+      valueFormatter: (current) => `${current}%`
+    })
+    expect(laid.valueText.text).toBe(`${expected}%`)
+  })
+
   it('defaults to a bottom-opening arc', () => {
     const laid = layoutGauge({
       innerWidth: 232,

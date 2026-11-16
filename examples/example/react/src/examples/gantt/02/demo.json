@@ -1,7 +1,7 @@
 {
   "id": "gantt-02",
   "title": "时间刻度与受控选择",
-  "description": "切换日、周、月刻度，并通过 selectedId 与 onSelectedIdChange 控制任务选择。",
+  "description": "切换日、周、月刻度，通过 selectedId 与 onSelectedIdChange 控制任务选择，拖动任务条后通过 onDataChange 写回日期。",
   "entry": "App.tsx",
   "order": 2,
   "viewport": {

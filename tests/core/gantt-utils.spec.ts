@@ -66,6 +66,17 @@ describe('gantt-utils', () => {
     expect(layout.tasks[1].progressWidth).toBe(layout.tasks[1].width)
   })
 
+  it('includes the whole maxDate calendar day in the timeline', () => {
+    const layout = computeGanttLayout(
+      [tasks[0], { id: 'last', label: 'Last day', start: '2026-01-05', end: '2026-01-05' }],
+      { minDate: '2026-01-01', maxDate: '2026-01-05', minBarWidth: 0 }
+    )
+
+    expect(layout.maxMs).toBe(normalizeGanttDate('2026-01-06'))
+    expect(layout.tasks[1].dateEndX).toBeGreaterThan(layout.tasks[1].x)
+    expect(layout.tasks[1].width).toBeGreaterThan(0)
+  })
+
   it('creates dependency links from prerequisite tasks to dependents', () => {
     const layout = computeGanttLayout(tasks, { width: 700, taskLabelWidth: 100 })
 

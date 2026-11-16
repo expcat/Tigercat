@@ -498,7 +498,7 @@ export interface GaugeChartProps extends BaseChartProps, ChartBuiltInTooltipProp
   height?: number
 
   /**
-   * Current value
+   * Current value, clamped to the scale for rendering and accessibility.
    */
   value: number
 
@@ -522,7 +522,8 @@ export interface GaugeChartProps extends BaseChartProps, ChartBuiltInTooltipProp
   startAngle?: number
 
   /**
-   * End angle in degrees (same convention as `startAngle`)
+   * End angle in degrees (same convention as `startAngle`).
+   * May precede `startAngle`; the absolute span must not exceed 360 degrees.
    * @default 135
    */
   endAngle?: number

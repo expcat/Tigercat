@@ -116,7 +116,7 @@ export function Gantt({
   onTaskChange,
   onDataChange,
   bind,
-  responsive: _responsive,
+  responsive = false,
   ...rest
 }: GanttProps): React.ReactElement {
   const config = useTigerConfig()
@@ -437,11 +437,14 @@ export function Gantt({
   }
 
   return (
-    <div {...rest} className={getCartesianChartShellClasses({ showLegend: false, className })}>
+    <div
+      {...rest}
+      className={getCartesianChartShellClasses({ showLegend: false, responsive, className })}>
       <ChartCanvas
         width={plotWidth}
         height={plotHeight}
         padding={padding}
+        responsive={responsive}
         title={title}
         desc={desc}
         aria-label={ariaLabel ?? (title ? undefined : labels.ganttAriaLabel)}>

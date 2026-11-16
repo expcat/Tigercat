@@ -27,7 +27,7 @@ description: Compact generated Tigercat Charts props reference
 - `taskLabelWidth?`: `number`; default `-`. -
 - `timelineHeight?`: `number`; default `-`. -
 - `minDate?`: `GanttDateValue`; default `-`. -
-- `maxDate?`: `GanttDateValue`; default `-`. -
+- `maxDate?`: `GanttDateValue`; default `-`. Inclusive calendar end for `YYYY-MM-DD` strings, matching task `end`. Date objects, tim...
 - `minBarWidth?`: `number`; default `-`. -
 - `showToday?`: `boolean`; default `-`. -
 - `now?`: `Date | number | string | null`; default `-`. Caller clock for the today line. `showToday` draws nothing until this is set. Render pa...

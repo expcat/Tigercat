@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { Gantt } from '@expcat/tigercat-react/Gantt'
 import type { GanttTask } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
+import GanttScaleDemo from '../../examples/example/react/src/examples/gantt/02/App'
 
 const data: GanttTask[] = [
   { id: 'design', label: 'Design', start: '2026-01-01', end: '2026-01-05', progress: 40 },
@@ -18,6 +19,26 @@ const data: GanttTask[] = [
 ]
 
 describe('Gantt', () => {
+  it.each([undefined, false, true])(
+    'passes responsive=%s to the shell and canvas',
+    (responsive) => {
+      const { container } = render(<Gantt data={data} responsive={responsive} />)
+      const shell = container.firstElementChild
+      const canvasHost = container.querySelector('svg')?.parentElement
+      expect(shell?.classList.contains('w-full')).toBe(responsive === true)
+      expect(canvasHost?.classList.contains('h-full')).toBe(responsive === true)
+    }
+  )
+
+  it('writes dragged dates back in the time-scale demo', () => {
+    const { container } = render(<GanttScaleDemo />)
+    const bar = container.querySelector('[data-gantt-task-id="research"]') as SVGElement
+    fireEvent.pointerDown(bar, { pointerId: 1, clientX: 200, button: 0 })
+    fireEvent.pointerMove(document, { pointerId: 1, clientX: 240 })
+    fireEvent.pointerUp(document, { pointerId: 1, clientX: 240 })
+    expect(bar).toHaveAttribute('aria-label', expect.stringContaining('2026-01-04 to 2026-01-10'))
+  })
+
   it('moves the task tab stop with arrow keys', () => {
     const { container } = render(<Gantt data={data} selectable />)
     const [first, second] = container.querySelectorAll<SVGElement>('[data-gantt-task-id]')

@@ -113,6 +113,7 @@ function safeNumber(value: number, fallback = 0): number {
  * Create an SVG arc path for a gauge segment.
  *
  * Angles are in degrees, 0 = 12 o'clock, clockwise.
+ * Reversed spans are supported; spans beyond 360 degrees return an empty path.
  */
 export function createGaugeArcPath(
   cx: number,
@@ -124,6 +125,15 @@ export function createGaugeArcPath(
 ): string {
   if (![cx, cy, radius, startDeg, endDeg, arcWidth].every((value) => Number.isFinite(value))) {
     return ''
+  }
+  const span = endDeg - startDeg
+  if (Math.abs(span) > 360) return ''
+  if (Math.abs(span) === 360) {
+    const middleDeg = startDeg + span / 2
+    return [
+      createGaugeArcPath(cx, cy, radius, startDeg, middleDeg, arcWidth),
+      createGaugeArcPath(cx, cy, radius, middleDeg, endDeg, arcWidth)
+    ].join(' ')
   }
   const outerR = Math.max(0, safeNumber(radius))
   const safeArcWidth = Math.max(0, safeNumber(arcWidth))
@@ -151,13 +161,14 @@ export function createGaugeArcPath(
     y: cy + innerR * Math.sin(startRad)
   }
 
-  const largeArc = Math.abs(endDeg - startDeg) > 180 ? 1 : 0
+  const largeArc = Math.abs(span) > 180 ? 1 : 0
+  const sweep = span < 0 ? 0 : 1
 
   return [
     `M${outerStart.x},${outerStart.y}`,
-    `A${outerR},${outerR} 0 ${largeArc} 1 ${outerEnd.x},${outerEnd.y}`,
+    `A${outerR},${outerR} 0 ${largeArc} ${sweep} ${outerEnd.x},${outerEnd.y}`,
     `L${innerStart.x},${innerStart.y}`,
-    `A${innerR},${innerR} 0 ${largeArc} 0 ${innerEnd.x},${innerEnd.y}`,
+    `A${innerR},${innerR} 0 ${largeArc} ${1 - sweep} ${innerEnd.x},${innerEnd.y}`,
     'Z'
   ].join(' ')
 }
@@ -304,6 +315,7 @@ export interface LaidOutGauge {
   radius: number
   startAngle: number
   endAngle: number
+  value: number
   valueAngle: number
   trackPath: string
   valuePath: string | null
@@ -326,9 +338,10 @@ export function layoutGauge(options: LayoutGaugeOptions): LaidOutGauge {
   const arcWidth = Math.max(0, options.arcWidth ?? 20)
   const tickSpace = options.showTicks === false ? 4 : 20
   const radius = Math.max(0, Math.min(options.innerWidth, options.innerHeight) / 2 - tickSpace)
-  const min = options.min
-  const max = options.max
-  const valueAngle = valueToGaugeAngle(options.value, min, max, startAngle, endAngle)
+  const min = safeNumber(options.min)
+  const max = safeNumber(options.max, min)
+  const value = Math.max(min, Math.min(max, safeNumber(options.value, min)))
+  const valueAngle = valueToGaugeAngle(value, min, max, startAngle, endAngle)
   const trackPath = createGaugeArcPath(cx, cy, radius, startAngle, endAngle, arcWidth)
   const valuePath =
     valueAngle === startAngle
@@ -348,9 +361,7 @@ export function layoutGauge(options: LayoutGaugeOptions): LaidOutGauge {
     options.showTicks === false
       ? []
       : computeGaugeTicks(cx, cy, radius, min, max, startAngle, endAngle, options.tickCount ?? 5)
-  const formatted = options.valueFormatter
-    ? options.valueFormatter(options.value)
-    : `${options.value}`
+  const formatted = options.valueFormatter ? options.valueFormatter(value) : `${value}`
   if (options.valueFormatter) {
     ticks.forEach((tick) => {
       tick.label = options.valueFormatter!(tick.value)
@@ -362,6 +373,7 @@ export function layoutGauge(options: LayoutGaugeOptions): LaidOutGauge {
     radius,
     startAngle,
     endAngle,
+    value,
     valueAngle,
     trackPath,
     valuePath,

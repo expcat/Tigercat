@@ -174,7 +174,7 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
         className
       })}
       role="meter"
-      aria-valuenow={Number.isFinite(value) ? value : undefined}
+      aria-valuenow={Number.isFinite(value) ? geometry.value : undefined}
       aria-valuemin={min}
       aria-valuemax={max}
       aria-valuetext={formattedValue}

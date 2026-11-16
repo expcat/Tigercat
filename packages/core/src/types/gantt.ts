@@ -39,6 +39,10 @@ export interface GanttProps
   taskLabelWidth?: number
   timelineHeight?: number
   minDate?: GanttDateValue
+  /**
+   * Inclusive calendar end for `YYYY-MM-DD` strings, matching task `end`.
+   * Date objects, timestamps and other date strings use their exact instant.
+   */
   maxDate?: GanttDateValue
   minBarWidth?: number
   showToday?: boolean

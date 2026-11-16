@@ -15,9 +15,9 @@ description: Compact generated Tigercat Charts props reference
 
 | Prop          | Type                                               | Default | Notes                                                                                      |
 | ------------- | -------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `value`       | `number`                                           | `-`     | Current value                                                                              |
+| `value`       | `number`                                           | `-`     | Current value, clamped to the scale for rendering and accessibility.                       |
 | `startAngle?` | `number`                                           | `-135`  | Start angle in degrees. `0` is 12 o'clock; positive is clockwise. Default is a bottom-o... |
-| `endAngle?`   | `number`                                           | `135`   | End angle in degrees (same convention as `startAngle`)                                     |
+| `endAngle?`   | `number`                                           | `135`   | End angle in degrees (same convention as `startAngle`). May precede `startAngle`; the a... |
 | `segments?`   | `Array<{ range: [number, number] color: string }>` | `-`     | Color segments along the arc. Array of { range: [from, to], color }                        |
 
 ### Remaining props (complete public API)

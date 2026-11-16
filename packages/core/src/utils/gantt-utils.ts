@@ -303,7 +303,10 @@ export function computeGanttLayout(
   if (data.length === 0) {
     const rawMinMs = options.minDate == null ? Number.NaN : normalizeGanttDate(options.minDate)
     const minMs = Number.isFinite(rawMinMs) ? rawMinMs : 0
-    const rawMaxMs = options.maxDate == null ? Number.NaN : normalizeGanttDate(options.maxDate)
+    let rawMaxMs = options.maxDate == null ? Number.NaN : normalizeGanttDate(options.maxDate)
+    if (isYearMonthDayString(options.maxDate)) {
+      rawMaxMs = ganttInclusiveEndMs(options.maxDate, rawMaxMs, minMs)
+    }
     const maxMs = Number.isFinite(rawMaxMs) && rawMaxMs > minMs ? rawMaxMs : minMs
     return {
       tasks: [],
@@ -339,8 +342,11 @@ export function computeGanttLayout(
   const inferredMinMs = Math.min(...taskRanges.map((item) => item.startMs))
   const inferredMaxMs = Math.max(...taskRanges.map((item) => item.endMs))
   const rawMinMs = normalizeGanttDate(options.minDate ?? inferredMinMs)
-  const rawMaxMs = normalizeGanttDate(options.maxDate ?? inferredMaxMs)
   const minMs = Number.isFinite(rawMinMs) ? rawMinMs : inferredMinMs
+  let rawMaxMs = normalizeGanttDate(options.maxDate ?? inferredMaxMs)
+  if (isYearMonthDayString(options.maxDate)) {
+    rawMaxMs = ganttInclusiveEndMs(options.maxDate, rawMaxMs, minMs)
+  }
   const maxMs = Number.isFinite(rawMaxMs) ? rawMaxMs : inferredMaxMs
   const safeMaxMs = maxMs > minMs ? maxMs : minMs + DAY_MS
   const timelineWidth = Math.max(0, width - taskLabelWidth)

@@ -79,7 +79,7 @@ const handleSelectedIdChange = (nextId: string | number | null) => {
       selectable
       :selected-id="selectedId"
       title="R34 delivery plan"
-      desc="Switchable time scale with controlled task selection"
+      desc="Switchable time scale with controlled task selection and dragging"
       @update:selected-id="handleSelectedIdChange" />
   </div>
 </template>

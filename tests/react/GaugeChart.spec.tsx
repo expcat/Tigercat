@@ -76,9 +76,13 @@ describe('GaugeChart (React)', () => {
       await expectNoA11yViolations(container)
     })
   })
-  it('clamps value that exceeds max', () => {
+  it.each([
+    [150, 100],
+    [-10, 0]
+  ])('clamps the rendered and accessible value for %s', (value, expected) => {
     const { container } = renderWithProps(GaugeChart, {
-      value: 150,
+      value,
+      showTicks: false,
       min: 0,
       max: 100,
       ...defaultSize
@@ -87,6 +91,10 @@ describe('GaugeChart (React)', () => {
     const paths = container.querySelectorAll('path')
     const trackPath = paths[0].getAttribute('d')
     const valuePath = paths[1].getAttribute('d')
-    expect(valuePath).toBe(trackPath)
+    if (expected === 100) expect(valuePath).toBe(trackPath)
+    const meter = container.querySelector('[role="meter"]')
+    expect(meter).toHaveAttribute('aria-valuenow', `${expected}`)
+    expect(meter).toHaveAttribute('aria-valuetext', `${expected}`)
+    expect(container.querySelector('text')?.textContent).toBe(`${expected}`)
   })
 })

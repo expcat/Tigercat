@@ -87,6 +87,7 @@ export const Gantt = defineComponent({
     width: { type: Number, default: 760 },
     height: { type: Number, default: 360 },
     padding: { type: [Number, Object] as PropType<ChartPadding>, default: 24 },
+    responsive: { type: Boolean, default: false },
     scale: { type: String as PropType<GanttScale>, default: 'week' },
     rowHeight: { type: Number, default: 40 },
     barHeight: { type: Number, default: 18 },
@@ -430,6 +431,7 @@ export const Gantt = defineComponent({
           ...attrs,
           class: getCartesianChartShellClasses({
             showLegend: false,
+            responsive: props.responsive,
             className: classNames(coerceClassValue(attrs.class), props.className)
           })
         },
@@ -440,6 +442,7 @@ export const Gantt = defineComponent({
               width: plotWidth.value,
               height: plotHeight.value,
               padding: props.padding,
+              responsive: props.responsive,
               title: props.title,
               desc: props.desc,
               'aria-label':
