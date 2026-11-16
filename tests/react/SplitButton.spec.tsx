@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { act, render, screen, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
+import { renderToStaticMarkup } from 'react-dom/server'
 import { SplitButton } from '@expcat/tigercat-react/SplitButton'
 import { DropdownItem } from '@expcat/tigercat-react/DropdownItem'
 import { DropdownMenu } from '@expcat/tigercat-react/DropdownMenu'
@@ -62,6 +63,35 @@ describe('SplitButton', () => {
       await userEvent.click(getTrigger(container))
       expect(screen.getByText('Save as draft')).toBeInTheDocument()
       expect(screen.getByText('Save and publish')).toBeInTheDocument()
+    })
+
+    it('partitions a Fragment into the primary action and menu in SSR and the DOM', async () => {
+      const button = (
+        <SplitButton>
+          <>
+            Save
+            <>
+              <DropdownMenu>
+                <DropdownItem>Draft</DropdownItem>
+              </DropdownMenu>
+            </>
+          </>
+        </SplitButton>
+      )
+      const ssr = document.createElement('div')
+      ssr.innerHTML = renderToStaticMarkup(button)
+      expect(getTrigger(ssr)).not.toBeNull()
+      expect(getPrimary(ssr).textContent).toBe('Save')
+      expect(getPrimary(ssr).querySelector('[role="menuitem"]')).toBeNull()
+
+      const { container } = render(button)
+      expect(getPrimary(container).textContent).toBe('Save')
+      expect(getPrimary(container).querySelector('[role="menuitem"]')).toBeNull()
+      const trigger = getTrigger(container)
+      vi.spyOn(trigger, 'getBoundingClientRect').mockReturnValue(new DOMRect(20, 20, 32, 32))
+      await userEvent.click(trigger)
+      expect(await screen.findByRole('menuitem', { name: 'Draft' })).toBeInTheDocument()
+      expect(getPrimary(container).querySelector('[role="menuitem"]')).toBeNull()
     })
 
     it('accepts DropdownMenu from the menu prop', async () => {
@@ -146,6 +176,34 @@ describe('SplitButton', () => {
   })
 
   describe('keyboard focus', () => {
+    it('shows the first keyboard focus ring until pointer interaction', async () => {
+      const { container } = renderSplitButton()
+      const trigger = getTrigger(container)
+      vi.spyOn(trigger, 'getBoundingClientRect').mockReturnValue(new DOMRect(20, 20, 32, 32))
+      trigger.focus()
+      fireEvent.keyDown(trigger, { key: 'ArrowDown' })
+      const first = await screen.findByRole('menuitem', { name: 'Save as draft' })
+      await waitFor(() => expect(first).toHaveFocus())
+      expect(first).toHaveAttribute('data-tiger-keyboard-focus')
+      expect(first).toHaveClass(
+        'data-[tiger-keyboard-focus]:focus:ring-2',
+        'data-[tiger-keyboard-focus]:focus:ring-[var(--tiger-primary)]/40',
+        'data-[tiger-keyboard-focus]:focus:ring-inset'
+      )
+
+      fireEvent.pointerDown(first)
+      expect(first).not.toHaveAttribute('data-tiger-keyboard-focus')
+      act(() => trigger.focus())
+      fireEvent.keyDown(trigger, { key: 'ArrowDown' })
+      expect(first).toHaveFocus()
+      expect(first).toHaveAttribute('data-tiger-keyboard-focus')
+      fireEvent.keyDown(first, { key: 'Escape' })
+      await userEvent.click(trigger)
+      expect(await screen.findByRole('menuitem', { name: 'Save as draft' })).not.toHaveAttribute(
+        'data-tiger-keyboard-focus'
+      )
+    })
+
     it('closes the menu on Tab and focuses the successor after the trigger', async () => {
       const { container } = renderSplitButton()
       const next = document.createElement('button')

@@ -57,9 +57,13 @@ function partitionChildren(children: React.ReactNode): {
   const menuItems: React.ReactElement[] = []
   let menu: React.ReactElement | null = null
 
-  React.Children.forEach(children, (child) => {
+  const visit = (child: React.ReactNode): void => {
     if (!React.isValidElement(child)) {
       if (child != null && typeof child !== 'boolean') primary.push(child)
+      return
+    }
+    if (child.type === React.Fragment) {
+      React.Children.forEach((child.props as { children?: React.ReactNode }).children, visit)
       return
     }
     if (child.type === DropdownMenu) {
@@ -71,7 +75,8 @@ function partitionChildren(children: React.ReactNode): {
       return
     }
     primary.push(child)
-  })
+  }
+  React.Children.forEach(children, visit)
 
   if (!menu && menuItems.length > 0) {
     menu = <DropdownMenu>{menuItems}</DropdownMenu>

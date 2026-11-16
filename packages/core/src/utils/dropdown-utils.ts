@@ -94,6 +94,7 @@ export function getDropdownItemClasses(disabled: boolean, divided: boolean): str
     'text-start',
     'focus:outline-none',
     'focus-visible:ring-2 focus-visible:ring-[var(--tiger-primary)]/40 focus-visible:ring-inset',
+    'data-[tiger-keyboard-focus]:focus:ring-2 data-[tiger-keyboard-focus]:focus:ring-[var(--tiger-primary)]/40 data-[tiger-keyboard-focus]:focus:ring-inset',
     divided && dropdownItemDividedClasses,
     disabled
       ? 'cursor-not-allowed opacity-50'

@@ -549,7 +549,7 @@ export const Dropdown = defineComponent({
         }
         if (!positioned || !edge || !floatingRef.value) return
         focusEdge.value = null
-        focusMenuItem(floatingRef.value, edge)
+        focusMenuItem(floatingRef.value, edge, true)
       },
       { flush: 'post' }
     )

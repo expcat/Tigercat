@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **SplitButton Fragment 与首次键盘焦点（Core / React / Vue，C029-F01、C029-F04）**：React 递归分类 Fragment 中的菜单，保留独立 trigger，主按钮内不再嵌入菜单项。双端 Dropdown 的键盘落项使用共享焦点标识补齐首帧焦点环，指针交互或失焦后清除，指针打开不添加标识。
+
 - **Segmented 方向、暗色底板与窄屏标签（Core / React / Vue，C028-F01、C028-V01、C028-V02）**：两端键盘优先使用 Provider 显式方向，否则读取最近 DOM `dir`。暗色选中底板混入前景色以区分轨道；lg 在窄屏缩小水平内边距，图标后的「日」字完整显示，桌面内边距保留。
 
 - **Result 条件空标题（Vue，C027-F02）**：按本次 title slot 的实际内容决定标题，空 slot 回退到 title prop；没有标题时不生成空 heading，HTTP 数字保留可访问文本，条件切换时同步更新。

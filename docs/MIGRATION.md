@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+React SplitButton 现在识别 Fragment 内的 DropdownMenu / DropdownItem，保留独立菜单 trigger，主按钮内不再包含菜单项。双端 Dropdown（含 SplitButton）从键盘进入首项或末项时立即显示焦点环。调用方式不用改，依赖旧 DOM 或焦点样式的断言需相应调整。
+
 双端 Segmented 未指定 Provider 方向时，现在按最近 DOM `dir` 决定左右键顺序；例如祖先 `dir="rtl"` 下 ArrowRight 移到前一个可用选项。调用方式不用改，依赖旧 LTR 顺序的键盘断言需调整。暗色选中底板与轨道分开，lg 在窄屏缩小水平内边距。
 
 Vue Result 的空 title slot 现在回退到 title prop；未提供 title 时不生成空 heading，HTTP 数字不再带 `aria-hidden`。调用方式不用改，依赖旧空标题输出的断言需调整。

@@ -234,10 +234,26 @@ export function handleMenuNavigation(container: HTMLElement, event: KeyboardEven
 /**
  * Focus the first non-disabled menu item in a container
  */
-export function focusMenuItem(container: HTMLElement, edge: 'first' | 'last'): boolean {
+export function focusMenuItem(
+  container: HTMLElement,
+  edge: 'first' | 'last',
+  focusVisible = false
+): boolean {
   const items = getMenuItems(container)
   if (items.length === 0) return false
   const item = edge === 'last' ? items[items.length - 1] : items[0]
+  // A portal's document may not share the trigger's :focus-visible input modality.
+  const attribute = 'data-tiger-keyboard-focus'
+  if (focusVisible && !item.hasAttribute(attribute)) {
+    const clear = (): void => {
+      item.removeAttribute(attribute)
+      item.removeEventListener('pointerdown', clear)
+      item.removeEventListener('blur', clear)
+    }
+    item.setAttribute(attribute, '')
+    item.addEventListener('pointerdown', clear)
+    item.addEventListener('blur', clear)
+  }
   item.focus()
   return true
 }

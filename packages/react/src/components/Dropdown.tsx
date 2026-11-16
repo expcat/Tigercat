@@ -242,7 +242,7 @@ export const Dropdown = forwardRef<HTMLElement, DropdownProps>(function Dropdown
     if (!edge) return
     focusEdgeRef.current = null
     const frame = requestAnimationFrame(() => {
-      if (floatingRef.current) focusMenuItem(floatingRef.current, edge)
+      if (floatingRef.current) focusMenuItem(floatingRef.current, edge, true)
     })
     return () => cancelAnimationFrame(frame)
   }, [visible])
@@ -297,13 +297,13 @@ export const Dropdown = forwardRef<HTMLElement, DropdownProps>(function Dropdown
         return
       }
       const edge = action === 'open-last' ? 'last' : 'first'
-      focusEdgeRef.current = edge
       openIntentRef.current = 'menu'
       if (!visible) {
+        focusEdgeRef.current = edge
         setVisible(true)
         return
       }
-      if (floatingRef.current) focusMenuItem(floatingRef.current, edge)
+      if (floatingRef.current) focusMenuItem(floatingRef.current, edge, true)
     },
     [visible, disabled, hoverController, setVisible]
   )

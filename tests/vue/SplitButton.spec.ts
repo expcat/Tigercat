@@ -142,6 +142,28 @@ describe('SplitButton', () => {
   })
 
   describe('keyboard focus', () => {
+    it('shows the first keyboard focus ring after Enter then Down until pointer interaction', async () => {
+      const { container } = renderSplitButton()
+      const trigger = getTrigger(container)
+      vi.spyOn(trigger, 'getBoundingClientRect').mockReturnValue(new DOMRect(20, 20, 32, 32))
+      trigger.focus()
+      await userEvent.keyboard('{Enter}')
+      expect(trigger).toHaveAttribute('aria-expanded', 'true')
+      expect(trigger).toHaveFocus()
+      await fireEvent.keyDown(trigger, { key: 'ArrowDown' })
+      const first = await screen.findByRole('menuitem', { name: 'Save as draft' })
+      await waitFor(() => expect(first).toHaveFocus())
+      expect(first).toHaveAttribute('data-tiger-keyboard-focus')
+      expect(first).toHaveClass(
+        'data-[tiger-keyboard-focus]:focus:ring-2',
+        'data-[tiger-keyboard-focus]:focus:ring-[var(--tiger-primary)]/40',
+        'data-[tiger-keyboard-focus]:focus:ring-inset'
+      )
+
+      await fireEvent.pointerDown(first)
+      expect(first).not.toHaveAttribute('data-tiger-keyboard-focus')
+    })
+
     it.each([
       ['ArrowDown', 'Save as draft'],
       ['ArrowUp', 'Save and publish']
