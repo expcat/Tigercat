@@ -152,13 +152,16 @@ describe('Splitter', () => {
       )
       fireEvent.keyDown(gutter(container), { key: 'ArrowRight' })
       const dragged = onResize.mock.calls.at(-1)?.[0].sizes as number[]
+      expect(dragged[0]).toBeCloseTo(210, 0)
+      expect(dragged[1]).toBeCloseTo(590, 0)
       rerender(
         <Splitter onResize={onResize}>
           <div>A</div>
           <div>B</div>
         </Splitter>
       )
-      expect(parseFloat(paneBox(container, 0).style.width)).toBeCloseTo(400, 0)
+      expect(parseFloat(paneBox(container, 0).style.width)).toBeCloseTo(210, 0)
+      expect(parseFloat(paneBox(container, 1).style.width)).toBeCloseTo(590, 0)
     })
   })
 
@@ -181,12 +184,51 @@ describe('Splitter', () => {
       })
     })
 
+    it('keeps dragged percentages when sizes are not written back', async () => {
+      const { container } = render(
+        <Splitter sizes={['30%', '70%']}>
+          <div>A</div>
+          <div>B</div>
+        </Splitter>
+      )
+      fireEvent.keyDown(gutter(container), { key: 'ArrowRight' })
+      expect(parseFloat(paneBox(container, 0).style.width)).toBeCloseTo(250, 0)
+      expect(parseFloat(paneBox(container, 1).style.width)).toBeCloseTo(550, 0)
+
+      stubElementSize(1604, 400)
+      act(() => {
+        MockResizeObserver.instances[0].trigger(1604, 400)
+      })
+      await waitFor(() => {
+        expect(parseFloat(paneBox(container, 0).style.width)).toBeCloseTo(500, 0)
+        expect(parseFloat(paneBox(container, 1).style.width)).toBeCloseTo(1100, 0)
+      })
+    })
+
     it('does not let independent min clamps overflow the container', () => {
       const { container } = renderSplitter({ sizes: ['50%', '50%'], min: 500 })
       const first = parseFloat(paneBox(container, 0).style.width)
       const second = parseFloat(paneBox(container, 1).style.width)
       expect(first + second).toBeCloseTo(800, 0)
       expect(first).toBeLessThan(500)
+    })
+  })
+
+  describe('Collapsible panes', () => {
+    it('restores an unspecified pane after collapse', () => {
+      const { container } = render(
+        <Splitter sizes={['30%']} collapsible>
+          <div>A</div>
+          <div>B</div>
+        </Splitter>
+      )
+      expect(parseFloat(paneBox(container, 1).style.width)).toBeCloseTo(560, 0)
+      const collapse = () =>
+        container.querySelectorAll('[data-tiger-splitter-collapse]')[1] as HTMLElement
+      fireEvent.click(collapse())
+      expect(parseFloat(paneBox(container, 1).style.width)).toBeCloseTo(0, 0)
+      fireEvent.click(collapse())
+      expect(parseFloat(paneBox(container, 1).style.width)).toBeCloseTo(560, 0)
     })
   })
 

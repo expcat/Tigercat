@@ -740,11 +740,13 @@ export function formatSplitterGutterLabel(template: string, index: number): stri
 
 export function collapseSplitterSizes(
   sizes: (number | string)[],
-  index: number
+  index: number,
+  fallback?: number | string
 ): { sizes: (number | string)[]; previous: number | string } {
-  const previous = sizes[index] ?? 0
+  const declared = index >= 0 && index < sizes.length ? sizes[index] : undefined
+  const previous = declared ?? fallback ?? 0
   const next = sizes.slice()
-  next[index] = 0
+  if (index >= 0 && index < next.length) next[index] = 0
   return { sizes: next, previous }
 }
 

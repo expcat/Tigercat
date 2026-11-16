@@ -20,15 +20,18 @@ import {
   measureSplitterContainer,
   mergeStyleValues,
   normalizeSplitterBounds,
+  panePixelsToRatios,
   parsePaneSize,
   projectControlledPaneSizes,
+  reconcileSplitterRatios,
   resizePanes,
   resolveSplitterSeparatorKey,
   serializePaneSizes,
   splitterContentSize,
   splitterPaneBaseClasses,
   type DocumentDragSession,
-  type SplitDirection
+  type SplitDirection,
+  type SplitterRatioState
 } from '@expcat/tigercat-core'
 import { flattenElementVNodes } from '../utils/flatten-vnodes'
 import { useTigerConfig } from './tiger-config'
@@ -43,6 +46,17 @@ export interface VueSplitterProps {
   collapsible?: boolean
   className?: string
   style?: Record<string, string | number>
+}
+
+function ratiosToPercentSizes(ratios: number[], gutterSize: number): (number | string)[] {
+  const basis = 1000
+  const container = basis + Math.max(0, ratios.length - 1) * gutterSize
+  return projectControlledPaneSizes(
+    ratios.map(() => '0%'),
+    ratios.map((ratio) => ratio * basis),
+    container,
+    gutterSize
+  )
 }
 
 export const Splitter = defineComponent({
@@ -94,7 +108,8 @@ export const Splitter = defineComponent({
     const containerRef = ref<HTMLElement | null>(null)
     const containerSize = ref(0)
     const sizesKey = computed(() => serializePaneSizes(props.sizes))
-    const override = ref<{ key: string | undefined; pixels: number[] } | null>(null)
+    const ratioState = ref<SplitterRatioState>({ ratios: [], sizesKey: undefined })
+    const override = ref<{ key: string | undefined; sizes: (number | string)[] } | null>(null)
     const collapsedPrevious = ref<(number | string | null)[]>([])
     const draggingIndex = ref(-1)
     const startPos = ref({ x: 0, y: 0 })
@@ -110,8 +125,18 @@ export const Splitter = defineComponent({
 
     const collectPanes = () => flattenElementVNodes(slots.default?.())
 
-    const dragPixels = () =>
-      override.value && override.value.key === sizesKey.value ? override.value.pixels : null
+    const activeSizes = (count: number): Array<number | string | undefined> | undefined => {
+      const key = sizesKey.value
+      if (props.sizes == null) {
+        const ratios = ratioState.value.ratios
+        if (containerSize.value > 0 && ratios.length === count) {
+          return ratiosToPercentSizes(ratios, props.gutterSize)
+        }
+        return undefined
+      }
+      if (override.value && override.value.key === key) return override.value.sizes
+      return props.sizes
+    }
 
     const applyMeasure = () => {
       const size = measureSplitterContainer(containerRef.value, props.orientation)
@@ -149,7 +174,7 @@ export const Splitter = defineComponent({
     ): number[] => {
       const bounds = boundsFor(count)
       return layoutDeclaredPanes(
-        dragPixels() ?? props.sizes,
+        activeSizes(count),
         count,
         liveSize,
         props.gutterSize,
@@ -163,11 +188,16 @@ export const Splitter = defineComponent({
       index: number,
       phase: 'move' | 'end' | 'keyboard'
     ) => {
-      override.value = { key: sizesKey.value, pixels: nextPixels }
-      emit(
-        'update:sizes',
-        projectControlledPaneSizes(props.sizes, nextPixels, containerSize.value, props.gutterSize)
+      const projected = projectControlledPaneSizes(
+        props.sizes,
+        nextPixels,
+        containerSize.value,
+        props.gutterSize
       )
+      const key = sizesKey.value
+      override.value = { key, sizes: projected }
+      ratioState.value = { ratios: panePixelsToRatios(nextPixels), sizesKey: key }
+      emit('update:sizes', projected)
       emit('resize', { index, sizes: nextPixels })
       if (phase === 'end' || phase === 'keyboard') {
         emit('resize-end', { index, sizes: nextPixels })
@@ -237,6 +267,14 @@ export const Splitter = defineComponent({
     return () => {
       const nodes: ReturnType<typeof h>[] = []
       const panes = collectPanes()
+      const available = splitterContentSize(containerSize.value, panes.length, props.gutterSize)
+      const reconciled = reconcileSplitterRatios(
+        ratioState.value,
+        panes.length,
+        props.sizes,
+        available
+      )
+      if (reconciled !== ratioState.value) ratioState.value = reconciled
       if (props.sizes && props.sizes.length !== panes.length && panes.length > 0) {
         devWarn(
           'Splitter.sizes.length',
@@ -245,7 +283,7 @@ export const Splitter = defineComponent({
       }
       const bounds = boundsFor(panes.length)
       const boxes = layoutDeclaredPanes(
-        dragPixels() ?? props.sizes,
+        activeSizes(panes.length),
         panes.length,
         containerSize.value,
         props.gutterSize,
@@ -257,21 +295,26 @@ export const Splitter = defineComponent({
       if (root) root.getSizes = () => pixels.slice()
 
       const toggleCollapse = (index: number) => {
-        const available = splitterContentSize(containerSize.value, panes.length, props.gutterSize)
-        const base = (dragPixels() ?? props.sizes ?? pixels).slice()
+        const source =
+          (override.value && override.value.key === sizesKey.value
+            ? override.value.sizes
+            : props.sizes) ?? []
         const stored = collapsedPrevious.value[index]
-        const nextPixels = base.map((size) => parsePaneSize(size, available))
+        const nextSizes = source.slice()
         if (stored == null) {
-          const collapsed = collapseSplitterSizes(base, index)
-          nextPixels[index] = 0
+          const collapsed = collapseSplitterSizes(source, index, pixels[index])
+          nextSizes[index] = 0
           collapsedPrevious.value = collapsedPrevious.value.slice()
           collapsedPrevious.value[index] = collapsed.previous
         } else {
-          nextPixels[index] = parsePaneSize(stored, available)
+          nextSizes[index] = stored
           collapsedPrevious.value = collapsedPrevious.value.slice()
           collapsedPrevious.value[index] = null
         }
-        override.value = { key: sizesKey.value, pixels: nextPixels }
+        const nextPixels = nextSizes.map((size) => parsePaneSize(size, available))
+        const key = sizesKey.value
+        override.value = { key, sizes: nextSizes }
+        ratioState.value = { ratios: panePixelsToRatios(nextPixels), sizesKey: key }
         emit(
           'update:sizes',
           projectControlledPaneSizes(props.sizes, nextPixels, containerSize.value, props.gutterSize)

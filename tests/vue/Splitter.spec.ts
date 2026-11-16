@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, fireEvent, waitFor } from '@testing-library/vue'
-import { h, ref } from 'vue'
+import { h, ref, nextTick } from 'vue'
 import { Splitter } from '@expcat/tigercat-vue/Splitter'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
@@ -117,6 +117,32 @@ describe('Splitter', () => {
         expect(parseFloat(paneBox(container, 0).style.width)).toBeCloseTo(100, 0)
       })
     })
+
+    it('keeps the last ratios after sizes is omitted', async () => {
+      const onResize = vi.fn()
+      const sizes = ref<(number | string)[] | undefined>([200, 600])
+      const { container } = render({
+        setup() {
+          return () =>
+            h(
+              Splitter,
+              {
+                sizes: sizes.value,
+                onResize
+              },
+              () => [h('div', 'A'), h('div', 'B')]
+            )
+        }
+      })
+      await waitFor(() => {
+        expect(parseFloat(paneBox(container, 0).style.width)).toBeCloseTo(200, 0)
+      })
+      await fireEvent.keyDown(gutter(container), { key: 'ArrowRight' })
+      sizes.value = undefined
+      await nextTick()
+      expect(parseFloat(paneBox(container, 0).style.width)).toBeCloseTo(210, 0)
+      expect(parseFloat(paneBox(container, 1).style.width)).toBeCloseTo(590, 0)
+    })
   })
 
   describe('Percentages follow the container', () => {
@@ -135,6 +161,38 @@ describe('Splitter', () => {
       await waitFor(() => {
         expect(parseFloat(paneBox(container, 0).style.width)).toBeCloseTo(480, 0)
       })
+    })
+
+    it('keeps dragged percentages when sizes are not written back', async () => {
+      const { container } = renderSplitter({ sizes: ['30%', '70%'] })
+      await waitFor(() => {
+        expect(parseFloat(paneBox(container, 0).style.width)).toBeCloseTo(240, 0)
+      })
+      await fireEvent.keyDown(gutter(container), { key: 'ArrowRight' })
+      expect(parseFloat(paneBox(container, 0).style.width)).toBeCloseTo(250, 0)
+      expect(parseFloat(paneBox(container, 1).style.width)).toBeCloseTo(550, 0)
+
+      stubElementSize(1604, 400)
+      MockResizeObserver.instances[0].trigger(1604, 400)
+      await waitFor(() => {
+        expect(parseFloat(paneBox(container, 0).style.width)).toBeCloseTo(500, 0)
+        expect(parseFloat(paneBox(container, 1).style.width)).toBeCloseTo(1100, 0)
+      })
+    })
+  })
+
+  describe('Collapsible panes', () => {
+    it('restores an unspecified pane after collapse', async () => {
+      const { container } = renderSplitter({ sizes: ['30%'], collapsible: true })
+      await waitFor(() => {
+        expect(parseFloat(paneBox(container, 1).style.width)).toBeCloseTo(560, 0)
+      })
+      const collapse = () =>
+        container.querySelectorAll('[data-tiger-splitter-collapse]')[1] as HTMLElement
+      await fireEvent.click(collapse())
+      expect(parseFloat(paneBox(container, 1).style.width)).toBeCloseTo(0, 0)
+      await fireEvent.click(collapse())
+      expect(parseFloat(paneBox(container, 1).style.width)).toBeCloseTo(560, 0)
     })
   })
 
