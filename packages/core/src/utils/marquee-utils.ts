@@ -293,9 +293,7 @@ export function resolveMarqueeRegion(input: { ariaLabel?: string; labelledBy?: s
  * Duplicate copies stay in the layout for a seamless loop but must not take
  * focus or pointer. Same contract as a collapsed CollapsePanel wrapper.
  */
-/** Copy the live subtree into inert clones. Ids are stripped so they are not duplicated. */
-export function syncMarqueeClones(track: HTMLElement | null | undefined): void {
-  if (!track) return
+function copyMarqueeCloneContents(track: HTMLElement): void {
   const source = track.querySelector<HTMLElement>(
     '[data-marquee-content]:not([data-marquee-clone])'
   )
@@ -306,6 +304,31 @@ export function syncMarqueeClones(track: HTMLElement | null | undefined): void {
     copy.querySelectorAll<HTMLElement>('[id]').forEach((node) => node.removeAttribute('id'))
     clone.replaceChildren(...Array.from(copy.childNodes))
   })
+}
+
+/**
+ * Copy the live subtree into inert clones and watch the source so a later
+ * child update stays in sync. Ids are stripped so they are not duplicated.
+ * Call the returned function to disconnect the watcher.
+ */
+export function syncMarqueeClones(track: HTMLElement | null | undefined): () => void {
+  if (!track) return () => {}
+  copyMarqueeCloneContents(track)
+  if (typeof MutationObserver === 'undefined') return () => {}
+  const source = track.querySelector<HTMLElement>(
+    '[data-marquee-content]:not([data-marquee-clone])'
+  )
+  if (!source) return () => {}
+  const observer = new MutationObserver(() => {
+    copyMarqueeCloneContents(track)
+  })
+  observer.observe(source, {
+    subtree: true,
+    childList: true,
+    characterData: true,
+    attributes: true
+  })
+  return () => observer.disconnect()
 }
 
 export function getMarqueeCloneAttributes(): {

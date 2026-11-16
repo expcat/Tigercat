@@ -78,7 +78,7 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | C021 | Inplace        | complete       | 主路径 8 格：视觉、键盘各 0 pass / 8 finding / 0 blocked；四桌面格页面起点纯键盘入口 blocked 未验证；2 项既有测试通过（无 axe 调用）；无 E2E；F02 未做原生 IME 复现    |
 | C022 | Kbd            | needs-evidence | C022-F01/F02 已修复。组合改为可见文本，空内容与注释 slot 不留尾随分隔符；双端 spec 启用 aria-prohibited-attr 后通过。键盘仍 blocked，读屏未测                          |
 | C023 | Link           | needs-evidence | C023-F01 已修复，F02 此前已修。禁用说明改为移除 href 且不可聚焦；反斜杠跨站地址此前已拒绝。键盘 16 格仍 blocked（外站终态未验证），页面起点未验证；无 E2E  |
-| C024 | Marquee        | complete       | 11-13 补采 32 格：视觉 32 pass；键盘 8 pass / 8 finding / 16 not-applicable（finding 均 F01）；67 项测试通过；F02/F03 仅 happy-dom 证据；无 E2E                        |
+| C024 | Marquee        | complete       | C024-F01/F02/F03 已修复。Demo02 改为 end，受控由 Pause/Play 控制、焦点不暂停；子层更新后复制段为 [1,1]；再开 pauseOnFocus 后仍运行。11-13 补采视觉 32 pass，键盘 finding 为当时的 F01；无 E2E                        |
 | C025 | QRCode         | complete       | 视觉 32 格 28 pass / 4 finding / 0 blocked；键盘 88 次按键、32 格预定链路通过；定向 spec 33 passed / 2 failed；SSR 探针已跑；读屏、独立扫码未执行                      |
 | C026 | Rate           | complete       | 视觉 24 格 10 pass / 14 finding / 0 blocked；键盘 8 pass / 16 finding / 0 blocked；29 项 spec 通过；SSR 探针已跑；无 E2E；读屏、精确半星命中未测                       |
 | C027 | Result         | complete       | 2026-11-13 二次补采：视觉 24 pass / 0 blocked；键盘 16 pass / 8 not-applicable（Demo02 无可聚焦控件）；48 项 spec 通过（未重跑）；SSR 探针已跑；读屏未执行             |
@@ -313,7 +313,7 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | C019 | ImageGroup            | C019-F01 已修复；Vue watch 把受控 currentIndex 存入内部值而 React 不同步（未立项）；动态重排、语言切换未测                                                                                                                                              |
 | C020 | ImagePreview          | C020-F01、C020-F02、C020-F03 已修复。未立项待验证：Vue 打开态卸载未 release Escape 条目；Demo03 下载使 iframe 导航到跨源图片（sandbox 无 allow-downloads，根因未隔离）；空列表首屏 React 发 open=false 而 Vue 不发；受控导航不回写时画面停在父层索引    |
 | C021 | Inplace               | C021-F01、C021-F02、C021-F03、C021-K01 已修复。未立项：React display/input 缺省回退 children，Vue 不读 default slot；textarea 普通 Enter 也退出，不另建问题；四桌面格页面起点纯键盘入口仍未验证                                                         |
-| C024 | Marquee               | 末尾 11-07 旧记录仍写「保持 needs-evidence」，以开头 11-13 补采为准（当前会话直接看图）；props 文档标注总数 14 与 Core 类型 13 个成员不符，交 X04；Vue prop 默认仍写 left（回退为 start，未立项）；hover 同类清理模式未执行                             |
+| C024 | Marquee               | C024-F01、C024-F02、C024-F03 已修复。末尾 11-07 旧记录仍写「保持 needs-evidence」，以开头 11-13 补采为准（当前会话直接看图）；props 文档标注总数 14 与 Core 类型 13 个成员不符，交 X04；Vue prop 默认仍写 left（回退为 start，未立项）；hover 同类清理模式未执行                             |
 | C031 | Tag                   | TagsInput、ActivityFeed、CommentThread 及三个 Workflow 组件直接渲染 Tag；12 个关联 Demo 只核源码；use-drag/01 两端仍传不存在的 color=blue（未立项）；现有 Demo 不含 lg、显式 closeAriaLabel 场景                                                        |
 | C047 | ScrollArea            | 未立项线索：双轴 lg 轨道 inset 14px 与 thumb 推导不一致（186 对 200）；横向 shadow 渐变方向；Vue 简例 max-height 字符串透传；Vue Props 类型未列 nativeBars。a11y helper 关闭多条 axe 规则                                                               |
 | C052 | AutoComplete          | 02 Demo 未显示原始 value 也未配 name，恢复时不能凭 label 声称读回底层值；受控父级拒绝选中时两端 hidden 保持原值（未登记缺陷）；恢复预留端口 Vue 8774 / React 8775                                                                                       |

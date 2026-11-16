@@ -1,7 +1,7 @@
 {
   "id": "marquee-02",
   "title": "反向与暂停",
-  "description": "direction 为 right 时朝 inline-end 滚。paused 受控停动画；焦点进入区域内仍会暂停。",
+  "description": "direction 用 end 而不是 right，朝 inline-end 滚。受控时由外部 Pause/Play 控制，焦点不触发暂停。",
   "entry": "App.tsx",
   "order": 2,
   "viewport": { "mode": "auto", "minHeight": 80, "maxHeight": 240 }

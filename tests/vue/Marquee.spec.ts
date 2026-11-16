@@ -4,7 +4,7 @@
 
 import { describe, expect, it } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/vue'
-import { h } from 'vue'
+import { defineComponent, h, nextTick, ref } from 'vue'
 import { Marquee } from '@expcat/tigercat-vue/Marquee'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import {
@@ -43,6 +43,26 @@ describe('Marquee', () => {
       expect(clone).toHaveAttribute('aria-hidden', 'true')
       expect(clone).toHaveAttribute('inert')
       expect(clone).toHaveTextContent('Vue React')
+    })
+
+    it('copies a child-local update into the inert clone without rerendering Marquee', async () => {
+      const count = ref(0)
+      const Child = defineComponent({
+        name: 'MarqueeChild',
+        setup() {
+          return () => h('span', String(count.value))
+        }
+      })
+      const { container } = render(Marquee, {
+        props: { pauseOnHover: false, pauseOnFocus: false },
+        slots: { default: () => h(Child) }
+      })
+      const texts = () =>
+        [...container.querySelectorAll('[data-marquee-content]')].map((node) => node.textContent)
+      expect(texts()).toEqual(['0', '0'])
+      count.value = 1
+      await nextTick()
+      expect(texts()).toEqual(['1', '1'])
     })
 
     it('renders a single static copy when repeat is 1', () => {
@@ -185,6 +205,23 @@ describe('Marquee', () => {
       const next = getRoot(container)
       await fireEvent.mouseEnter(next)
       expect(next).toHaveAttribute('data-marquee-paused', 'false')
+    })
+
+    it('does not resume a stale focus pause after pauseOnFocus is turned back on', async () => {
+      const { container, rerender } = render(Marquee, {
+        props: { pauseOnFocus: true },
+        slots: { default: () => h('button', { type: 'button' }, 'Docs') }
+      })
+      const root = getRoot(container)
+      const paused = () => root.getAttribute('data-marquee-paused')
+      await fireEvent.focusIn(screen.getByRole('button', { name: 'Docs' }))
+      expect(paused()).toBe('true')
+      await rerender({ pauseOnFocus: false })
+      expect(paused()).toBe('false')
+      await fireEvent.focusOut(root, { relatedTarget: document.body })
+      expect(paused()).toBe('false')
+      await rerender({ pauseOnFocus: true })
+      expect(paused()).toBe('false')
     })
   })
 

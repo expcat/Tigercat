@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Marquee 复制段与焦点暂停（Core / React / Vue / Demo，C024-F01、C024-F02、C024-F03）**：两端 Demo02 改为 direction 用 end，并写明受控时由外部 Pause/Play 控制、焦点不触发暂停。子层只更新自己的 state 或 ref 时，原内容与复制段都变成新文本。未受控实例在关闭 pauseOnFocus 期间焦点离开后，再打开仍继续滚动。
+
 - **Link 禁用示例说明（Demo，C023-F01）**：两端 link/01 改为写明 disabled 时移除 href 并不可聚焦，不再写禁用仍保留 href。
 
 - **Kbd 组合名称与空末键（React / Vue / 文档，C022-F01、C022-F02）**：两端组合键留在原生 kbd 的可见文本里，不再设置根 aria-label，内层键名也不再 aria-hidden。keys 为 Ctrl 与 K 时，启用 aria-prohibited-attr 后无违规；Ctrl 后再接末键 S 时露出的文本含 S。空数组、空 Fragment 和只含注释的 slot 不再留下尾随分隔符。

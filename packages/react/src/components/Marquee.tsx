@@ -76,7 +76,7 @@ export const Marquee = forwardRef<HTMLDivElement, MarqueeProps>(
       labelledBy
     })
     useLayoutEffect(() => {
-      syncMarqueeClones(trackRef.current)
+      return syncMarqueeClones(trackRef.current)
     })
 
     const handleMouseEnter = useCallback(
@@ -105,15 +105,12 @@ export const Marquee = forwardRef<HTMLDivElement, MarqueeProps>(
 
     const handleBlur = useCallback(
       (event: React.FocusEvent<HTMLDivElement>) => {
-        if (
-          resolvedPauseOnFocus &&
-          !isMarqueeFocusInside(event.currentTarget, event.relatedTarget)
-        ) {
+        if (!isMarqueeFocusInside(event.currentTarget, event.relatedTarget)) {
           setFocused(false)
         }
         onBlur?.(event)
       },
-      [onBlur, resolvedPauseOnFocus]
+      [onBlur]
     )
 
     return (

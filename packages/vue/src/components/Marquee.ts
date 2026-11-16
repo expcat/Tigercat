@@ -1,4 +1,4 @@
-import { defineComponent, h, onMounted, onUpdated, PropType, ref } from 'vue'
+import { defineComponent, h, onBeforeUnmount, onMounted, onUpdated, PropType, ref } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -140,9 +140,16 @@ export const Marquee = defineComponent({
   },
   setup(props, { slots, attrs }) {
     const trackRef = ref<HTMLElement | null>(null)
-    const syncClones = () => syncMarqueeClones(trackRef.value)
+    let stopCloneSync = (): void => {}
+    const syncClones = (): void => {
+      stopCloneSync()
+      stopCloneSync = syncMarqueeClones(trackRef.value)
+    }
     onMounted(syncClones)
     onUpdated(syncClones)
+    onBeforeUnmount(() => {
+      stopCloneSync()
+    })
 
     const hovered = ref(false)
     const focused = ref(false)
@@ -236,7 +243,7 @@ export const Marquee = defineComponent({
             callAttrHandler(attrsRecord.onFocusin, event)
           },
           onFocusout: (event: FocusEvent) => {
-            if (pauseOnFocus && !isMarqueeFocusInside(event.currentTarget, event.relatedTarget)) {
+            if (!isMarqueeFocusInside(event.currentTarget, event.relatedTarget)) {
               focused.value = false
             }
             callAttrHandler(attrsRecord.onFocusout, event)
