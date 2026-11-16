@@ -122,6 +122,27 @@ describe('Layout Sections', () => {
     expect(aside.hasAttribute('inert')).toBe(true)
   })
 
+  it('keeps an expanded Sidebar tabindex and forces -1 when fully hidden', async () => {
+    const open = document.createElement('div')
+    open.innerHTML = await renderToString(
+      createSSRApp({
+        render: () => h(Sidebar, { tabindex: '0', id: 'focusable' }, () => 'Side')
+      })
+    )
+    const openAside = open.querySelector('aside')
+    expect(openAside).toHaveAttribute('id', 'focusable')
+    expect(openAside).toHaveAttribute('tabindex', '0')
+
+    const hidden = document.createElement('div')
+    hidden.innerHTML = await renderToString(
+      createSSRApp({
+        render: () =>
+          h(Sidebar, { tabindex: '0', collapsed: true, collapsedWidth: '0px' }, () => 'Side')
+      })
+    )
+    expect(hidden.querySelector('aside')).toHaveAttribute('tabindex', '-1')
+  })
+
   it('follows Sidebar collapsed for a nested Menu that omitted collapsed', async () => {
     const view = render({
       setup() {

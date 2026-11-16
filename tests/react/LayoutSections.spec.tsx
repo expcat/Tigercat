@@ -127,6 +127,30 @@ describe('Layout Sections', () => {
     expect(document.activeElement).not.toBe(screen.getByRole('button', { hidden: true }))
   })
 
+  it('keeps zero-width Sidebar isolation when caller attributes conflict', () => {
+    const hidden = document.createElement('div')
+    hidden.innerHTML = renderToStaticMarkup(
+      <Sidebar collapsed collapsedWidth="0px" inert={false} aria-hidden={false} tabIndex={0}>
+        <button type="button">Nav</button>
+      </Sidebar>
+    )
+    const aside = hidden.querySelector('aside') as HTMLElement
+    expect(aside.hasAttribute('inert')).toBe(true)
+    expect(aside.getAttribute('aria-hidden')).toBe('true')
+    expect(aside.getAttribute('tabindex')).toBe('-1')
+
+    const open = document.createElement('div')
+    open.innerHTML = renderToStaticMarkup(
+      <Sidebar tabIndex={0} aria-hidden={false}>
+        Side
+      </Sidebar>
+    )
+    const openAside = open.querySelector('aside') as HTMLElement
+    expect(openAside.getAttribute('tabindex')).toBe('0')
+    expect(openAside.getAttribute('aria-hidden')).toBe('false')
+    expect(openAside.hasAttribute('inert')).toBe(false)
+  })
+
   it('lets caller style.width win when Sidebar width is omitted', () => {
     const { container } = render(<Sidebar style={{ width: '192px' }}>Side</Sidebar>)
     const aside = container.querySelector('aside') as HTMLElement

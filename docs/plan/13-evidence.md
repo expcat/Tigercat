@@ -107,7 +107,7 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | C045 | Resizable    | needs-evidence | F01–F04 已修复。文档与 MCP 写未禁用角手柄进入 Tab。未设最大值时 aria-valuemax 等于当前值。style 320×180 时 right/bottom 为 320/180。根 aria-labelledby 保留手柄名。视觉/键盘 0/16 blocked；hydration、读屏、E2E 未执行 |
 | C046 | Row          | needs-evidence | 视觉 0/24 blocked；键盘 0/24 blocked；截图 0；未执行新的 SSR/hydration、Example 构建、浏览器 E2E、读屏；Vue 属性更新探针为合成 DOM；Terra 两阶段只读复核完成但无图可审        |
 | C047 | ScrollArea   | needs-evidence | F01–F06 已修复。hidden 或 nativeBars 且溢出时 viewport 有 tabindex、region 与名称，gutter 只跟自定义条；aria-describedby 与 aria-busy 进 viewport；Vue 字符串 tabindex=-1 保留；RTL 负值模型零点连续；已测量溢出时隐藏原生条；Demo02 写 axis。视觉/键盘 0/24 blocked、截图 0；E2E、读屏、hydration 未执行 |
-| C048 | Sidebar      | needs-evidence | 视觉 0/16 blocked；键盘 0/16 blocked；截图 0；SSR/happy-dom/TS 探针已跑；E2E、全量构建、读屏未执行；docs:links 退出 1（均来自 .local/review）；Terra 未审图                   |
+| C048 | Sidebar      | needs-evidence | F01/F03 已修复。零宽折叠且调用方传入冲突属性时，根仍输出 inert、aria-hidden=true、tabindex=-1；Vue 展开态保留 tabindex=0，fullyHidden 仍为 -1。视觉/键盘 0/16 blocked、截图 0；E2E、读屏、hydration 未执行 |
 | C049 | Skeleton     | needs-evidence | 视觉 0/16 blocked；键盘 0/16 blocked；截图 0；双端 SSR 与 happy-dom 探针已跑；E2E、完整构建、读屏未执行；docs:links 退出 1（均在 .local/review）；Terra 未审图                |
 | C050 | Space        | needs-evidence | 视觉 0/24 blocked；键盘 0/24 blocked；截图 0；28 个双端 SSR 输出与 TS 诊断已跑；hydration、E2E、全量构建、读屏未执行；C012 旧截图未重审，不计入 C050 pass                     |
 | C051 | Splitter     | needs-evidence | 视觉 0/24 blocked；键盘 0/24 blocked；截图 0；双端 SSR 成功，hydration 未验证；E2E 未运行且无直接 Splitter 用例；docs:links 退出 1（均在 .local/review）                      |

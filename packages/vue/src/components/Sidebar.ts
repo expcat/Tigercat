@@ -110,9 +110,7 @@ export const Sidebar = defineComponent({
           ...restAttrs,
           class: sidebarClasses.value,
           style: mergeStyleValues(props.style, sidebarStyle.value),
-          inert: fullyHidden.value ? true : undefined,
-          tabindex: fullyHidden.value ? -1 : undefined,
-          'aria-hidden': fullyHidden.value ? true : undefined,
+          ...(fullyHidden.value ? { inert: true, tabindex: -1, 'aria-hidden': true } : {}),
           ...aria
         },
         slots.default?.()

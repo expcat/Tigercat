@@ -79,11 +79,9 @@ export const Sidebar = forwardRef<HTMLDivElement, ReactSidebarProps>(function Si
         ref={ref}
         className={sidebarClasses}
         style={sidebarStyle}
-        inert={fullyHidden || undefined}
-        tabIndex={fullyHidden ? -1 : undefined}
-        aria-hidden={fullyHidden || undefined}
         {...named}
-        {...rest}>
+        {...rest}
+        {...(fullyHidden ? { inert: true, tabIndex: -1, 'aria-hidden': true } : {})}>
         {children}
       </Tag>
     </SidebarContext.Provider>
