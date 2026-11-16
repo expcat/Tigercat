@@ -382,7 +382,7 @@ describe('Tree', () => {
       const { getByText } = render(Tree, {
         props: {
           treeData: sampleTreeData,
-          selectionMode: 'none',
+          selectable: false,
           onSelect
         }
       })
@@ -412,6 +412,17 @@ describe('Tree', () => {
       await nextTick()
 
       expect(onSelect).not.toHaveBeenCalled()
+    })
+
+    it('uses multiple as multi-select when selectionMode is omitted', () => {
+      render(Tree, {
+        props: {
+          treeData: sampleTreeData,
+          multiple: true
+        }
+      })
+
+      expect(screen.getByRole('tree')).toHaveAttribute('aria-multiselectable', 'true')
     })
   })
 

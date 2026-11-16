@@ -326,6 +326,31 @@ describe('Tree', () => {
         expect(parent).not.toHaveAttribute('aria-selected')
       })
     })
+
+    it('keeps the first typeahead match and continues a multi-letter prefix', async () => {
+      const user = userEvent.setup()
+      render(
+        <Tree
+          treeData={[
+            { key: 'mango', label: 'Mango' },
+            { key: 'melon', label: 'Melon' },
+            { key: 'banana', label: 'Banana' }
+          ]}
+        />
+      )
+      const mango = screen.getByRole('treeitem', { name: 'Mango' })
+      act(() => {
+        mango.focus()
+      })
+
+      await user.keyboard('m')
+      await waitFor(() => expect(document.activeElement).toBe(mango))
+
+      await user.keyboard('e')
+      await waitFor(() =>
+        expect(document.activeElement).toBe(screen.getByRole('treeitem', { name: 'Melon' }))
+      )
+    })
   })
 
   describe('Selection', () => {
@@ -349,7 +374,7 @@ describe('Tree', () => {
       const onSelect = vi.fn()
 
       const { getByText } = render(
-        <Tree treeData={sampleTreeData} selectionMode="none" onSelect={onSelect} />
+        <Tree treeData={sampleTreeData} selectable={false} onSelect={onSelect} />
       )
 
       await user.click(getByText('Parent 1'))
@@ -370,6 +395,11 @@ describe('Tree', () => {
 
       await user.click(getByText('Node 1'))
       expect(onSelect).not.toHaveBeenCalled()
+    })
+
+    it('uses multiple as multi-select when selectionMode is omitted', () => {
+      render(<Tree treeData={sampleTreeData} multiple />)
+      expect(screen.getByRole('tree')).toHaveAttribute('aria-multiselectable', 'true')
     })
   })
 
@@ -679,6 +709,15 @@ describe('Tree', () => {
         </ConfigProvider>
       )
       expect(screen.getByRole('tree')).toHaveAttribute('aria-label', '樹')
+    })
+
+    it('uses the native aria-label as the tree name', () => {
+      render(
+        <ConfigProvider locale={zhCN}>
+          <Tree treeData={sampleTreeData} aria-label="懒加载树" />
+        </ConfigProvider>
+      )
+      expect(screen.getByRole('tree')).toHaveAttribute('aria-label', '懒加载树')
     })
   })
 

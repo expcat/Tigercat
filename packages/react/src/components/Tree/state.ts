@@ -88,6 +88,8 @@ export function useTreeState(props: TreeProps): TreeContext & {
     defaultExpandAll = false,
     checkStrictly = false,
     checkStrategy = 'all',
+    selectable,
+    multiple,
     allowDeselect = false,
     loadData,
     loadedKeys: controlledLoadedKeys,
@@ -101,6 +103,7 @@ export function useTreeState(props: TreeProps): TreeContext & {
     blockNode = false,
     emptyText,
     ariaLabel,
+    'aria-label': htmlAriaLabel,
     onExpandedKeysChange,
     onSelectedKeysChange,
     onCheckedKeysChange,
@@ -132,7 +135,7 @@ export function useTreeState(props: TreeProps): TreeContext & {
   )
   const labels = useMemo(() => getTreeLabels(mergedLocale), [mergedLocale])
   const dir = config.direction === 'rtl' ? 'rtl' : 'ltr'
-  const selection = resolveTreeSelection({ selectionMode })
+  const selection = resolveTreeSelection({ selectionMode, selectable, multiple })
   const edgeScroll = useRef(createTreeEdgeScroll())
   const hasLoadData = typeof loadData === 'function'
 
@@ -537,6 +540,7 @@ export function useTreeState(props: TreeProps): TreeContext & {
       )
       if (hit && hit.index >= 0) {
         event.preventDefault()
+        event.stopPropagation()
         setActiveKey(view.visibleItems[hit.index].key)
         return
       }
@@ -681,7 +685,7 @@ export function useTreeState(props: TreeProps): TreeContext & {
     className,
     ariaLabel: labelledBy
       ? undefined
-      : resolveLocaleText(labels.ariaLabel, ariaLabel, labels.ariaLabel),
+      : resolveLocaleText(labels.ariaLabel, ariaLabel, htmlAriaLabel, labels.ariaLabel),
     labelledBy: typeof labelledBy === 'string' ? labelledBy : undefined,
     emptyText: resolveLocaleText(
       mergedLocale?.empty?.noData ?? mergedLocale?.common?.emptyText ?? 'No data',

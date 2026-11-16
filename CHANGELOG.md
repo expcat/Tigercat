@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Tree 键盘、名称与选择（Core / Vue / React，C116-F01、C116-F02、C116-F03）**：React 一次字母只推进一次 typeahead，先停在首个匹配项，连续前缀再命中对应节点。未传 `ariaLabel` 时，`role=tree` 使用原生 `aria-label`。未写 `selectionMode` 时，`selectable={false}` 不可选，`multiple` 为多选；显式 `selectionMode` 仍优先。
+
 - **TabPane label slot（Vue，C115-F01）**：标签实例带上子节点的 label slot。`label=概览` 且 `#label` 为「自定义」时，可见标题和读屏名称都是「自定义」。
 
 - **Tabs 懒渲染默认值与类型化 key（Vue / React，C114-F01、C114-F02）**：React 省略 `lazy` 时与 Core、Vue 一样挂载未访问面板，只有显式 `lazy` 才推迟挂载。数字 `1` 与字符串 `"1"` 的 DOM id、React 列表 key 和溢出文案不再相撞，关闭当前项后焦点落到对应的下一项。

@@ -38,11 +38,17 @@ import {
 export const EMPTY_TREE_DATA: TreeNode[] = []
 export const EMPTY_TREE_KEYS: TreeNodeKey[] = []
 
-export function resolveTreeSelection(options: { selectionMode?: TreeSelectionMode }): {
+export function resolveTreeSelection(options: {
+  selectionMode?: TreeSelectionMode
+  selectable?: boolean
+  multiple?: boolean
+}): {
   selectable: boolean
   multiple: boolean
 } {
-  const mode = options.selectionMode ?? 'single'
+  const mode =
+    options.selectionMode ??
+    (options.selectable === false ? 'none' : options.multiple ? 'multiple' : 'single')
   return {
     selectable: mode !== 'none',
     multiple: mode === 'multiple'

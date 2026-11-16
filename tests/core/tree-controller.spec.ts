@@ -37,6 +37,14 @@ const treeData: TreeNode[] = [
 describe('resolveTreeSelection', () => {
   it('defaults to single selection when selectionMode is omitted', () => {
     expect(resolveTreeSelection({})).toEqual({ selectable: true, multiple: false })
+    expect(resolveTreeSelection({ selectable: false })).toEqual({
+      selectable: false,
+      multiple: false
+    })
+    expect(resolveTreeSelection({ multiple: true })).toEqual({
+      selectable: true,
+      multiple: true
+    })
     expect(resolveTreeSelection({ selectionMode: 'none' })).toEqual({
       selectable: false,
       multiple: false
@@ -44,6 +52,12 @@ describe('resolveTreeSelection', () => {
     expect(resolveTreeSelection({ selectionMode: 'multiple' })).toEqual({
       selectable: true,
       multiple: true
+    })
+    expect(
+      resolveTreeSelection({ selectionMode: 'single', selectable: false, multiple: true })
+    ).toEqual({
+      selectable: true,
+      multiple: false
     })
   })
 })

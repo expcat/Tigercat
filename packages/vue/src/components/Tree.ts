@@ -222,7 +222,9 @@ export const Tree = defineComponent({
     const dir = computed(() => (config.value.direction === 'rtl' ? 'rtl' : 'ltr'))
     const selection = computed(() =>
       resolveTreeSelection({
-        selectionMode: props.selectionMode
+        selectionMode: props.selectionMode,
+        selectable: props.selectable,
+        multiple: props.multiple
       })
     )
     const hasLoadData = computed(() => typeof props.loadData === 'function')
