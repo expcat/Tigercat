@@ -546,10 +546,16 @@ export const ActivityFeed = defineComponent({
             ? h(
                 'div',
                 { 'data-tiger-activity-dates': '' },
-                groupActivityByDate(props.items).map((group) =>
-                  h('section', { key: group.title }, [
-                    h('h3', { 'data-activity-date': group.title }, group.title)
-                  ])
+                groupActivityByDate(props.items, props.timeZone || documentTimeZone.value).map(
+                  (group) =>
+                    h('section', { key: group.title }, [
+                      h('h3', { 'data-activity-date': group.title }, group.title),
+                      ...group.items.map((item, index) => {
+                        const copy = resolveActivityCopy(item)
+                        const label = copy.title || copy.body
+                        return label ? h('p', { key: item.id ?? index }, label) : null
+                      })
+                    ])
                 )
               )
             : null,
@@ -572,7 +578,7 @@ export const ActivityFeed = defineComponent({
                     flight.begin(emitWithReturn(instance, 'load-more'))
                   }
                 },
-                'next'
+                labels.value.nextText
               )
             : null,
           props.loading
@@ -598,6 +604,9 @@ export const ActivityFeed = defineComponent({
                       const group = resolvedGroups.value[row?.groupIndex]
                       if (!row || !group) return null
                       if (row.kind === 'header') {
+                        const headerNode =
+                          slots.groupHeader?.({ group }) ?? slots.groupTitle?.({ group })
+                        if (headerNode) return headerNode
                         return h('div', { class: 'flex items-center gap-2 mb-2' }, [
                           h('span', { class: activityFeedGroupMarkerClasses }),
                           h(
@@ -688,6 +697,22 @@ export const ActivityFeed = defineComponent({
                 class: infiniteScrollSentinelClasses,
                 'aria-hidden': 'true'
               })
+            : null,
+          props.loadError
+            ? h('div', { role: 'alert' }, [
+                h('p', null, labels.value.loadErrorText),
+                h(
+                  'button',
+                  {
+                    type: 'button',
+                    onClick: () => {
+                      flight.reset()
+                      flight.begin(emitWithReturn(instance, 'load-more'))
+                    }
+                  },
+                  labels.value.retryText
+                )
+              ])
             : null
         ] as HChildren
       )

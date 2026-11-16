@@ -555,7 +555,10 @@ export const arSA: TigerLocale = {
     loadingText: 'جارٍ التحميل...',
     listAriaLabel: 'النشاط',
     newItemText: 'نشاط جديد: {title}',
-    otherGroupTitle: 'أخرى'
+    otherGroupTitle: 'أخرى',
+    loadErrorText: 'تعذر تحميل المزيد من النشاط.',
+    retryText: 'إعادة المحاولة',
+    nextText: 'التالي'
   },
   notificationCenter: {
     title: 'الإشعارات',

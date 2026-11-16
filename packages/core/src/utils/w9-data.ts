@@ -9,7 +9,8 @@ import type { WaterfallDatum, WaterfallKind } from '../types/chart-visualization
 import { calculateVirtualColumnRange, type VirtualColumnRange } from './virtual-table-utils'
 import { calculateVirtualRange } from './virtual-list-utils'
 import { tableRowKeyId } from './table-utils'
-import { formatMonthYear } from './date-utils'
+import { dateInTimeZone, formatMonthYear } from './date-utils'
+import { resolveCallerTimeZone } from './caller-clock'
 import { downsampleSeriesData } from './chart-shared'
 import { devWarn } from './dev-warn'
 import { formatW9Label, getW9DataLabels } from './i18n/w9/data-labels'
@@ -1335,11 +1336,12 @@ export function paginatePrintPreview(options: {
 }
 
 export function groupActivityByDate<T extends { time?: string | number | Date }>(
-  items: readonly T[]
+  items: readonly T[],
+  timeZone?: string | null
 ): { title: string; items: T[] }[] {
   const groups: { title: string; items: T[] }[] = []
   for (const item of items) {
-    const title = activityDateTitle(item.time)
+    const title = activityDateTitle(item.time, timeZone)
     const last = groups[groups.length - 1]
     if (!last || last.title !== title) groups.push({ title, items: [item] })
     else last.items.push(item)
@@ -1347,13 +1349,18 @@ export function groupActivityByDate<T extends { time?: string | number | Date }>
   return groups
 }
 
-function activityDateTitle(time: string | number | Date | undefined): string {
+function activityDateTitle(
+  time: string | number | Date | undefined,
+  timeZone?: string | null
+): string {
   if (time === undefined) return ''
   const date = time instanceof Date ? time : new Date(time)
   if (Number.isNaN(date.getTime())) return String(time)
-  const month = `${date.getMonth() + 1}`.padStart(2, '0')
-  const day = `${date.getDate()}`.padStart(2, '0')
-  return `${date.getFullYear()}-${month}-${day}`
+  const zone = resolveCallerTimeZone(timeZone)
+  const basis = zone ? dateInTimeZone(date, zone) : date
+  const month = `${basis.getMonth() + 1}`.padStart(2, '0')
+  const day = `${basis.getDate()}`.padStart(2, '0')
+  return `${basis.getFullYear()}-${month}-${day}`
 }
 
 export function latestActivityAnnouncement<T extends { title?: string }>(

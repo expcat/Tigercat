@@ -556,7 +556,10 @@ export const deDE: TigerLocale = {
     loadingText: 'Wird geladen...',
     listAriaLabel: 'Aktivität',
     newItemText: 'Neue Aktivität: {title}',
-    otherGroupTitle: 'Sonstiges'
+    otherGroupTitle: 'Sonstiges',
+    loadErrorText: 'Weitere Aktivitäten konnten nicht geladen werden.',
+    retryText: 'Erneut versuchen',
+    nextText: 'Weiter'
   },
   notificationCenter: {
     title: 'Benachrichtigungen',

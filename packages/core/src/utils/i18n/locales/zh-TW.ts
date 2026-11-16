@@ -555,7 +555,10 @@ export const zhTW: TigerLocale = {
     loadingText: '載入中...',
     listAriaLabel: '動態',
     newItemText: '新動態：{title}',
-    otherGroupTitle: '其他'
+    otherGroupTitle: '其他',
+    loadErrorText: '無法載入更多動態。',
+    retryText: '重試',
+    nextText: '下一頁'
   },
   notificationCenter: {
     title: '通知中心',

@@ -555,7 +555,10 @@ export const idID: TigerLocale = {
     loadingText: 'Memuat...',
     listAriaLabel: 'Aktivitas',
     newItemText: 'Aktivitas baru: {title}',
-    otherGroupTitle: 'Lainnya'
+    otherGroupTitle: 'Lainnya',
+    loadErrorText: 'Tidak dapat memuat aktivitas lainnya.',
+    retryText: 'Coba lagi',
+    nextText: 'Berikutnya'
   },
   notificationCenter: {
     title: 'Notifikasi',

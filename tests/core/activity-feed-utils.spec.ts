@@ -5,6 +5,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   buildActivityGroups,
+  groupActivityByDate,
   toActivityTimelineItems,
   type ActivityItem
 } from '@expcat/tigercat-core'
@@ -34,5 +35,11 @@ describe('activity-feed-utils groups', () => {
 
   it('keeps id 0 as the timeline key', () => {
     expect(toActivityTimelineItems([{ id: 0, title: 'Zero' }])[0]?.key).toBe(0)
+  })
+
+  it('groups a UTC evening timestamp on 2024-05-02 and keeps the item', () => {
+    const items = [{ time: '2024-05-02T20:00:00.000Z', title: 'Evening' }]
+    expect(groupActivityByDate(items, 'UTC')).toEqual([{ title: '2024-05-02', items }])
+    expect(groupActivityByDate(items, 'Asia/Shanghai')[0]?.title).toBe('2024-05-03')
   })
 })

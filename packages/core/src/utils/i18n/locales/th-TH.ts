@@ -555,7 +555,10 @@ export const thTH: TigerLocale = {
     loadingText: 'กำลังโหลด...',
     listAriaLabel: 'กิจกรรม',
     newItemText: 'กิจกรรมใหม่: {title}',
-    otherGroupTitle: 'อื่นๆ'
+    otherGroupTitle: 'อื่นๆ',
+    loadErrorText: 'โหลดกิจกรรมเพิ่มเติมไม่สำเร็จ',
+    retryText: 'ลองอีกครั้ง',
+    nextText: 'ถัดไป'
   },
   notificationCenter: {
     title: 'การแจ้งเตือน',

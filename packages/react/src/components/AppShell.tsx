@@ -50,6 +50,52 @@ export function AppShell({
   const effectiveCollapsed = collapsed !== undefined ? collapsed : localCollapsed
   const active = resolveAppShellActiveTab(tabs, activeTab, localTab)
 
+  const crumbList =
+    breadcrumb.length > 0 ? (
+      <Breadcrumb>
+        {breadcrumb.map((item) => (
+          <BreadcrumbItem key={item.key ?? item.title} href={item.href}>
+            {item.title}
+          </BreadcrumbItem>
+        ))}
+      </Breadcrumb>
+    ) : null
+  const breadcrumbNode =
+    crumbList && breadcrumbExtra ? (
+      <>
+        {crumbList}
+        {breadcrumbExtra}
+      </>
+    ) : (
+      (crumbList ?? breadcrumbExtra)
+    )
+  const tabList =
+    tabs.length > 0 ? (
+      <Tabs
+        type="card"
+        activeKey={active}
+        onChange={(key) => {
+          const next = String(key)
+          if (activeTab === undefined) setLocalTab(next)
+          onTabChange?.(next)
+        }}>
+        {tabs.map((tab) => (
+          <TabPane key={tab.key} tabKey={tab.key} label={tab.title}>
+            {active === tab.key ? children : null}
+          </TabPane>
+        ))}
+      </Tabs>
+    ) : null
+  const tabsNode =
+    tabList && tabsExtra ? (
+      <>
+        {tabList}
+        {tabsExtra}
+      </>
+    ) : (
+      (tabList ?? tabsExtra)
+    )
+
   return (
     <Layout {...rest} fullHeight={fullHeight} className={className} data-tiger-app-shell="">
       <Sidebar
@@ -70,40 +116,11 @@ export function AppShell({
           <PageHeader
             title={title}
             subTitle={subTitle}
-            breadcrumb={
-              breadcrumb.length ? (
-                <Breadcrumb>
-                  {breadcrumb.map((item) => (
-                    <BreadcrumbItem key={item.key ?? item.title} href={item.href}>
-                      {item.title}
-                    </BreadcrumbItem>
-                  ))}
-                </Breadcrumb>
-              ) : (
-                breadcrumbExtra
-              )
-            }
-            tabs={
-              tabs.length ? (
-                <Tabs
-                  type="card"
-                  activeKey={active}
-                  onChange={(key) => {
-                    const next = String(key)
-                    if (activeTab === undefined) setLocalTab(next)
-                    onTabChange?.(next)
-                  }}>
-                  {tabs.map((tab) => (
-                    <TabPane key={tab.key} tabKey={tab.key} label={tab.title} />
-                  ))}
-                </Tabs>
-              ) : (
-                tabsExtra
-              )
-            }
+            breadcrumb={breadcrumbNode}
+            tabs={tabsNode}
             actions={actions}
           />
-          {children}
+          {tabs.length ? null : children}
         </Content>
       </div>
     </Layout>

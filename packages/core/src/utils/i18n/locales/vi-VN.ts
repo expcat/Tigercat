@@ -555,7 +555,10 @@ export const viVN: TigerLocale = {
     loadingText: 'Đang tải...',
     listAriaLabel: 'Hoạt động',
     newItemText: 'Hoạt động mới: {title}',
-    otherGroupTitle: 'Khác'
+    otherGroupTitle: 'Khác',
+    loadErrorText: 'Không tải thêm hoạt động được.',
+    retryText: 'Thử lại',
+    nextText: 'Tiếp'
   },
   notificationCenter: {
     title: 'Thông báo',

@@ -555,7 +555,10 @@ export const koKR: TigerLocale = {
     loadingText: '로딩 중...',
     listAriaLabel: '활동',
     newItemText: '새 활동: {title}',
-    otherGroupTitle: '기타'
+    otherGroupTitle: '기타',
+    loadErrorText: '활동을 더 불러오지 못했습니다.',
+    retryText: '다시 시도',
+    nextText: '다음'
   },
   notificationCenter: {
     title: '알림',

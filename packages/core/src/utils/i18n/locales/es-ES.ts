@@ -556,7 +556,10 @@ export const esES: TigerLocale = {
     loadingText: 'Cargando...',
     listAriaLabel: 'Actividad',
     newItemText: 'Nueva actividad: {title}',
-    otherGroupTitle: 'Otros'
+    otherGroupTitle: 'Otros',
+    loadErrorText: 'No se pudieron cargar más actividades.',
+    retryText: 'Reintentar',
+    nextText: 'Siguiente'
   },
   notificationCenter: {
     title: 'Notificaciones',

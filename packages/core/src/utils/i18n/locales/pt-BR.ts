@@ -555,7 +555,10 @@ export const ptBR: TigerLocale = {
     loadingText: 'Carregando...',
     listAriaLabel: 'Atividade',
     newItemText: 'Nova atividade: {title}',
-    otherGroupTitle: 'Outros'
+    otherGroupTitle: 'Outros',
+    loadErrorText: 'Não foi possível carregar mais atividades.',
+    retryText: 'Tentar novamente',
+    nextText: 'Próxima'
   },
   notificationCenter: {
     title: 'Notificações',

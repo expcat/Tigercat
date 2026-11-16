@@ -555,7 +555,10 @@ export const jaJP: TigerLocale = {
     loadingText: '読み込み中...',
     listAriaLabel: 'アクティビティ',
     newItemText: '新しいアクティビティ: {title}',
-    otherGroupTitle: 'その他'
+    otherGroupTitle: 'その他',
+    loadErrorText: 'これ以上のアクティビティを読み込めませんでした。',
+    retryText: '再試行',
+    nextText: '次へ'
   },
   notificationCenter: {
     title: '通知',

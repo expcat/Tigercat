@@ -2,7 +2,7 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { render, screen, waitFor, fireEvent, within } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
 import { defineComponent, h } from 'vue'
@@ -153,6 +153,82 @@ describe('ActivityFeed (Vue)', () => {
     expect(screen.queryByText('今天')).not.toBeInTheDocument()
     expect(screen.getByText('A')).toBeInTheDocument()
   })
+
+  it('keeps a custom group header before and after the window opens', () => {
+    const short = [
+      { id: 1, title: 'A' },
+      { id: 2, title: 'B' }
+    ]
+    const { unmount } = render(ActivityFeed, {
+      props: { groups: [{ key: 'g', title: 'RealTitle', items: short }] },
+      slots: { groupHeader: () => 'CUSTOM-HEADER' }
+    })
+    expect(screen.getByText('CUSTOM-HEADER')).toBeInTheDocument()
+    unmount()
+
+    render(ActivityFeed, {
+      props: {
+        groups: [
+          {
+            key: 'g',
+            title: 'RealTitle',
+            items: Array.from({ length: 45 }, (_, index) => ({
+              id: index + 1,
+              title: `Row ${index + 1}`
+            }))
+          }
+        ]
+      },
+      slots: { groupHeader: () => 'CUSTOM-HEADER' }
+    })
+    expect(screen.getByText('CUSTOM-HEADER')).toBeInTheDocument()
+  })
+
+  it('puts a UTC evening item in the 2024-05-02 section', () => {
+    const DateWrapper = defineComponent({
+      setup() {
+        return () =>
+          h(ConfigProvider, { locale: zhCN }, () =>
+            h(ActivityFeed, {
+              groupByDate: true,
+              timeZone: 'UTC',
+              items: [{ id: 1, title: 'Evening', time: '2024-05-02T20:00:00.000Z' }]
+            })
+          )
+      }
+    })
+    const { container } = render(DateWrapper)
+    const section = container.querySelector('section')
+    expect(section?.querySelector('[data-activity-date]')?.getAttribute('data-activity-date')).toBe(
+      '2024-05-02'
+    )
+    expect(section?.textContent).toContain('Evening')
+    expect(screen.getByRole('button', { name: '下一页' })).toBeInTheDocument()
+  })
+
+  it('retries a localized load error once', async () => {
+    const onLoadMore = vi.fn()
+    const RetryWrapper = defineComponent({
+      setup() {
+        return () =>
+          h(ConfigProvider, { locale: zhCN }, () =>
+            h(ActivityFeed, {
+              hasMore: true,
+              loadError: true,
+              items: [{ id: 1, title: 'One' }],
+              onLoadMore
+            })
+          )
+      }
+    })
+    render(RetryWrapper)
+    const alert = screen.getByRole('alert')
+    expect(alert.textContent).toContain('无法加载更多动态')
+    expect(screen.queryByRole('button', { name: 'Retry' })).not.toBeInTheDocument()
+    await fireEvent.click(screen.getByRole('button', { name: '重试' }))
+    expect(onLoadMore).toHaveBeenCalledTimes(1)
+  })
+
   describe('locale', () => {
     it('uses ConfigProvider zh-CN empty and loading copy when props are omitted', () => {
       const EmptyWrapper = defineComponent({

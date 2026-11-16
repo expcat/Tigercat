@@ -555,7 +555,10 @@ export const enUS: TigerLocale = {
     loadingText: 'Loading...',
     listAriaLabel: 'Activity',
     newItemText: 'New activity: {title}',
-    otherGroupTitle: 'Other'
+    otherGroupTitle: 'Other',
+    loadErrorText: 'Could not load more activity.',
+    retryText: 'Retry',
+    nextText: 'Next'
   },
   notificationCenter: {
     title: 'Notifications',

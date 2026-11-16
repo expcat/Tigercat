@@ -555,7 +555,10 @@ export const frFR: TigerLocale = {
     loadingText: 'Chargement...',
     listAriaLabel: 'Activité',
     newItemText: 'Nouvelle activité : {title}',
-    otherGroupTitle: 'Autre'
+    otherGroupTitle: 'Autre',
+    loadErrorText: 'Impossible de charger d’autres activités.',
+    retryText: 'Réessayer',
+    nextText: 'Suivant'
   },
   notificationCenter: {
     title: 'Centre de notifications',

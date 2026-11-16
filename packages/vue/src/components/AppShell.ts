@@ -78,8 +78,9 @@ export const AppShell = defineComponent({
                     PageHeader,
                     { title: props.title, subTitle: props.subTitle },
                     {
-                      breadcrumb: () =>
-                        props.breadcrumb.length
+                      breadcrumb: () => {
+                        const extra = slots.breadcrumbExtra?.()
+                        const crumbs = props.breadcrumb.length
                           ? h(Breadcrumb, null, {
                               default: () =>
                                 props.breadcrumb.map((item) =>
@@ -90,9 +91,13 @@ export const AppShell = defineComponent({
                                   )
                                 )
                             })
-                          : slots.breadcrumb?.(),
-                      tabs: () =>
-                        props.tabs.length
+                          : null
+                        if (crumbs && extra) return [crumbs, extra]
+                        return crumbs ?? extra
+                      },
+                      tabs: () => {
+                        const extra = slots.tabsExtra?.()
+                        const tabList = props.tabs.length
                           ? h(
                               Tabs,
                               {
@@ -107,15 +112,22 @@ export const AppShell = defineComponent({
                               {
                                 default: () =>
                                   props.tabs.map((tab) =>
-                                    h(TabPane, { key: tab.key, tabKey: tab.key, label: tab.title })
+                                    h(
+                                      TabPane,
+                                      { key: tab.key, tabKey: tab.key, label: tab.title },
+                                      active.value === tab.key ? () => slots.default?.() : undefined
+                                    )
                                   )
                               }
                             )
-                          : slots.tabs?.(),
+                          : null
+                        if (tabList && extra) return [tabList, extra]
+                        return tabList ?? extra
+                      },
                       actions: () => slots.actions?.()
                     }
                   ),
-                  slots.default?.()
+                  props.tabs.length ? null : slots.default?.()
                 ]
               })
             ])

@@ -49,4 +49,56 @@ describe('W10 composites', () => {
     const { container } = render(WorkflowDetailShell)
     expect(container.querySelector('h1')?.textContent).toBe('Approval')
   })
+
+  it('puts the page body in the selected tab panel', () => {
+    const { container } = render(AppShell, {
+      props: {
+        tabs: [
+          { key: 'home', title: 'Home' },
+          { key: 'list', title: 'List' }
+        ]
+      },
+      slots: { default: () => 'PAGE-BODY' }
+    })
+    const selected = [...container.querySelectorAll('[role="tabpanel"]')].find(
+      (panel) => panel.getAttribute('aria-hidden') !== 'true'
+    )
+    expect(selected?.textContent).toContain('PAGE-BODY')
+    const textHosts = [...container.querySelectorAll('*')].filter((el) =>
+      [...el.childNodes].some(
+        (node) => node.nodeType === Node.TEXT_NODE && node.textContent?.includes('PAGE-BODY')
+      )
+    )
+    expect(textHosts.length).toBeGreaterThan(0)
+    for (const host of textHosts) {
+      expect(host.closest('[role="tabpanel"]')).toBe(selected)
+    }
+  })
+
+  it('keeps breadcrumbExtra and tabsExtra with or without arrays', () => {
+    const filled = render(AppShell, {
+      props: {
+        breadcrumb: [{ title: 'HomeCrumb' }],
+        tabs: [{ key: 'home', title: 'Home' }]
+      },
+      slots: {
+        breadcrumbExtra: () => 'CRUMB-EXTRA',
+        tabsExtra: () => 'TABS-EXTRA'
+      }
+    })
+    expect(filled.container.textContent).toContain('HomeCrumb')
+    expect(filled.container.textContent).toContain('CRUMB-EXTRA')
+    expect(filled.container.textContent).toContain('TABS-EXTRA')
+    filled.unmount()
+
+    const empty = render(AppShell, {
+      props: { breadcrumb: [], tabs: [] },
+      slots: {
+        breadcrumbExtra: () => 'CRUMB-EXTRA',
+        tabsExtra: () => 'TABS-EXTRA'
+      }
+    })
+    expect(empty.container.textContent).toContain('CRUMB-EXTRA')
+    expect(empty.container.textContent).toContain('TABS-EXTRA')
+  })
 })

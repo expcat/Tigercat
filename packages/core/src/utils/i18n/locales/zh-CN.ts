@@ -555,7 +555,10 @@ export const zhCN: TigerLocale = {
     loadingText: '加载中...',
     listAriaLabel: '动态',
     newItemText: '新动态：{title}',
-    otherGroupTitle: '其他'
+    otherGroupTitle: '其他',
+    loadErrorText: '无法加载更多动态。',
+    retryText: '重试',
+    nextText: '下一页'
   },
   notificationCenter: {
     title: '通知中心',

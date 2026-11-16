@@ -388,9 +388,15 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
       </div>
       {groupByDate ? (
         <div data-tiger-activity-dates="">
-          {groupActivityByDate(items).map((group) => (
+          {groupActivityByDate(items, timeZone || documentTimeZone).map((group) => (
             <section key={group.title}>
               <h3 data-activity-date={group.title}>{group.title}</h3>
+              {group.items.map((item, index) => {
+                const copy = resolveActivityCopy(item)
+                const label = copy.title || copy.body
+                if (!label) return null
+                return <p key={String(item.id ?? index)}>{label}</p>
+              })}
             </section>
           ))}
         </div>
@@ -404,7 +410,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
             if (!flight.canRequest({ hasMore, loading, error: loadError })) return
             flight.begin(onLoadMore?.())
           }}>
-          next
+          {labels.nextText}
         </button>
       ) : null}
       {loading ? <p>{resolvedLoadingText}</p> : null}
@@ -421,6 +427,8 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
             const group = resolvedGroups[row?.groupIndex]
             if (!row || !group) return null
             if (row.kind === 'header') {
+              const headerNode = renderGroupHeader?.(group)
+              if (headerNode) return headerNode
               return (
                 <div className="flex items-center gap-2 mb-2">
                   <span className={activityFeedGroupMarkerClasses} />
@@ -502,6 +510,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
       )}
       {loadError ? (
         <div role="alert">
+          <p>{labels.loadErrorText}</p>
           <button
             type="button"
             onClick={() => {
@@ -509,7 +518,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
               const start = onLoadMoreRef.current
               if (start) flightRef.current.begin(start())
             }}>
-            Retry
+            {labels.retryText}
           </button>
         </div>
       ) : null}

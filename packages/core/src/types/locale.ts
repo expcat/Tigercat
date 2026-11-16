@@ -833,6 +833,12 @@ export interface TigerLocaleActivityFeed {
   otherGroupTitle?: string
   /** Polite announcement for a new item. Supports {title}. */
   newItemText?: string
+  /** Failure explanation shown with the load-error retry control. */
+  loadErrorText?: string
+  /** Retry control after a failed page load. */
+  retryText?: string
+  /** Page control shown when groupByDate is on. */
+  nextText?: string
 }
 
 export interface TigerLocaleNotificationCenter {
