@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+React Progress 的默认百分比文字现在遵循 ConfigProvider 的 locale，与 Vue 一致。fr-FR 下的 50% 现在输出 `50\u00A0%`；依赖旧百分比文字的断言需按 locale 调整，调用方式不用改。
+
 双端 Popconfirm 打开并完成定位后，现在聚焦确定按钮，Enter 可直接确认；Shift+Tab 到取消，Tab 回确定时弹层保持打开。调用方式不用改，依赖旧焦点停留行为的键盘脚本需相应调整。
 
 React `confirmModal` 现在等待 `onOk` 返回的 Promise 兑现后才关闭，外层 Promise 继续采纳该返回值；返回 false 或拒绝时，对话框保持打开，外层 Promise 继续待决，仍可重试或取消。Vue Modal 的自定义 `zIndex` 现在随打开期间的 prop 更新，并在离场过渡中保留。调用方式不用改。

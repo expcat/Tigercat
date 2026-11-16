@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Progress 百分比语言（React，C128-F01）**：默认百分比文字遵循 ConfigProvider 的 locale；fr-FR 的 50% 显示为 `50\u00A0%`，与 Vue 一致。
+
 - **Popconfirm 键盘确认（React / Vue，C126-F01）**：打开并完成定位后聚焦确定按钮，Enter 确认；Shift+Tab 与 Tab 可在取消、确定之间移动，不再因焦点留在触发器而提前关闭。
 
 - **NotificationContainer 操作节点（Vue，C125-F01）**：主按钮或 `actions` 与 `actionNode` 同时存在时，自定义节点渲染在同一操作区的按钮之后，与 React 一致。

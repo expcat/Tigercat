@@ -67,7 +67,8 @@ export const Progress: React.FC<ProgressProps> = React.memo(
           indeterminate,
           steps,
           ariaLabelledby,
-          widgetName
+          widgetName,
+          locales: config.locale?.locale
         }),
       [
         percentage,
@@ -83,7 +84,8 @@ export const Progress: React.FC<ProgressProps> = React.memo(
         indeterminate,
         steps,
         ariaLabelledby,
-        widgetName
+        widgetName,
+        config.locale?.locale
       ]
     )
 

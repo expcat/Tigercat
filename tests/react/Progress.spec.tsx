@@ -7,6 +7,7 @@ import { render, screen } from '@testing-library/react'
 import React from 'react'
 import { Progress } from '@expcat/tigercat-react/Progress'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
+import { frFR } from '@expcat/tigercat-core/locales/fr-FR'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 import { expectNoA11yViolations } from '../utils/react'
@@ -86,6 +87,16 @@ describe('Progress', () => {
       </ConfigProvider>
     )
     expect(screen.getByRole('progressbar')).toHaveAttribute('aria-label', zhTW.progress!.ariaLabel)
+  })
+
+  it('formats default percentage text with the ConfigProvider locale', () => {
+    render(
+      <ConfigProvider locale={frFR}>
+        <Progress percentage={50} />
+      </ConfigProvider>
+    )
+
+    expect(screen.getByRole('progressbar').textContent).toBe('50\u00A0%')
   })
 
   it('renders line text and supports custom text/format', () => {
