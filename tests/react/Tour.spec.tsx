@@ -75,6 +75,32 @@ describe('Tour', () => {
     expect(screen.getByText('2 / 3')).toBeInTheDocument()
   })
 
+  it('keeps an advanceOnTarget target active and advances when it is clicked', async () => {
+    const user = userEvent.setup()
+    const target = mountTarget()
+    const onChange = vi.fn()
+    render(
+      <Tour
+        steps={[
+          { ...baseSteps[0], target, type: 'advanceOnTarget' },
+          { ...baseSteps[1], target, interact: true }
+        ]}
+        open
+        onChange={onChange}
+      />
+    )
+
+    await screen.findByRole('dialog', { name: 'Step 1' })
+    expect(target).not.toHaveAttribute('inert')
+    await user.click(target)
+    expect(onChange).toHaveBeenCalledWith(1)
+    expect(await screen.findByRole('dialog', { name: 'Step 2' })).toBeInTheDocument()
+    expect(target).not.toHaveAttribute('inert')
+    await user.click(target)
+    expect(onChange).toHaveBeenCalledTimes(1)
+    target.remove()
+  })
+
   it('should not show Previous button on the first step', async () => {
     render(<Tour steps={baseSteps} open={true} />)
     await screen.findByRole('dialog')

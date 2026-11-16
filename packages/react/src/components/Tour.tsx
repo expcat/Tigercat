@@ -335,7 +335,7 @@ export const Tour = React.forwardRef<TourHandle, TourProps>(function Tour(
     inert: true,
     autoFocus: true,
     initialFocusRef: popoverRef,
-    exemptRef: step?.interact ? targetExemptRef : undefined
+    exemptRef: targetExemptRef
   })
 
   const {

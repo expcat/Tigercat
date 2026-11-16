@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Tour 目标点击推进（React / 文档生成器，C130-F01）**：`advanceOnTarget` 目标保持在 inert 之外，点击后进入下一步，与 Vue 一致；生成笔记同步说明它与 `interact` 都豁免。
+
 - **Tooltip 焦点说明（文档 / MCP，C129-F02）**：生成笔记与迁移文档写明，`trigger="hover"` 的焦点进入立即打开，默认 100ms 的显示延迟只作用于指针。
 
 - **Progress 百分比语言（React，C128-F01）**：默认百分比文字遵循 ConfigProvider 的 locale；fr-FR 的 50% 显示为 `50\u00A0%`，与 Vue 一致。
