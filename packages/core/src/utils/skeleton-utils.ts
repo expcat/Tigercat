@@ -70,6 +70,21 @@ export function resolveSkeletonRows(rows: number | undefined): number {
   return Math.max(1, whole)
 }
 
+/**
+ * `preset` selects the same shapes as `variant`.
+ * An explicit `variant` wins; an omitted variant falls back to the preset, then text.
+ */
+export function resolveSkeletonVariant(
+  variant: SkeletonVariant | undefined,
+  preset: 'text' | 'avatar' | 'image' | 'button' | undefined
+): SkeletonVariant {
+  if (variant != null) return variant
+  if (preset === 'text' || preset === 'avatar' || preset === 'image' || preset === 'button') {
+    return preset
+  }
+  return 'text'
+}
+
 /** Bar fill utility. Same chain as `.tiger-skeleton` so a scanned class cannot paint transparent over the plugin rule. */
 export const skeletonBaseClasses = `tiger-skeleton bg-[${skeletonBoneFill.replace(/ /g, '_')}] rounded-[var(--tiger-radius-sm)]`
 

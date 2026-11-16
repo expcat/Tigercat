@@ -29,5 +29,5 @@ Note: `wave` 是扫光，不是 pulse。未传宽高用 class 默认值。装饰
 - `width?`: `string`; default `undefined (uses variant defaults)`. Width of the skeleton Can be a CSS value (e.g., '100px', '50%', '100%')
 - `className?`: `string`; default `-`. Additional CSS classes
 - `loading?`: `boolean`; default `-`. `true` shows the placeholder. `false` shows children. Omit to always show the placeholder.
-- `preset?`: `'text' | 'avatar' | 'image' | 'button'`; default `-`. Shape and row preset. Not a separate control component.
+- `preset?`: `'text' | 'avatar' | 'image' | 'button'`; default `-`. Shape and row preset. Not a separate control. Explicit variant wins.
 - `style?`: `Record<string, string | number>`; default `-`. -

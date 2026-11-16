@@ -2,8 +2,8 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect } from 'vitest'
-import { render } from '@testing-library/vue'
+import { describe, expect, it, vi } from 'vitest'
+import { fireEvent, render } from '@testing-library/vue'
 import { Skeleton } from '@expcat/tigercat-vue/Skeleton'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
@@ -131,6 +131,86 @@ describe('Skeleton', () => {
         attrs: { 'aria-hidden': 'false' }
       })
       expect(getRoot(container).getAttribute('aria-hidden')).toBe('false')
+    })
+  })
+
+  describe('preset', () => {
+    it('maps preset=avatar onto the avatar shape and does not pass preset through', () => {
+      const avatar = render(Skeleton, { props: { preset: 'avatar' } })
+      const avatarRoot = getRoot(avatar.container)
+      expect(avatarRoot.className).toContain('rounded-full')
+      expect(avatarRoot.className).toContain('w-10')
+      expect(avatarRoot.className).toContain('h-10')
+      expect(avatarRoot.hasAttribute('preset')).toBe(false)
+      avatar.unmount()
+
+      const explicit = render(Skeleton, {
+        props: { variant: 'text', preset: 'avatar' }
+      })
+      const textRoot = getRoot(explicit.container)
+      expect(textRoot.className).toContain('w-full')
+      expect(textRoot.className).toContain('h-4')
+      expect(textRoot.className).not.toContain('rounded-full')
+      expect(textRoot.className).not.toContain('w-10')
+    })
+  })
+
+  describe('row normalization', () => {
+    it('caps rows, floors paragraph rows, and keeps the last line at 60%', () => {
+      const capped = render(Skeleton, { props: { rows: 8 } })
+      expect(getBars(capped.container)).toHaveLength(6)
+      capped.unmount()
+
+      const fraction = render(Skeleton, { props: { rows: 2.5, paragraph: true } })
+      const bars = getBars(fraction.container)
+      expect(bars).toHaveLength(2)
+      expect(bars[1].style.width).toBe('60%')
+      fraction.unmount()
+
+      const infinite = render(Skeleton, { props: { rows: Infinity } })
+      expect(getBars(infinite.container)).toHaveLength(1)
+    })
+  })
+
+  describe('loaded host', () => {
+    it('keeps caller root props and clicks after loading becomes false', async () => {
+      const onClick = vi.fn()
+      const { container, rerender } = render(Skeleton, {
+        props: {
+          loading: true,
+          className: 'persistent-class',
+          style: { padding: '12px' }
+        },
+        attrs: {
+          id: 'persistent-host',
+          'aria-describedby': 'help',
+          'data-marker': 'keep',
+          onClick
+        },
+        slots: { default: '<button type="button">ready</button>' }
+      })
+      const loadingRoot = getRoot(container)
+      expect(loadingRoot.className).toContain('tiger-skeleton')
+      expect(loadingRoot.getAttribute('aria-hidden')).toBe('true')
+      await fireEvent.click(loadingRoot)
+      expect(onClick).toHaveBeenCalledTimes(1)
+
+      await rerender({
+        loading: false,
+        className: 'persistent-class',
+        style: { padding: '12px' }
+      })
+      const loaded = getRoot(container)
+      expect(loaded.id).toBe('persistent-host')
+      expect(loaded.className).toContain('persistent-class')
+      expect(loaded.style.padding).toBe('12px')
+      expect(loaded).toHaveAttribute('aria-describedby', 'help')
+      expect(loaded).toHaveAttribute('data-marker', 'keep')
+      expect(loaded).toHaveAttribute('aria-busy', 'false')
+      expect(loaded.hasAttribute('aria-hidden')).toBe(false)
+      expect(loaded.hasAttribute('role')).toBe(false)
+      await fireEvent.click(loaded.querySelector('button')!)
+      expect(onClick).toHaveBeenCalledTimes(2)
     })
   })
 })

@@ -7,6 +7,8 @@ import {
   getParagraphRowWidth,
   isSkeletonNamed,
   resolveSkeletonAriaHidden,
+  resolveSkeletonRows,
+  resolveSkeletonVariant,
   mergeStyleValues,
   type SkeletonVariant,
   type SkeletonAnimation,
@@ -24,7 +26,11 @@ export const Skeleton = defineComponent({
   props: {
     variant: {
       type: String as PropType<SkeletonVariant>,
-      default: 'text' as SkeletonVariant
+      default: undefined
+    },
+    preset: {
+      type: String as PropType<'text' | 'avatar' | 'image' | 'button'>,
+      default: undefined
     },
     animation: {
       type: String as PropType<SkeletonAnimation>,
@@ -70,12 +76,26 @@ export const Skeleton = defineComponent({
     }))
 
     return () => {
-      if (!props.loading) {
-        return h('div', { 'data-tiger-skeleton': '', 'aria-busy': 'false' }, slots.default?.())
-      }
       const attrsRecord = attrs as Record<string, unknown>
       const attrsClass = attrsRecord.class
       const attrsStyle = attrsRecord.style
+
+      if (!props.loading) {
+        return h(
+          'div',
+          {
+            ...attrs,
+            class: classNames(props.className, coerceClassValue(attrsClass)),
+            style: mergeStyleValues(attrsStyle, props.style),
+            'data-tiger-skeleton': '',
+            'aria-busy': 'false'
+          },
+          slots.default?.()
+        )
+      }
+
+      const variant = resolveSkeletonVariant(props.variant, props.preset)
+      const rowCount = resolveSkeletonRows(props.rows)
       const named = isSkeletonNamed(attrsRecord['aria-label'], attrsRecord['aria-labelledby'])
       const computedAriaHidden = resolveSkeletonAriaHidden(attrsRecord['aria-hidden'], named)
       const namedStatus = named && computedAriaHidden !== true
@@ -86,24 +106,24 @@ export const Skeleton = defineComponent({
         'aria-busy': namedStatus ? true : undefined
       }
 
-      if (props.variant === 'text' && props.rows > 1) {
+      if (variant === 'text' && rowCount > 1) {
         const rows = []
-        for (let i = 0; i < props.rows; i++) {
+        for (let i = 0; i < rowCount; i++) {
           const rowStyle: Record<string, string> = {}
           if (props.paragraph) {
-            rowStyle.width = getParagraphRowWidth(i, props.rows)
+            rowStyle.width = getParagraphRowWidth(i, rowCount)
           }
           if (props.height) rowStyle.height = props.height
           rows.push(
             h('div', {
               key: i,
               class: classNames(
-                getSkeletonClasses(props.variant, props.animation, props.shape, {
+                getSkeletonClasses(variant, props.animation, props.shape, {
                   height: props.height,
                   omitWidth: true
                 }),
                 !props.paragraph && 'w-full',
-                i < props.rows - 1 && 'mb-2'
+                i < rowCount - 1 && 'mb-2'
               ),
               style: Object.keys(rowStyle).length > 0 ? rowStyle : undefined
             })
@@ -131,7 +151,7 @@ export const Skeleton = defineComponent({
       return h('div', {
         ...attrs,
         class: classNames(
-          getSkeletonClasses(props.variant, props.animation, props.shape, visualOptions.value),
+          getSkeletonClasses(variant, props.animation, props.shape, visualOptions.value),
           props.className,
           coerceClassValue(attrsClass)
         ),

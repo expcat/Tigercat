@@ -4343,6 +4343,7 @@
       "resolveSignatureSurfaceColor",
       "resolveSkeletonAriaHidden",
       "resolveSkeletonRows",
+      "resolveSkeletonVariant",
       "resolveSliderThumbName",
       "resolveSpaceSize",
       "resolveSplitButtonSize",

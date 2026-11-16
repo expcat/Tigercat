@@ -6,6 +6,8 @@ import {
   getSkeletonInlineStyle,
   isSkeletonNamed,
   resolveSkeletonAriaHidden,
+  resolveSkeletonRows,
+  resolveSkeletonVariant,
   type SkeletonProps as CoreSkeletonProps
 } from '@expcat/tigercat-core'
 
@@ -17,12 +19,13 @@ export type SkeletonProps = CoreSkeletonProps &
 
 export const Skeleton = forwardRef<HTMLDivElement, SkeletonProps>(function Skeleton(
   {
-    variant = 'text',
+    variant,
+    preset,
     animation = 'pulse',
     width,
     height,
     shape = 'circle',
-    rows = 1,
+    rows,
     paragraph = false,
     loading = true,
     children,
@@ -35,6 +38,8 @@ export const Skeleton = forwardRef<HTMLDivElement, SkeletonProps>(function Skele
   },
   ref
 ) {
+  const resolvedVariant = resolveSkeletonVariant(variant, preset)
+  const rowCount = resolveSkeletonRows(rows)
   const named = isSkeletonNamed(ariaLabel, ariaLabelledBy)
   const computedAriaHidden = resolveSkeletonAriaHidden(ariaHidden, named)
   const namedStatus = named && computedAriaHidden !== true
@@ -49,30 +54,39 @@ export const Skeleton = forwardRef<HTMLDivElement, SkeletonProps>(function Skele
 
   if (!loading) {
     return (
-      <div ref={ref} data-tiger-skeleton="" aria-busy={false}>
+      <div
+        {...divProps}
+        ref={ref}
+        className={className}
+        style={style}
+        data-tiger-skeleton=""
+        aria-label={ariaLabel}
+        aria-labelledby={ariaLabelledBy}
+        aria-hidden={ariaHidden}
+        aria-busy={false}>
         {children}
       </div>
     )
   }
 
-  if (variant === 'text' && rows > 1) {
+  if (resolvedVariant === 'text' && rowCount > 1) {
     const rowElements: React.ReactNode[] = []
-    for (let i = 0; i < rows; i++) {
+    for (let i = 0; i < rowCount; i++) {
       const rowStyle: React.CSSProperties = {}
       if (paragraph) {
-        rowStyle.width = getParagraphRowWidth(i, rows)
+        rowStyle.width = getParagraphRowWidth(i, rowCount)
       }
       if (height) rowStyle.height = height
       rowElements.push(
         <div
           key={i}
           className={classNames(
-            getSkeletonClasses(variant, animation, shape, {
+            getSkeletonClasses(resolvedVariant, animation, shape, {
               height,
               omitWidth: true
             }),
             !paragraph && 'w-full',
-            i < rows - 1 && 'mb-2'
+            i < rowCount - 1 && 'mb-2'
           )}
           style={Object.keys(rowStyle).length > 0 ? rowStyle : undefined}
         />
@@ -98,7 +112,7 @@ export const Skeleton = forwardRef<HTMLDivElement, SkeletonProps>(function Skele
       ref={ref}
       data-tiger-skeleton=""
       className={classNames(
-        getSkeletonClasses(variant, animation, shape, { width, height }),
+        getSkeletonClasses(resolvedVariant, animation, shape, { width, height }),
         className
       )}
       style={{ ...inlineStyle, ...style }}

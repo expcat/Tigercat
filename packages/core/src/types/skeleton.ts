@@ -77,7 +77,7 @@ export interface SkeletonProps {
   loading?: boolean
 
   /**
-   * Shape and row preset. Not a separate control component.
+   * Shape and row preset. Not a separate control. Explicit variant wins.
    */
   preset?: 'text' | 'avatar' | 'image' | 'button'
 }
