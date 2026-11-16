@@ -1,5 +1,4 @@
 import { Highlight } from '@expcat/tigercat-react/Highlight'
-import { Link } from '@expcat/tigercat-react/Link'
 import { Text } from '@expcat/tigercat-react/Text'
 
 const orderId = ['#42', '#7']
@@ -19,7 +18,7 @@ export default function App() {
       </Text>
       <Text tag="p" size="sm">
         <Highlight keywords="Vue">
-          Learn <Link href="https://vuejs.org">Vue</Link> today
+          Learn <a href="https://vuejs.org">Vue</a> today
         </Highlight>
       </Text>
     </div>

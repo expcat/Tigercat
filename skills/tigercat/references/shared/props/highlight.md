@@ -13,7 +13,7 @@ description: Compact generated Tigercat Basic props reference
 
 `packages/core/src/types/highlight.ts` · `HighlightProps` · 4/9 compact props · [Complete props](#remaining-props-complete-public-api)
 
-Note: `keywords` 只收字符串，按字面量线性扫描，不执行正则。`global={false}` 是每个 keyword 的首次匹配，不是整段只亮一次。children/slot 里的元素节点会保留，匹配的文本包在 `mark` 里。
+Note: `keywords` 只收字符串，按字面量线性扫描，不执行正则。`global={false}` 是每个 keyword 的首次匹配，不是整段只亮一次。children/slot 里的元素节点会保留，匹配的文本包在 `mark` 里。Vue 不展开组件 VNode。
 
 | Prop                  | Type                | Default | Notes                                                                                      |
 | --------------------- | ------------------- | ------- | ------------------------------------------------------------------------------------------ |

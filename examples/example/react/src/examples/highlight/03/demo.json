@@ -1,7 +1,7 @@
 {
   "id": "highlight-03",
   "title": "首次匹配与保树",
-  "description": "global=false 是每个 keyword 的首次匹配。子节点里的链接会保留，匹配文本包在 mark 里。",
+  "description": "global=false 是每个 keyword 的首次匹配。原生链接会保留，匹配文本包在 mark 里。",
   "entry": "App.tsx",
   "order": 3,
   "viewport": { "mode": "auto", "minHeight": 80, "maxHeight": 240 }

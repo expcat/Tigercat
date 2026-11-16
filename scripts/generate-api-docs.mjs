@@ -294,7 +294,7 @@ const COMPONENT_USAGE_NOTES = {
   },
   Highlight: {
     notes:
-      '`keywords` 只收字符串，按字面量线性扫描，不执行正则。`global={false}` 是每个 keyword 的首次匹配，不是整段只亮一次。children/slot 里的元素节点会保留，匹配的文本包在 `mark` 里。'
+      '`keywords` 只收字符串，按字面量线性扫描，不执行正则。`global={false}` 是每个 keyword 的首次匹配，不是整段只亮一次。children/slot 里的元素节点会保留，匹配的文本包在 `mark` 里。Vue 不展开组件 VNode。'
   },
   Marquee: {
     notes:

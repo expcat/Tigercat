@@ -8,6 +8,6 @@ const modules = getDemoModules('highlight')
 <template>
   <DemoPage
     title="Highlight 文本高亮"
-    description="把关键词或正则匹配包在语义化 mark 里，保留其余文本，不是可交互控件。"
+    description="把字符串关键词匹配包在语义化 mark 里，保留其余文本，不是可交互控件。"
     :modules="modules" />
 </template>

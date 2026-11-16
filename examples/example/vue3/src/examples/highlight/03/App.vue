@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Highlight } from '@expcat/tigercat-vue/Highlight'
-import { Link } from '@expcat/tigercat-vue/Link'
 import { Text } from '@expcat/tigercat-vue/Text'
 
 const orderId = ['#42', '#7']
@@ -21,7 +20,7 @@ const keywords = ['Vue', 'React']
     <Text tag="p" size="sm">
       <Highlight keywords="Vue">
         Learn
-        <Link href="https://vuejs.org">Vue</Link>
+        <a href="https://vuejs.org">Vue</a>
         today
       </Highlight>
     </Text>
