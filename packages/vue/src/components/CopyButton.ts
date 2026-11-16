@@ -1,4 +1,4 @@
-import { defineComponent, h, ref, useId } from 'vue'
+import { defineComponent, h, mergeProps, ref, useId } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -25,41 +25,42 @@ export const CopyButton = defineComponent({
     const statusId = `tiger-copy-status-${useId()}`
     const status = ref<'copied' | 'failed' | null>(null)
 
-    async function onClick(event: MouseEvent): Promise<void> {
+    async function onClick(): Promise<void> {
       if (props.disabled) return
-      const button = event.currentTarget
       const ok = await copyTextToClipboard(props.text)
       status.value = ok ? 'copied' : 'failed'
       emit('copy', ok)
-      if (button instanceof HTMLElement) button.focus()
     }
 
-    return () =>
-      h(
+    return () => {
+      const { class: wrapperClass, style: wrapperStyle, ...buttonAttrs } = attrs
+      return h(
         'span',
         {
-          ...attrs,
           class: classNames(
             getSpaceClasses({ size: 'sm', align: 'center' }),
-            coerceClassValue(attrs.class)
+            coerceClassValue(wrapperClass)
           ),
+          style: wrapperStyle,
           'data-tiger-copy': ''
         },
         [
           h(
             'button',
-            {
-              type: 'button',
+            mergeProps({ type: 'button' }, buttonAttrs, {
               class: resolveButtonClasses({
                 variant: 'outline',
                 size: 'sm',
                 disabled: props.disabled
               }),
               disabled: props.disabled,
-              'aria-invalid': status.value === 'failed' ? 'true' : undefined,
-              'aria-describedby': status.value === 'failed' ? statusId : undefined,
+              'aria-invalid': status.value === 'failed' ? 'true' : buttonAttrs['aria-invalid'],
+              'aria-describedby':
+                status.value === 'failed'
+                  ? [buttonAttrs['aria-describedby'], statusId].filter(Boolean).join(' ')
+                  : buttonAttrs['aria-describedby'],
               onClick
-            },
+            }),
             slots.default?.() ?? props.label ?? getTextLabels(config.value.locale).copyLabel
           ),
           status.value
@@ -73,6 +74,7 @@ export const CopyButton = defineComponent({
             : null
         ]
       )
+    }
   }
 })
 

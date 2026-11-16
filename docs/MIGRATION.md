@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+Vue CopyButton 的 `aria-*`、`id`、`tabindex` 等原生属性现在落在真实 button，`class` / `style` 仍用于外层布局。双端复制完成后不再强制回焦，等待期间移到其他控件的焦点会保留。调用方式不用改，依赖旧属性落点或回焦行为的选择器与断言需调整。
+
 双端 Badge 现在保留字符串 `aria-hidden="false"`，overlay 计数的数字与复数格式使用组件 locale 覆盖；例如 en-US Provider 下组件使用 ar-SA 时，计数中的 `1234` 格式化为 `١٬٢٣٤`。React 的 dot 不再因 `locale.status.badgeLabel=''` 隐藏，仍可用显式 `aria-label` 命名。调用方式不用改，依赖旧输出的断言需按修正后的语义调整。
 
 双端 Avatar 现在将 `aria-labelledby` 传给实际图片；图片与回退统一按 `aria-label`、`alt`、`text`、`aria-labelledby` 的顺序命名。依赖回退分支中外部标签覆盖显式名称的用法应只保留预期的命名来源。AvatarGroup 的溢出按钮重叠缩至 4px，普通头像间保持 8px；调用方式不用改。

@@ -32,11 +32,9 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
   async function handleClick(event: React.MouseEvent<HTMLButtonElement>): Promise<void> {
     onClick?.(event)
     if (disabled || event.defaultPrevented) return
-    const button = event.currentTarget
     const ok = await copyTextToClipboard(text)
     setStatus(ok ? 'copied' : 'failed')
     onCopy?.(ok)
-    button.focus()
   }
 
   return (

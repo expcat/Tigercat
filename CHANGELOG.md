@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **CopyButton 按钮属性与异步焦点（React / Vue，C010-F001、C010-F002）**：Vue 的原生按钮属性传给真实 button，class/style 继续用于外层布局；两端复制完成后保留用户已移走的焦点。
+
 - **Badge 无障碍与 locale（React / Vue，C007-F01、C007-F02、C007-F03）**：两端保留字符串 `aria-hidden="false"`，overlay 计数按组件合并后的 locale 格式化；React 的 dot 在 locale 名称为空时仍按共享内容决议渲染并保留显式名称。
 
 - **AvatarGroup 折叠与组名（React / Vue，C006-F001、C006-F003）**：React 计数前展开 Fragment，max=1 时保留 A 并折叠 B 为 +1；两端原生 aria-label 为 undefined 时保留 locale 默认组名，显式名称仍可覆盖。
