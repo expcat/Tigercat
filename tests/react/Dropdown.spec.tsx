@@ -110,6 +110,28 @@ describe('Dropdown', () => {
     expect(document.querySelector('[data-tiger-dropdown-menu]')).toBeNull()
   })
 
+  it('opens a hover menu on focus and stays closed after Escape restores focus', async () => {
+    render(
+      <Dropdown trigger="hover" portal={false} items={[{ key: 'a', label: 'Action' }]}>
+        <button>Trigger</button>
+      </Dropdown>
+    )
+
+    const trigger = screen.getByRole('button', { name: 'Trigger' })
+    act(() => trigger.focus())
+    expect(screen.getByRole('menu')).toBeInTheDocument()
+    expect(trigger).toHaveFocus()
+    fireEvent.click(trigger)
+    expect(screen.getByRole('menu')).toBeInTheDocument()
+
+    fireEvent.keyDown(trigger, { key: 'ArrowDown' })
+    const action = screen.getByRole('menuitem', { name: 'Action' })
+    await waitFor(() => expect(action).toHaveFocus())
+    fireEvent.keyDown(action, { key: 'Escape' })
+    expect(trigger).toHaveFocus()
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument()
+  })
+
   it('supports offset prop', () => {
     render(
       <Dropdown placement="top-end" offset={12}>

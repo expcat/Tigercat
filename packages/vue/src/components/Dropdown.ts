@@ -56,6 +56,7 @@ import type {
   DropdownProps as CoreDropdownProps,
   DropdownMenuProps as CoreDropdownMenuProps,
   DropdownItemProps as CoreDropdownItemProps,
+  PopupMenuCheckChange,
   PopupMenuItem
 } from '@expcat/tigercat-core'
 import { renderVueOverlayTeleport, useVueAnchoredOverlay } from '../utils/overlay'
@@ -269,7 +270,8 @@ export interface VueDropdownProps extends CoreDropdownProps {
 
 function renderPopupItems(
   items: PopupMenuItem[],
-  emitCheck: (key: string | number, checked: boolean) => void,
+  context: DropdownContext,
+  emitCheck: (change: PopupMenuCheckChange) => void,
   emitSelect?: (item: PopupMenuItem) => void
 ): VNode[] {
   return items.map((item) => {
@@ -287,6 +289,15 @@ function renderPopupItems(
         {
           key: item.key,
           items: item.children,
+          disabled: item.disabled,
+          closeOnClick: context.closeOnClick,
+          onCheck: emitCheck,
+          onSelect: (selected: PopupMenuItem) => {
+            emitSelect?.(selected)
+            if (context.closeOnClick && popupMenuItemCloses(resolvePopupMenuItemType(selected))) {
+              context.handleItemClick()
+            }
+          },
           trigger: 'hover',
           placement: getContextMenuSubPlacement(
             typeof document === 'undefined' ? 'ltr' : document.documentElement.dir
@@ -307,8 +318,8 @@ function renderPopupItems(
         href,
         shortcut: item.shortcut,
         checked: item.checked,
-        closeOnClick: popupMenuItemCloses(type),
-        onCheck: (checked: boolean) => emitCheck(item.key, checked),
+        onCheck: (checked: boolean) =>
+          emitCheck(nextPopupMenuCheck(items, item.key) ?? { key: item.key, checked }),
         onClick: () => emitSelect?.(item)
       },
       () => item.label
@@ -387,7 +398,7 @@ export const Dropdown = defineComponent({
     const containerRef = ref<HTMLElement | null>(null)
     const triggerRef = ref<HTMLElement | null>(null)
     const floatingRef = ref<HTMLElement | null>(null)
-    const openIntent = ref<'menu' | 'hover'>('menu')
+    const openIntent = ref<'menu' | 'hover' | 'focus'>('menu')
     const focusEdge = ref<'first' | 'last' | null>(null)
     const skipRestore = ref(false)
 
@@ -420,6 +431,7 @@ export const Dropdown = defineComponent({
 
       hoverController.cancel()
       if (!skipRestore.value) {
+        skipRestore.value = true
         restoreFocus(previousActiveElement.value)
       }
       previousActiveElement.value = null
@@ -445,8 +457,18 @@ export const Dropdown = defineComponent({
       if (props.disabled) return
       if (triggerRef.value?.getAttribute('aria-disabled') === 'true') return
       if (props.trigger === 'hover') hoverController.cancel()
+      const visible =
+        !currentVisible.value || (props.trigger === 'hover' && openIntent.value === 'focus')
       openIntent.value = 'menu'
-      setVisible(!currentVisible.value)
+      setVisible(visible)
+    }
+
+    const handleFocus = () => {
+      if (props.trigger !== 'hover' || props.disabled || skipRestore.value) return
+      hoverController.cancel()
+      if (currentVisible.value) return
+      openIntent.value = 'focus'
+      setVisible(true)
     }
 
     const handleTriggerKeyDown = (event: Event) => {
@@ -573,10 +595,8 @@ export const Dropdown = defineComponent({
             default: () =>
               renderPopupItems(
                 props.items ?? [],
-                (key, checked) => {
-                  const change = nextPopupMenuCheck(props.items ?? [], key)
-                  emit('check', change ?? { key, checked })
-                },
+                dropdownContext,
+                (change) => emit('check', change),
                 (item) => emit('select', item)
               )
           }
@@ -636,6 +656,7 @@ export const Dropdown = defineComponent({
         aria: triggerAria,
         handlers: {
           onClick: handleClick,
+          onFocus: handleFocus,
           onKeydown: handleTriggerKeyDown,
           onMouseenter: handleMouseEnter,
           onMouseleave: handleMouseLeave

@@ -289,6 +289,28 @@ describe('Dropdown', () => {
     })
   })
 
+  it('opens a hover menu on focus and stays closed after Escape restores focus', async () => {
+    render(Dropdown, {
+      props: { trigger: 'hover', portal: false, items: [{ key: 'a', label: 'Action' }] },
+      slots: { default: () => h('button', null, 'Trigger') }
+    })
+
+    const trigger = screen.getByRole('button', { name: 'Trigger' })
+    trigger.focus()
+    await nextTick()
+    expect(screen.getByRole('menu')).toBeInTheDocument()
+    expect(trigger).toHaveFocus()
+    await fireEvent.click(trigger)
+    expect(screen.getByRole('menu')).toBeInTheDocument()
+
+    await fireEvent.keyDown(trigger, { key: 'ArrowDown' })
+    const action = screen.getByRole('menuitem', { name: 'Action' })
+    await waitFor(() => expect(action).toHaveFocus())
+    await fireEvent.keyDown(action, { key: 'Escape' })
+    expect(trigger).toHaveFocus()
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument()
+  })
+
   describe('className', () => {
     it('merges custom className', () => {
       const { container } = render(Dropdown, {
@@ -492,6 +514,95 @@ describe('Dropdown', () => {
   })
 
   describe('Edge Cases', () => {
+    it('honors closeOnClick false for schema actions without closing checkbox or radio items', async () => {
+      const { emitted } = render(Dropdown, {
+        props: {
+          defaultOpen: true,
+          portal: false,
+          closeOnClick: false,
+          items: [
+            { key: 'a', label: 'Action' },
+            { key: 'c', type: 'checkbox', label: 'Check', checked: false },
+            { key: 'r', type: 'radio', label: 'Radio', group: 'group', checked: false }
+          ]
+        },
+        slots: { default: () => 'Trigger' }
+      })
+
+      await fireEvent.click(screen.getByRole('menuitem', { name: 'Action' }))
+      expect(emitted().select?.[0]).toEqual([{ key: 'a', label: 'Action' }])
+      expect(screen.getByRole('menu')).toBeInTheDocument()
+      await fireEvent.click(screen.getByRole('menuitemcheckbox', { name: 'Check' }))
+      await fireEvent.click(screen.getByRole('menuitemradio', { name: 'Radio' }))
+      expect(emitted().check).toEqual([
+        [{ key: 'c', checked: true }],
+        [{ key: 'r', checked: true, group: 'group' }]
+      ])
+      expect(screen.getByRole('menu')).toBeInTheDocument()
+      expect(emitted()['open-change']).toBeUndefined()
+    })
+
+    it('keeps disabled schema submenus disabled and closed', async () => {
+      render(Dropdown, {
+        props: {
+          defaultOpen: true,
+          portal: false,
+          items: [
+            {
+              key: 'more',
+              label: 'More',
+              disabled: true,
+              children: [{ key: 'n', label: 'Nested' }]
+            }
+          ]
+        },
+        slots: { default: () => 'Trigger' }
+      })
+
+      const more = screen.getByRole('button', { name: 'More' })
+      expect(more).toBeDisabled()
+      await fireEvent.click(more)
+      expect(screen.queryByText('Nested')).not.toBeInTheDocument()
+      expect(more).toHaveAttribute('aria-expanded', 'false')
+    })
+
+    it.each([
+      ['item', true],
+      ['item', false],
+      ['checkbox', true],
+      ['radio', true]
+    ] as const)(
+      'forwards nested schema %s events with closeOnClick %s',
+      async (type, closeOnClick) => {
+        const nested = { key: 'n', type, label: 'Nested', checked: false, group: 'group' }
+        const { emitted } = render(Dropdown, {
+          props: {
+            defaultOpen: true,
+            portal: false,
+            closeOnClick,
+            items: [{ key: 'more', label: 'More', children: [nested] }]
+          },
+          slots: { default: () => 'Trigger' }
+        })
+
+        await fireEvent.click(screen.getByRole('button', { name: 'More' }))
+        await fireEvent.click(screen.getByText('Nested'))
+        expect(emitted().select).toEqual([[nested]])
+        if (type === 'item' && closeOnClick) {
+          expect(emitted()['open-change']).toEqual([[false]])
+          expect(screen.queryByRole('menu')).not.toBeInTheDocument()
+        } else {
+          if (type !== 'item') {
+            expect(emitted().check).toEqual([
+              [{ key: 'n', checked: true, ...(type === 'radio' ? { group: 'group' } : {}) }]
+            ])
+          }
+          expect(emitted()['open-change']).toBeUndefined()
+          expect(screen.getAllByRole('menu')).toHaveLength(2)
+        }
+      }
+    )
+
     it('does not close on item click when closeOnClick is false', async () => {
       render(Dropdown, {
         props: { trigger: 'click', closeOnClick: false },

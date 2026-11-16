@@ -188,7 +188,7 @@ export const Dropdown = forwardRef<HTMLElement, DropdownProps>(function Dropdown
   const triggerRef = useRef<HTMLElement | null>(null)
   const floatingRef = useRef<HTMLDivElement>(null)
   const previousActiveElementRef = useRef<HTMLElement | null>(null)
-  const openIntentRef = useRef<'menu' | 'hover'>('menu')
+  const openIntentRef = useRef<'menu' | 'hover' | 'focus'>('menu')
   const focusEdgeRef = useRef<'first' | 'last' | null>(null)
   const skipRestoreRef = useRef(false)
 
@@ -225,6 +225,7 @@ export const Dropdown = forwardRef<HTMLElement, DropdownProps>(function Dropdown
       if (!next) {
         hoverController.cancel()
         if (!skipRestoreRef.current) {
+          skipRestoreRef.current = true
           restoreFocus(previousActiveElementRef.current)
         }
         previousActiveElementRef.current = null
@@ -267,9 +268,18 @@ export const Dropdown = forwardRef<HTMLElement, DropdownProps>(function Dropdown
     if (trigger === 'hover') {
       hoverController.cancel()
     }
+    const nextVisible = !visible || (trigger === 'hover' && openIntentRef.current === 'focus')
     openIntentRef.current = 'menu'
-    setVisible(!visible)
+    setVisible(nextVisible)
   }, [disabled, trigger, visible, setVisible, hoverController])
+
+  const handleFocus = useCallback(() => {
+    if (trigger !== 'hover' || disabled || skipRestoreRef.current) return
+    hoverController.cancel()
+    if (visible) return
+    openIntentRef.current = 'focus'
+    setVisible(true)
+  }, [trigger, disabled, visible, hoverController, setVisible])
 
   const handleTriggerKeyDown = useCallback(
     (event: React.KeyboardEvent) => {
@@ -397,6 +407,7 @@ export const Dropdown = forwardRef<HTMLElement, DropdownProps>(function Dropdown
     aria: triggerAria,
     handlers: {
       onClick: handleClick,
+      onFocus: handleFocus,
       onKeyDown: handleTriggerKeyDown,
       onMouseEnter: handleMouseEnter,
       onMouseLeave: handleMouseLeave

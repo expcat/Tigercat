@@ -21,8 +21,8 @@ navigation 组 35 个组件（C082–C116）。审查时这一组同样没有浏
 
 ## 概览
 
-本篇 59 条：P2 43、P3 16。
-按波次：W4 43、W9 16。
+本篇 55 条：P2 39、P3 16。
+按波次：W4 39、W9 16。
 
 已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C086-F03（S13）、C088-F05（S13）、C095-F02（S13）、C109-F06（S13）、C112-F01（S13）、C113-F01（S13）、C114-F04（S13）、C116-F05（S13）。
 
@@ -52,20 +52,9 @@ navigation 组 35 个组件（C082–C116）。审查时这一组同样没有浏
 | -------- | ---- | ---- | ----- | ---- | ---------------------------------------- | -------------------------------------------------------------------------------- |
 | C089-F02 | P3   | W9   | React | 行为 | React 将公开 itemKey 下传为未知 DOM 属性 | React 渲染 itemKey=stable-id 的 Item，输出不含 itemKey 属性且无未知 DOM 属性告警 |
 
-### C092 Dropdown
-
-报告 `groups/navigation/Dropdown.md`，队列状态 needs-evidence。另受 S01 影响。
-
-| 编号     | 级别 | 波次 | 端   | 类别 | 条目                                                   | 验收                                                                               |
-| -------- | ---- | ---- | ---- | ---- | ------------------------------------------------------ | ---------------------------------------------------------------------------------- |
-| C092-F01 | P2   | W4   | Vue  | 行为 | Vue schema 普通项强制关闭，忽略父级 closeOnClick=false | Vue closeOnClick=false、items=[Action] 点击后发 select(a) 且菜单保留、无关闭请求   |
-| C092-F02 | P2   | W4   | 双端 | 键盘 | 两端 hover 模式没有接上已文档化的 focus 打开           | trigger=hover、portal=false 时仅聚焦触发器，两端菜单均打开（menuPresent=true）     |
-| C092-F03 | P2   | W4   | Vue  | 行为 | Vue schema 子菜单未传递 disabled，禁用项仍可展开       | Vue items=[More(submenu,disabled)→Nested] 点击 More 不展开且带禁用状态，同 React   |
-| C092-F04 | P2   | W4   | Vue  | 行为 | Vue schema 子菜单丢失父级选择 / 勾选通知与根菜单关闭   | Vue items=[More→Nested] 点 Nested 后根收到 select(n) 并整体关闭；checkbox 发 check |
-
 ### C093 DropdownItem
 
-报告 `groups/navigation/DropdownItem.md`，队列状态 needs-evidence。另受 S01、S02、C092-F01 影响。
+报告 `groups/navigation/DropdownItem.md`，队列状态 needs-evidence。另受 S01、S02 影响。
 
 | 编号     | 级别 | 波次 | 端    | 类别 | 条目                                                                 | 验收                                                                              |
 | -------- | ---- | ---- | ----- | ---- | -------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
