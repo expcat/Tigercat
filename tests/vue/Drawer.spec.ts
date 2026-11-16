@@ -97,6 +97,50 @@ describe('Drawer', () => {
     expect(onClose).toHaveBeenCalled()
   })
 
+  it('preserves a caller description and otherwise describes the default slot', async () => {
+    const { rerender } = render(Drawer, {
+      props: { open: true, 'aria-describedby': 'caller-description' },
+      slots: { default: 'Drawer content' }
+    })
+    expect(screen.getByRole('dialog')).toHaveAttribute('aria-describedby', 'caller-description')
+
+    await rerender({ 'aria-describedby': undefined })
+    const dialog = screen.getByRole('dialog')
+    const body = dialog.querySelector('[data-tiger-drawer-body]')
+    expect(body?.id).toBeTruthy()
+    expect(dialog).toHaveAttribute('aria-describedby', body?.id)
+  })
+
+  it('tabs to the resize separator and resizes along its axis with arrow keys', async () => {
+    const user = userEvent.setup()
+    const { rerender } = render(Drawer, {
+      props: { open: true, resizable: true, width: 90, fullscreenOnMobile: false }
+    })
+    await nextTick()
+    const dialog = screen.getByRole('dialog')
+    Object.defineProperty(dialog, 'offsetWidth', { configurable: true, value: 90 })
+    const separator = screen.getByRole('separator')
+    screen.getByRole('button', { name: 'Close' }).focus()
+
+    await user.tab()
+    expect(separator).toHaveFocus()
+    expect(separator).toHaveAttribute('aria-orientation', 'vertical')
+    await user.keyboard('{ArrowLeft}')
+    expect(dialog).toHaveStyle({ width: '100px' })
+    expect(separator).toHaveAttribute('aria-valuenow', '100')
+    expect(separator).toHaveAttribute('aria-valuemin', '80')
+    expect(separator).toHaveAttribute('aria-valuemax', '100')
+    await user.keyboard('{ArrowRight}{ArrowRight}{ArrowRight}')
+    expect(dialog).toHaveStyle({ width: '80px' })
+
+    await rerender({ placement: 'bottom' })
+    expect(separator).toHaveAttribute('aria-orientation', 'horizontal')
+    await user.keyboard('{ArrowUp}')
+    expect(dialog).toHaveStyle({ height: '90px' })
+    await user.keyboard('{ArrowDown}{ArrowDown}')
+    expect(dialog).toHaveStyle({ height: '80px' })
+  })
+
   it('uses official locale objects for the close button', async () => {
     render({
       components: { ConfigProvider, Drawer },
@@ -582,7 +626,7 @@ describe('Drawer', () => {
 
   it('should pass basic accessibility checks', async () => {
     render(Drawer, {
-      props: { open: true, title: 'Accessible Drawer' },
+      props: { open: true, resizable: true, title: 'Accessible Drawer' },
       slots: { default: () => h('div', 'Drawer content') }
     })
 

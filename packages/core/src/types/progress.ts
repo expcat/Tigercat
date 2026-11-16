@@ -53,6 +53,7 @@ export interface ProgressProps {
   /**
    * Progress status
    * When set, overrides variant color
+   * 'success' sets the displayed value to 100 and disables indeterminate mode.
    * @default 'normal'
    */
   status?: ProgressStatus

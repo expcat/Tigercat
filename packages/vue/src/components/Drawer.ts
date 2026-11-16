@@ -35,6 +35,7 @@ import {
   getDrawerFooterClasses,
   getDrawerCloseButtonClasses,
   getDrawerTitleClasses,
+  getResizeKeyboardDelta,
   getGestureTouchPoint,
   resolveSwipeGesture,
   shouldRenderOverlay,
@@ -354,7 +355,20 @@ export const Drawer = defineComponent({
 
     const sheetOffset = ref(0)
     const resizedLength = ref<number | null>(null)
+    const measuredLength = ref(80)
     const resizing = ref(false)
+    const readResizeLength = () =>
+      resizedLength.value ??
+      (resolvedPlacement.value === 'left' || resolvedPlacement.value === 'right'
+        ? (dialogRef.value?.offsetWidth ?? 320)
+        : (dialogRef.value?.offsetHeight ?? 240))
+    watch(
+      [dialogRef, () => props.open, () => props.resizable, () => props.width, resolvedPlacement],
+      () => {
+        if (props.open && props.resizable) measuredLength.value = Math.max(80, readResizeLength())
+      },
+      { flush: 'post' }
+    )
     const swipeFollowOptions = () => ({
       direction: writingDirection.value,
       fullscreen: isDrawerMobileFullscreen({
@@ -665,7 +679,7 @@ export const Drawer = defineComponent({
           'aria-modal': 'true',
           'aria-labelledby': ariaLabelledby,
           'aria-label': ariaLabel,
-          'aria-describedby': slots.default ? bodyId : undefined,
+          'aria-describedby': attrs['aria-describedby'] ?? (slots.default ? bodyId : undefined),
           'aria-owns': overlayHostId,
           tabindex: -1,
           ref: dialogRef,
@@ -683,8 +697,23 @@ export const Drawer = defineComponent({
             ? h('div', {
                 'data-tiger-drawer-resize': '',
                 role: 'separator',
+                tabindex: 0,
+                'aria-valuemin': 80,
+                'aria-valuenow': Math.round(resizedLength.value ?? measuredLength.value),
+                'aria-valuemax': Math.round(resizedLength.value ?? measuredLength.value),
                 'aria-orientation': isHorizontal ? 'vertical' : 'horizontal',
                 'aria-label': drawerLabels.value.resizeAriaLabel,
+                onFocus: () => {
+                  measuredLength.value = Math.max(80, readResizeLength())
+                },
+                onKeydown: (event: KeyboardEvent) => {
+                  const step = getResizeKeyboardDelta(event.key)
+                  if (!step) return
+                  const delta = drawerResizeDelta(resolvedPlacement.value, step.deltaX, step.deltaY)
+                  if (!delta) return
+                  event.preventDefault()
+                  resizedLength.value = Math.max(80, readResizeLength() + delta)
+                },
                 style: {
                   position: 'absolute',
                   touchAction: 'none',
@@ -708,11 +737,7 @@ export const Drawer = defineComponent({
                   resizing.value = true
                   const startX = event.clientX
                   const startY = event.clientY
-                  const start =
-                    resizedLength.value ??
-                    (isHorizontal
-                      ? (dialogRef.value?.offsetWidth ?? 320)
-                      : (dialogRef.value?.offsetHeight ?? 240))
+                  const start = readResizeLength()
                   const move = (pointer: PointerEvent) => {
                     const delta = drawerResizeDelta(
                       resolvedPlacement.value,

@@ -13,7 +13,7 @@ description: Compact generated Tigercat Feedback props reference
 
 `packages/core/src/types/loading.ts` · `LoadingProps` · 4/14 compact props · [Complete props](#remaining-props-complete-public-api)
 
-Note: 每次 `spinning` 变为真都重新等 `delay`，中途转回假就取消。`fullscreen` 盖住视口，和有没有子节点分开，层高于模态，并占住焦点栈。区域遮罩把 `aria-busy` 放在被挡住的区域上，结束时若焦点没被移走就还回去。
+Note: 每次 `spinning` 变为真都重新等 `delay`，中途转回假就取消。`fullscreen` 盖住视口，和有没有子节点分开，层高于模态，并占住焦点栈。有子节点时 class 只落在区域根（全屏时也如此），没有子节点时落在指示器上。区域遮罩把 `aria-busy` 放在被挡住的区域上，结束时若焦点没被移走就还回去。
 
 | Prop          | Type      | Default | Notes                                                                                      |
 | ------------- | --------- | ------- | ------------------------------------------------------------------------------------------ |

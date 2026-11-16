@@ -198,22 +198,26 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 
 ### feedback
 
-| 任务 | 组件                  | 队列           | 现状                                                                                                                                                       |
-| ---- | --------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| C117 | Alert                 | needs-evidence | 视觉 0/32 blocked；键盘 0/32 blocked；截图 0；定向 vitest 43 项通过（happy-dom）；未跑 SSR 渲染与 w9-render-wire；探针为 jiti 读取，非 DOM 渲染            |
-| C118 | Drawer                | needs-evidence | 视觉 0/24 blocked；键盘 0/24 blocked；截图 0；定向 vitest 73 项通过（happy-dom，含 feedback-ssr 2 项）；未跑 w9-render-wire 与 SSR 属性探针                |
-| C119 | Loading               | needs-evidence | 视觉 0/24 blocked；键盘 0/24 blocked；截图 0；定向 vitest 36 项通过（happy-dom/node）；未跑 SSR 与 SSR 属性探针                                            |
-| C120 | LoadingBarContainer   | needs-evidence | loading-bar/04 的 8 格视觉与键盘 blocked；01–03 的 24 格也 blocked；截图 0；定向 vitest 30 项通过（happy-dom/node）；无主责测试文件；未启动 Vite           |
-| C121 | LoadingBar            | needs-evidence | 视觉 0/32 blocked；键盘 0/32 blocked；截图 0；定向 vitest 30 项通过（happy-dom/node，有 React act 警告）；未启动 Vite                                      |
-| C122 | MessageContainer      | needs-evidence | 主责视觉矩阵 0 格；message/05 的 8 格 blocked（owner C123）；视觉与键盘未执行；截图 0；Message 两份 spec 13 项通过（happy-dom）；无 MessageContainer.spec  |
-| C123 | Message               | needs-evidence | 视觉 0/40 blocked；键盘 0/40 blocked；截图 0；定向 vitest 40 项通过（happy-dom，React 有未包 act 的 stderr）；未启动 Vite                                  |
-| C124 | Modal                 | needs-evidence | 视觉 0/40 blocked；键盘 0/40 blocked；截图 0；定向 vitest 100 项通过（happy-dom，有 act stderr 与 Popover 无名开发警告）；未启动 Vite                      |
-| C125 | NotificationContainer | needs-evidence | 主责矩阵 0 格记 blocked；notification/05 的 8 格 blocked（owner X05）；键盘未执行；截图 0；Notification spec 11 项通过（happy-dom，属 X06）；未跑 w9       |
-| C126 | Popconfirm            | needs-evidence | 视觉 0/16 blocked；键盘 0/16 blocked；截图 0；定向 vitest 27 项通过（happy-dom）；未做挂载探针；未启动 Vite                                                |
-| C127 | Popover               | needs-evidence | 视觉 0/16 blocked；键盘 0/16 blocked；截图 0；定向 vitest 64 项通过（happy-dom）；未做挂载探针；未启动 Vite                                                |
-| C128 | Progress              | needs-evidence | 视觉 0/32 blocked；键盘 0/32 blocked；截图 0；定向 vitest 31 项通过（happy-dom）；Intl 探针是 node 输出，非组件挂载；height 为 0 未做挂载探针；未启动 Vite |
-| C129 | Tooltip               | needs-evidence | 视觉 0/32 blocked；键盘 0/32 blocked；截图 0；定向 vitest 47 项通过（happy-dom）；未做类型测试与挂载探针；未启动 Vite                                      |
-| C130 | Tour                  | needs-evidence | 视觉 0/16 blocked；键盘 0/16 blocked；截图 0；定向 vitest 87 项通过（happy-dom，未设 TIGER_A11Y，axe 未扫描）；未跑 docs:api:check、exports:check          |
+本轮 W9 的 8 条已实现。9 条新增回归先红后绿；`TIGER_A11Y=1` 下，双端 Alert / Drawer / Loading / Progress / Tour、React 首绘、Vue feedback-ssr 与双端 w9-render-wire 共 14 文件 264 项通过，含实际 axe 扫描。Drawer / Loading 与首绘补跑 5 文件 107 项通过，MCP 定向 2 文件 20 项通过。`types:check`、改动源码 ESLint、`docs:api:check`、`mcp:build`、841 份 Demo 源码与 146 页索引检查通过。双端 Drawer 在无 document 的 Node SSR 各连续渲染两次，均不输出遮罩，Drawer 层与 overlay 计数保持 0。
+
+Codex IAB 不可用，按授权使用 happy-dom / DOM；真实视觉与键盘仍等待人工验收，原矩阵不重计。`docs:links` 失败的 5360 处全部来自未改动的 `.local/`（5233 个链接、127 个锚点），保留基线问题。
+
+| 任务 | 组件                  | 队列           | 现状                                                                                                                                                      |
+| ---- | --------------------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| C117 | Alert                 | needs-evidence | F04 已修复：取消 close 后保持打开、不发可见性回调、不移焦点；本组 264 项（含 axe）与类型通过。视觉 0/32、键盘 0/32 blocked，截图 0。                      |
+| C118 | Drawer                | needs-evidence | F03/F05/F06 已修复：React 首绘遮罩、Vue 描述保留、双端键盘调整；定向回归、axe、SSR 无层泄漏通过。视觉 0/24、键盘 0/24 blocked，截图 0。                   |
+| C119 | Loading               | needs-evidence | F02/F03 已修复：双端 class 只落区域根、React 首绘遮罩与 inert；定向回归与 axe 通过。视觉 0/24、键盘 0/24 blocked，截图 0。                                |
+| C120 | LoadingBarContainer   | needs-evidence | loading-bar/04 的 8 格视觉与键盘 blocked；01–03 的 24 格也 blocked；截图 0；定向 vitest 30 项通过（happy-dom/node）；无主责测试文件；未启动 Vite          |
+| C121 | LoadingBar            | needs-evidence | 视觉 0/32 blocked；键盘 0/32 blocked；截图 0；定向 vitest 30 项通过（happy-dom/node，有 React act 警告）；未启动 Vite                                     |
+| C122 | MessageContainer      | needs-evidence | 主责视觉矩阵 0 格；message/05 的 8 格 blocked（owner C123）；视觉与键盘未执行；截图 0；Message 两份 spec 13 项通过（happy-dom）；无 MessageContainer.spec |
+| C123 | Message               | needs-evidence | 视觉 0/40 blocked；键盘 0/40 blocked；截图 0；定向 vitest 40 项通过（happy-dom，React 有未包 act 的 stderr）；未启动 Vite                                 |
+| C124 | Modal                 | needs-evidence | 视觉 0/40 blocked；键盘 0/40 blocked；截图 0；定向 vitest 100 项通过（happy-dom，有 act stderr 与 Popover 无名开发警告）；未启动 Vite                     |
+| C125 | NotificationContainer | needs-evidence | 主责矩阵 0 格记 blocked；notification/05 的 8 格 blocked（owner X05）；键盘未执行；截图 0；Notification spec 11 项通过（happy-dom，属 X06）；未跑 w9      |
+| C126 | Popconfirm            | needs-evidence | 视觉 0/16 blocked；键盘 0/16 blocked；截图 0；定向 vitest 27 项通过（happy-dom）；未做挂载探针；未启动 Vite                                               |
+| C127 | Popover               | needs-evidence | 视觉 0/16 blocked；键盘 0/16 blocked；截图 0；定向 vitest 64 项通过（happy-dom）；未做挂载探针；未启动 Vite                                               |
+| C128 | Progress              | needs-evidence | F02 已完成：注释与生成笔记明确 success 显示 100 并关闭 indeterminate；定向回归、axe、文档与 MCP 门禁通过。视觉 0/32、键盘 0/32 blocked，截图 0。          |
+| C129 | Tooltip               | needs-evidence | 视觉 0/32 blocked；键盘 0/32 blocked；截图 0；定向 vitest 47 项通过（happy-dom）；未做类型测试与挂载探针；未启动 Vite                                     |
+| C130 | Tour                  | needs-evidence | F02 已完成：生成笔记写明关闭名回退到 locale.common.closeText；定向回归、axe、文档与 MCP 门禁通过。视觉 0/16、键盘 0/16 blocked，截图 0；F03 待处理。      |
 
 ### data
 

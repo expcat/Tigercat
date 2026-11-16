@@ -156,7 +156,9 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
   }
 
   const requestClose = useCallback((fromCloseButton: boolean) => {
-    onCloseRef.current?.(new Event('close', { cancelable: true }))
+    const event = new Event('close', { cancelable: true })
+    onCloseRef.current?.(event)
+    if (event.defaultPrevented) return
     onOpenChangeRef.current?.(false)
     if (openRef.current === undefined) setDismissed(true)
     if (fromCloseButton) focusAfterElement(alertRef.current)

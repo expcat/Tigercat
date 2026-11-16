@@ -4,6 +4,15 @@
 
 ## v3.0.1（未发布）
 
+- **Alert 取消关闭（React / Vue，C117-F04）**：close 事件的 preventDefault 阻止关闭、可见性回调与焦点移动，保留原有未取消路径。
+- **Drawer 首帧遮罩（React，C118-F03）**：层登记移到 layout effect，首次绘制即带遮罩；服务端仍不登记层。
+- **Drawer 描述引用（Vue，C118-F05）**：优先保留调用方 aria-describedby，未传时仍回退默认槽内容 id。
+- **Drawer 键盘调整（React / Vue，C118-F06）**：resizable 分隔条进入 Tab 顺序，方向键复用 10px 步进与 80px 下限，补齐 separator 值属性。
+- **Loading 类名落点（React / Vue，C119-F02）**：有子节点时自定义 class 统一只作用于区域根，全屏时不再重复落到浮层。
+- **Loading 首帧遮罩（React，C119-F03）**：门闩订阅与同步在 layout effect 完成，delay=0 时首次绘制即遮罩并 inert 内容。
+- **Progress 成功状态说明（Core / 文档 / MCP，C128-F02）**：status 注释及生成笔记写明 success 把显示值收到 100 并关闭 indeterminate，运行逻辑不变。
+- **Tour 关闭名称说明（文档 / MCP，C130-F02）**：生成笔记写明关闭钮可访问名会回退到 locale.common.closeText，回退顺序不变。
+
 - **滚动章节示例回调（Demo，C110-F03）**：React scroll-spy/02 的说明改为实际公开回调 onActiveKeyChange。
 - **命令面板最近项说明（Core / 文档，C111-F05）**：recentIds 仅在空查询时排前；非空查询继续按相关度排序，未命中项不回插。
 - **命令面板服务端选中（React，C111-F06）**：渲染期选中首个启用结果，SSR 首帧即输出 aria-selected 与输入框 aria-activedescendant；effect 只做选中项滚动定位。

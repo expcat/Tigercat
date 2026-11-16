@@ -149,6 +149,24 @@ describe('Alert', () => {
     expect(screen.getByText('Closable')).toBeInTheDocument()
   })
 
+  it('keeps the alert open when its close request is canceled', async () => {
+    const onOpenChange = vi.fn()
+    render(
+      <Alert
+        title="Keep open"
+        closable
+        onClose={(event) => event.preventDefault()}
+        onOpenChange={onOpenChange}
+      />
+    )
+
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Close alert' }))
+
+    expect(screen.getByText('Keep open')).toBeInTheDocument()
+    expect(onOpenChange).not.toHaveBeenCalled()
+    expect(screen.getByRole('button', { name: 'Close alert' })).toHaveFocus()
+  })
+
   it('hides when open is false', () => {
     const { rerender } = render(<Alert title="Closable" closable open />)
     expect(screen.getByText('Closable')).toBeInTheDocument()

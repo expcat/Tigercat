@@ -236,8 +236,8 @@ export const Loading = defineComponent({
                 tabindex: -1,
                 class: classNames(
                   loadingFullscreenBaseClasses,
-                  props.className,
-                  coerceClassValue(attrs.class)
+                  !hasRegion.value && props.className,
+                  !hasRegion.value && coerceClassValue(attrs.class)
                 ),
                 style: overlayStyle.value,
                 ...statusProps,
@@ -254,7 +254,11 @@ export const Loading = defineComponent({
           'div',
           {
             ref: regionRef,
-            class: classNames(loadingRegionBaseClasses, props.className),
+            class: classNames(
+              loadingRegionBaseClasses,
+              props.className,
+              coerceClassValue(attrs.class)
+            ),
             'aria-busy': showIndicator.value ? 'true' : undefined
           },
           [
@@ -268,7 +272,7 @@ export const Loading = defineComponent({
                   'div',
                   {
                     ...attrs,
-                    class: classNames(loadingRegionOverlayClasses, coerceClassValue(attrs.class)),
+                    class: loadingRegionOverlayClasses,
                     style: overlayStyle.value,
                     ...statusProps
                   },

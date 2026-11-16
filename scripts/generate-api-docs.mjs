@@ -147,11 +147,11 @@ const COMPONENT_USAGE_NOTES = {
   },
   Drawer: {
     notes:
-      '与 Modal 同一套在场、焦点栈和关场。打开时焦点进对话框或 `initialFocus`。`placement` 含 `start`/`end`，先换成物理边再决定滑动方向；`fullscreenOnMobile` 铺满后，关闭滑动跟铺满后的边。swipe 只在标题栏或对应轴滚到头时成立。面板类名只有 `className`。`bodyPadding={false}` 去掉默认内边距，自定义间距用 `bodyClassName`。离开回调等这一层过渡结束。关闭名走 `locale.drawer`。嵌套 Drawer 进外层 overlay-host，Esc 先关里层。'
+      '与 Modal 同一套在场、焦点栈和关场。打开时焦点进对话框或 `initialFocus`。`placement` 含 `start`/`end`，先换成物理边再决定滑动方向；`fullscreenOnMobile` 铺满后，关闭滑动跟铺满后的边。swipe 只在标题栏或对应轴滚到头时成立。面板类名只有 `className`。`bodyPadding={false}` 去掉默认内边距，自定义间距用 `bodyClassName`。离开回调等这一层过渡结束。关闭名走 `locale.drawer`。嵌套 Drawer 进外层 overlay-host，Esc 先关里层。`resizable` 分隔条可 Tab 聚焦，方向键按 10px 调整对应轴尺寸，下限 80px。调用方的 `aria-describedby` 优先于默认内容描述。'
   },
   Tour: {
     notes:
-      '`current` 是 `steps` 的原始下标。关掉后非受控下标回到第一个未跳过的步骤；受控时发出回到该下标。同一次打开只加载一次 `loadSteps`，失败有可见状态，不先闪 `steps`。只在打开和换步时把目标滚进视口一次。默认洞只是视觉，点击落在遮罩上，目标保持 inert；`interact` 或 `type` 为 `advanceOnTarget` 时都把该目标排除在 inert 之外。换步时焦点回到气泡。`start` / `end` 按书写方向，left / right 是物理边。气泡沿边移入视口，首选与相反侧均放不下时尝试垂直侧；箭头跟随实际位置指向目标。`closable={false}` 只藏 X。无标题仍有 locale dialog 名。文案只读 `locale.tour`。'
+      '`current` 是 `steps` 的原始下标。关掉后非受控下标回到第一个未跳过的步骤；受控时发出回到该下标。同一次打开只加载一次 `loadSteps`，失败有可见状态，不先闪 `steps`。只在打开和换步时把目标滚进视口一次。默认洞只是视觉，点击落在遮罩上，目标保持 inert；`interact` 或 `type` 为 `advanceOnTarget` 时都把该目标排除在 inert 之外。换步时焦点回到气泡。`start` / `end` 按书写方向，left / right 是物理边。气泡沿边移入视口，首选与相反侧均放不下时尝试垂直侧；箭头跟随实际位置指向目标。`closable={false}` 只藏 X。无标题仍有 locale dialog 名。文案优先读 `locale.tour`，关闭钮可访问名还会回退到 `locale.common.closeText`。'
   },
   ChartCanvas: {
     notes:
@@ -350,7 +350,7 @@ const COMPONENT_USAGE_NOTES = {
   },
   Progress: {
     notes:
-      '默认名是 locale「进度」，不含当前值。自定义 `text`/`format` 进 `aria-valuetext`。`status="paused"` 会停条纹动画。条纹和过渡在样式表里，减少动效时停。'
+      '默认名是 locale「进度」，不含当前值。自定义 `text`/`format` 进 `aria-valuetext`。`status="success"` 会把显示值收到 100，并关闭 indeterminate。`status="paused"` 会停条纹动画。条纹和过渡在样式表里，减少动效时停。'
   },
   Splitter: {
     notes:
@@ -374,7 +374,7 @@ const COMPONENT_USAGE_NOTES = {
   },
   Alert: {
     notes:
-      '省略 `open` 时展示，关闭按钮和到时由组件自己收起，焦点从关闭按钮移到后面下一个可聚焦元素。传入 `open` 时只发事件。父级重渲染不重置剩余时间。`error` 保持 `role="alert"`。首屏之后新插入的 success / info / warning 用组件自己的 `role="status"`；静态条文不加实时区域。与 ImagePreview「省略即关」相反。'
+      '省略 `open` 时展示，关闭按钮和到时由组件自己收起，焦点从关闭按钮移到后面下一个可聚焦元素。传入 `open` 时只发事件。close 事件可取消，`preventDefault()` 会保留打开状态和焦点。父级重渲染不重置剩余时间。`error` 保持 `role="alert"`。首屏之后新插入的 success / info / warning 用组件自己的 `role="status"`；静态条文不加实时区域。与 ImagePreview「省略即关」相反。'
   },
   Tooltip: {
     notes:
@@ -390,7 +390,7 @@ const COMPONENT_USAGE_NOTES = {
   },
   Loading: {
     notes:
-      '每次 `spinning` 变为真都重新等 `delay`，中途转回假就取消。`fullscreen` 盖住视口，和有没有子节点分开，层高于模态，并占住焦点栈。区域遮罩把 `aria-busy` 放在被挡住的区域上，结束时若焦点没被移走就还回去。'
+      '每次 `spinning` 变为真都重新等 `delay`，中途转回假就取消。`fullscreen` 盖住视口，和有没有子节点分开，层高于模态，并占住焦点栈。有子节点时 class 只落在区域根（全屏时也如此），没有子节点时落在指示器上。区域遮罩把 `aria-busy` 放在被挡住的区域上，结束时若焦点没被移走就还回去。'
   },
   LoadingBar: {
     notes:

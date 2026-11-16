@@ -215,7 +215,9 @@ export const Alert = defineComponent({
     )
 
     const requestClose = (fromCloseButton: boolean) => {
-      emit('close', new Event('close', { cancelable: true }))
+      const event = new Event('close', { cancelable: true })
+      emit('close', event)
+      if (event.defaultPrevented) return
       emit('update:open', false)
       if (props.open === undefined) dismissed.value = true
       if (fromCloseButton) focusAfterElement(alertRef.value)

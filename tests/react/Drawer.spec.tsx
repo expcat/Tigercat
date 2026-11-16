@@ -35,6 +35,33 @@ describe('Drawer', () => {
     })
   })
 
+  it('tabs to the resize separator and resizes along its axis with arrow keys', async () => {
+    const user = userEvent.setup()
+    const { rerender } = render(<Drawer open resizable width={90} fullscreenOnMobile={false} />)
+    const dialog = screen.getByRole('dialog')
+    Object.defineProperty(dialog, 'offsetWidth', { configurable: true, value: 90 })
+    const separator = screen.getByRole('separator')
+    screen.getByRole('button', { name: 'Close' }).focus()
+
+    await user.tab()
+    expect(separator).toHaveFocus()
+    expect(separator).toHaveAttribute('aria-orientation', 'vertical')
+    await user.keyboard('{ArrowLeft}')
+    expect(dialog).toHaveStyle({ width: '100px' })
+    expect(separator).toHaveAttribute('aria-valuenow', '100')
+    expect(separator).toHaveAttribute('aria-valuemin', '80')
+    expect(separator).toHaveAttribute('aria-valuemax', '100')
+    await user.keyboard('{ArrowRight}{ArrowRight}{ArrowRight}')
+    expect(dialog).toHaveStyle({ width: '80px' })
+
+    rerender(<Drawer open resizable width={90} fullscreenOnMobile={false} placement="bottom" />)
+    expect(separator).toHaveAttribute('aria-orientation', 'horizontal')
+    await user.keyboard('{ArrowUp}')
+    expect(dialog).toHaveStyle({ height: '90px' })
+    await user.keyboard('{ArrowDown}{ArrowDown}')
+    expect(dialog).toHaveStyle({ height: '80px' })
+  })
+
   it('should link aria-labelledby to an existing title element', async () => {
     render(<Drawer open={true} title="Accessible Drawer" />)
 
@@ -441,7 +468,7 @@ describe('Drawer', () => {
 
   it('should pass basic accessibility checks', async () => {
     render(
-      <Drawer open={true} title="Accessible Drawer">
+      <Drawer open={true} resizable title="Accessible Drawer">
         <div>Drawer content</div>
       </Drawer>
     )

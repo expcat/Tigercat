@@ -23,6 +23,7 @@ import {
   getDrawerFooterClasses,
   getDrawerCloseButtonClasses,
   getDrawerTitleClasses,
+  getResizeKeyboardDelta,
   getGestureTouchPoint,
   resolveDrawerPlacement,
   getDrawerSwipeCloseDirection,
@@ -215,12 +216,25 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
   const swipeAllowedRef = useRef(false)
   const [sheetOffset, setSheetOffset] = useState(0)
   const [resizedLength, setResizedLength] = useState<number | null>(null)
+  const [measuredLength, setMeasuredLength] = useState(80)
   const [resizing, setResizing] = useState(false)
   const [layerId, setLayerId] = useState<number | null>(null)
   const [stackedZ, setStackedZ] = useState<number | undefined>(undefined)
 
   const writingDirection = mergedLocale?.direction === 'rtl' ? 'rtl' : 'ltr'
   const resolvedPlacement = resolveDrawerPlacement(placement, writingDirection)
+  const isHorizontal = resolvedPlacement === 'left' || resolvedPlacement === 'right'
+  const readResizeLength = useCallback(
+    () =>
+      resizedLength ??
+      (isHorizontal
+        ? (dialogRef.current?.offsetWidth ?? 320)
+        : (dialogRef.current?.offsetHeight ?? 240)),
+    [isHorizontal, resizedLength]
+  )
+  useLayoutEffect(() => {
+    if (open && resizable) setMeasuredLength(Math.max(80, readResizeLength()))
+  }, [open, resizable, readResizeLength, width, size, panelStyle, style, portalTarget])
   const swipeFollowOptions = useCallback(
     () => ({
       direction: writingDirection,
@@ -232,7 +246,7 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
     [fullscreenOnMobile, writingDirection]
   )
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!open) {
       setLayerId(null)
       setStackedZ(undefined)
@@ -494,12 +508,25 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
           <div
             data-tiger-drawer-resize=""
             role="separator"
+            tabIndex={0}
+            aria-valuemin={80}
+            aria-valuenow={Math.round(resizedLength ?? measuredLength)}
+            aria-valuemax={Math.round(resizedLength ?? measuredLength)}
             aria-orientation={
               resolvedPlacement === 'left' || resolvedPlacement === 'right'
                 ? 'vertical'
                 : 'horizontal'
             }
             aria-label={drawerLabels.resizeAriaLabel}
+            onFocus={() => setMeasuredLength(Math.max(80, readResizeLength()))}
+            onKeyDown={(event) => {
+              const step = getResizeKeyboardDelta(event.key)
+              if (!step) return
+              const delta = drawerResizeDelta(resolvedPlacement, step.deltaX, step.deltaY)
+              if (!delta) return
+              event.preventDefault()
+              setResizedLength(Math.max(80, readResizeLength() + delta))
+            }}
             style={{
               position: 'absolute',
               touchAction: 'none',
@@ -517,12 +544,7 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
               setResizing(true)
               const startX = event.clientX
               const startY = event.clientY
-              const horizontal = resolvedPlacement === 'left' || resolvedPlacement === 'right'
-              const start =
-                resizedLength ??
-                (horizontal
-                  ? (dialogRef.current?.offsetWidth ?? 320)
-                  : (dialogRef.current?.offsetHeight ?? 240))
+              const start = readResizeLength()
               const move = (pointer: PointerEvent) => {
                 const delta = drawerResizeDelta(
                   resolvedPlacement,

@@ -4,6 +4,10 @@
 
 ## v3.0.1（未发布）
 
+双端 Alert 的 close 事件现在可通过 preventDefault() 取消关闭，取消时保留打开状态与焦点。双端 Drawer 的 resizable 分隔条进入 Tab 顺序，方向键每次调整 10px，下限仍为 80px；Vue Drawer 优先保留调用方 aria-describedby。React Drawer 与 delay=0 的 Loading 在首次绘制前完成遮罩同步。
+
+Loading 有子节点时，React className 与 Vue className / class 统一只落到区域根，全屏时也如此。原先用这些类修饰区域遮罩或全屏浮层的调用方，应改用 background / style 设置遮罩样式。没有子节点时，类名仍落在指示器上。
+
 React Spotlight 打开态的 SSR 首帧即选中首个启用结果，并输出 aria-activedescendant。双端纵向 Tabs 的面板内若存在纵向滚动容器，其上的滑动不再切换页签；React Tabs 将合并 locale 的方向写入 tablist，仅传组件 rtl locale 也生效。Tree 内置搜索框的 aria-label 采用本地化搜索文案。调用方式不用改。
 
 React Pagination 非受控点击当前页不再触发 onChange；依赖重复回调的逻辑应改为监听实际页码变化。双端 PageHeader 无标题时保留调用方 aria-labelledby；ScrollSpy 的 section active 属性覆盖嵌套项，Vue 同步输出 active 与 behavior 属性。React ContextMenuItem / DropdownItem 的 itemKey 不再透传到原生元素，调用方式不用改。

@@ -13,7 +13,7 @@ description: Compact generated Tigercat Feedback props reference
 
 `packages/core/src/types/alert.ts` · `AlertProps` · 4/18 compact props · [Complete props](#remaining-props-complete-public-api)
 
-Note: 省略 `open` 时展示，关闭按钮和到时由组件自己收起，焦点从关闭按钮移到后面下一个可聚焦元素。传入 `open` 时只发事件。父级重渲染不重置剩余时间。`error` 保持 `role="alert"`。首屏之后新插入的 success / info / warning 用组件自己的 `role="status"`；静态条文不加实时区域。与 ImagePreview「省略即关」相反。
+Note: 省略 `open` 时展示，关闭按钮和到时由组件自己收起，焦点从关闭按钮移到后面下一个可聚焦元素。传入 `open` 时只发事件。close 事件可取消，`preventDefault()` 会保留打开状态和焦点。父级重渲染不重置剩余时间。`error` 保持 `role="alert"`。首屏之后新插入的 success / info / warning 用组件自己的 `role="status"`；静态条文不加实时区域。与 ImagePreview「省略即关」相反。
 
 | Prop        | Type        | Default  | Notes                                                                                      |
 | ----------- | ----------- | -------- | ------------------------------------------------------------------------------------------ |

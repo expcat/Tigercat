@@ -80,8 +80,8 @@ export const Loading: React.FC<LoadingProps> = ({
   const showIndicator = visible
   const showFullscreen = Boolean(fullscreen && showIndicator)
 
-  useEffect(() => gate.subscribe(() => setVisible(gate.isShown())), [gate])
-  useEffect(() => {
+  useLayoutEffect(() => gate.subscribe(() => setVisible(gate.isShown())), [gate])
+  useLayoutEffect(() => {
     gate.sync(Boolean(spinning), delay)
   }, [gate, spinning, delay])
   useEffect(() => () => gate.dispose(), [gate])
@@ -134,7 +134,7 @@ export const Loading: React.FC<LoadingProps> = ({
         {...props}
         ref={layerRef}
         tabIndex={-1}
-        className={classNames(loadingFullscreenBaseClasses, className)}
+        className={classNames(loadingFullscreenBaseClasses, !hasRegion && className)}
         style={{
           ...(customColor ? { color: customColor } : null),
           backgroundColor: background,
@@ -152,7 +152,7 @@ export const Loading: React.FC<LoadingProps> = ({
     return (
       <div
         ref={regionRef}
-        className={classNames(loadingRegionBaseClasses, !showFullscreen && className)}
+        className={classNames(loadingRegionBaseClasses, className)}
         aria-busy={showIndicator || undefined}>
         <div inert={showIndicator && !showFullscreen ? true : undefined}>{children}</div>
         {showIndicator && !showFullscreen ? (

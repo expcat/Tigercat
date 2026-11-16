@@ -180,6 +180,26 @@ describe('Alert', () => {
     expect(screen.queryByText('Closable Alert')).not.toBeInTheDocument()
   })
 
+  it('keeps the alert open when its close request is canceled', async () => {
+    const onUpdateOpen = vi.fn()
+    render(Alert, {
+      props: {
+        title: 'Keep open',
+        closable: true,
+        onClose: (event: Event) => event.preventDefault(),
+        'onUpdate:open': onUpdateOpen
+      }
+    })
+    const close = screen.getByRole('button', { name: 'Close alert' })
+    close.focus()
+
+    await fireEvent.click(close)
+
+    expect(screen.getByText('Keep open')).toBeInTheDocument()
+    expect(onUpdateOpen).not.toHaveBeenCalled()
+    expect(close).toHaveFocus()
+  })
+
   it('uses official locale objects for the close name', () => {
     const { unmount } = render({
       components: { ConfigProvider, Alert },

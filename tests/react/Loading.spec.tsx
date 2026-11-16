@@ -72,6 +72,22 @@ describe('Loading (React)', () => {
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   })
 
+  it('keeps the custom class only on the region root, including fullscreen', () => {
+    const { rerender } = render(<Loading className="region-class">Content</Loading>)
+    const region = screen.getByText('Content').parentElement
+    expect(region).toHaveClass('region-class')
+    expect(screen.getByRole('status')).not.toHaveClass('region-class')
+
+    rerender(
+      <Loading className="region-class" fullscreen>
+        Content
+      </Loading>
+    )
+    expect(region).toHaveClass('region-class')
+    expect(screen.getByRole('status')).not.toHaveClass('region-class')
+    expect(document.querySelectorAll('.region-class')).toHaveLength(1)
+  })
+
   it('renders dots and bars variants', () => {
     const { rerender } = render(<Loading variant="dots" />)
     expect(screen.getByRole('status').querySelectorAll('[aria-hidden="true"] > *')).toHaveLength(3)

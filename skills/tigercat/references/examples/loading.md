@@ -15,7 +15,7 @@ description: Compact Tigercat Feedback Vue and React usage routes
 
 Runnable modules: `examples/example/vue3/src/examples/loading/01/`, `examples/example/vue3/src/examples/loading/02/`, `examples/example/vue3/src/examples/loading/03/`, `examples/example/react/src/examples/loading/01/`, `examples/example/react/src/examples/loading/02/`, `examples/example/react/src/examples/loading/03/`.
 
-Note: 每次 `spinning` 变为真都重新等 `delay`，中途转回假就取消。`fullscreen` 盖住视口，和有没有子节点分开，层高于模态，并占住焦点栈。区域遮罩把 `aria-busy` 放在被挡住的区域上，结束时若焦点没被移走就还回去。
+Note: 每次 `spinning` 变为真都重新等 `delay`，中途转回假就取消。`fullscreen` 盖住视口，和有没有子节点分开，层高于模态，并占住焦点栈。有子节点时 class 只落在区域根（全屏时也如此），没有子节点时落在指示器上。区域遮罩把 `aria-busy` 放在被挡住的区域上，结束时若焦点没被移走就还回去。
 
 Vue: `<Loading :spinning="loading"><slot /></Loading>`
 

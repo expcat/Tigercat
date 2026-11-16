@@ -13,14 +13,14 @@ description: Compact generated Tigercat Feedback props reference
 
 `packages/core/src/types/progress.ts` · `ProgressProps` · 4/17 compact props · [Complete props](#remaining-props-complete-public-api)
 
-Note: 默认名是 locale「进度」，不含当前值。自定义 `text`/`format` 进 `aria-valuetext`。`status="paused"` 会停条纹动画。条纹和过渡在样式表里，减少动效时停。
+Note: 默认名是 locale「进度」，不含当前值。自定义 `text`/`format` 进 `aria-valuetext`。`status="success"` 会把显示值收到 100，并关闭 indeterminate。`status="paused"` 会停条纹动画。条纹和过渡在样式表里，减少动效时停。
 
-| Prop          | Type             | Default                           | Notes                                                                        |
-| ------------- | ---------------- | --------------------------------- | ---------------------------------------------------------------------------- |
-| `percentage?` | `number`         | `0`                               | Current progress percentage (0-100)                                          |
-| `status?`     | `ProgressStatus` | `'normal'`                        | Progress status When set, overrides variant color                            |
-| `showText?`   | `boolean`        | `true for line, false for circle` | Whether to show progress text. Line: outside the bar. Circle: in the center. |
-| `type?`       | `ProgressType`   | `'line'`                          | Progress type (shape)                                                        |
+| Prop          | Type             | Default                           | Notes                                                                                      |
+| ------------- | ---------------- | --------------------------------- | ------------------------------------------------------------------------------------------ |
+| `percentage?` | `number`         | `0`                               | Current progress percentage (0-100)                                                        |
+| `status?`     | `ProgressStatus` | `'normal'`                        | Progress status When set, overrides variant color 'success' sets the displayed value to... |
+| `showText?`   | `boolean`        | `true for line, false for circle` | Whether to show progress text. Line: outside the bar. Circle: in the center.               |
+| `type?`       | `ProgressType`   | `'line'`                          | Progress type (shape)                                                                      |
 
 ### Remaining props (complete public API)
 

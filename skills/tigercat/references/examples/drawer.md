@@ -15,7 +15,7 @@ description: Compact Tigercat Feedback Vue and React usage routes
 
 Runnable modules: `examples/example/vue3/src/examples/drawer/01/`, `examples/example/vue3/src/examples/drawer/02/`, `examples/example/vue3/src/examples/drawer/03/`, `examples/example/react/src/examples/drawer/01/`, `examples/example/react/src/examples/drawer/02/`, `examples/example/react/src/examples/drawer/03/`.
 
-Note: 与 Modal 同一套在场、焦点栈和关场。打开时焦点进对话框或 `initialFocus`。`placement` 含 `start`/`end`，先换成物理边再决定滑动方向；`fullscreenOnMobile` 铺满后，关闭滑动跟铺满后的边。swipe 只在标题栏或对应轴滚到头时成立。面板类名只有 `className`。`bodyPadding={false}` 去掉默认内边距，自定义间距用 `bodyClassName`。离开回调等这一层过渡结束。关闭名走 `locale.drawer`。嵌套 Drawer 进外层 overlay-host，Esc 先关里层。
+Note: 与 Modal 同一套在场、焦点栈和关场。打开时焦点进对话框或 `initialFocus`。`placement` 含 `start`/`end`，先换成物理边再决定滑动方向；`fullscreenOnMobile` 铺满后，关闭滑动跟铺满后的边。swipe 只在标题栏或对应轴滚到头时成立。面板类名只有 `className`。`bodyPadding={false}` 去掉默认内边距，自定义间距用 `bodyClassName`。离开回调等这一层过渡结束。关闭名走 `locale.drawer`。嵌套 Drawer 进外层 overlay-host，Esc 先关里层。`resizable` 分隔条可 Tab 聚焦，方向键按 10px 调整对应轴尺寸，下限 80px。调用方的 `aria-describedby` 优先于默认内容描述。
 
 Vue: `<Drawer :open="open" title="Title">Body</Drawer>`
 

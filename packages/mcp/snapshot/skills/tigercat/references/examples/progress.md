@@ -15,7 +15,7 @@ description: Compact Tigercat Feedback Vue and React usage routes
 
 Runnable modules: `examples/example/vue3/src/examples/progress/01/`, `examples/example/vue3/src/examples/progress/02/`, `examples/example/vue3/src/examples/progress/03/`, `examples/example/vue3/src/examples/progress/04/`, `examples/example/react/src/examples/progress/01/`, `examples/example/react/src/examples/progress/02/`, `examples/example/react/src/examples/progress/03/`, `examples/example/react/src/examples/progress/04/`.
 
-Note: 默认名是 locale「进度」，不含当前值。自定义 `text`/`format` 进 `aria-valuetext`。`status="paused"` 会停条纹动画。条纹和过渡在样式表里，减少动效时停。
+Note: 默认名是 locale「进度」，不含当前值。自定义 `text`/`format` 进 `aria-valuetext`。`status="success"` 会把显示值收到 100，并关闭 indeterminate。`status="paused"` 会停条纹动画。条纹和过渡在样式表里，减少动效时停。
 
 Vue: `<Progress :percentage="64" />`
 

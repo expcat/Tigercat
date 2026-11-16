@@ -77,6 +77,25 @@ describe('Loading (Vue)', () => {
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   })
 
+  it('keeps custom classes only on the region root, including fullscreen', async () => {
+    const { rerender } = render(Loading, {
+      props: { className: 'region-class' },
+      attrs: { class: 'attr-class' },
+      slots: { default: 'Content' }
+    })
+    const region = screen.getByText('Content').parentElement
+    expect(region).toHaveClass('region-class', 'attr-class')
+    expect(screen.getByRole('status')).not.toHaveClass('region-class')
+    expect(screen.getByRole('status')).not.toHaveClass('attr-class')
+
+    await rerender({ fullscreen: true })
+    expect(region).toHaveClass('region-class', 'attr-class')
+    expect(screen.getByRole('status')).not.toHaveClass('region-class')
+    expect(screen.getByRole('status')).not.toHaveClass('attr-class')
+    expect(document.querySelectorAll('.region-class')).toHaveLength(1)
+    expect(document.querySelectorAll('.attr-class')).toHaveLength(1)
+  })
+
   it('renders dots and bars variants', () => {
     const { unmount } = render(Loading, { props: { variant: 'dots' } })
     expect(screen.getByRole('status').querySelectorAll('[aria-hidden="true"] > *')).toHaveLength(3)
