@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **NavigationMenuTrigger 顶栏 typeahead（React，C107-F01）**：Trigger 聚焦后键入字母前缀时，复用已有 menubar typeahead，焦点跳到匹配顶栏项并写上 tab stop，与 Vue 一致。
+
 - **NavigationMenuList current 指示器（Vue / React，C106-F01、C106-F02）**：React current 指示器补上与 Vue 相同的绝对定位、h-0.5 高度和主色。双端在视口或列表几何变化后重测 current 项，指示器起点和宽度继续对齐。
 
 - **NavigationMenuLink 根禁用（Vue / React，C105-F01）**：面板已经打开后再把根设为 `disabled` 时，双端面板内 Link 去掉 href、带 `aria-disabled`，点击不再执行调用方回调。

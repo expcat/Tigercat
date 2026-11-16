@@ -188,6 +188,17 @@ describe('NavigationMenu', () => {
     expect(document.activeElement).toHaveTextContent('About')
   })
 
+  it('moves focus and the tab stop when a trigger types a letter prefix', () => {
+    render(<Demo />)
+    const products = screen.getByRole('menuitem', { name: 'Products' })
+    const docs = screen.getByRole('menuitem', { name: 'Docs' })
+    products.focus()
+    fireEvent.keyDown(products, { key: 'd' })
+    expect(docs).toHaveFocus()
+    expect(docs.tabIndex).toBe(0)
+    expect(products.tabIndex).toBe(-1)
+  })
+
   it('moves to the visual next item with ArrowLeft when dir is rtl', () => {
     render(
       <div dir="rtl">

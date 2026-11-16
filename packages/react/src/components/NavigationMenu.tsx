@@ -344,6 +344,21 @@ export const NavigationMenuTrigger = React.forwardRef<
     if (isDisabled || !item) return
 
     if (root?.menubarRef.current) {
+      const barItems = getNavigationMenuBarItems(root.menubarRef.current)
+      const hit = root.typeahead.push(
+        event.key,
+        barItems.map((node) => (node.textContent ?? '').trim()),
+        Math.max(0, barItems.indexOf(event.currentTarget)),
+        barItems.map((node) => node.getAttribute('aria-disabled') === 'true')
+      )
+      if (hit && hit.index >= 0) {
+        event.preventDefault()
+        markTypeaheadMatch(barItems, hit.index)
+        barItems[hit.index]?.focus()
+        const matched = getNavigationMenuItemValue(barItems[hit.index])
+        if (matched != null) root.setTabStopValue(matched)
+        return
+      }
       const next = handleMenubarNavigation(root.menubarRef.current, event.nativeEvent)
       if (next) {
         const value = getNavigationMenuItemValue(next)
