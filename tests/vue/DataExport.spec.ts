@@ -33,7 +33,7 @@ afterEach(() => {
 })
 
 describe('DataExport', () => {
-  it('renders a dropdown trigger with both format items by default', async () => {
+  it('renders a dropdown trigger with the default format items', async () => {
     render(DataExport, { props: { columns, dataSource: data } })
 
     const trigger = screen.getByRole('button', { name: 'Export data' })
@@ -42,6 +42,7 @@ describe('DataExport', () => {
     await fireEvent.click(trigger)
     expect(trigger).toHaveAttribute('aria-expanded', 'true')
     expect(await screen.findByRole('menuitem', { name: 'Export Excel' })).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: 'Export CSV' })).toBeInTheDocument()
     expect(screen.getByRole('menuitem', { name: 'Export Markdown' })).toBeInTheDocument()
   })
 
@@ -151,6 +152,36 @@ describe('DataExport', () => {
     await waitFor(() => expect(emitted().error).toBeTruthy())
     expect((emitted().error[0] as [Error])[0].message).toBe('boom')
     expect(await screen.findByRole('status')).toHaveTextContent('Export failed')
+  })
+
+  it('gives customExport filtered columns and formatted rows', async () => {
+    const customExport = vi.fn()
+    const exportColumns: TableColumn[] = [
+      { key: 'name', title: 'Name' },
+      { key: 'secret', title: 'Secret' },
+      { key: 'actions', title: 'Ops', render: () => 'edit' }
+    ]
+    render(DataExport, {
+      props: {
+        columns: exportColumns,
+        dataSource: [{ name: 'Ada', secret: 'hidden' }],
+        hiddenColumnKeys: ['secret'],
+        cellFormatter: (value: unknown, column: TableColumn) =>
+          column.key === 'name' ? `X:${value}` : value,
+        customExport,
+        formats: ['csv']
+      }
+    })
+
+    await fireEvent.click(screen.getByRole('button', { name: 'Export CSV' }))
+
+    await waitFor(() => expect(customExport).toHaveBeenCalled())
+    const info = customExport.mock.calls[0][0] as {
+      columns: TableColumn[]
+      dataSource: Array<Record<string, unknown>>
+    }
+    expect(info.columns.map((column) => column.key)).toEqual(['name'])
+    expect(info.dataSource).toEqual([{ name: 'X:Ada' }])
   })
 
   it('has no a11y violations for single, open menu, and disabled states', async () => {

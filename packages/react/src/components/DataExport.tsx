@@ -21,6 +21,7 @@ import {
 import {
   DEFAULT_DATA_EXPORT_FORMATS,
   isDataExportFormat,
+  resolveDataExportColumns,
   sanitizeDataExportRows,
   yieldDataExportFrame
 } from '@expcat/tigercat-core/utils/data-export'
@@ -115,10 +116,11 @@ function DataExportInner<T extends Record<string, unknown>>(
       try {
         await yieldDataExportFrame()
         if (customExport) {
+          const exportColumns = resolveDataExportColumns(columns, dataSource, hiddenColumnKeys)
           await customExport({
             format,
-            columns,
-            dataSource: sanitizeDataExportRows(columns, dataSource),
+            columns: exportColumns,
+            dataSource: sanitizeDataExportRows(exportColumns, dataSource, cellFormatter),
             fileName
           })
         } else {

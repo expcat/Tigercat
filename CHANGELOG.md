@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **DataExport 默认三项与 customExport 载荷（Core / React / Vue / Demo / 文档 / MCP，C135-F01、C135-F02）**：笔记与两端 Demo 写默认 xlsx、csv、markdown，多格式菜单含 Export CSV，触发器名走 triggerAriaLabel。隐藏 secret 时 customExport 收不到 secret 和 render-only 列，name 为 X:Ada。
+
 - **Countdown timer 可访问名（React / Vue，C134-F01）**：无 title、interval 为 0、ariaLabel 为「付款倒计时」时，timer 可访问名是 00:00:05，根节点仍用 ariaLabel。React 未传 ariaLabel 时保留调用方的 aria-label。
 
 - **CollapsePanel 收起态 aria-controls（Vue，C133-F01）**：默认收起的标题按钮不再写 aria-controls；展开后等于 region 的 id。关闭仍即卸载。

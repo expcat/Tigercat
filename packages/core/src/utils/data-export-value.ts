@@ -150,15 +150,24 @@ export function resolveDataExportColumns<T>(
   })
 }
 
-/** Cell values a custom serializer receives. Text is already neutralized. */
-export function sanitizeDataExportRows<T>(columns: TableColumn<T>[], data: T[]): T[] {
+/**
+ * Cells a custom serializer receives: one field per export column.
+ * `cellFormatter` runs first; text is neutralized.
+ */
+export function sanitizeDataExportRows<T>(
+  columns: TableColumn<T>[],
+  data: T[],
+  cellFormatter?: (value: unknown, column: TableColumn<T>, record: T) => unknown
+): T[] {
   return data.map((record) => {
-    const next = { ...(record as Record<string, unknown>) }
+    const source = record as Record<string, unknown>
+    const next: Record<string, unknown> = {}
     for (const column of columns) {
       const field = column.dataKey || column.key
       if (!field) continue
-      const cell = toDataExportCell(next[field])
-      next[field] = cell.value
+      const raw = source[field]
+      const value = cellFormatter ? cellFormatter(raw, column, record) : raw
+      next[field] = toDataExportCell(value).value
     }
     return next as T
   })

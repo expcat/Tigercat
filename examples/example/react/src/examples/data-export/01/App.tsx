@@ -35,8 +35,8 @@ export default function App() {
     <div className="space-y-6">
       <section className="space-y-2">
         <p className="text-sm text-gray-500">
-          默认 formats 是 Excel + Markdown 下拉。操作列没有 dataKey，不会写进文件；hiddenColumnKeys
-          会跳过内部备注。
+          默认 formats 是 Excel、CSV 与 Markdown 下拉。操作列没有
+          dataKey，不会写进文件；hiddenColumnKeys 会跳过内部备注。
         </p>
         <div className="flex flex-wrap items-center gap-3">
           <DataExport<Row>

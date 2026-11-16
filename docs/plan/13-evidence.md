@@ -214,7 +214,7 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | C132 | Collapse      | needs-evidence | 视觉 0/24、键盘 0/24 均 blocked，截图 0；vitest 3 files 75 passed（happy-dom，axe 未扫）；未跑 docs:api:check、exports:check；无 ref 探针                                                                                   |
 | C133 | CollapsePanel | needs-evidence | C133-F01 已修复。Vue 收起时标题按钮不写 aria-controls，展开后等于 region id。主责视觉格 0；相关 24 格（owner C132）视觉、键盘 0/24 blocked，截图 0；vitest 2 files 67 passed（happy-dom，TIGER_A11Y=1，无自有测试）；无读屏 |
 | C134 | Countdown     | needs-evidence | C134-F01 已修复。无 title、interval=0 时 timer 可访问名为 00:00:05，根 aria-label 仍是付款倒计时。视觉 0/16、键盘 0/16 均 blocked，截图 0；vitest 3 files 77 passed（happy-dom，TIGER_A11Y=1）；未跑 docs:api:check；无读屏 |
-| C135 | DataExport    | needs-evidence | 视觉 0/8、键盘 0/8 均 blocked，截图 0；vitest 3 files 40 passed（happy-dom，axe 未扫）；临时 happy-dom 探针（非浏览器、非 SSR）；未跑 docs:api:check                                                                        |
+| C135 | DataExport    | needs-evidence | C135-F01、C135-F02 已修复。默认笔记与 Demo 为 xlsx/csv/markdown；隐藏 secret 时 customExport 无 secret 与 render-only 列，name 为 X:Ada。视觉 0/8、键盘 0/8 均 blocked，截图 0；vitest 3 files 40 passed（happy-dom，axe 未扫）；临时 happy-dom 探针（非浏览器、非 SSR）；未跑 docs:api:check |
 | C136 | Table         | needs-evidence | 视觉 0/64、键盘 0/64 均 blocked，截图 0；vitest 2 files 156 项通过（happy-dom）；table-utils、w9-bind、TableState spec 未跑；menu/05 属 C098                                                                                |
 | C137 | Timeline      | needs-evidence | 视觉 0/24、键盘 0/24 均 blocked，截图 0；vitest 3 files 45 passed；happy-dom 探针通过（已删，非视觉）；未跑 SSR；无读屏；alternate、right、horizontal 无画面                                                                |
 

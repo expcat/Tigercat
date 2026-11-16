@@ -17,6 +17,7 @@ import {
 import {
   DEFAULT_DATA_EXPORT_FORMATS,
   isDataExportFormat,
+  resolveDataExportColumns,
   sanitizeDataExportRows,
   yieldDataExportFrame
 } from '@expcat/tigercat-core/utils/data-export'
@@ -159,10 +160,19 @@ export const DataExport = defineComponent({
       try {
         await yieldDataExportFrame()
         if (props.customExport) {
+          const exportColumns = resolveDataExportColumns(
+            props.columns,
+            props.dataSource,
+            props.hiddenColumnKeys
+          )
           await props.customExport({
             format,
-            columns: props.columns,
-            dataSource: sanitizeDataExportRows(props.columns, props.dataSource),
+            columns: exportColumns,
+            dataSource: sanitizeDataExportRows(
+              exportColumns,
+              props.dataSource,
+              props.cellFormatter
+            ),
             fileName: props.fileName
           })
         } else {

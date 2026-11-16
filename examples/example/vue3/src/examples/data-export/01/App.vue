@@ -40,8 +40,8 @@ const handleError = () => {
   <div class="space-y-6">
     <section class="space-y-2">
       <p class="text-sm text-gray-500">
-        默认 formats 是 Excel + Markdown 下拉。操作列没有 dataKey，不会写进文件；hiddenColumnKeys
-        会跳过内部备注。
+        默认 formats 是 Excel、CSV 与 Markdown 下拉。操作列没有
+        dataKey，不会写进文件；hiddenColumnKeys 会跳过内部备注。
       </p>
       <div class="flex flex-wrap items-center gap-3">
         <DataExport

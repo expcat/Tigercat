@@ -15,7 +15,7 @@ description: Compact generated Tigercat Data props reference
 
 Uses: `Dropdown`, `DropdownMenu`, `DropdownItem`.
 
-Note: 将 columns + dataSource 导出为真正的 .xlsx（零依赖、STORED zip）、CSV（UTF-8 BOM + CRLF）或 GFM Markdown。序列化在点击时才 `import('@expcat/tigercat-core/utils/data-export')`。默认 `formats` 是 xlsx+markdown 下拉（不含 csv）；单个值才是一颗按钮。列复用 `TableColumn`（`title` 与 `dataKey || key`，不跑 `render`）；操作列和无字段的 `render` 列默认跳过，隐藏列传 `hiddenColumnKeys`。`fileName` 已有后缀不会再拼。locale `triggerAriaLabel` 目前未接到触发器。
+Note: 将 columns + dataSource 导出为真正的 .xlsx（零依赖、STORED zip）、CSV（UTF-8 BOM + CRLF）或 GFM Markdown。序列化在点击时才 `import('@expcat/tigercat-core/utils/data-export')`。默认 `formats` 是 xlsx、csv 与 markdown 下拉；单个值才是一颗按钮。列复用 `TableColumn`（`title` 与 `dataKey || key`，不跑 `render`）；操作列和无字段的 `render` 列默认跳过，隐藏列传 `hiddenColumnKeys`。`fileName` 已有后缀不会再拼。多格式触发器的可访问名是 locale `triggerAriaLabel`。
 
 | Prop         | Type                 | Default                       | Notes                                                                                      |
 | ------------ | -------------------- | ----------------------------- | ------------------------------------------------------------------------------------------ |
