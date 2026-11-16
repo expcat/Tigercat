@@ -935,7 +935,7 @@ export const COMMAND_API_USAGE = {
 export const REQUIRED_USAGE_SNIPPETS = {
   Vue: {
     Image: '<Image src="..." alt="..." />',
-    Calendar: '<Calendar :value="date" />',
+    Calendar: '<Calendar v-model="date" />',
     FormItem: '<FormItem name="name" label="Name"><Input /></FormItem>',
     QRCode: '<QRCode value="..." />',
     Result: '<Result status="success" title="提交成功" />',

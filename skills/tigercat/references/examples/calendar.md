@@ -15,7 +15,7 @@ description: Compact Tigercat Data Vue and React usage routes
 
 Runnable modules: `examples/example/vue3/src/examples/calendar/01/`, `examples/example/vue3/src/examples/calendar/02/`, `examples/example/vue3/src/examples/calendar/03/`, `examples/example/vue3/src/examples/calendar/04/`, `examples/example/react/src/examples/calendar/01/`, `examples/example/react/src/examples/calendar/02/`, `examples/example/react/src/examples/calendar/03/`, `examples/example/react/src/examples/calendar/04/`.
 
-Vue: `<Calendar :value="date" />`
+Vue: `<Calendar v-model="date" />`
 
 React: `<Calendar value={date} />`
 
