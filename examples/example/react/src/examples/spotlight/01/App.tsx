@@ -26,6 +26,7 @@ export default function App() {
       <Spotlight
         open={open}
         items={items}
+        hotkey
         onOpenChange={setOpen}
         onSelect={(item) => setSelected(item.label)}
       />

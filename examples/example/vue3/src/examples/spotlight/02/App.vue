@@ -38,6 +38,6 @@ const selected = ref('尚未选择命令')
     <p class="text-sm text-gray-500" aria-live="polite">
       {{ selected }}。别名走 keywords；面板打开时 ⌘ , 会选中偏好设置。
     </p>
-    <Spotlight :items="items" @select="selected = `已选择：${$event.label}`" />
+    <Spotlight :items="items" default-open @select="selected = `已选择：${$event.label}`" />
   </div>
 </template>

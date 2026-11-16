@@ -213,6 +213,25 @@ describe('Spotlight (React)', () => {
       expect(document.body).toHaveTextContent('★')
       expect(document.body).toHaveTextContent('Icon command')
     })
+
+    it('renders a registered icon name as svg and an unknown string as text', () => {
+      render(
+        <Spotlight
+          open
+          items={[
+            { key: 'find', label: 'Find command', icon: 'search' },
+            { key: 'star', label: 'Star command', icon: '★' }
+          ]}
+        />
+      )
+
+      const find = screen.getByRole('option', { name: 'Find command' })
+      expect(find.querySelector('svg')).toBeTruthy()
+      expect(find).not.toHaveTextContent('search')
+      const star = screen.getByRole('option', { name: /Star command/ })
+      expect(star.querySelector('svg')).toBeNull()
+      expect(star).toHaveTextContent('★')
+    })
   })
 
   it('has no accessibility violations', async () => {
@@ -243,6 +262,27 @@ describe('Spotlight (React)', () => {
       ref.current?.open()
     })
     expect(document.querySelector('[role="dialog"]')).toBeInTheDocument()
+  })
+
+  it('closes from the toggle hotkey on the panel search input only', async () => {
+    render(
+      <>
+        <input aria-label="notes" />
+        <Spotlight items={items} hotkey />
+      </>
+    )
+    const notes = screen.getByRole('textbox', { name: 'notes' })
+
+    await fireEvent.keyDown(notes, { key: 'k', metaKey: true })
+    expect(document.querySelector('[role="dialog"]')).not.toBeInTheDocument()
+
+    await fireEvent.keyDown(document, { key: 'k', metaKey: true })
+    const search = document.querySelector('[data-tiger-spotlight-root] input') as HTMLInputElement
+    search.focus()
+    expect(document.querySelector('[role="dialog"]')).toBeInTheDocument()
+
+    await fireEvent.keyDown(search, { key: 'k', metaKey: true })
+    expect(document.querySelector('[role="dialog"]')).not.toBeInTheDocument()
   })
 
   it('selects an item from its shortcut while open', async () => {

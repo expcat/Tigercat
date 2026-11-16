@@ -24,6 +24,6 @@ const selected = ref('')
     <p class="text-sm text-gray-500">按 Ctrl/⌘ K 打开。页内按钮只是补充通道。</p>
     <Button @click="open = true">打开命令面板</Button>
     <p v-if="selected" class="text-sm text-gray-500">已选择：{{ selected }}</p>
-    <Spotlight v-model:open="open" :items="items" @select="selected = $event.label" />
+    <Spotlight v-model:open="open" :items="items" hotkey @select="selected = $event.label" />
   </div>
 </template>

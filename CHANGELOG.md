@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Spotlight 热键、搜索框关闭与图标（Core / Vue / React / Demo，C111-F01、C111-F02、C111-F03、C111-F04）**：Vue 在 `hotkey` 变化时认领或释放全局热键，挂载后再打开可以响应 Meta/Ctrl+K，关掉后不再响应。已打开面板的搜索框上，带命令修饰键的切换热键可以关闭面板；其他可编辑目标和裸字母仍留给输入。示例 01 传入 `hotkey`，02 用 `defaultOpen` 演示 ⌘ ,。已注册图标名渲染为 svg，未注册字符串仍显示为文本。
+
 - **ScrollSpy 受控禁用键（React，C110-F01）**：传入 `activeKey` 时显示该键，禁用或不存在也不再静默改成第一项，且不触发 `onActiveKeyChange`。未传 `activeKey` 时仍按 `defaultActiveKey` 或第一项可用项初始化。
 
 - **Pagination 受控夹取、快速跳页、禁用与方向（Vue / React，C109-F01、C109-F02、C109-F03、C109-F04）**：Vue 在受控 current 为有限数字且与夹取值不同时发出一次 `update:current` 与 `change`，父级接受夹取值后不再重发。React 传入 `quickJumperValidation` 时复用空闲校验调度，不传时仍在提交时才夹取。双端 `disabled` 同时禁用省略号跳页按钮和输入。React 按合并后的 locale 在 `nav` 上写 `dir`。

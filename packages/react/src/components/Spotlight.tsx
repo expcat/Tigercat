@@ -24,6 +24,7 @@ import {
   getSpotlightSearchState,
   orderSpotlightWithRecent,
   getSpotlightShortcutLabel,
+  getIconDefinition,
   isSpotlightHotkeyEnabled,
   isSpotlightToggleHotkey,
   releaseSpotlightHotkey,
@@ -51,6 +52,7 @@ import { useEscapeKey, useFocusTrap } from '../utils/overlay'
 import { OverlayPortal } from '../utils/overlay-outlet'
 import { useTigerConfig } from './tiger-config'
 import { useControlledState } from '../hooks/useControlledState'
+import { Icon } from './Icon'
 
 export interface SpotlightProps
   extends
@@ -67,8 +69,10 @@ const EMPTY_ITEMS: SpotlightItem[] = []
 function getRenderableIcon(icon: unknown): React.ReactNode | null {
   const kind = resolveSpotlightIconKind(icon)
   if (kind === 'none') return null
-  if (kind === 'text') return icon as React.ReactNode
-  if (kind === 'node') return icon as React.ReactNode
+  if (kind === 'name' && typeof icon === 'string') {
+    const definition = getIconDefinition(icon)
+    return definition ? <Icon icon={definition} /> : null
+  }
   return icon as React.ReactNode
 }
 

@@ -318,6 +318,28 @@ export function isSpotlightEditableTarget(target: EventTarget | null): boolean {
   return EDITABLE_INPUT_TYPES.has(type)
 }
 
+function isSpotlightPanelSearchInput(target: EventTarget | null): boolean {
+  if (!target || typeof target !== 'object') return false
+  const element = target as {
+    tagName?: string
+    getAttribute?: (name: string) => string | null
+    closest?: (selector: string) => unknown
+  }
+  if (element.tagName !== 'INPUT') return false
+  const type = (element.getAttribute?.('type') ?? 'text').toLowerCase()
+  if (type !== 'search') return false
+  return (
+    typeof element.closest === 'function' && element.closest('[data-tiger-spotlight-root]') != null
+  )
+}
+
+function spotlightToggleHasCommandModifier(hotkey: boolean | string | undefined): boolean {
+  if (hotkey === true) return true
+  if (typeof hotkey !== 'string') return false
+  const chord = parseSpotlightShortcut(hotkey)
+  return Boolean(chord && (chord.meta || chord.ctrl || chord.alt))
+}
+
 let spotlightHotkeyOwner: object | null = null
 
 /** The same chord belongs to one mounted instance. */
@@ -338,7 +360,11 @@ export function isSpotlightToggleHotkey(
   if (!isSpotlightHotkeyEnabled(hotkey)) return false
   if (event.defaultPrevented) return false
   if (event.repeat) return false
-  if (isSpotlightEditableTarget(event.target)) return false
+  if (isSpotlightEditableTarget(event.target)) {
+    if (!isSpotlightPanelSearchInput(event.target) || !spotlightToggleHasCommandModifier(hotkey)) {
+      return false
+    }
+  }
   if (hotkey === true) {
     return (
       (event.metaKey || event.ctrlKey) &&

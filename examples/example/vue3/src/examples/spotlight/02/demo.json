@@ -1,7 +1,7 @@
 {
   "id": "spotlight-02",
   "title": "别名与快捷键",
-  "description": "附加检索字段用 keywords。面板打开时 shortcut 会选中对应项。",
+  "description": "附加检索字段用 keywords。示例以 defaultOpen 打开面板，shortcut 会选中对应项。",
   "entry": "App.vue",
   "order": 2,
   "viewport": {

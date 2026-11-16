@@ -2,7 +2,7 @@
  * @vitest-environment happy-dom
  */
 
-import { defineComponent, h, ref } from 'vue'
+import { defineComponent, h, nextTick, ref } from 'vue'
 import { fireEvent, render, waitFor } from '@testing-library/vue'
 import { describe, expect, it } from 'vitest'
 import { Spotlight } from '@expcat/tigercat-vue/Spotlight'
@@ -192,6 +192,26 @@ describe('Spotlight (Vue)', () => {
       expect(document.body).toHaveTextContent('★')
       expect(document.body).toHaveTextContent('Icon command')
     })
+
+    it('renders a registered icon name as svg and an unknown string as text', () => {
+      render(Spotlight, {
+        props: {
+          open: true,
+          items: [
+            { key: 'find', label: 'Find command', icon: 'search' },
+            { key: 'star', label: 'Star command', icon: '★' }
+          ]
+        }
+      })
+
+      const options = [...document.querySelectorAll('[role="option"]')]
+      const find = options.find((option) => option.textContent?.includes('Find command'))
+      const star = options.find((option) => option.textContent?.includes('Star command'))
+      expect(find?.querySelector('svg')).toBeTruthy()
+      expect(find?.textContent).not.toContain('search')
+      expect(star?.querySelector('svg')).toBeNull()
+      expect(star?.textContent).toContain('★')
+    })
   })
 
   it('has no accessibility violations', async () => {
@@ -203,6 +223,51 @@ describe('Spotlight (Vue)', () => {
     render(Spotlight, { props: { items } })
     expect(document.querySelector('[role="dialog"]')).not.toBeInTheDocument()
     await fireEvent.keyDown(document, { key: 'k', metaKey: true })
+    expect(document.querySelector('[role="dialog"]')).not.toBeInTheDocument()
+  })
+
+  it('claims the hotkey after mount and releases it when hotkey turns off', async () => {
+    const hotkey = ref(false)
+    const Page = defineComponent({
+      setup() {
+        return () => h(Spotlight, { items, hotkey: hotkey.value })
+      }
+    })
+    render(Page)
+
+    await fireEvent.keyDown(document, { key: 'k', metaKey: true })
+    expect(document.querySelector('[role="dialog"]')).not.toBeInTheDocument()
+
+    hotkey.value = true
+    await nextTick()
+    await fireEvent.keyDown(document, { key: 'k', metaKey: true })
+    expect(document.querySelector('[role="dialog"]')).toBeInTheDocument()
+
+    hotkey.value = false
+    await nextTick()
+    await fireEvent.keyDown(document, { key: 'k', metaKey: true })
+    expect(document.querySelector('[role="dialog"]')).toBeInTheDocument()
+  })
+
+  it('closes from the toggle hotkey on the panel search input only', async () => {
+    const Page = defineComponent({
+      setup() {
+        return () =>
+          h('div', [h('input', { 'aria-label': 'notes' }), h(Spotlight, { items, hotkey: true })])
+      }
+    })
+    render(Page)
+    const notes = document.querySelector('input[aria-label="notes"]')!
+
+    await fireEvent.keyDown(notes, { key: 'k', metaKey: true })
+    expect(document.querySelector('[role="dialog"]')).not.toBeInTheDocument()
+
+    await fireEvent.keyDown(document, { key: 'k', metaKey: true })
+    const search = document.querySelector('[data-tiger-spotlight-root] input')!
+    search.focus()
+    expect(document.querySelector('[role="dialog"]')).toBeInTheDocument()
+
+    await fireEvent.keyDown(search, { key: 'k', metaKey: true })
     expect(document.querySelector('[role="dialog"]')).not.toBeInTheDocument()
   })
 

@@ -37,7 +37,11 @@ export default function App() {
       <p className="text-sm text-gray-500" aria-live="polite">
         {selected}。别名走 keywords；面板打开时 ⌘ , 会选中偏好设置。
       </p>
-      <Spotlight items={items} onSelect={(item) => setSelected(`已选择：${item.label}`)} />
+      <Spotlight
+        defaultOpen
+        items={items}
+        onSelect={(item) => setSelected(`已选择：${item.label}`)}
+      />
     </div>
   )
 }

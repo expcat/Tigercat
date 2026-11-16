@@ -107,5 +107,27 @@ describe('spotlight-utils', () => {
     expect(isSpotlightToggleHotkey(ctrlK, true)).toBe(true)
     expect(isSpotlightToggleHotkey(bareD, true)).toBe(false)
     expect(isSpotlightToggleHotkey(ctrlK, false)).toBe(false)
+
+    const root = document.createElement('div')
+    root.setAttribute('data-tiger-spotlight-root', '')
+    const search = document.createElement('input')
+    search.type = 'search'
+    root.append(search)
+    const notes = document.createElement('input')
+    document.body.append(root, notes)
+
+    const onSearch = new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true })
+    const onNotes = new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true })
+    const bareOnSearch = new KeyboardEvent('keydown', { key: 'k', bubbles: true })
+    search.dispatchEvent(onSearch)
+    notes.dispatchEvent(onNotes)
+    search.dispatchEvent(bareOnSearch)
+
+    expect(isSpotlightToggleHotkey(onSearch, true)).toBe(true)
+    expect(isSpotlightToggleHotkey(onNotes, true)).toBe(false)
+    expect(isSpotlightToggleHotkey(bareOnSearch, 'k')).toBe(false)
+
+    root.remove()
+    notes.remove()
   })
 })

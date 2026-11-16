@@ -49,9 +49,11 @@ import {
   type SpotlightItem,
   type SpotlightItemFilter,
   type TigerLocale,
+  type IconName,
   OVERLAY_Z_INDEX
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './tiger-config'
+import { Icon } from './Icon'
 import { useVueEscapeKey, useVueFocusTrap } from '../utils/overlay'
 import { renderVueOverlayOutlet } from '../utils/overlay-outlet'
 
@@ -267,6 +269,17 @@ export const Spotlight = defineComponent({
 
     const hotkeyOwner = {}
     let hotkeyClaimed = false
+    let hotkeyMounted = false
+    const syncHotkeyClaim = () => {
+      if (!hotkeyMounted) return
+      if (isSpotlightHotkeyEnabled(props.hotkey)) {
+        if (!hotkeyClaimed && claimSpotlightHotkey(hotkeyOwner)) hotkeyClaimed = true
+        return
+      }
+      if (!hotkeyClaimed) return
+      releaseSpotlightHotkey(hotkeyOwner)
+      hotkeyClaimed = false
+    }
     const onDocumentKeyDown = (event: KeyboardEvent) => {
       if (hotkeyClaimed && isSpotlightToggleHotkey(event, props.hotkey)) {
         event.preventDefault()
@@ -289,17 +302,22 @@ export const Spotlight = defineComponent({
         onEscape: closeSpotlight,
         layerRef: rootRef
       })
-      if (isSpotlightHotkeyEnabled(props.hotkey) && claimSpotlightHotkey(hotkeyOwner)) {
-        hotkeyClaimed = true
-      }
+      hotkeyMounted = true
+      syncHotkeyClaim()
       document.addEventListener('keydown', onDocumentKeyDown)
     })
 
     onBeforeUnmount(() => {
       cleanupEscape?.()
       document.removeEventListener('keydown', onDocumentKeyDown)
-      if (hotkeyClaimed) releaseSpotlightHotkey(hotkeyOwner)
+      hotkeyMounted = false
+      if (hotkeyClaimed) {
+        releaseSpotlightHotkey(hotkeyOwner)
+        hotkeyClaimed = false
+      }
     })
+
+    watch(() => props.hotkey, syncHotkeyClaim)
 
     watch(
       [
@@ -339,7 +357,9 @@ export const Spotlight = defineComponent({
           ? slots.icon({ item: result.item })
           : iconKind === 'none'
             ? undefined
-            : (result.item.icon as VNodeChild | undefined)
+            : iconKind === 'name'
+              ? h(Icon, { name: result.item.icon as IconName })
+              : (result.item.icon as VNodeChild | undefined)
 
         return h(
           'div',
