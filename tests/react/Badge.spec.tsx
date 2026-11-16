@@ -8,6 +8,7 @@ import userEvent from '@testing-library/user-event'
 import React, { createRef, useState } from 'react'
 import { Badge } from '@expcat/tigercat-react/Badge'
 import { Button } from '@expcat/tigercat-react/Button'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { resetDevWarnCache } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
@@ -36,6 +37,35 @@ describe('Badge', () => {
     expect(badge).toBeInTheDocument()
     expect(badge?.textContent).toBe('')
     expect(badge).toHaveAttribute('aria-hidden', 'true')
+  })
+
+  it.each([false, 'false'] as const)('preserves aria-hidden=%s on a count', (ariaHidden) => {
+    render(<Badge content={5} aria-hidden={ariaHidden} aria-label="Unread messages" />)
+    expect(screen.getByText('5')).toHaveAttribute('aria-hidden', 'false')
+    expect(screen.getByText('5')).toHaveAttribute('aria-label', 'Unread messages')
+  })
+
+  it('formats overlay counts with the component locale override', () => {
+    const { container } = render(
+      <ConfigProvider locale={{ locale: 'en-US' }}>
+        <Badge
+          content={1234}
+          standalone={false}
+          locale={{ locale: 'ar-SA', status: { badgeCountLabel: '{count} إشعارات' } }}>
+          <button>Host</button>
+        </Badge>
+      </ConfigProvider>
+    )
+    expect(container.querySelector('.sr-only')).toHaveTextContent('١٬٢٣٤ إشعارات')
+  })
+
+  it('keeps a named dot when its locale label is empty', () => {
+    const { container } = render(
+      <Badge type="dot" locale={{ status: { badgeLabel: '' } }} aria-label="New message" />
+    )
+    expect(container.firstElementChild).toHaveClass('w-2.5', 'h-2.5')
+    expect(container.firstElementChild).toHaveAttribute('aria-label', 'New message')
+    expect(container.firstElementChild).not.toHaveAttribute('aria-hidden', 'true')
   })
 
   it('caps number content and leaves text content uncapped', () => {

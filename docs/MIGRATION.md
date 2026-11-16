@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+双端 Badge 现在保留字符串 `aria-hidden="false"`，overlay 计数的数字与复数格式使用组件 locale 覆盖；例如 en-US Provider 下组件使用 ar-SA 时，计数中的 `1234` 格式化为 `١٬٢٣٤`。React 的 dot 不再因 `locale.status.badgeLabel=''` 隐藏，仍可用显式 `aria-label` 命名。调用方式不用改，依赖旧输出的断言需按修正后的语义调整。
+
 双端 Avatar 现在将 `aria-labelledby` 传给实际图片；图片与回退统一按 `aria-label`、`alt`、`text`、`aria-labelledby` 的顺序命名。依赖回退分支中外部标签覆盖显式名称的用法应只保留预期的命名来源。AvatarGroup 的溢出按钮重叠缩至 4px，普通头像间保持 8px；调用方式不用改。
 
 ConfigProvider 的嵌套 `localeLoading` 现在在本层或任一父层仍加载时为 true，与 i18n 文档一致；依赖旧内层 ready 状态的断言需调整。撤销根 `theme` 后恢复文档基线主题，无基线时使用 default。React StrictMode 重放后自建图标表保持同一引用，最终卸载时清空。调用方式不用改。

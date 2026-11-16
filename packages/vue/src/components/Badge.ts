@@ -80,9 +80,8 @@ export const Badge = defineComponent({
   },
   setup(props, { slots, attrs }) {
     const config = useTigerConfig()
-    const statusLabels = computed(() =>
-      getStatusLabels(mergeTigerLocale(config.value.locale, props.locale))
-    )
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const statusLabels = computed(() => getStatusLabels(mergedLocale.value))
     const resolved = computed(() =>
       resolveBadgeContent({
         type: props.type,
@@ -113,7 +112,10 @@ export const Badge = defineComponent({
       const ariaLabelledby = attrsRecord['aria-labelledby'] as string | undefined
       const ariaHidden = attrsRecord['aria-hidden'] as boolean | string | undefined
       const userNamed = Boolean(ariaLabel || ariaLabelledby)
-      const hideFromAT = ariaHidden ?? (!userNamed && (isDot.value || !props.standalone))
+      const hideFromAT =
+        ariaHidden == null
+          ? !userNamed && (isDot.value || !props.standalone)
+          : ariaHidden === true || ariaHidden === 'true'
 
       const {
         class: attrsClass,
@@ -168,7 +170,7 @@ export const Badge = defineComponent({
                     ? formatBadgeCountLabel(
                         statusLabels.value.badgeCountLabel,
                         props.content,
-                        config.value.locale?.locale
+                        mergedLocale.value?.locale
                       )
                     : resolved.value.kind === 'text'
                       ? resolved.value.value

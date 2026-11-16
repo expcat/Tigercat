@@ -44,19 +44,20 @@ export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(function Badge(
   ref
 ) {
   const config = useTigerConfig()
-  const statusLabels = useMemo(
-    () => getStatusLabels(mergeTigerLocale(config.locale, locale)),
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
     [config.locale, locale]
   )
+  const statusLabels = useMemo(() => getStatusLabels(mergedLocale), [mergedLocale])
   warnStandaloneBadgeChildren(children != null && children !== false, standalone)
 
   const position = resolveBadgePosition(positionProp)
   const resolved = resolveBadgeContent({ type, content, max, showZero })
   const isDot = resolved.kind === 'dot'
-  const isHidden = resolved.kind === 'hidden' || (isDot && !statusLabels.badgeLabel)
+  const isHidden = resolved.kind === 'hidden'
   const countLabel =
     typeof content === 'number' && Number.isFinite(content)
-      ? formatBadgeCountLabel(statusLabels.badgeCountLabel, content, config.locale?.locale)
+      ? formatBadgeCountLabel(statusLabels.badgeCountLabel, content, mergedLocale?.locale)
       : resolved.kind === 'text'
         ? resolved.value
         : statusLabels.badgeLabel
@@ -70,7 +71,10 @@ export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(function Badge(
   )
 
   const userNamed = Boolean(ariaLabelProp || ariaLabelledbyProp)
-  const hideFromAT = ariaHiddenProp ?? (!standalone || (isDot && !userNamed))
+  const hideFromAT =
+    ariaHiddenProp == null
+      ? !standalone || (isDot && !userNamed)
+      : ariaHiddenProp === true || ariaHiddenProp === 'true'
 
   const badgeElement = !isHidden ? (
     <span

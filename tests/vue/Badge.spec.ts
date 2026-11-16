@@ -7,6 +7,7 @@ import { defineComponent, h, ref } from 'vue'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import { Badge } from '@expcat/tigercat-vue/Badge'
 import { Button } from '@expcat/tigercat-vue/Button'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { resetDevWarnCache } from '@expcat/tigercat-core'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
@@ -28,6 +29,42 @@ describe('Badge', () => {
     expect(badge).toBeInTheDocument()
     expect(badge?.textContent).toBe('')
     expect(badge).toHaveAttribute('aria-hidden', 'true')
+  })
+
+  it.each([false, 'false'] as const)('preserves aria-hidden=%s on a count', (ariaHidden) => {
+    render(Badge, {
+      props: { content: 5 },
+      attrs: { 'aria-hidden': ariaHidden, 'aria-label': 'Unread messages' }
+    })
+    expect(screen.getByText('5')).toHaveAttribute('aria-hidden', 'false')
+    expect(screen.getByText('5')).toHaveAttribute('aria-label', 'Unread messages')
+  })
+
+  it('formats overlay counts with the component locale override', () => {
+    const { container } = render({
+      components: { Badge, ConfigProvider },
+      setup: () => ({
+        locale: { locale: 'ar-SA', status: { badgeCountLabel: '{count} إشعارات' } }
+      }),
+      template: `
+        <ConfigProvider :locale="{ locale: 'en-US' }">
+          <Badge :content="1234" :standalone="false" :locale="locale">
+            <button>Host</button>
+          </Badge>
+        </ConfigProvider>
+      `
+    })
+    expect(container.querySelector('.sr-only')).toHaveTextContent('١٬٢٣٤ إشعارات')
+  })
+
+  it('keeps a named dot when its locale label is empty', () => {
+    const { container } = render(Badge, {
+      props: { type: 'dot', locale: { status: { badgeLabel: '' } } },
+      attrs: { 'aria-label': 'New message' }
+    })
+    expect(container.firstElementChild).toHaveClass('w-2.5', 'h-2.5')
+    expect(container.firstElementChild).toHaveAttribute('aria-label', 'New message')
+    expect(container.firstElementChild).not.toHaveAttribute('aria-hidden', 'true')
   })
 
   it('caps number content and leaves text content uncapped', () => {

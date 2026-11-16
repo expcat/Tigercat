@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Badge 无障碍与 locale（React / Vue，C007-F01、C007-F02、C007-F03）**：两端保留字符串 `aria-hidden="false"`，overlay 计数按组件合并后的 locale 格式化；React 的 dot 在 locale 名称为空时仍按共享内容决议渲染并保留显式名称。
+
 - **AvatarGroup 折叠与组名（React / Vue，C006-F001、C006-F003）**：React 计数前展开 Fragment，max=1 时保留 A 并折叠 B 为 +1；两端原生 aria-label 为 undefined 时保留 locale 默认组名，显式名称仍可覆盖。
 
 - **Avatar 名称、示例配色与组叠放（Core / React / Vue / Demo，C005-F001、C005-F002、C005-F003）**：外部标签接到实际图片，图片与回退保持显式名称优先；TC 示例使用主题前景色适配明暗主题；溢出按钮重叠缩至 4px，避免遮住「陈晨」字形。
