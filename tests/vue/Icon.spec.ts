@@ -4,6 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render } from '@testing-library/vue'
+import { renderToString } from '@vue/server-renderer'
 import { Icon } from '@expcat/tigercat-vue/Icon'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import type { IconDefinition } from '@expcat/tigercat-core'
@@ -206,6 +207,18 @@ describe('Icon (Vue)', () => {
       attrs: { style: { color: 'red' } }
     })
     expect(container.querySelector('span')).toHaveStyle({ color: 'red' })
+  })
+
+  it.each([
+    { color: undefined, expectedColor: 'red' },
+    { color: 'blue', expectedColor: 'blue' }
+  ])('preserves string styles during SSR with color=$color', async ({ color, expectedColor }) => {
+    const html = await renderToString(
+      h(Icon, { name: 'search', style: 'color:red;width:31px;height:31px', color })
+    )
+    expect(html).toContain(`color:${expectedColor};`)
+    expect(html).toContain('width:31px;')
+    expect(html).toContain('height:31px;')
   })
 
   it('prefers custom children over the icon prop', () => {

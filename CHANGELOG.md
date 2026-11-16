@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Icon 字符串样式与注册说明（Vue / Core / Demo / MCP，C002-F001、C002-F003）**：Vue 保留字符串 style 的颜色与宽高，显式 color 只覆盖颜色；类型注释、生成文档与两端示例改用 createIconRegistry 的 register / registerMany，并通过 ConfigProvider.iconRegistry 接线。
+
 - **ConfigProvider 生命周期、主题撤销与加载状态（Core / React / Demo，C001-F001、C001-F002、C001-F003、C001-F005）**：React StrictMode 重放后保留同一自建图标表，卸载时清空；撤销根 theme 后恢复文档基线主题或 default；嵌套 `localeLoading` 纳入父层状态。两端 Demo 明确控件只作用于示例子树，iframe 的 html 由沙箱外层管理。
 
 - **Tour 目标点击推进（React / 文档生成器，C130-F01）**：`advanceOnTarget` 目标保持在 inert 之外，点击后进入下一步，与 Vue 一致；生成笔记同步说明它与 `interact` 都豁免。

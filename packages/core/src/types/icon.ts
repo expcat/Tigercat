@@ -14,8 +14,9 @@ export type IconSize = 'sm' | 'md' | 'lg' | 'xl'
  */
 export interface IconProps {
   /**
-   * Built-in or app-registered icon name (`registerIcon` on the icons/registry
-   * subpath). When provided (and no custom SVG children are given), the
+   * Built-in name or `createIconRegistry()` name via `ConfigProvider.iconRegistry`.
+   * Add app icons with the registry's `register` / `registerMany` methods.
+   * When provided (and no custom SVG children are given), the
    * component renders the matching glyph. Custom children always take
    * precedence.
    */

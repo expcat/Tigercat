@@ -17,7 +17,7 @@ Note: 内置图标集通过 `name` 属性指定；自定义 SVG 子元素仍享�
 
 | Prop     | Type                        | Default | Notes                                                                                      |
 | -------- | --------------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `name?`  | `IconName \| (string & {})` | `-`     | Built-in or app-registered icon name (`registerIcon` on the icons/registry subpath). Wh... |
+| `name?`  | `IconName \| (string & {})` | `-`     | Built-in name or `createIconRegistry()` name via `ConfigProvider.iconRegistry`. Add app... |
 | `size?`  | `IconSize`                  | `'md'`  | Icon size                                                                                  |
 | `color?` | `string`                    | `-`     | Icon color written onto the wrapper. Omitted values inherit CSS `color` (including `sty... |
 

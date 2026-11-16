@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, PropType, type VNode, type CSSProperties } from 'vue'
+import { defineComponent, computed, h, normalizeStyle, PropType, type VNode } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -120,11 +120,7 @@ export const Icon = defineComponent({
       }
 
       const children = builtInSvg ? [builtInSvg] : (defaultSlot ?? []).map(normalizeSlotNode)
-      const attrsStyle = attrs.style as CSSProperties | string | undefined
-      const styleObject =
-        attrsStyle && typeof attrsStyle === 'object'
-          ? (attrsStyle as Record<string, unknown>)
-          : undefined
+      const styleObject = normalizeStyle([attrs.style]) as Record<string, unknown>
 
       return h(
         'span',
