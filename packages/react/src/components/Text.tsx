@@ -23,7 +23,7 @@ import {
 import { useTigerConfig } from './tiger-config'
 
 export type TextProps = CoreTextProps &
-  Omit<React.HTMLAttributes<HTMLElement>, 'color' | 'children'> &
+  Omit<React.HTMLAttributes<HTMLElement>, 'color' | 'children' | 'onCopy'> &
   Pick<React.LabelHTMLAttributes<HTMLLabelElement>, 'htmlFor'> & {
     children?: React.ReactNode
     locale?: Partial<TigerLocale>

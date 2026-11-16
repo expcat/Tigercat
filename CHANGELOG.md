@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Text 复制回调类型与标签示例（React / Demo，C003-F001、C003-F002）**：React 顶层 onCopy 排除原生剪贴板事件类型，回调接收复制文本；Vue 标签改用 for，两端示例补上对应输入目标。
+
 - **Icon 字符串样式与注册说明（Vue / Core / Demo / MCP，C002-F001、C002-F003）**：Vue 保留字符串 style 的颜色与宽高，显式 color 只覆盖颜色；类型注释、生成文档与两端示例改用 createIconRegistry 的 register / registerMany，并通过 ConfigProvider.iconRegistry 接线。
 
 - **ConfigProvider 生命周期、主题撤销与加载状态（Core / React / Demo，C001-F001、C001-F002、C001-F003、C001-F005）**：React StrictMode 重放后保留同一自建图标表，卸载时清空；撤销根 theme 后恢复文档基线主题或 default；嵌套 `localeLoading` 纳入父层状态。两端 Demo 明确控件只作用于示例子树，iframe 的 html 由沙箱外层管理。

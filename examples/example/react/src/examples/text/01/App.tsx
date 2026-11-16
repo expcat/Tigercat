@@ -7,8 +7,9 @@ export default function App() {
         页面标题
       </Text>
       <Text tag="label" htmlFor="display-name">
-        显示名（需配 htmlFor）
+        显示名
       </Text>
+      <input id="display-name" type="text" className="block rounded border p-2" />
       <div dir="rtl" className="space-y-1">
         <Text align="start">start 贴起始边</Text>
         <Text align="end">end 贴结束边</Text>
