@@ -5,6 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { act, render, screen, fireEvent, waitFor } from '@testing-library/react'
 import React from 'react'
+import { renderToStaticMarkup } from 'react-dom/server'
 import {
   ContextMenu,
   ContextMenuItem,
@@ -40,6 +41,19 @@ function getMenu() {
 }
 
 describe('ContextMenu', () => {
+  it('consumes itemKey without rendering an unknown DOM attribute', () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {})
+    try {
+      const html = renderToStaticMarkup(
+        <ContextMenuItem itemKey="stable-id">Action</ContextMenuItem>
+      )
+      expect(html).not.toMatch(/itemkey=/i)
+      expect(error).not.toHaveBeenCalled()
+    } finally {
+      error.mockRestore()
+    }
+  })
+
   it('renders the trigger surface and menu content', () => {
     render(<Demo />)
 

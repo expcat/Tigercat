@@ -38,6 +38,21 @@ describe('Dropdown', () => {
     expect(screen.getByText('Item 2')).toBeInTheDocument()
   })
 
+  it('consumes itemKey without rendering an unknown DOM attribute', () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {})
+    render(
+      <Dropdown defaultOpen portal={false}>
+        <button>Trigger</button>
+        <DropdownMenu>
+          <DropdownItem itemKey="identity-7">Action</DropdownItem>
+        </DropdownMenu>
+      </Dropdown>
+    )
+
+    expect(screen.getByRole('menuitem', { name: 'Action' })).not.toHaveAttribute('itemkey')
+    expect(error).not.toHaveBeenCalled()
+  })
+
   it('exposes data-state on the trigger reflecting open state', () => {
     const { container } = render(
       <Dropdown trigger="click">

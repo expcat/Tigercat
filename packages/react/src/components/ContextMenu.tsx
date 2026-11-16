@@ -93,6 +93,7 @@ export interface ContextMenuItemProps
 }
 
 export const ContextMenuItem: React.FC<ContextMenuItemProps> = ({
+  itemKey: _itemKey,
   disabled = false,
   divided = false,
   href,

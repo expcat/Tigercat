@@ -115,6 +115,7 @@ export function createBackTopVisibilityController(
   let frameHandle: number | undefined
 
   const update = (): void => {
+    if (frameHandle !== undefined) cancelFrame(frameHandle)
     frameHandle = undefined
     options.onChange(shouldShowBackTop(options.target, options.getVisibilityHeight()))
   }

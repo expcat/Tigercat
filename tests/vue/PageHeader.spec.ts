@@ -150,6 +150,13 @@ describe('PageHeader', () => {
   })
 
   describe('a11y', () => {
+    it('preserves caller aria-labelledby when there is no title', () => {
+      const { container } = render(PageHeader, {
+        attrs: { 'aria-labelledby': 'caller-label' }
+      })
+      expect(getRoot(container)).toHaveAttribute('aria-labelledby', 'caller-label')
+    })
+
     it('exposes a banner landmark and an accessible back control', async () => {
       const { container } = render(PageHeader, {
         props: { title: '订单详情', subTitle: '可访问页头', showBack: true },

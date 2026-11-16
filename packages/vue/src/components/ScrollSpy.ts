@@ -16,6 +16,7 @@ import {
   coerceClassValue,
   createProgrammaticScrollLock,
   createScrollSpyObserver,
+  createSectionScrollModel,
   createScrollSpyPayload,
   flattenScrollSpyItems,
   getInitialScrollSpyActiveKey,
@@ -30,6 +31,7 @@ import {
   mergeTigerLocale,
   resolveScrollSpyContainer,
   resolveScrollSpyOffset,
+  sectionScrollBehavior,
   shouldActivateScrollSpyClick,
   activateScrollSpyClick,
   type ScrollRootInput,
@@ -232,6 +234,11 @@ export const ScrollSpy = defineComponent({
 
     return () => {
       const attrsRecord = attrs as Record<string, unknown>
+      const activeItem = getScrollSpyItemByKey(props.items, currentActiveKey.value)
+      const sectionModel = createSectionScrollModel({
+        activeHref: activeItem?.href ?? '',
+        container: props.getContainer
+      })
       return h(
         'nav',
         {
@@ -246,7 +253,9 @@ export const ScrollSpy = defineComponent({
             attrsRecord.style,
             props.style
           ),
-          'aria-label': props.ariaLabel ?? labels.value.ariaLabel
+          'aria-label': props.ariaLabel ?? labels.value.ariaLabel,
+          'data-tiger-section-behavior': sectionScrollBehavior(sectionModel.reducedMotion),
+          'data-tiger-section-active': sectionModel.activeHref
         },
         renderItems(props.items)
       )

@@ -67,6 +67,29 @@ describe('back-top-utils', () => {
     expect(onChange).not.toHaveBeenCalled()
   })
 
+  it('cancels the queued frame when visibility is updated immediately', () => {
+    const scheduler = createFrameScheduler()
+    const container = document.createElement('div')
+    container.scrollTop = 450
+    const onChange = vi.fn()
+    const controller = createBackTopVisibilityController({
+      target: container,
+      getVisibilityHeight: () => 400,
+      onChange,
+      requestFrame: scheduler.requestFrame,
+      cancelFrame: scheduler.cancelFrame
+    })
+
+    controller.schedule()
+    controller.update()
+    controller.cancel()
+
+    expect(scheduler.pendingCount()).toBe(0)
+    scheduler.flush()
+    expect(onChange).toHaveBeenCalledTimes(1)
+    expect(onChange).toHaveBeenCalledWith(true)
+  })
+
   it('uses native smooth scroll for positive duration', () => {
     const container = document.createElement('div')
     const scrollTo = vi.fn()

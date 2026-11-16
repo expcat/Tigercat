@@ -161,20 +161,20 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | C082 | Affix                 | needs-evidence | 视觉/键盘各 0/16 blocked，截图 0；F01/F02 已修复，happy-dom 回归通过；Affix/Core/Anchor（含 AnchorLink）5 文件 95 pass、现有 axe 与类型通过；浏览器、读屏、hydration 待补 |
 | C083 | Anchor                | needs-evidence | 视觉 24 格、键盘 24 格均 blocked，截图 0；定向 Vitest 102 passed、W9 E13 1 passed；源码 SSR 探针成功，未验 hydration；未跑 E2E、build；真实 RTL、读屏未测                 |
 | C084 | AnchorLink            | needs-evidence | 视觉/键盘各 24 格 blocked（owner 为 C083），截图 0；F01/F02 已修复，Anchor/Breadcrumb/Core 定向 166 passed、类型通过；E2E、build、hydration、读屏待补                     |
-| C085 | BackTop               | needs-evidence | 视觉 16 格、键盘 16 格均 blocked，截图 0；定向 Vitest 30 passed、a11y 25 passed；源码 SSR 探针成功；未跑 E2E、build、hydration；读屏、reduced-motion 未测                 |
+| C085 | BackTop               | needs-evidence | F01 已修复：schedule→update→cancel 后 pending=0，Core 先红后绿。本组 314 pass（axe）、类型通过；原视觉/键盘各 16 格 blocked，完整矩阵、读屏与 hydration 待补。            |
 | C086 | Breadcrumb            | needs-evidence | 视觉 24 格、真实键盘 24 格均 blocked，截图 0；定向 Vitest 75 passed（axe 不覆盖打开的菜单）；SSR 与 happy-dom 探针；未跑 E2E、build、hydration；读屏未测                  |
 | C087 | BreadcrumbItem        | needs-evidence | 视觉 24 格、真实键盘 24 格均 blocked（owner 为 C086），截图 0；定向 Vitest 49 passed；SSR 与 happy-dom 点击探针；未跑 E2E、build、hydration；读屏未测                     |
 | C088 | ContextMenu           | needs-evidence | 视觉 0/16、原生键盘 0/16 均 blocked，截图 0；E2E 双端 4 场景未执行；定向 Vitest 4 文件 44 项通过；SSR 8 份成功，未验 hydration；RTL 布局、碰撞定位、iframe 层叠、读屏未测 |
-| C089 | ContextMenuItem       | needs-evidence | 共享 16 格视觉、原生键盘均 blocked（owner 为 C088），截图 0；E2E 4 场景未执行；定向 Vitest 85 项通过；SSR 16 份成功，无 hydration；axe 不扫 portal 内菜单；读屏未测       |
+| C089 | ContextMenuItem       | needs-evidence | F02 已修复：React SSR / IAB 无 itemKey 属性及未知 DOM 告警，回归先红后绿。本组 314 pass（axe）、类型通过；原共享 16 格视觉/键盘 blocked，完整矩阵与读屏待补。             |
 | C090 | ContextMenuMenu       | needs-evidence | 共享 16 格视觉、真实键盘均 0/16 blocked（owner 为 C088），截图 0；E2E 未执行；定向 Vitest 83 项通过、10 项 skipped；SSR 8 份，未验 hydration；RTL、读屏未测               |
 | C091 | ContextMenuSub        | needs-evidence | 共享 16 格视觉与真实键盘全部 blocked（owner 为 C088），截图 0；E2E 未执行；定向 Vitest 93 项通过，a11y 复跑 33 项（重叠）；SSR 6 份，未测 hydration；RTL、触摸、读屏未测  |
 | C092 | Dropdown              | needs-evidence | 视觉 24 格 blocked；原生键盘 24 格 blocked（Mac 锁屏无浏览器）；未跑 E2E/build/hydration；SSR 仅 16 个服务端渲染场景成功；读屏、主题、窄屏、reduced-motion 未测           |
-| C093 | DropdownItem          | needs-evidence | 共享 Demo（owner C092）视觉 24 blocked、原生键盘 24 blocked、截图 0；未跑 E2E/build/hydration/真实导航；SSR 仅 12 场景服务端输出；读屏未测                                |
+| C093 | DropdownItem          | needs-evidence | F01 已修复：React DOM / IAB 无 itemkey 属性及未知 DOM 告警，回归先红后绿。本组 314 pass（axe）、类型通过；原共享 24 格视觉/键盘 blocked，完整矩阵与读屏待补。             |
 | C094 | DropdownMenu          | needs-evidence | 共享 Demo（owner C092）视觉 24 blocked、原生键盘 24 blocked、截图 0；E2E/build/hydration 未执行；SSR 仅 8 份字符串；亮暗主题、窄屏、RTL、读屏无证据                       |
 | C095 | FloatButton           | needs-evidence | 视觉 24 blocked、原生键盘 24 blocked、截图 0（CUA browsers=[]）；无专属 E2E；hydration 未测，SSR 仅 10 份字符串；亮暗主题、窄屏、RTL、焦点可见性、读屏未验收              |
 | C096 | FloatButtonGroup      | needs-evidence | 视觉 24 blocked、原生键盘 24 blocked、截图 0（owner 均 C095，仅 02 渲染 Group）；浏览器 E2E 未执行；hydration 未测，SSR 仅 6 份；亮暗主题、窄屏、RTL 未验收               |
 | C097 | FullscreenButton      | needs-evidence | 视觉 8 blocked、原生键盘 8 blocked、截图 0（CUA browsers=[]）；无 Core 专项或 E2E 用例；hydration 未测，SSR 仅 2 份字符串；真实全屏进入/退出与外部状态同步未验            |
-| C098 | Menu                  | needs-evidence | 视觉 40 blocked、原生键盘 40 blocked、截图 0；TIGER_A11Y=1 下 182 项 2 failed（即 F01）；浏览器 E2E、hydration、读屏未执行，SSR 仅 2 份                                   |
+| C098 | Menu                  | needs-evidence | F04 已修复：注释和测试名明确不同类型 key 不相等，断言不变。Core / 双端 Menu 定向 62 pass（axe）、类型通过；原视觉/键盘各 40 格 blocked，完整矩阵与读屏待补。              |
 | C099 | MenuItem              | needs-evidence | F01–F04 已修复并通过定向自动门禁；原 Demo（owner C098）视觉 40 blocked、原生键盘 40 blocked、截图 0；无专属 E2E；hydration 未测                                           |
 | C100 | MenuItemGroup         | needs-evidence | Demo（owner C098）视觉 40 blocked、原生键盘 40 blocked、截图 0；TIGER_A11Y=1 下 79 项 2 failed（归 C098-F01）；无专属 E2E；hydration、读屏未测                            |
 | C101 | SubMenu               | needs-evidence | 视觉 0/40 blocked；原生键盘 0/40 blocked；截图 0；无专属 E2E；SSR 字符串无警告，hydration 未测；TIGER_A11Y 79 项 77 passed/2 failed；读屏、RTL 几何未测                   |
@@ -184,9 +184,9 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | C105 | NavigationMenuLink    | needs-evidence | 视觉 0/16 blocked；原生键盘 0/16 blocked；截图 0；E2E 未执行；SSR/hydration 未跑且无专项覆盖；React NavigationMenu 组合的 TIGER_A11Y=1 单文件 33 项通过                   |
 | C106 | NavigationMenuList    | needs-evidence | 视觉 0/16 blocked；原生键盘 0/16 blocked；截图 0；E2E 未执行；SSR/hydration 未跑；React NavigationMenu 组合的 TIGER_A11Y=1 单文件 33 项通过；真实像素与 resize 未测       |
 | C107 | NavigationMenuTrigger | needs-evidence | 视觉 0/16 blocked；原生键盘 0/16 blocked；截图 0；E2E 未执行；SSR/hydration、w9-t07 未跑；React NavigationMenu 组合的 TIGER_A11Y=1 单文件 33 项通过；无浏览器清单         |
-| C108 | PageHeader            | needs-evidence | 视觉 0/32 blocked；原生键盘 0/32 blocked；截图空；无 PageHeader E2E；SSR/hydration、w9-t07 未跑；测试 38 passed；happy-dom 探针 1 passed；无浏览器清单                    |
-| C109 | Pagination            | needs-evidence | 视觉 0/40 blocked；原生键盘 0/40 blocked；截图空；无 Pagination E2E；SSR/hydration、w9-t07 未跑；测试 54 passed；happy-dom 探针 1 passed；无浏览器清单                    |
-| C110 | ScrollSpy             | needs-evidence | 视觉 0/16 blocked；原生键盘 0/16 blocked；截图空；无 E2E；SSR 仅探针静态渲染，hydration 未跑；测试 87 passed，w9-t07 1 passed/14 skipped；无浏览器清单                    |
+| C108 | PageHeader            | needs-evidence | F01 已修复：双端无标题时保留调用方 labelledby，先红后绿、IAB 通过。本组 314 pass（axe）、类型通过；原视觉/键盘各 32 格 blocked，完整矩阵、读屏与 hydration 待补。         |
+| C109 | Pagination            | needs-evidence | F05/F07 已修复：非受控当前页 IAB 回调 0 次、翻页 1 次，size 文档对齐 md / sm·md·lg。本组 314 pass（axe）、类型通过；原视觉/键盘各 40 格 blocked，完整矩阵待补。           |
+| C110 | ScrollSpy             | needs-evidence | F02 已修复：双端嵌套 active / behavior 先红后绿，IAB 为 #child / smooth；Vue 使用共享模型。本组 314 pass（axe）、类型通过；原视觉/键盘各 16 格 blocked，完整矩阵待补。    |
 | C111 | Spotlight             | needs-evidence | 视觉 0/16（16 blocked）；原生键盘 0/16（16 blocked）；截图全空；无 Spotlight E2E；SSR 仅 node 探针渲染未抛错，未跑 hydrate；happy-dom 50 passed                           |
 | C112 | Steps                 | needs-evidence | 视觉 0/24 blocked；原生键盘 0/24 blocked；无 Steps E2E；SSR 仅 node 探针 renderToString 未抛错，未跑 hydrate 与独立 SSR 套件；happy-dom 52 passed                         |
 | C113 | StepsItem             | needs-evidence | 视觉 0/24 blocked；原生键盘 0/24 blocked；无 StepsItem E2E；无专属测试路径，父组件 spec 42 passed（happy-dom）；SSR 仅 node 探针未抛错，未跑 hydrate                      |

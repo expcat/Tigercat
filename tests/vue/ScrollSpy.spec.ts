@@ -129,6 +129,13 @@ describe('ScrollSpy', () => {
       expect(screen.getByText('API')).toHaveAttribute('aria-current', 'location')
     })
 
+    it('exposes the nested active section and scroll behavior on the nav', () => {
+      renderScrollSpy({ activeKey: 'api' })
+      const nav = screen.getByRole('navigation')
+      expect(nav).toHaveAttribute('data-tiger-section-active', '#api')
+      expect(nav).toHaveAttribute('data-tiger-section-behavior', 'smooth')
+    })
+
     it('does not change the rendered active item in controlled mode after click', async () => {
       renderScrollSpy({ activeKey: 'intro' })
       await fireEvent.click(screen.getByText('Usage'))

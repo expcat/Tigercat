@@ -283,7 +283,7 @@ export const PageHeader = defineComponent({
           ),
           style: mergeStyleValues(attrsRecord.style, props.style),
           'data-page-header': '',
-          'aria-labelledby': hasTitle ? titleId : undefined
+          ...(hasTitle ? { 'aria-labelledby': titleId } : {})
         },
         [
           heading,

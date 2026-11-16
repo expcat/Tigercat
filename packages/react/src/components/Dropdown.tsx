@@ -90,6 +90,7 @@ export interface DropdownItemProps
 }
 
 export const DropdownItem: React.FC<DropdownItemProps> = ({
+  itemKey: _itemKey,
   disabled = false,
   divided = false,
   closeOnClick,

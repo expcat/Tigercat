@@ -164,7 +164,7 @@ export const Pagination: React.FC<PaginationProps> = ({
       if (disabled) return
       const next = validateCurrentPage(page, totalPages)
       focusIntent.current = source
-      if (next === validatedCurrentPage && controlledCurrent === next) return
+      if (next === validatedCurrentPage) return
 
       if (controlledCurrent === undefined) {
         setInternalCurrent(next)

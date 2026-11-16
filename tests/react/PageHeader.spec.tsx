@@ -152,6 +152,11 @@ describe('PageHeader', () => {
   })
 
   describe('a11y', () => {
+    it('preserves caller aria-labelledby when there is no title', () => {
+      const { container } = render(<PageHeader aria-labelledby="caller-label" />)
+      expect(getRoot(container)).toHaveAttribute('aria-labelledby', 'caller-label')
+    })
+
     it('exposes a banner landmark and an accessible back control', async () => {
       const { container } = render(
         <PageHeader

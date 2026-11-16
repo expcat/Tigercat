@@ -39,6 +39,13 @@ describe('Pagination', () => {
     expect(onChange).toHaveBeenCalledWith(2, 10)
   })
 
+  it('does not call onChange when the current uncontrolled page is clicked', () => {
+    const onChange = vi.fn()
+    render(<Pagination total={100} onChange={onChange} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Page 1' }))
+    expect(onChange).not.toHaveBeenCalled()
+  })
+
   it('sets aria-current on the active page', () => {
     render(<Pagination total={100} pageSize={10} current={3} />)
     expect(screen.getByRole('button', { name: 'Page 3' })).toHaveAttribute('aria-current', 'page')

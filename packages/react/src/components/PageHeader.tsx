@@ -181,7 +181,7 @@ export const PageHeader = forwardRef<HTMLElement, PageHeaderProps>(
         data-page-header=""
         className={rootClasses}
         style={style}
-        aria-labelledby={hasTitle ? titleId : undefined}>
+        {...(hasTitle ? { 'aria-labelledby': titleId } : {})}>
         {showHeading ? (
           <div className={pageHeaderHeadingRowClasses} data-page-header-heading="">
             <div className={pageHeaderStartClasses}>

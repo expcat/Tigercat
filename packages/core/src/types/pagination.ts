@@ -129,7 +129,7 @@ export interface PaginationProps {
 
   /**
    * Size of pagination
-   * @default 'medium'
+   * @default 'md'
    */
   size?: PaginationSize
 

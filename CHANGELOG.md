@@ -4,6 +4,15 @@
 
 ## v3.0.1（未发布）
 
+- **返回顶部帧取消（Core，C085-F01）**：立即 update 前取消待执行帧，schedule → update → cancel 后不再残留回调。
+- **上下文菜单项身份属性（React，C089-F02）**：在 Item 边界消费 itemKey，SSR 与原生元素不再输出未知属性或触发 React 告警。
+- **下拉菜单项身份属性（React，C093-F01）**：DropdownItem 显式消费 itemKey，避免向原生 button / a 透传 itemkey。
+- **菜单 key 契约说明（Core / 测试，C098-F04）**：注释和测试名明确数字 1 与字符串「1」不同，运行逻辑与断言不变。
+- **无标题页头命名（React / Vue，C108-F01）**：没有 title 时保留调用方传入的 aria-labelledby，有标题时继续关联内部标题。
+- **分页当前页事件（React，C109-F05）**：非受控分页点击当前显示页不再触发 onChange，与 Vue 一致。
+- **分页尺寸说明（Core / Demo，C109-F07）**：size 默认值注释改为 md，两端 Demo 03 说明统一为 sm / md / lg，并更新生成文档。
+- **嵌套章节属性（React / Vue，C110-F02）**：React 用既有递归查找取当前项 href，Vue 使用相同共享 section 模型输出 active 与 behavior 属性。
+
 - **预览打开索引（React，C014-S01）**：ImagePreview 渲染直接采用受控 currentIndex，Gallery 选择第二张后 Enter 打开的首次提交就是第二张与 2 / 3。
 - **窄屏预览工具栏（Core，C014-V01）**：按内容宽度分配工具栏空间，计数不换行、按钮不压缩；Gallery、Image、ImageGroup、ImagePreview 共用修复。
 - **比较器无变化事件（Vue，C017-F02）**：发事件前比较归一化位置，0 再按 Home、100 再按 End 不再发 update:position / change。

@@ -197,7 +197,7 @@ export const ScrollSpy = forwardRef<HTMLElement, ScrollSpyProps>(function Scroll
     )
   }
 
-  const activeItem = items.find((item) => item.key === currentActiveKey)
+  const activeItem = getScrollSpyItemByKey(items, currentActiveKey)
   const sectionModel = useMemo(
     () =>
       createSectionScrollModel({

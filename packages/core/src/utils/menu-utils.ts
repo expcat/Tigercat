@@ -340,7 +340,7 @@ export function uniqueMenuKeys(keys: Iterable<MenuKey>): MenuKey[] {
 }
 
 /**
- * Check if a key is in the selected keys array (`1` and `"1"` match).
+ * Check if a key is in the selected keys array (`1` and `"1"` are different keys).
  */
 export function isKeySelected(key: MenuKey, selectedKeys: readonly MenuKey[]): boolean {
   const id = menuKeyId(key)
@@ -348,7 +348,7 @@ export function isKeySelected(key: MenuKey, selectedKeys: readonly MenuKey[]): b
 }
 
 /**
- * Check if a key is in the open keys array (`1` and `"1"` match).
+ * Check if a key is in the open keys array (`1` and `"1"` are different keys).
  */
 export function isKeyOpen(key: MenuKey, openKeys: readonly MenuKey[]): boolean {
   return isKeySelected(key, openKeys)

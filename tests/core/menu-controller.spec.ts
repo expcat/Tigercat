@@ -31,7 +31,7 @@ const items: MenuItem[] = [
 ]
 
 describe('menu-controller keys', () => {
-  it('treats 1 and "1" as the same selected/open key', () => {
+  it('treats 1 and "1" as different selected/open keys', () => {
     expect(isKeySelected(1, ['1'])).toBe(false)
     expect(isKeySelected('1', [1])).toBe(false)
     expect(isKeyOpen(1, ['1'])).toBe(false)

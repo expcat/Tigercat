@@ -33,7 +33,7 @@ Note: `size` 是 `sm|md|lg`（与 Form/Button 相同）。Table 内置分页默�
 - `showTotal?`: `boolean`; default `true`. Whether to show total count
 - `totalText?`: `(total: number, range: [number, number]) => string`; default `-`. Custom total text renderer
 - `pageIndicatorText?`: `(current: number, totalPages: number) => string`; default `-`. Custom text renderer for the simple-mode page indicator. Defaults to the locale `pageIn...
-- `size?`: `PaginationSize`; default `'medium'`. Size of pagination
+- `size?`: `PaginationSize`; default `'md'`. Size of pagination
 - `align?`: `PaginationAlign`; default `'center'`. Alignment of pagination
 - `disabled?`: `boolean`; default `false`. Whether pagination is disabled
 - `hideOnSinglePage?`: `boolean`; default `false`. Whether to hide pagination on single page

@@ -11,7 +11,7 @@
 - 审查基线：`main` 分支 `5afd2bdb`（3.0.0 stable），4494 个跟踪文件。
 - 范围：185 个公开组件（9 组）、841 个 Demo（Vue 420、React 421）、7 份项目专题（X01–X07）。
 - 入口：`RESULTS-ENTRY.md`。组件报告在 `groups/<组>/<组件>.md`，专题在 `project/`，总验收在 `project/final-acceptance.md`。
-- 结果：564 条发现。已完成条目见 [CHANGELOG.md](../../CHANGELOG.md)，剩 84 条：P1 0、P2 0、P3 84。
+- 结果：564 条发现。已完成条目见 [CHANGELOG.md](../../CHANGELOG.md)，剩 76 条：P1 0、P2 0、P3 76。
 - 审查总状态是 needs-evidence，不是 complete。证据缺口见 [13](13-evidence.md)。
 
 `FINDINGS.md` 的索引表只列到 C092。本目录的条目是从 202 份报告逐份提取的，再和报告里的发现标题、`FINDINGS.md` 已有的索引核对过编号，没有缺漏。
@@ -58,7 +58,7 @@
 | [03 基础组件](03-basic.md)                         | C001–C032              |    0 |   0 |   0 |   0 |
 | [04 布局组件](04-layout.md)                        | C033–C051              |    0 |   0 |   0 |   0 |
 | [05 表单组件](05-form.md)                          | C052–C081              |    0 |   0 |   0 |   0 |
-| [06 导航组件](06-navigation.md)                    | C082–C116              |   16 |   0 |   0 |  16 |
+| [06 导航组件](06-navigation.md)                    | C082–C116              |    8 |   0 |   0 |   8 |
 | [07 反馈组件](07-feedback.md)                      | C117–C130              |    9 |   0 |   0 |   9 |
 | [08 数据展示组件](08-data.md)                      | C131–C137              |    6 |   0 |   0 |   6 |
 | [09 图表组件](09-charts.md)                        | C138–C158              |   25 |   0 |   0 |  25 |
