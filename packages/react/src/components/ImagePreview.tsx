@@ -122,9 +122,10 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
   const [transform, setTransform] = useState<GestureTransform>(() =>
     restLightboxTransform(scaleRange)
   )
-  const [index, setIndex] = useState(() =>
+  const [internalIndex, setIndex] = useState(() =>
     resolved.length ? Math.min(Math.max(0, currentIndex ?? 0), resolved.length - 1) : 0
   )
+  const index = currentIndex ?? internalIndex
   const [dragging, setDragging] = useState(false)
 
   const rootRef = useRef<HTMLDivElement | null>(null)

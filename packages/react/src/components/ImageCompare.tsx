@@ -254,6 +254,7 @@ export const ImageCompare = forwardRef<HTMLDivElement, ImageCompareProps>(
           {afterTitle ? (
             <span
               className="pointer-events-none absolute end-2 top-2 text-sm"
+              data-compare-title=""
               data-compare-after-title="">
               {afterTitle}
             </span>
@@ -272,6 +273,7 @@ export const ImageCompare = forwardRef<HTMLDivElement, ImageCompareProps>(
           {beforeTitle ? (
             <span
               className="pointer-events-none absolute start-2 top-2 text-sm"
+              data-compare-title=""
               data-compare-before-title="">
               {beforeTitle}
             </span>

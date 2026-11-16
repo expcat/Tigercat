@@ -5,7 +5,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { useState } from 'react'
+import { Profiler, useState } from 'react'
 import { ImagePreview } from '@expcat/tigercat-react/ImagePreview'
 import { Image } from '@expcat/tigercat-react/Image'
 import { ImageGroup } from '@expcat/tigercat-react/ImageGroup'
@@ -171,24 +171,42 @@ describe('W9 T02 React', () => {
 
   it('selects a thumbnail from the keyboard and opens its preview', async () => {
     const user = userEvent.setup()
+    const previewCommits: string[] = []
     render(
-      <Gallery
-        items={[
-          { src: '/g1.jpg', alt: 'One' },
-          { src: '/g2.jpg', alt: 'Two' }
-        ]}
-      />
+      <Profiler
+        id="gallery"
+        onRender={() => {
+          const preview = document.querySelector('[data-tiger-image-preview]')
+          if (preview) {
+            previewCommits.push(
+              `${preview.querySelector('img')?.getAttribute('src')} ${preview.querySelector('[aria-live="polite"]')?.textContent}`
+            )
+          }
+        }}>
+        <Gallery
+          items={[
+            { src: '/g1.jpg', alt: 'One' },
+            { src: '/g2.jpg', alt: 'Two' },
+            { src: '/g3.jpg', alt: 'Three' }
+          ]}
+        />
+      </Profiler>
     )
-    expect(screen.getByText('1 / 2')).toBeInTheDocument()
+    expect(screen.getByText('1 / 3')).toBeInTheDocument()
     expect(screen.getByRole('list', { name: 'Thumbnails' })).toBeInTheDocument()
     await user.tab()
     await user.tab()
     await user.tab()
     expect(screen.getByRole('button', { name: 'Two' })).toHaveFocus()
     await user.keyboard('{Enter}')
-    expect(screen.getByText('2 / 2')).toBeInTheDocument()
+    expect(screen.getByText('2 / 3')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Two' })).toHaveAttribute('aria-current', 'true')
-    await user.click(screen.getByRole('button', { name: 'Open preview' }))
+    await user.tab({ shift: true })
+    await user.tab({ shift: true })
+    expect(screen.getByRole('button', { name: 'Open preview' })).toHaveFocus()
+    await user.keyboard('{Enter}')
+    expect(previewCommits.length).toBeGreaterThan(0)
+    expect(previewCommits.every((commit) => commit === '/g2.jpg 2 / 3')).toBe(true)
     expect(document.querySelector('[data-tiger-image-preview] img')).toHaveAttribute(
       'src',
       '/g2.jpg'

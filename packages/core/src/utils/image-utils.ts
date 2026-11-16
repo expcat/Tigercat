@@ -209,13 +209,13 @@ export const imagePreviewImgMotionClasses =
  * Preview toolbar classes. Position is plugin CSS, not `left-1/2` / `bottom-6`.
  */
 export const imagePreviewToolbarClasses =
-  'tiger-image-preview-chrome tiger-image-preview-toolbar flex items-center gap-2 px-4 py-2 rounded-full bg-black/60 text-white'
+  'tiger-image-preview-chrome tiger-image-preview-toolbar flex flex-wrap items-center justify-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 rounded-full bg-black/60 text-white'
 
 /**
  * Preview toolbar button classes
  */
 export const imagePreviewToolbarBtnClasses =
-  'flex items-center justify-center w-8 h-8 rounded-full hover:bg-white/20 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 disabled:opacity-40 disabled:cursor-not-allowed'
+  'flex shrink-0 items-center justify-center w-8 h-8 rounded-full hover:bg-white/20 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 disabled:opacity-40 disabled:cursor-not-allowed'
 
 /**
  * Preview navigation button classes (prev/next).
@@ -278,6 +278,8 @@ export const imagePreviewChromeStyles = {
   '.tiger-image-preview-toolbar': {
     bottom: '1.5rem',
     left: '50%',
+    width: 'max-content',
+    maxWidth: 'calc(100% - 2rem)',
     transform: 'translateX(-50%)'
   }
 } as const
@@ -285,7 +287,8 @@ export const imagePreviewChromeStyles = {
 /**
  * Preview counter text classes
  */
-export const imagePreviewCounterClasses = 'text-sm text-white/80 mx-2 tabular-nums'
+export const imagePreviewCounterClasses =
+  'text-sm text-white/80 mx-1 sm:mx-2 tabular-nums shrink-0 whitespace-nowrap'
 
 /** ImageViewer public class aliases of the ImagePreview chrome set. */
 export const imageViewerBackdropClasses = imagePreviewWrapperClasses

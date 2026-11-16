@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+React ImagePreview（含 Gallery）打开时立即采用受控 currentIndex。Vue ImageCompare 在归一化位置不变时不再发 update:position / change；依赖重复 Home / End 回调的逻辑应改为监听实际位置变化。
+
 双端 Rate 只读时现在也取消 Home、End 与方向键的默认滚动，值和焦点保持。调用方式不用改；依赖这些按键滚动页面的交互应改用页面滚动操作。
 
 NotificationBell 删除 `NotificationBellItem`。`items` 改为 `NotificationItem[]`；已读变化增加 `onItemReadChange(item, read)`，Vue 事件名仍是 `item-read-change`。引用旧条目类型的调用方改为 `NotificationItem`。

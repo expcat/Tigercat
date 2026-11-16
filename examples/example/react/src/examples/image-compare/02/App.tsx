@@ -5,15 +5,17 @@ const after = 'https://picsum.photos/seed/tiger-compare-bottom/800/500'
 
 export default function App() {
   return (
-    <ImageCompare
-      beforeSrc={before}
-      afterSrc={after}
-      beforeAlt="上半部分"
-      afterAlt="下半部分"
-      orientation="vertical"
-      defaultPosition={40}
-      width={480}
-      height={280}
-    />
+    <div className="py-2">
+      <ImageCompare
+        beforeSrc={before}
+        afterSrc={after}
+        beforeAlt="上半部分"
+        afterAlt="下半部分"
+        orientation="vertical"
+        defaultPosition={40}
+        width={480}
+        height={280}
+      />
+    </div>
   )
 }

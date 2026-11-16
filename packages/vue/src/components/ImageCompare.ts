@@ -224,6 +224,7 @@ export const ImageCompare = defineComponent({
 
     const commit = (next: number): void => {
       const resolved = resolveImageComparePosition(next, props.step)
+      if (Object.is(resolved, currentPosition())) return
       if (props.position === undefined) {
         internalPosition.value = resolved
       }
@@ -388,6 +389,7 @@ export const ImageCompare = defineComponent({
                     'span',
                     {
                       class: 'pointer-events-none absolute end-2 top-2 text-sm',
+                      'data-compare-title': '',
                       'data-compare-after-title': ''
                     },
                     slots.afterTitle ? slots.afterTitle() : props.afterTitle
@@ -413,6 +415,7 @@ export const ImageCompare = defineComponent({
                     'span',
                     {
                       class: 'pointer-events-none absolute start-2 top-2 text-sm',
+                      'data-compare-title': '',
                       'data-compare-before-title': ''
                     },
                     slots.beforeTitle ? slots.beforeTitle() : props.beforeTitle

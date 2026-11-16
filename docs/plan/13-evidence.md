@@ -53,6 +53,13 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 
 ### basic
 
+2026-11-17 W9-G3 复验：六项均已实现并通过定向自动门禁。IAB 返回 unavailable，按授权改用 Playwright 内置 headless Chromium 149，验证双端生产构建的真实示例；下表历史矩阵不重计。
+
+- C014-S01：React Profiler 覆盖打开预览的每次提交；自然 Tab 选第二张、Shift+Tab 返回入口后 Enter 打开，浏览器从首次 DOM / rAF 采样起均为第二张与「2 / 3」。
+- C014-V01：两端 Gallery、Image、ImageGroup、ImagePreview 在 390×844、亮/暗主题共 16 条入口通过。多图「2 / 3」「3 / 3」均单行，七个工具按钮保持 32×32、无重叠或裁切，缩放、旋转、翻转、复位可操作；单图不显示计数。
+- C017-F02/F03：包含 axe 的 17 文件、310 项定向测试通过。重复 Home / End 不发无变化事件；取消与 preventDefault 均先证明真实拖动可进入，临时移除取消回写或阻止守卫时旧用例通过、修正后用例失败，源码已还原。
+- C017-V01/V02：两端 × 亮/暗 × 390×844 / 1440×900 共 8 格通过。Demo 02 自然 Tab 后 Home / End 的 4px 焦点环完整且不被祖先裁切；Demo 05 两个标题可读，白字与 70% 黑色衬底在最亮背景上的计算对比度为 8.59:1，保留滑块 value text。52 张截图的相关区域已核对，未新增图片基线。
+
 | 任务 | 组件           | 队列           | 现状                                                                                                                                                                                                                 |
 | ---- | -------------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | C001 | ConfigProvider | complete       | 8 格：视觉 6 finding（F005）/2 pass；键盘主路径 8 pass；27 张截图；测试 65 用例、a11y 49 用例通过；无 DOM SSR 通过，非 Next/Nuxt 构建；RTL 的 dir prop 说明已修复                                                    |
@@ -68,10 +75,10 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | C011 | CropUpload     | complete       | 视觉 16/16 pass；已执行键盘主路径 16/16 pass；测试 95/97 过（2 败指向 F001）；4 Demo SSR 成功；未跑 E2E/hydration；读屏、禁用态、裁剪像素未测；16 份初拍 DOM/AX 被覆盖                                               |
 | C012 | Divider        | complete       | 视觉 32/32 pass；整体键盘 32/32 finding（同一 C012-V01）；19 项测试通过；28 个 SSR 输出成功；未跑 E2E/hydration；读屏未测；双端 02/03 共 16 格原图未含主 h1（已披露）                                                |
 | C013 | Empty          | complete       | 视觉 24 pass / 0 blocked（11-13 补拍后）；键盘历史 20 pass / 4 finding 未重采；外壳已加 16px 滚动边距，happy-dom/几何核对通过；IAB 受限，待窄屏复验；未跑 SSR/hydration、E2E；forced-colors 未测                     |
-| C014 | Gallery        | complete       | 主责 8 格：视觉 4 pass / 4 finding，键盘 4 pass / 4 finding，0 blocked；120 关联格 pending；历史测试 54 项通过；无 Gallery.spec/E2E；未跑 SSR；未切语言                                                              |
+| C014 | Gallery        | complete       | C014-S01/V01 已通过本轮复验；历史主责 8 格：视觉 4 pass / 4 finding，键盘 4 pass / 4 finding，0 blocked；120 关联格 pending；历史测试 54 项通过；无 Gallery.spec/E2E；未跑 Gallery SSR；未切语言                     |
 | C015 | Highlight      | needs-evidence | 画面 20 pass / 4 finding；键盘 16 pass / 8 blocked（03 八格 Enter 后到 chrome-error，外站终态未验证）；52 测试通过；6 Demo SSR 完成；未跑 E2E                                                                        |
 | C016 | Image          | complete       | 主责 48 格：视觉 36 pass / 12 finding，键盘 28 pass / 20 finding，无 blocked；80 关联格 pending；193 测试通过；未跑 E2E、hydration；悬停、故障注入、切语言未测                                                       |
-| C017 | ImageCompare   | complete       | 40 格：视觉 24 pass / 16 finding / 0 blocked；键盘 32 pass / 8 finding / 0 blocked；67 项测试通过；F01/F02 未动态复现；未跑 SSR、E2E、触控、数值对比度                                                               |
+| C017 | ImageCompare   | complete       | C017-F02/F03/V01/V02 已通过本轮复验；历史 40 格：视觉 24 pass / 16 finding / 0 blocked；键盘 32 pass / 8 finding / 0 blocked；历史测试 67 项通过；F01 未浏览器复现；未跑 SSR、E2E、触控、真实读屏                    |
 | C018 | ImageCropper   | complete       | 32 格：视觉 24 pass / 8 finding，键盘 8 pass / 24 finding，0 blocked；181 项测试通过；F01–F04 未浏览器复现；未跑 E2E、SSR/hydration、读屏、导出像素比对                                                              |
 | C019 | ImageGroup     | complete       | 普通 16 格视觉、键盘各 8 pass / 8 finding；r1 回退 8 格各 4 pass / 4 finding，0 blocked；37 项测试通过；未跑 E2E、SSR；组级固定索引未浏览器验证                                                                      |
 | C020 | ImagePreview   | complete       | 主责 24 格：视觉、键盘各 8 pass / 12 finding / 4 blocked；关联 48 格键盘 24 finding / 24 pending；156 项测试通过；无 E2E；Demo03 第二图与下载后路径缺证据                                                            |
@@ -307,9 +314,9 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | C009 | Code                  | 无 Code 专属新缺陷；X02-F003 方向：把换行/语言标题文案纳入 TigerLocale 合并覆盖链；仅传 locale=zh-CN 时出现反向分裂；Vue 字符串 style 有开发警告未立项；C004 的 Button 专属发现不适用（原生按钮）                                                                                      |
 | C010 | CopyButton            | Vue 失败态有 aria-describedby 而 React 没有，未立项；无 copying 状态与定时复位，文档未承诺故不算缺陷；Demo 缺 disabled、slot/children、可控失败入口；固定 outline/sm，C004 的非法 variant/size 问题不触发                                                                              |
 | C011 | CropUpload            | 待验证：Demo 01 后续成功时是否残留旧错误；无 cropping 证据；compact 文档只列 4/10 属性为有意压缩；28 个关联 Demo 待属主证据                                                                                                                                                            |
-| C014 | Gallery               | 未立项接线差异：Vue watch 受控值同步内部索引而 React 不同步；Gallery 无 open prop 仅有通知事件；受控回调、空数组、Space、关闭后焦点返回无专门用例；V01 仍待 ImagePreview 窄屏计数，不另立编号；C004/C011 独有问题与 X01 未见适用；X02-F002 未实测                                      |
+| C014 | Gallery               | 未立项接线差异：Vue watch 受控值同步内部索引而 React 不同步；Gallery 无 open prop 仅有通知事件；受控回调、空数组、Space、关闭后焦点返回无专门用例；V01 已在共享 ImagePreview 工具栏修复并通过窄屏复验；C004/C011 独有问题与 X01 未见适用；X02-F002 未实测                              |
 | C016 | Image                 | 待验证：React 有 complete/naturalWidth 检查而 Vue 只靠 load/error，缓存/hydration 无证据；aria-busy 两端差异未立项；image/02 metadata 把原生 lazy 写成视口前占位，列为文案建议；现有测试未覆盖失败后激活预览                                                                           |
-| C017 | ImageCompare          | Core/Vue alt 注释写默认空串，实际空值回落 locale Before/After，建议注释改为「空值视为未提供」（未立项）；V01 是预览/焦点组合候选，交 X05 去重；Props 文档 4/19 属明确精简；Demo 均用 Picsum，无失败回退演示                                                                            |
+| C017 | ImageCompare          | Core/Vue alt 注释写默认空串，实际空值回落 locale Before/After，建议注释改为「空值视为未提供」（未立项）；V01 已在 Demo 02 留出端点焦点空间，并通过双端 8 格复验；Props 文档 4/19 属明确精简；Demo 均用 Picsum，无失败回退演示                                                          |
 | C019 | ImageGroup            | C019-F01 已修复；Vue watch 把受控 currentIndex 存入内部值而 React 不同步（未立项）；动态重排、语言切换未测                                                                                                                                                                             |
 | C020 | ImagePreview          | C020-F01、C020-F02、C020-F03 已修复。未立项待验证：Vue 打开态卸载未 release Escape 条目；Demo03 下载使 iframe 导航到跨源图片（sandbox 无 allow-downloads，根因未隔离）；空列表首屏 React 发 open=false 而 Vue 不发；受控导航不回写时画面停在父层索引                                   |
 | C021 | Inplace               | C021-F01、C021-F02、C021-F03、C021-K01 已修复。未立项：React display/input 缺省回退 children，Vue 不读 default slot；textarea 普通 Enter 也退出，不另建问题；四桌面格页面起点纯键盘入口仍未验证                                                                                        |

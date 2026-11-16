@@ -23,7 +23,8 @@ import {
 } from './helpers/slider-utils'
 
 /** Root surface. Overflow clip lives on the panes so the handle knob stays visible. */
-export const imageCompareRootClasses = 'tiger-image-compare relative select-none max-w-full'
+export const imageCompareRootClasses =
+  'tiger-image-compare relative select-none max-w-full [&_[data-compare-title]]:rounded-[var(--tiger-radius-sm)] [&_[data-compare-title]]:bg-black/70 [&_[data-compare-title]]:px-2 [&_[data-compare-title]]:py-1 [&_[data-compare-title]]:text-white [&_[data-compare-title]]:shadow-sm'
 
 /** Horizontal axis */
 export const imageCompareHorizontalClasses = 'tiger-image-compare-horizontal'

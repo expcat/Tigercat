@@ -178,6 +178,27 @@ describe('ImageCompare', () => {
       await fireEvent.keyDown(getHandle(container), { key: 'End' })
       expect(onUpdate).toHaveBeenCalledWith(100)
     })
+
+    it('does not emit when Home or End keeps the normalized position unchanged', async () => {
+      const onUpdate = vi.fn()
+      const onChange = vi.fn()
+      const { container } = render(ImageCompare, {
+        props: { defaultPosition: 0, 'onUpdate:position': onUpdate, onChange }
+      })
+      const handle = getHandle(container)
+      await fireEvent.keyDown(handle, { key: 'Home' })
+      expect(onUpdate).not.toHaveBeenCalled()
+      expect(onChange).not.toHaveBeenCalled()
+      await fireEvent.keyDown(handle, { key: 'End' })
+      expect(handle).toHaveAttribute('aria-valuenow', '100')
+      expect(onUpdate).toHaveBeenCalledWith(100)
+      expect(onChange).toHaveBeenCalledWith(100)
+      onUpdate.mockClear()
+      onChange.mockClear()
+      await fireEvent.keyDown(handle, { key: 'End' })
+      expect(onUpdate).not.toHaveBeenCalled()
+      expect(onChange).not.toHaveBeenCalled()
+    })
   })
 
   describe('pointer drag', () => {
@@ -262,7 +283,13 @@ describe('ImageCompare', () => {
       })
       const root = getRoot(container)
       stubRootRect(root)
-      await fireEvent.pointerDown(root, { pointerId: 1, clientX: 80, clientY: 10, button: 0 })
+      await fireEvent.pointerDown(getHandle(container), {
+        pointerId: 1,
+        clientX: 80,
+        clientY: 10,
+        button: 0
+      })
+      expect(root).toHaveAttribute('data-image-compare-dragging', 'true')
       onChange.mockClear()
       await fireEvent.pointerCancel(document, { pointerId: 1 })
       expect(root).toHaveAttribute('data-image-compare-dragging', 'false')
@@ -272,6 +299,7 @@ describe('ImageCompare', () => {
 
     it('does not start a drag when the user listener prevents default', async () => {
       const onChange = vi.fn()
+      let preventDrag = false
       const { container } = render(ImageCompare, {
         props: {
           beforeSrc: '/b.jpg',
@@ -279,16 +307,32 @@ describe('ImageCompare', () => {
           onChange
         },
         attrs: {
-          onPointerdown: (event: PointerEvent) => event.preventDefault()
+          onPointerdown: (event: PointerEvent) => {
+            if (preventDrag) event.preventDefault()
+          }
         }
       })
-      stubRootRect(getRoot(container))
-      await fireEvent.pointerDown(getRoot(container), {
+      const root = getRoot(container)
+      stubRootRect(root)
+      await fireEvent.pointerDown(getHandle(container), {
         pointerId: 1,
         clientX: 80,
         clientY: 10,
         button: 0
       })
+      expect(root).toHaveAttribute('data-image-compare-dragging', 'true')
+      await fireEvent.pointerUp(document, { pointerId: 1 })
+      expect(root).toHaveAttribute('data-image-compare-dragging', 'false')
+      onChange.mockClear()
+      preventDrag = true
+      await fireEvent.pointerDown(getHandle(container), {
+        pointerId: 2,
+        clientX: 80,
+        clientY: 10,
+        button: 0
+      })
+      expect(root).toHaveAttribute('data-image-compare-dragging', 'false')
+      await fireEvent.pointerMove(document, { pointerId: 2, clientX: 160, clientY: 10 })
       expect(onChange).not.toHaveBeenCalled()
     })
 

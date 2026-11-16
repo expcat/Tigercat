@@ -4,6 +4,13 @@
 
 ## v3.0.1（未发布）
 
+- **预览打开索引（React，C014-S01）**：ImagePreview 渲染直接采用受控 currentIndex，Gallery 选择第二张后 Enter 打开的首次提交就是第二张与 2 / 3。
+- **窄屏预览工具栏（Core，C014-V01）**：按内容宽度分配工具栏空间，计数不换行、按钮不压缩；Gallery、Image、ImageGroup、ImagePreview 共用修复。
+- **比较器无变化事件（Vue，C017-F02）**：发事件前比较归一化位置，0 再按 Home、100 再按 End 不再发 update:position / change。
+- **比较器拖动测试（测试，C017-F03）**：取消与 preventDefault 用例从手柄起拖并断言 dragging=true；临时去掉取消回写或阻止守卫时，旧用例通过、修正后失败。
+- **纵向比较器端点焦点（Demo，C017-V01）**：双端 Demo 02 增加上下留白，Home / End 时手柄与 4px 焦点环均留在预览内。
+- **比较器叠图标题（Core / React / Vue，C017-V02）**：前后标题统一使用半透明深色衬底与白字，保留标题与滑块 value text。
+
 - **ConfigProvider RTL 属性说明（文档 / MCP，C001-F004）**：i18n 方向解析说明改为 explicit dir prop，与公开属性一致。
 - **Badge 默认零值与位置说明（Demo / 文档 / MCP，C007-F04）**：两端 Demo 和生成笔记写明 standalone 默认显示 0，位置只用 top-start、top-end、bottom-start、bottom-end。
 - **Demo 外壳焦点留白（Demo，C013-V01）**：两端「编辑源码」按钮加入 16px 上下滚动边距，为自然 Tab 聚焦及 4px 焦点环留出空间；happy-dom 与几何核对通过，IAB 受子代理限制，窄屏真实复验待补。
