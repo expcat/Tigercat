@@ -95,7 +95,7 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | C033 | AspectRatio  | complete       | C033-F01/F02 已修复；47 项 spec（含 axe）通过，IAB 不可用待视觉复验。既有视觉 8 pass / 16 图片 blocked（picsum 封锁）、键盘 24/24 pass；hydration、E2E、读屏未测              |
 | C034 | Card         | complete       | F01/F02/F03/F05/F06 已修复；51 spec（axe）、类型/SSR 通过，文档/MCP 同步；IAB 不可用。旧视觉16 pass/16封面blocked、键盘16组pass；hover/href Enter/RTL/读屏/hydration/E2E 未测 |
 | C035 | Carousel     | complete       | F01/F02/F03 已修复；45 spec（axe）、types:check 通过；happy-dom 验证受控释放与 slot 更新。IAB 不可用待复验；旧视觉 16/16、键盘 8/8 组 pass；RTL/hover/读屏/hydration/E2E 未测 |
-| C036 | Col          | needs-evidence | 视觉 0/24 blocked、真实键盘 0/24 blocked、截图 0（24 格 owner 均为 C046 Row）；未跑 hydration、浏览器 E2E、读屏；容器断点、offset/RTL 几何、flex 尺寸未实测                   |
+| C036 | Col          | needs-evidence | F01 已修复；35 spec（双端 SSR）、types:check 通过；IAB 不可用，改用变量/CSS 断言。视觉/键盘 0/24 blocked（owner C046）；断点、offset/RTL/flex 几何及 hydration/E2E/读屏未测   |
 | C037 | Container    | needs-evidence | 视觉 0/8 blocked、真实外壳键盘 0/8 blocked、截图 0（8 格 owner 均为 C042 Layout）；未跑 hydration、浏览器 E2E、读屏；Terra 运行时模型未独立核验                               |
 | C038 | Content      | needs-evidence | 视觉 0/24 blocked、真实外壳键盘 0/24 blocked、截图 0（24 格 owner 均为 C042 Layout）；未启动 Demo 服务；未跑 hydration、浏览器 E2E、读屏；跳转链接点击与真实滚动未测          |
 | C039 | Descriptions | needs-evidence | 视觉 0/16 blocked、键盘 0/16 blocked、截图 0；视觉代理因 Terra 额度超限未执行；未跑 hydration、读屏；docs:links exit 1（.local 资料 1128 个链接错误）                         |

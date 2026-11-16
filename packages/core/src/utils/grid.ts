@@ -165,16 +165,16 @@ export function getRowClasses(
   return classNames('tiger-row', options.wrap === false && 'tiger-row-nowrap', options.className)
 }
 
-function setSpanVars(vars: Record<string, string>, span: ColSpan): void {
+function setSpanVars(vars: Record<string, string>, span: ColSpan, applyWidth: boolean): void {
   if (typeof span === 'number') {
     const value = clampGridValue(span, 'span')
     if (value === undefined) return
-    vars['--tiger-col-span'] = String(value)
+    if (applyWidth) vars['--tiger-col-span'] = String(value)
     vars['--tiger-col-display-base'] = value === 0 ? 'none' : 'block'
     return
   }
 
-  vars['--tiger-col-span'] = '24'
+  if (applyWidth) vars['--tiger-col-span'] = '24'
   vars['--tiger-col-display-base'] = 'block'
 
   GRID_BREAKPOINT_ORDER.forEach((bp) => {
@@ -184,11 +184,11 @@ function setSpanVars(vars: Record<string, string>, span: ColSpan): void {
     if (value === undefined) return
     const display = value === 0 ? 'none' : 'block'
     if (bp === 'xs') {
-      vars['--tiger-col-span'] = String(value)
+      if (applyWidth) vars['--tiger-col-span'] = String(value)
       vars['--tiger-col-display-base'] = display
       return
     }
-    vars[`--tiger-col-span-${bp}`] = String(value)
+    if (applyWidth) vars[`--tiger-col-span-${bp}`] = String(value)
     vars[`--tiger-col-display-${bp}`] = display
   })
 }
@@ -242,7 +242,7 @@ export function getColMergedStyleVars(
   flex?: string | number
 ): Record<string, string> {
   const vars: Record<string, string> = {}
-  if (flex === undefined && span !== undefined && span !== null) setSpanVars(vars, span)
+  if (span !== undefined && span !== null) setSpanVars(vars, span, flex === undefined)
   if (offset !== undefined && offset !== null) setOffsetVars(vars, offset)
   if (order !== undefined && order !== null) setOrderVars(vars, order)
   if (flex !== undefined) {

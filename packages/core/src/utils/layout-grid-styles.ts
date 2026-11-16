@@ -381,7 +381,7 @@ export const LAYOUT_GRID_CSS = `
   max-width: ${SPAN_WIDTH};
 }
 .tiger-col.tiger-col-flex {
-  display: block;
+  display: var(--tiger-col-display, block);
   min-width: 0;
   flex: var(--tiger-col-flex);
 }

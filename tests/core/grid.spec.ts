@@ -6,6 +6,7 @@ import {
   getRowAlignJustifyVars,
   getRowGutterStyleVars,
   hasGutter,
+  LAYOUT_GRID_CSS,
   resetDevWarnCache,
   resolveActiveGridBreakpoint,
   resolveGutter
@@ -102,6 +103,7 @@ describe('grid col css variable helpers', () => {
 
   it('skips span width vars when flex is set', () => {
     expect(getColMergedStyleVars(24, 0, undefined, '120px')).toEqual({
+      '--tiger-col-display-base': 'block',
       '--tiger-col-offset': '0',
       '--tiger-col-flex': '120px'
     })
@@ -112,6 +114,24 @@ describe('grid col css variable helpers', () => {
     })
     expect(warn).toHaveBeenCalled()
     warn.mockRestore()
+  })
+
+  it('preserves span visibility without span widths in flex mode', () => {
+    expect(LAYOUT_GRID_CSS).toMatch(
+      /\.tiger-col\.tiger-col-flex\s*\{\s*display: var\(--tiger-col-display, block\);/
+    )
+    expect(getColMergedStyleVars(0, undefined, undefined, '120px')).toEqual({
+      '--tiger-col-display-base': 'none',
+      '--tiger-col-flex': '120px'
+    })
+    expect(
+      getColMergedStyleVars({ xs: 24, md: 0, lg: 12 }, undefined, undefined, '1 1 auto')
+    ).toEqual({
+      '--tiger-col-display-base': 'block',
+      '--tiger-col-display-md': 'none',
+      '--tiger-col-display-lg': 'block',
+      '--tiger-col-flex': '1 1 auto'
+    })
   })
 
   it('creates order variables for numeric and responsive values', () => {

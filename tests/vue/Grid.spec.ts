@@ -4,7 +4,8 @@
 
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
-import { h } from 'vue'
+import { createSSRApp, h } from 'vue'
+import { renderToString } from '@vue/server-renderer'
 import { Col } from '@expcat/tigercat-vue/Col'
 import { Row } from '@expcat/tigercat-vue/Row'
 import { expectNoA11yViolationsIsolated } from '../utils'
@@ -57,6 +58,24 @@ describe('Grid (Vue)', () => {
     const col = screen.getByTestId('offset') as HTMLElement
     expect(col.style.getPropertyValue('--tiger-col-offset')).toBe('4')
     expect(col.style.getPropertyValue('--tiger-col-offset-md')).toBe('0')
+  })
+
+  it('preserves flex column visibility at zero-span breakpoints during SSR', async () => {
+    const html = await renderToString(
+      createSSRApp(() =>
+        h(Row, null, () => [
+          h(Col, { flex: '120px', span: 0 }),
+          h(Col, { flex: '1 1 auto', span: { xs: 24, md: 0, lg: 12 } })
+        ])
+      )
+    )
+    expect(html).toContain('class="tiger-col tiger-col-flex"')
+    expect(html).toContain('--tiger-col-display-base:none')
+    expect(html).toContain('--tiger-col-display-md:none')
+    expect(html).toContain('--tiger-col-display-lg:block')
+    expect(html).toContain('--tiger-col-flex:120px')
+    expect(html).toContain('--tiger-col-flex:1 1 auto')
+    expect(html).not.toContain('--tiger-col-span')
   })
 
   it('supports order (including responsive)', () => {

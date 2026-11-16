@@ -3,6 +3,7 @@
  */
 
 import React from 'react'
+import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { Col } from '@expcat/tigercat-react/Col'
@@ -65,6 +66,22 @@ describe('Grid (React)', () => {
     const col = screen.getByTestId('offset')
     expect(col.style.getPropertyValue('--tiger-col-offset')).toBe('4')
     expect(col.style.getPropertyValue('--tiger-col-offset-md')).toBe('0')
+  })
+
+  it('preserves flex column visibility at zero-span breakpoints during SSR', () => {
+    const html = renderToStaticMarkup(
+      <Row>
+        <Col flex="120px" span={0} />
+        <Col flex="1 1 auto" span={{ xs: 24, md: 0, lg: 12 }} />
+      </Row>
+    )
+    expect(html).toContain('class="tiger-col tiger-col-flex"')
+    expect(html).toContain('--tiger-col-display-base:none')
+    expect(html).toContain('--tiger-col-display-md:none')
+    expect(html).toContain('--tiger-col-display-lg:block')
+    expect(html).toContain('--tiger-col-flex:120px')
+    expect(html).toContain('--tiger-col-flex:1 1 auto')
+    expect(html).not.toContain('--tiger-col-span')
   })
 
   it('order only changes visual flex order', () => {
