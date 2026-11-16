@@ -117,6 +117,8 @@ export const ImageCompare = forwardRef<HTMLDivElement, ImageCompareProps>(
     const rootRef = useRef<HTMLDivElement | null>(null)
     const handleRef = useRef<HTMLDivElement | null>(null)
     const dragSessionRef = useRef<DocumentDragSession | null>(null)
+    const disabledRef = useRef(disabled)
+    disabledRef.current = disabled
     const vertical = isImageCompareVertical(resolvedOrientation)
     const explicitAriaLabel = resolveImageCompareAriaLabel(
       typeof ariaLabelAttr === 'string' ? ariaLabelAttr : ariaLabel
@@ -165,6 +167,10 @@ export const ImageCompare = forwardRef<HTMLDivElement, ImageCompareProps>(
 
     useEffect(() => stopDrag, [stopDrag])
 
+    useEffect(() => {
+      if (disabled) stopDrag()
+    }, [disabled, stopDrag])
+
     const handlePointerDown = useCallback(
       (event: React.PointerEvent<HTMLDivElement>) => {
         onPointerDown?.(event)
@@ -188,6 +194,7 @@ export const ImageCompare = forwardRef<HTMLDivElement, ImageCompareProps>(
           pointerId: event.pointerId,
           pointerTarget: event.currentTarget,
           onMove: ({ event: moveEvent, currentX, currentY }) => {
+            if (disabledRef.current) return
             if (moveEvent.cancelable) moveEvent.preventDefault()
             const moved = positionFromPoint(currentX, currentY)
             if (moved !== null) commit(moved)

@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **ImageCompare 拖动中禁用（React / Vue，C017-F01）**：手柄拖动中切到 `disabled` 时结束当前会话。之后的 pointermove 不改变位置，也不发出 change 或 update:position。
+
 - **Image 失败预览与示例（React / Vue / Demo，C016-F001、C016-F002、C016-F003）**：独立图片最终失败且没有可用回退时，激活宿主不发出预览已打开，后续 src 更新也不会自行打开。image/03 的 alt 改为「示例图片」。image/06 主图改为本地失效地址，失败后使用回退图。
 
 - **Highlight 保树示例与关键词说明（Demo / 文档 / MCP，C015-F01、C015-F02）**：两端 03 改用原生链接，第三段保留链接并把匹配文字包在 mark 里。生成笔记写明 Vue 不展开组件 VNode。页面介绍改为字符串关键词匹配。

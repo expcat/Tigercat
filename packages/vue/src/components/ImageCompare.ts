@@ -256,6 +256,13 @@ export const ImageCompare = defineComponent({
       dragging.value = false
     }
 
+    watch(
+      () => props.disabled,
+      (disabled) => {
+        if (disabled) stopDrag()
+      }
+    )
+
     const startDrag = (event: PointerEvent): void => {
       if (props.disabled) return
       if (event.button !== 0) return
@@ -279,6 +286,7 @@ export const ImageCompare = defineComponent({
         pointerId: event.pointerId,
         pointerTarget: event.currentTarget instanceof Element ? event.currentTarget : null,
         onMove: ({ event: moveEvent, currentX, currentY }) => {
+          if (props.disabled) return
           if (moveEvent.cancelable) moveEvent.preventDefault()
           const moved = positionFromPoint(currentX, currentY)
           if (moved !== null) commit(moved)

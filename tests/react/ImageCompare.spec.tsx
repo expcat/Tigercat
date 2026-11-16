@@ -190,6 +190,43 @@ describe('ImageCompare', () => {
       expect(root).toHaveAttribute('data-image-compare-dragging', 'false')
     })
 
+    it('stops an in-progress drag when disabled becomes true', () => {
+      const onChange = vi.fn()
+      const { container, rerender } = render(
+        <ImageCompare
+          beforeSrc="/b.jpg"
+          afterSrc="/a.jpg"
+          defaultPosition={50}
+          onChange={onChange}
+        />
+      )
+      const root = getRoot(container)
+      stubRootRect(root)
+      fireEvent.pointerDown(getHandle(container), {
+        pointerId: 1,
+        clientX: 80,
+        clientY: 10,
+        button: 0
+      })
+      expect(onChange).toHaveBeenCalledWith(40)
+      expect(root).toHaveAttribute('data-image-compare-position', '40')
+      expect(root).toHaveAttribute('data-image-compare-dragging', 'true')
+      onChange.mockClear()
+      rerender(
+        <ImageCompare
+          beforeSrc="/b.jpg"
+          afterSrc="/a.jpg"
+          defaultPosition={50}
+          disabled
+          onChange={onChange}
+        />
+      )
+      expect(root).toHaveAttribute('data-image-compare-dragging', 'false')
+      fireEvent.pointerMove(document, { pointerId: 1, clientX: 160, clientY: 10 })
+      expect(root).toHaveAttribute('data-image-compare-position', '40')
+      expect(onChange).not.toHaveBeenCalled()
+    })
+
     it('stops dragging on pointercancel', () => {
       const onChange = vi.fn()
       const { container } = render(
