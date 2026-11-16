@@ -35,6 +35,7 @@ import {
   moveCropRect,
   getInitialCropRect,
   cropCanvas,
+  nudgeCropHandle,
   getImageLabels,
   getTouchDistance,
   toCSSSize,
@@ -410,6 +411,15 @@ describe('image-utils — resizeCropRect', () => {
     expect(out.y).toBe(50)
   })
 
+  it('shrinks a locked corner when only the horizontal key changes', () => {
+    const rect: CropRect = { x: 41, y: 15, width: 160, height: 120 }
+    const out = nudgeCropHandle(rect, 'se', 'ArrowLeft', 1, 240, 150, 4 / 3)
+    expect(out).not.toEqual(rect)
+    expect(out?.width).toBeCloseTo(159)
+    expect(out?.height).toBeCloseTo(119.25)
+    expect((out?.width ?? 0) / (out?.height ?? 1)).toBeCloseTo(4 / 3)
+  })
+
   it.each([
     // e handle with the rect hugging the top edge: height cannot grow past
     // the centered room, so the width must follow instead of breaking 1:1
@@ -489,6 +499,15 @@ describe('image-utils — getInitialCropRect', () => {
     const rNeg = getInitialCropRect(200, 100, -1)
     expect(rNeg.width).toBeCloseTo(160)
   })
+
+  it('grows to an achievable minimum after locking the aspect ratio', () => {
+    const rect = getInitialCropRect(800, 600, 1, 20, 500)
+    expect(rect.width).toBeGreaterThanOrEqual(500)
+    expect(rect.height).toBeGreaterThanOrEqual(500)
+    expect(rect.width / rect.height).toBeCloseTo(1)
+    expect(rect.x + rect.width).toBeLessThanOrEqual(800)
+    expect(rect.y + rect.height).toBeLessThanOrEqual(600)
+  })
 })
 
 describe('image-utils — cropCanvas', () => {
@@ -559,6 +578,95 @@ describe('image-utils — cropCanvas', () => {
     expect(canvases.at(-1)?.height).toBe(100)
   })
 
+  it('maps a rotated flipped source onto the transformed preview selection', async () => {
+    const img = makeImage(640, 400)
+    const rect: CropRect = { x: 40, y: 80, width: 200, height: 150 }
+    const displayWidth = 320
+    const displayHeight = 200
+    type DrawOp =
+      | { type: 'translate'; x: number; y: number }
+      | { type: 'scale'; x: number; y: number }
+      | { type: 'rotate'; angle: number }
+    const stack: DrawOp[][] = [[]]
+    let drawn: unknown[] = []
+    let drawOps: DrawOp[] = []
+    const current = () => stack[stack.length - 1] ?? []
+    HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
+      save: () => {
+        stack.push(current().slice())
+      },
+      restore: () => {
+        stack.pop()
+      },
+      translate: (x: number, y: number) => {
+        current().push({ type: 'translate', x, y })
+      },
+      scale: (x: number, y: number) => {
+        current().push({ type: 'scale', x, y })
+      },
+      rotate: (angle: number) => {
+        current().push({ type: 'rotate', angle })
+      },
+      drawImage: (...args: unknown[]) => {
+        drawn = args
+        drawOps = current().slice()
+      },
+      beginPath: vi.fn(),
+      arc: vi.fn(),
+      clip: vi.fn()
+    })) as unknown as typeof HTMLCanvasElement.prototype.getContext
+
+    await cropCanvas(img, rect, displayWidth, displayHeight, 'image/jpeg', 0.8, {
+      rotation: 90,
+      flipX: true
+    })
+
+    // A viewBox-only SVG draws at the 300×150 default object size unless the
+    // destination rectangle is explicit. That is smaller than this natural size.
+    const svgDefaultWidth = 300
+    const svgDefaultHeight = 150
+    const destW = typeof drawn[3] === 'number' ? drawn[3] : svgDefaultWidth
+    const destH = typeof drawn[4] === 'number' ? drawn[4] : svgDefaultHeight
+    const u = 180 / 640
+    const v = 130 / 400
+    let x = u * destW
+    let y = v * destH
+    for (let index = drawOps.length - 1; index >= 0; index -= 1) {
+      const op = drawOps[index]
+      if (!op) continue
+      if (op.type === 'translate') {
+        x += op.x
+        y += op.y
+      } else if (op.type === 'scale') {
+        x *= op.x
+        y *= op.y
+      } else {
+        const cos = Math.cos(op.angle)
+        const sin = Math.sin(op.angle)
+        const nextX = x * cos - y * sin
+        const nextY = x * sin + y * cos
+        x = nextX
+        y = nextY
+      }
+    }
+
+    const centerX = displayWidth / 2
+    const centerY = displayHeight / 2
+    let previewX = u * displayWidth - centerX
+    let previewY = v * displayHeight - centerY
+    previewX = -previewX
+    const cos = Math.cos(Math.PI / 2)
+    const sin = Math.sin(Math.PI / 2)
+    const rotatedX = previewX * cos - previewY * sin
+    const rotatedY = previewX * sin + previewY * cos
+    const canvas = canvases.at(-1)
+    expect(canvas).toBeTruthy()
+    const expectedX = ((rotatedX + centerX - rect.x) / rect.width) * (canvas?.width ?? 0)
+    const expectedY = ((rotatedY + centerY - rect.y) / rect.height) * (canvas?.height ?? 0)
+    expect(x).toBeCloseTo(expectedX)
+    expect(y).toBeCloseTo(expectedY)
+  })
+
   it('throws when display size or crop rect is not a finite area', async () => {
     const img = makeImage(100, 100)
     const rect: CropRect = { x: 0, y: 0, width: 50, height: 50 }
@@ -599,6 +707,19 @@ describe('image preview demo viewports', () => {
     expect(demo.viewport.minHeight).toBeGreaterThanOrEqual(520)
     expect(demo.viewport.maxHeight).toBeGreaterThanOrEqual(720)
     expect(demo.viewport).not.toHaveProperty('height')
+  })
+})
+
+describe('image cropper demo copy', () => {
+  it.each([
+    'examples/example/vue3/src/examples/image-cropper/04/demo.json',
+    'examples/example/react/src/examples/image-cropper/04/demo.json'
+  ])('%s crops the displayed selection instead of swapping edges', (relativePath) => {
+    const demo = JSON.parse(readFileSync(resolve(process.cwd(), relativePath), 'utf-8')) as {
+      description: string
+    }
+    expect(demo.description).not.toContain('旋转会交换宽高')
+    expect(demo.description).toContain('显示选区')
   })
 })
 

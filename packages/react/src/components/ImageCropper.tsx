@@ -145,6 +145,11 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
     )
     const labels = useMemo(() => getImageEditorLabels(mergedLocale), [mergedLocale])
     const [preset, setPreset] = useState(aspectPreset)
+    const [aspectPresetProp, setAspectPresetProp] = useState(aspectPreset)
+    if (!Object.is(aspectPreset, aspectPresetProp)) {
+      setAspectPresetProp(aspectPreset)
+      setPreset(aspectPreset)
+    }
     const [rotation, setRotation] = useState(0)
     const [flipX, setFlipX] = useState(false)
     const aspectRatio = resolveCropAspectRatio(preset ?? aspectPreset, aspectRatioProp)
@@ -258,6 +263,8 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
           current.h
         )
         if (!next) return
+        // postState reads displayDimsRef while setCropRect is still synchronous.
+        displayDimsRef.current = { w: next.width, h: next.height }
         setCropRect((prev) =>
           remapCropRect(
             prev,
@@ -270,7 +277,6 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
             minHeight
           )
         )
-        displayDimsRef.current = { w: next.width, h: next.height }
         setDisplayWidth(next.width)
         setDisplayHeight(next.height)
       })

@@ -529,8 +529,9 @@ export function getPreviewNavState(currentIndex: number, total: number): Preview
 
 /**
  * Constrain a crop rect to stay within image bounds, optionally enforcing
- * aspect ratio and minimum size. When the image is smaller than minW/minH,
- * the rect is clamped to the image — min cannot exceed the bitmap.
+ * aspect ratio and minimum size. Ratio adjustment cannot leave a side below
+ * a minimum the bitmap can still hold. When the image is smaller than
+ * minW/minH, the rect is clamped to the image — min cannot exceed the bitmap.
  */
 export function constrainCropRect(
   rect: CropRect,
@@ -562,6 +563,24 @@ export function constrainCropRect(
       width = height * aspectRatio
     } else {
       height = width / aspectRatio
+    }
+
+    if (width < minWidth || height < minHeight) {
+      const needW = Math.max(minWidth, minHeight * aspectRatio)
+      const needH = needW / aspectRatio
+      if (needW <= maxW && needH <= maxH) {
+        width = needW
+        height = needH
+      } else {
+        let fitW = maxW
+        let fitH = fitW / aspectRatio
+        if (fitH > maxH) {
+          fitH = maxH
+          fitW = fitH * aspectRatio
+        }
+        width = fitW
+        height = fitH
+      }
     }
   }
 
@@ -633,10 +652,12 @@ export function resizeCropRect(
       : Math.max(0, lockTop ? imageHeight - startTop : startBottom)
 
     // Desired size follows the drag as before: side handles follow the
-    // dragged axis, corners follow the dragged height.
+    // dragged axis. Corners follow height, unless the input is only
+    // horizontal, so a locked corner still scales from ArrowLeft/ArrowRight.
     let width = right - left
     let height = bottom - top
-    if (horizontalOnly) height = width / aspectRatio
+    const followWidth = horizontalOnly || (!verticalOnly && dy === 0 && dx !== 0)
+    if (followWidth) height = width / aspectRatio
     else width = height * aspectRatio
 
     // Fit inside the room without changing the ratio, then restore the
@@ -1113,7 +1134,9 @@ export async function cropCanvas(
     if (flipX) ctx.scale(-1, 1)
     ctx.translate(-displayWidth / 2, -displayHeight / 2)
     ctx.scale(1 / scaleX, 1 / scaleY)
-    ctx.drawImage(image, 0, 0)
+    // A bare drawImage uses the SVG default object size (300×150) and misses
+    // the preview frame. The natural size is what the scale above expects.
+    ctx.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight)
     ctx.restore()
     if (circular) ctx.restore()
   }

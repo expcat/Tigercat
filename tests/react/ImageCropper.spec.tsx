@@ -163,6 +163,37 @@ describe('ImageCropper', () => {
     )
   })
 
+  it('follows aspectPreset updates from the parent', async () => {
+    const onCropChange = vi.fn()
+    const { container, rerender } = await renderLoadedCropper(
+      <ImageCropper src="/test.jpg" aspectPreset="1:1" onCropChange={onCropChange} />
+    )
+    expect(container.querySelector('[data-crop-preset="1:1"]')).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    )
+    expect(onCropChange).toHaveBeenLastCalledWith({ x: 160, y: 60, width: 480, height: 480 })
+
+    rerender(<ImageCropper src="/test.jpg" aspectPreset="16:9" onCropChange={onCropChange} />)
+    expect(container.querySelector('[data-crop-preset="16:9"]')).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    )
+    expect(container.querySelector('[data-image-cropper]')).toHaveAttribute(
+      'data-crop-aspect',
+      '16:9'
+    )
+    expect(onCropChange).toHaveBeenLastCalledWith({ x: 80, y: 120, width: 640, height: 360 })
+
+    rerender(<ImageCropper src="/test.jpg" onCropChange={onCropChange} />)
+    expect(container.querySelector('[data-crop-preset="free"]')).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    )
+    expect(container.querySelector('[data-image-cropper]')).toHaveAttribute('data-crop-aspect', '')
+    expect(onCropChange).toHaveBeenLastCalledWith({ x: 80, y: 60, width: 640, height: 480 })
+  })
+
   it('moves crop area with pointer drag and clamps to image bounds', async () => {
     const onCropChange = vi.fn()
     const { container } = await renderLoadedCropper(
@@ -369,6 +400,30 @@ describe('ImageCropper', () => {
         })
       )
       expect(onCropChange).toHaveBeenLastCalledWith({ x: 40, y: 30, width: 320, height: 240 })
+    })
+
+    it('remaps the crop when the host grows back to the bitmap', async () => {
+      Object.defineProperty(HTMLElement.prototype, 'clientWidth', {
+        configurable: true,
+        value: 400
+      })
+      const onCropChange = vi.fn()
+      const { container } = await renderLoadedCropper(
+        <ImageCropper src="/test.jpg" onCropChange={onCropChange} />
+      )
+      const host = container.querySelector('[data-image-cropper]') as HTMLElement
+      await waitFor(() => expect(MockResizeObserver.instances).toHaveLength(1))
+      expect(onCropChange).toHaveBeenLastCalledWith({ x: 40, y: 30, width: 320, height: 240 })
+      onCropChange.mockClear()
+      Object.defineProperty(host, 'clientWidth', { configurable: true, value: 800 })
+      MockResizeObserver.instances[0].trigger(800, 600)
+      await waitFor(() =>
+        expect(container.querySelector('[data-image-cropper-stage]')).toHaveStyle({
+          width: '800px',
+          height: '600px'
+        })
+      )
+      expect(onCropChange).toHaveBeenLastCalledWith({ x: 80, y: 60, width: 640, height: 480 })
     })
   })
 })
