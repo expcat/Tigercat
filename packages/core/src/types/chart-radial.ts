@@ -4,11 +4,12 @@
 
 import type {
   BaseChartProps,
+  ChartBuiltInTooltipProps,
   ChartGridLineStyle,
   ChartInteractionProps,
   ChartLegendToggleProps,
-  ChartSeriesPoint,
-  ChartBuiltInTooltipProps
+  ChartPadding,
+  ChartSeriesPoint
 } from './chart-core'
 
 export interface PieChartDatum extends ChartSeriesPoint {
@@ -138,6 +139,18 @@ export interface PieChartProps
    * @default false
    */
   animated?: boolean
+
+  /**
+   * Whether the SVG should observe its container and resize responsively.
+   * @default true
+   */
+  responsive?: boolean
+
+  /**
+   * Chart padding. A number applies to every side.
+   * @default 24
+   */
+  padding?: ChartPadding
 }
 
 export interface RadarChartDatum {
@@ -478,6 +491,18 @@ export interface RadarChartProps
    * @default false
    */
   gradient?: boolean
+
+  /**
+   * Whether the SVG should observe its container and resize responsively.
+   * @default true
+   */
+  responsive?: boolean
+
+  /**
+   * Chart padding. A number applies to every side.
+   * @default 36
+   */
+  padding?: ChartPadding
 }
 
 // -------------------------------------------------------------------
@@ -596,4 +621,16 @@ export interface GaugeChartProps extends BaseChartProps, ChartBuiltInTooltipProp
    * @default false
    */
   animated?: boolean
+
+  /**
+   * Whether the SVG should observe its container and resize responsively.
+   * @default true
+   */
+  responsive?: boolean
+
+  /**
+   * Chart padding. A number applies to every side.
+   * @default 24
+   */
+  padding?: ChartPadding
 }

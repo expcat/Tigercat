@@ -37,10 +37,10 @@ description: Compact generated Tigercat Charts props reference
 - `pointGradient?`: `boolean`; default `false`. Render data point fill as a per-series `<radialGradient>` (bright center → series color...
 - `tooltipFormatter?`: `( datum: LineChartDatum, seriesIndex: number, index: number, series?: AreaChartSeries ) => string`; default `-`. Tooltip formatter
 - `legendFormatter?`: `(series: AreaChartSeries, index: number) => string`; default `-`. Legend formatter
+- `responsive?`: `boolean`; default `true`. Whether the SVG should observe its container and resize responsively.
 - `width?`: `number`; default `320`. Chart width
 - `height?`: `number`; default `200`. Chart height
 - `padding?`: `ChartPadding`; default `{ top: 24, right: 24, bottom: 52, left: 52 }`. Chart padding. Default leaves room for ChartAxis labels (`labelOffset` 28 + tick + dy).
-- `responsive?`: `boolean`; default `false`. Whether the SVG should observe its container and resize responsively.
 - `title?`: `string`; default `-`. Accessible title for the SVG
 - `desc?`: `string`; default `-`. Accessible description for the SVG
 - `className?`: `string`; default `-`. Additional CSS classes

@@ -4,7 +4,7 @@
 type: active-roadmap
 scope: 3.0.0 之后的修复阶段；本文件是入口，任务表在 docs/plan/
 input: .local/review/2026-11-05（全项目 Review，不进 git）
-tasks: 53 条 Review 发现 + 11 条证据任务
+tasks: 46 条 Review 发现 + 11 条证据任务
 verified-date: 2026-11-17
 -->
 
@@ -14,7 +14,7 @@ verified-date: 2026-11-17
 
 ## 现状
 
-- Review 覆盖 185 个公开组件、841 个 Demo 和 7 份项目专题，共 564 条发现。已完成条目移入 [CHANGELOG.md](../CHANGELOG.md)，剩 53 条：P1 0、P2 0、P3 53。
+- Review 覆盖 185 个公开组件、841 个 Demo 和 7 份项目专题，共 564 条发现。已完成条目移入 [CHANGELOG.md](../CHANGELOG.md)，剩 46 条：P1 0、P2 0、P3 46。
 - 审查的总状态是 needs-evidence。3364 个视口格里，视觉 2772 格、键盘 2832 格没有浏览器证据。很多条目的依据只有源码和 happy-dom，动手前要先复现。
 
 ## 计划
@@ -31,7 +31,7 @@ verified-date: 2026-11-17
 | [06 导航组件](plan/06-navigation.md)                    | C082–C116                                                     |    0 |
 | [07 反馈组件](plan/07-feedback.md)                      | C117–C130                                                     |    0 |
 | [08 数据展示组件](plan/08-data.md)                      | C131–C137                                                     |    0 |
-| [09 图表组件](plan/09-charts.md)                        | C138–C158                                                     |   25 |
+| [09 图表组件](plan/09-charts.md)                        | C138–C158                                                     |   18 |
 | [10 高级组件](plan/10-advanced.md)                      | C159–C169                                                     |    5 |
 | [11 组合组件](plan/11-composite.md)                     | C170–C185                                                     |   19 |
 | [12 工具链、文档与示例平台](plan/12-tooling-docs.md)    | X03–X07：CLI、MCP、生成器、Example、发布配置、项目文档        |    4 |
@@ -52,7 +52,7 @@ verified-date: 2026-11-17
 | W6   | 数据、图表与高级的 P2            |    0 | 08、09、10 |
 | W7   | 组合组件的 P2                    |    0 | 11         |
 | W8   | 工具链、文档与示例平台的 P2      |    0 | 12         |
-| W9   | 各篇的 P3                        |   53 | 02–12      |
+| W9   | 各篇的 P3                        |   46 | 02–12      |
 | W10  | 证据补采与复验，随浏览器环境并行 |   11 | 13         |
 
 ## 边界

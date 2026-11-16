@@ -45,6 +45,19 @@ describe('ChartAxis', () => {
     expect(container.querySelector('g')?.getAttribute('aria-hidden')).not.toBe('true')
     expect(container.querySelector('[data-axis-label]')?.textContent).toBe('Value')
   })
+
+  it('keeps a caller aria-hidden on the root and omits it when absent', () => {
+    const hidden = renderWithProps(
+      ChartAxis,
+      { scale, tickValues },
+      { attrs: { 'aria-hidden': 'true' } }
+    )
+    expect(hidden.container.querySelector('g')?.getAttribute('aria-hidden')).toBe('true')
+    hidden.unmount()
+
+    const plain = renderWithProps(ChartAxis, { scale, tickValues })
+    expect(plain.container.querySelector('g')?.hasAttribute('aria-hidden')).toBe(false)
+  })
 })
 
 // ===========================================================================
@@ -143,6 +156,13 @@ describe('ChartCanvas', () => {
 
     const events = emitted()['resolved-size-change']
     expect(events?.at(-1)?.[0]).toEqual({ width: 480, height: 260 })
+  })
+
+  it('emits the fallback size on mount when width and height are 0', async () => {
+    vi.stubGlobal('ResizeObserver', MockResizeObserver)
+    const { emitted } = renderWithProps(ChartCanvas, { width: 0, height: 0 })
+    await nextTick()
+    expect(emitted()['resolved-size-change']).toEqual([[{ width: 320, height: 200 }]])
   })
 
   it('observes its own host instead of a legend sibling', async () => {
@@ -321,6 +341,26 @@ describe('ChartTooltip', () => {
     renderWithProps(ChartTooltip, { content: 'Tooltip text', open: false, x: 100, y: 100 })
     await new Promise((resolve) => setTimeout(resolve, 0))
     expect(document.querySelector('[data-chart-tooltip]')).toBeNull()
+  })
+
+  it('does not mount a tooltip when content is only a newline', async () => {
+    const newline = renderWithProps(ChartTooltip, { content: '\n', open: true, x: 10, y: 10 })
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(document.querySelector('[role="tooltip"]')).toBeNull()
+    newline.unmount()
+
+    const empty = renderWithProps(ChartTooltip, { content: '', open: true, x: 10, y: 10 })
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(document.querySelector('[role="tooltip"]')).toBeNull()
+    empty.unmount()
+  })
+
+  it('renders a list when content has two lines', async () => {
+    renderWithProps(ChartTooltip, { content: 'a\nb', open: true, x: 10, y: 10 })
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    const tip = document.querySelector('[role="tooltip"]')
+    expect(tip?.querySelector('ul')).not.toBeNull()
+    expect(tip?.textContent).toBe('ab')
   })
 
   it('applies custom className', async () => {

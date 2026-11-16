@@ -68,6 +68,19 @@ describe('ChartAxis', () => {
     expect(container.querySelector('g')).not.toHaveAttribute('aria-hidden', 'true')
     expect(container.querySelector('[data-axis-label]')).toHaveTextContent('Value')
   })
+
+  it('keeps a caller aria-hidden on the root and omits it when absent', () => {
+    const hidden = renderWithProps(ChartAxisWrapper, {
+      scale,
+      tickValues,
+      'aria-hidden': true
+    })
+    expect(hidden.container.querySelector('g')).toHaveAttribute('aria-hidden', 'true')
+    hidden.unmount()
+
+    const plain = renderWithProps(ChartAxisWrapper, { scale, tickValues })
+    expect(plain.container.querySelector('g')).not.toHaveAttribute('aria-hidden')
+  })
 })
 
 // ===========================================================================
@@ -349,6 +362,23 @@ describe('ChartTooltip', () => {
   it('does not mount when closed', () => {
     renderWithProps(ChartTooltip, { content: 'Tooltip text', open: false, x: 100, y: 100 })
     expect(document.querySelector('[data-chart-tooltip]')).toBeNull()
+  })
+
+  it('does not mount a tooltip when content is only a newline', () => {
+    const newline = renderWithProps(ChartTooltip, { content: '\n', open: true, x: 10, y: 10 })
+    expect(document.querySelector('[role="tooltip"]')).toBeNull()
+    newline.unmount()
+
+    const empty = renderWithProps(ChartTooltip, { content: '', open: true, x: 10, y: 10 })
+    expect(document.querySelector('[role="tooltip"]')).toBeNull()
+    empty.unmount()
+  })
+
+  it('renders a list when content has two lines', () => {
+    renderWithProps(ChartTooltip, { content: 'a\nb', open: true, x: 10, y: 10 })
+    const tip = document.querySelector('[role="tooltip"]')
+    expect(tip?.querySelector('ul')).not.toBeNull()
+    expect(tip?.textContent).toBe('ab')
   })
 
   it('applies custom className', () => {

@@ -4,6 +4,14 @@
 
 ## v3.0.1（未发布）
 
+- **图表 responsive 默认说明（Core / 文档 / MCP，C138-F02）**：Area、Bar、Funnel、Gauge、Heatmap、Line、Pie、Radar、Scatter、Sunburst、TreeMap 的 responsive 注释与生成表改为默认 true，与两端省略该 prop 时的行为一致。共享 BaseChartProps 仍是 false。
+- **坐标轴 aria-hidden（React，C140-F01）**：ChartAxis 根节点保留调用方传入的 aria-hidden；未传时根上没有该属性。
+- **画布初始尺寸（Vue，C141-F04）**：ChartCanvas 在 width 与 height 都为 0 时，挂载后发出一次 resolved-size-change，尺寸为 320×200。
+- **图表提示空换行（React / Vue，C145-F03）**：content 只有换行时不再挂载 role=tooltip，与空字符串一致；一行仍是文本，a 换行 b 仍渲染列表。
+- **漏斗渐变说明（Core / 文档 / MCP，C146-F03）**：gradient 注释和生成表改为沿漏斗方向渐变，不再写垂直。
+- **图表内边距说明（Core / 文档 / MCP，C146-F04）**：Funnel、Gantt、Gauge、Org、Pie 的 padding 注释与生成表改为默认 24，Radar 为 36。
+- **甘特任务名裁切（Vue，C147-F04）**：任务名超出标签栏时用 clip-path 裁切，矩形按 labelX、labelWidth 和布局高度建立。
+
 - **Tour 方向（React / Vue，C130-F03）**：气泡按合并 locale 的方向定位。ConfigProvider 为 rtl 时，显式 direction ltr 的 popover left 为 400px；locale id ar-SA 推断为 rtl，left 为 440px。
 - **Calendar 周次角色（React / Vue，C131-F02）**：月网格的周次单元格改为 rowheader，每行仍是 8 个表头或单元格。
 - **Collapse 内容壳（Core / React / Vue，C133-F02）**：内容壳去掉未使用的 max-height、opacity 过渡，只保留 overflow-hidden。

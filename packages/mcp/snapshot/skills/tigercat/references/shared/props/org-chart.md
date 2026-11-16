@@ -33,7 +33,7 @@ Note: `avatar` 在写成 SVG image 之前走 `link-utils` 同一协议门。`jav
 - `colors?`: `string[]`; default `-`. -
 - `selectedId?`: `string | number | null`; default `-`. -
 - `ariaLabel?`: `string`; default `-`. -
-- `padding?`: `ChartPadding`; default `{ top: 24, right: 24, bottom: 52, left: 52 }`. Chart padding. Default leaves room for ChartAxis labels (`labelOffset` 28 + tick + dy).
+- `padding?`: `ChartPadding`; default `24`. Chart padding. A number applies to every side.
 - `responsive?`: `boolean`; default `false`. Whether the SVG should observe its container and resize responsively.
 - `title?`: `string`; default `-`. Accessible title for the SVG
 - `desc?`: `string`; default `-`. Accessible description for the SVG

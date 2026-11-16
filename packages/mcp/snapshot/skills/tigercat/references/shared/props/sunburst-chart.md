@@ -27,7 +27,7 @@ description: Compact generated Tigercat Charts props reference
 - `padding?`: `ChartPadding`; default `24`. Padding around the rings (not cartesian axis padding)
 - `gradient?`: `boolean`; default `false`. Whether to apply a 12-o'clock vertical alpha gradient in user space
 - `tooltipFormatter?`: `(datum: SunburstChartDatum, index: number) => string`; default `-`. Tooltip formatter. Receives the arc's original datum and layout index.
-- `responsive?`: `boolean`; default `false`. Whether the SVG should observe its container and resize responsively.
+- `responsive?`: `boolean`; default `true`. Whether the SVG should observe its container and resize responsively.
 - `title?`: `string`; default `-`. Accessible title for the SVG
 - `desc?`: `string`; default `-`. Accessible description for the SVG
 - `className?`: `string`; default `-`. Additional CSS classes

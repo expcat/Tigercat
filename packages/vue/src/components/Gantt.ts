@@ -6,6 +6,7 @@ import {
   PropType,
   ref,
   shallowRef,
+  useId,
   watch
 } from 'vue'
 import {
@@ -140,6 +141,7 @@ export const Gantt = defineComponent({
   },
   emits: ['update:selectedId', 'task-click', 'task-hover', 'task-change', 'update:data'],
   setup(props, { emit, attrs }) {
+    const labelClipId = useId()
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getChartLabels(mergedLocale.value, props.labels))
@@ -451,6 +453,16 @@ export const Gantt = defineComponent({
             {
               default: () =>
                 h('g', { 'data-series-type': 'gantt' }, [
+                  h('defs', [
+                    h('clipPath', { id: labelClipId }, [
+                      h('rect', {
+                        x: layout.value.labelX,
+                        y: 0,
+                        width: layout.value.labelWidth,
+                        height: layout.value.height
+                      })
+                    ])
+                  ]),
                   h('g', { 'data-gantt-axis': 'true' }, [
                     h('line', {
                       x1: props.taskLabelWidth,
@@ -528,9 +540,10 @@ export const Gantt = defineComponent({
                         h(
                           'text',
                           {
-                            x: 0,
+                            x: layout.value.labelX,
                             y: task.y + task.height / 2 + 4,
-                            class: ganttLabelClasses
+                            class: ganttLabelClasses,
+                            'clip-path': `url(#${labelClipId})`
                           },
                           task.task.label
                         ),

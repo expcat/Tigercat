@@ -58,9 +58,9 @@ export const ChartTooltip: React.FC<ChartTooltipProps> = ({
           <li key={index}>{line}</li>
         ))}
       </ul>
-    ) : (
+    ) : lines.length === 1 ? (
       content
-    ))
+    ) : null)
 
   const place = useCallback(() => {
     const node = tooltipRef.current

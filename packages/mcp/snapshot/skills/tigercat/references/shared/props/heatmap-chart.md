@@ -36,7 +36,7 @@ description: Compact generated Tigercat Charts props reference
 - `colorSpace?`: `'rgb' | 'oklch'`; default `'rgb'`. Colour interpolation space for cell fills. - `'rgb'` (default): linear hex interpolatio...
 - `renderMode?`: `'svg' | 'canvas' | 'auto'`; default `'auto'`. Rendering backend for heatmap cells. - `'svg'`: render one `<rect>` per cell. - `'canva...
 - `canvasThreshold?`: `number`; default `1000`. Cell count threshold used when `renderMode` is `'auto'`.
-- `responsive?`: `boolean`; default `false`. Whether the SVG should observe its container and resize responsively.
+- `responsive?`: `boolean`; default `true`. Whether the SVG should observe its container and resize responsively.
 - `title?`: `string`; default `-`. Accessible title for the SVG
 - `desc?`: `string`; default `-`. Accessible description for the SVG
 - `className?`: `string`; default `-`. Additional CSS classes

@@ -162,7 +162,9 @@ export const ChartTooltip = defineComponent({
                 { class: 'm-0 list-none whitespace-pre-line p-0' },
                 lines.map((line, index) => h('li', { key: index }, line))
               )
-            : props.content
+            : lines.length === 1
+              ? props.content
+              : null
       const tooltip =
         props.open && body
           ? h(

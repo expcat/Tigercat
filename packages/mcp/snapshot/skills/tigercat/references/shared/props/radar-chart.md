@@ -62,10 +62,10 @@ description: Compact generated Tigercat Charts props reference
 - `strokeGradient?`: `boolean`; default `false`. Render each series polygon stroke as a 3-stop vertical gradient (lighter → base → darke...
 - `pointGradient?`: `boolean`; default `false`. Render data point fill as a per-series `<radialGradient>` (bright center → series color...
 - `gradient?`: `boolean`; default `false`. Fill each series polygon with a vertical alpha gradient in radar user space.
+- `responsive?`: `boolean`; default `true`. Whether the SVG should observe its container and resize responsively.
+- `padding?`: `ChartPadding`; default `36`. Chart padding. A number applies to every side.
 - `width?`: `number`; default `320`. Chart width
 - `height?`: `number`; default `200`. Chart height
-- `padding?`: `ChartPadding`; default `{ top: 24, right: 24, bottom: 52, left: 52 }`. Chart padding. Default leaves room for ChartAxis labels (`labelOffset` 28 + tick + dy).
-- `responsive?`: `boolean`; default `false`. Whether the SVG should observe its container and resize responsively.
 - `title?`: `string`; default `-`. Accessible title for the SVG
 - `desc?`: `string`; default `-`. Accessible description for the SVG
 - `className?`: `string`; default `-`. Additional CSS classes

@@ -29,7 +29,7 @@ description: Compact generated Tigercat Charts props reference
 - `colors?`: `string[]`; default `-`. Palette of colors
 - `gradient?`: `boolean`; default `false`. Whether to apply a top-to-bottom alpha gradient in chart user space
 - `tooltipFormatter?`: `(datum: TreeMapChartDatum, index: number) => string`; default `-`. Tooltip formatter. Receives the node's original datum and layout index.
-- `responsive?`: `boolean`; default `false`. Whether the SVG should observe its container and resize responsively.
+- `responsive?`: `boolean`; default `true`. Whether the SVG should observe its container and resize responsively.
 - `title?`: `string`; default `-`. Accessible title for the SVG
 - `desc?`: `string`; default `-`. Accessible description for the SVG
 - `className?`: `string`; default `-`. Additional CSS classes

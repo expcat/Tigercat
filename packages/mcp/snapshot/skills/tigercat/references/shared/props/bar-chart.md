@@ -35,9 +35,9 @@ description: Compact generated Tigercat Charts props reference
 - `animated?`: `boolean`; default `false`. Enable CSS transitions for smooth bar updates
 - `tooltipFormatter?`: `(datum: BarChartDatum, index: number) => string`; default `-`. Tooltip formatter
 - `legendFormatter?`: `(datum: BarChartDatum, index: number) => string`; default `-`. Legend formatter
+- `responsive?`: `boolean`; default `true`. Whether the SVG should observe its container and resize responsively.
 - `width?`: `number`; default `320`. Chart width
 - `height?`: `number`; default `200`. Chart height
-- `responsive?`: `boolean`; default `false`. Whether the SVG should observe its container and resize responsively.
 - `title?`: `string`; default `-`. Accessible title for the SVG
 - `desc?`: `string`; default `-`. Accessible description for the SVG
 - `className?`: `string`; default `-`. Additional CSS classes

@@ -50,8 +50,7 @@ export const ChartAxis = ({
       {...props}
       className={classNames(className)}
       transform={`translate(${x}, ${y})`}
-      data-axis-orientation={orientation}
-      aria-hidden={undefined}>
+      data-axis-orientation={orientation}>
       <line
         {...geometry.axisLine}
         className={chartAxisLineClasses}

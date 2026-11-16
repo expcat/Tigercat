@@ -103,6 +103,10 @@ export const ChartCanvas = defineComponent({
     onMounted(() => {
       ready = true
       syncResponsiveObserver()
+      emit('resolved-size-change', {
+        width: resolvedSize.value.width,
+        height: resolvedSize.value.height
+      })
     })
     watch(() => props.responsive, syncResponsiveObserver)
     watch(

@@ -36,8 +36,8 @@ description: Compact generated Tigercat Charts props reference
 - `color?`: `string`; default `'var(--tiger-primary)'`. Default arc fill color
 - `gradient?`: `boolean`; default `false`. When true, the value arc is rendered with a vertical alpha gradient in gauge user space...
 - `animated?`: `boolean`; default `false`. Animate the needle when `value` changes. `prefers-reduced-motion` skips. Angles on this...
-- `padding?`: `ChartPadding`; default `{ top: 24, right: 24, bottom: 52, left: 52 }`. Chart padding. Default leaves room for ChartAxis labels (`labelOffset` 28 + tick + dy).
-- `responsive?`: `boolean`; default `false`. Whether the SVG should observe its container and resize responsively.
+- `responsive?`: `boolean`; default `true`. Whether the SVG should observe its container and resize responsively.
+- `padding?`: `ChartPadding`; default `24`. Chart padding. A number applies to every side.
 - `title?`: `string`; default `-`. Accessible title for the SVG
 - `desc?`: `string`; default `-`. Accessible description for the SVG
 - `className?`: `string`; default `-`. Additional CSS classes

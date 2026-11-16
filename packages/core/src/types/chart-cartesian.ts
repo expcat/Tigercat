@@ -112,6 +112,12 @@ export interface BarChartProps
    * Legend formatter
    */
   legendFormatter?: (datum: BarChartDatum, index: number) => string
+
+  /**
+   * Whether the SVG should observe its container and resize responsively.
+   * @default true
+   */
+  responsive?: boolean
 }
 
 export interface ScatterChartDatum {
@@ -210,6 +216,12 @@ export interface ScatterChartProps
    * Legend formatter
    */
   legendFormatter?: (datum: ScatterChartDatum, index: number) => string
+
+  /**
+   * Whether the SVG should observe its container and resize responsively.
+   * @default true
+   */
+  responsive?: boolean
 }
 
 // ============================================================================
@@ -406,6 +418,12 @@ export interface LineChartProps
    * Legend formatter
    */
   legendFormatter?: (series: LineChartSeries, index: number) => string
+
+  /**
+   * Whether the SVG should observe its container and resize responsively.
+   * @default true
+   */
+  responsive?: boolean
 }
 
 // ============================================================================
@@ -547,4 +565,10 @@ export interface AreaChartProps
    * Legend formatter
    */
   legendFormatter?: (series: AreaChartSeries, index: number) => string
+
+  /**
+   * Whether the SVG should observe its container and resize responsively.
+   * @default true
+   */
+  responsive?: boolean
 }

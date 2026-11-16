@@ -6,7 +6,7 @@ import { fireEvent, render } from '@testing-library/vue'
 import { describe, expect, it } from 'vitest'
 import { nextTick, reactive } from 'vue'
 import { Gantt } from '@expcat/tigercat-vue/Gantt'
-import type { GanttTask } from '@expcat/tigercat-core'
+import { computeGanttLayout, normalizeChartPadding, type GanttTask } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 const data: GanttTask[] = [
@@ -32,6 +32,38 @@ describe('Gantt', () => {
       expect(canvasHost?.classList.contains('h-full')).toBe(responsive === true)
     }
   )
+
+  it('clips task labels that exceed the label column', () => {
+    const tasks: GanttTask[] = [
+      {
+        id: 'long',
+        label: 'A very long task name that overflows the label column',
+        start: '2026-01-01',
+        end: '2026-01-05'
+      }
+    ]
+    const taskLabelWidth = 36
+    const width = 760
+    const { container } = render(Gantt, { props: { data: tasks, taskLabelWidth, width } })
+    const textNode = container.querySelector('[data-gantt-tasks] text')
+    const rect = container.querySelector('clipPath rect')
+    const padding = normalizeChartPadding(24)
+    const layout = computeGanttLayout(tasks, {
+      width: Math.max(0, width - padding.left - padding.right),
+      rowHeight: 40,
+      barHeight: 18,
+      taskLabelWidth,
+      timelineHeight: 36,
+      minBarWidth: 6,
+      scale: 'week'
+    })
+    const clipId = rect?.parentElement?.getAttribute('id')
+    expect(textNode?.getAttribute('clip-path')).toBe('url(#' + clipId + ')')
+    expect(rect).toHaveAttribute('x', String(layout.labelX))
+    expect(rect).toHaveAttribute('y', '0')
+    expect(rect).toHaveAttribute('width', String(layout.labelWidth))
+    expect(rect).toHaveAttribute('height', String(layout.height))
+  })
 
   it('moves the task tab stop with arrow keys', async () => {
     const { container } = render(Gantt, { props: { data, selectable: true } })

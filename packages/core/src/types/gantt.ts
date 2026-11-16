@@ -1,4 +1,4 @@
-import type { BaseChartProps, ChartInteractionProps } from './chart'
+import type { BaseChartProps, ChartInteractionProps, ChartPadding } from './chart'
 
 export type GanttDateValue = Date | string | number
 
@@ -64,4 +64,10 @@ export interface GanttProps
   colors?: string[]
   selectedId?: string | number | null
   ariaLabel?: string
+
+  /**
+   * Chart padding. A number applies to every side.
+   * @default 24
+   */
+  padding?: ChartPadding
 }

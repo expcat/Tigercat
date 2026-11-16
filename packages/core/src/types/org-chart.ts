@@ -1,4 +1,4 @@
-import type { BaseChartProps, ChartInteractionProps } from './chart'
+import type { BaseChartProps, ChartInteractionProps, ChartPadding } from './chart'
 
 export interface OrgChartNode {
   id: string | number
@@ -41,4 +41,10 @@ export interface OrgChartProps
   colors?: string[]
   selectedId?: string | number | null
   ariaLabel?: string
+
+  /**
+   * Chart padding. A number applies to every side.
+   * @default 24
+   */
+  padding?: ChartPadding
 }

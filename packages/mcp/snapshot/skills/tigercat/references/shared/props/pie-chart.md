@@ -41,10 +41,10 @@ Note: `innerRadiusRatio` 做环形（0.6 为甜甜圈）。`centerValue`/`center
 - `shadow?`: `boolean`; default `false`. Enable drop shadow on slices
 - `gradient?`: `boolean`; default `false`. Fill slices with a vertical alpha gradient in pie user space.
 - `animated?`: `boolean`; default `false`. Entrance animation on the pie SVG host (not the legend).
+- `responsive?`: `boolean`; default `true`. Whether the SVG should observe its container and resize responsively.
+- `padding?`: `ChartPadding`; default `24`. Chart padding. A number applies to every side.
 - `width?`: `number`; default `320`. Chart width
 - `height?`: `number`; default `200`. Chart height
-- `padding?`: `ChartPadding`; default `{ top: 24, right: 24, bottom: 52, left: 52 }`. Chart padding. Default leaves room for ChartAxis labels (`labelOffset` 28 + tick + dy).
-- `responsive?`: `boolean`; default `false`. Whether the SVG should observe its container and resize responsively.
 - `title?`: `string`; default `-`. Accessible title for the SVG
 - `desc?`: `string`; default `-`. Accessible description for the SVG
 - `className?`: `string`; default `-`. Additional CSS classes

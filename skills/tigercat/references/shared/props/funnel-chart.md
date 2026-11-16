@@ -13,12 +13,12 @@ description: Compact generated Tigercat Charts props reference
 
 `packages/core/src/types/chart-visualization.ts` · `FunnelChartProps` · 4/28 compact props · [Complete props](#remaining-props-complete-public-api)
 
-| Prop        | Type                 | Default | Notes                                                                    |
-| ----------- | -------------------- | ------- | ------------------------------------------------------------------------ |
-| `data`      | `FunnelChartDatum[]` | `-`     | Data items — ordered from widest to narrowest                            |
-| `gap?`      | `number`             | `2`     | Gap between funnel segments in px                                        |
-| `pinch?`    | `boolean`            | `false` | Whether the last segment tapers to a point                               |
-| `gradient?` | `boolean`            | `false` | Render each segment with a vertical alpha gradient in funnel user space. |
+| Prop        | Type                 | Default | Notes                                                       |
+| ----------- | -------------------- | ------- | ----------------------------------------------------------- |
+| `data`      | `FunnelChartDatum[]` | `-`     | Data items — ordered from widest to narrowest               |
+| `gap?`      | `number`             | `2`     | Gap between funnel segments in px                           |
+| `pinch?`    | `boolean`            | `false` | Whether the last segment tapers to a point                  |
+| `gradient?` | `boolean`            | `false` | Alpha gradient along the funnel direction (沿漏斗方向渐变). |
 
 ### Remaining props (complete public API)
 
@@ -27,9 +27,9 @@ description: Compact generated Tigercat Charts props reference
 - `colors?`: `string[]`; default `-`. Palette of colors
 - `showLabels?`: `boolean`; default `true`. Draw stage name, value and conversion percentage relative to the first stage.
 - `tooltipFormatter?`: `(datum: FunnelChartDatum, index: number) => string`; default `-`. Tooltip formatter. The default names conversion rates relative to the first and previou...
+- `responsive?`: `boolean`; default `true`. Whether the SVG should observe its container and resize responsively.
+- `padding?`: `ChartPadding`; default `24`. Chart padding. A number applies to every side.
 - `width?`: `number`; default `320`. Chart width
-- `padding?`: `ChartPadding`; default `{ top: 24, right: 24, bottom: 52, left: 52 }`. Chart padding. Default leaves room for ChartAxis labels (`labelOffset` 28 + tick + dy).
-- `responsive?`: `boolean`; default `false`. Whether the SVG should observe its container and resize responsively.
 - `title?`: `string`; default `-`. Accessible title for the SVG
 - `desc?`: `string`; default `-`. Accessible description for the SVG
 - `className?`: `string`; default `-`. Additional CSS classes

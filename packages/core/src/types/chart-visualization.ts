@@ -61,7 +61,7 @@ export interface FunnelChartProps
   colors?: string[]
 
   /**
-   * Render each segment with a vertical alpha gradient in funnel user space.
+   * Alpha gradient along the funnel direction (沿漏斗方向渐变).
    * @default false
    */
   gradient?: boolean
@@ -77,6 +77,18 @@ export interface FunnelChartProps
    * and previous stages; percentages are rounded to match the stage labels.
    */
   tooltipFormatter?: (datum: FunnelChartDatum, index: number) => string
+
+  /**
+   * Whether the SVG should observe its container and resize responsively.
+   * @default true
+   */
+  responsive?: boolean
+
+  /**
+   * Chart padding. A number applies to every side.
+   * @default 24
+   */
+  padding?: ChartPadding
 }
 
 // -------------------------------------------------------------------
@@ -208,6 +220,12 @@ export interface HeatmapChartProps
    * @default 1000
    */
   canvasThreshold?: number
+
+  /**
+   * Whether the SVG should observe its container and resize responsively.
+   * @default true
+   */
+  responsive?: boolean
 }
 
 // -------------------------------------------------------------------
@@ -289,6 +307,12 @@ export interface TreeMapChartProps
    * Tooltip formatter. Receives the node's original datum and layout index.
    */
   tooltipFormatter?: (datum: TreeMapChartDatum, index: number) => string
+
+  /**
+   * Whether the SVG should observe its container and resize responsively.
+   * @default true
+   */
+  responsive?: boolean
 }
 
 // -------------------------------------------------------------------
@@ -359,6 +383,12 @@ export interface SunburstChartProps
    * Tooltip formatter. Receives the arc's original datum and layout index.
    */
   tooltipFormatter?: (datum: SunburstChartDatum, index: number) => string
+
+  /**
+   * Whether the SVG should observe its container and resize responsively.
+   * @default true
+   */
+  responsive?: boolean
 }
 
 export type WaterfallKind = 'increase' | 'decrease' | 'total'
