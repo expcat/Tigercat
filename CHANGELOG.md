@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Tag 关闭回调与名称边界（Core / React / Vue / 文档 / MCP，C031-F01、C031-F02）**：两端关闭时通知一次 `onOpenChange(false)`（Vue 为 `open-change`），保留 close，由父级回写 open 或卸载。Core 注释与生成笔记明确子组件内部文字不进入默认关闭名，此时须显式传 `closeAriaLabel`。
+
 - **Statistic SSR、精度与零节点（Core / React / Vue，C030-F01、C030-F02、C030-F03）**：两端动画初值使用目标值，SSR 与首次客户端渲染一致，挂载后启动动画。Core 按科学计数法的尾数与指数推断小数位。React 保留 title / prefix / suffix 的数字 0，空值与 false 仍省略。
 
 - **SplitButton Fragment 与首次键盘焦点（Core / React / Vue，C029-F01、C029-F04）**：React 递归分类 Fragment 中的菜单，保留独立 trigger，主按钮内不再嵌入菜单项。双端 Dropdown 的键盘落项使用共享焦点标识补齐首帧焦点环，指针交互或失焦后清除，指针打开不添加标识。

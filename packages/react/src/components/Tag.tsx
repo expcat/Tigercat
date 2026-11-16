@@ -72,6 +72,7 @@ export const Tag = forwardRef<HTMLSpanElement, TagProps>(function Tag(
     closable = false,
     closeAriaLabel,
     open,
+    onOpenChange,
     pill = false,
     onClose,
     children,
@@ -107,6 +108,7 @@ export const Tag = forwardRef<HTMLSpanElement, TagProps>(function Tag(
   const handleClose = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation()
     onClose?.(event)
+    onOpenChange?.(false)
   }
 
   const visibleLabel = visibleTagText(children)

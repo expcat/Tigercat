@@ -5,6 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { defineComponent, h, ref } from 'vue'
 import { render, screen, fireEvent } from '@testing-library/vue'
+import userEvent from '@testing-library/user-event'
 import { Tag } from '@expcat/tigercat-vue/Tag'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
@@ -108,6 +109,40 @@ describe('Tag', () => {
     expect(screen.getByText('Beta')).toBeInTheDocument()
   })
 
+  it.each(['{Enter}', ' '])('requests a controlled close once with %s', async (key) => {
+    const user = userEvent.setup()
+    const onClose = vi.fn()
+    const onOpenChange = vi.fn()
+    const Host = defineComponent({
+      setup() {
+        const open = ref(true)
+        return () =>
+          h(
+            Tag,
+            {
+              closable: true,
+              open: open.value,
+              onClose,
+              onOpenChange: (next: boolean) => {
+                onOpenChange(next)
+                open.value = next
+              }
+            },
+            { default: () => 'Alpha' }
+          )
+      }
+    })
+
+    render(Host)
+    await user.tab()
+    expect(screen.getByRole('button', { name: 'Close Alpha' })).toHaveFocus()
+    await user.keyboard(key)
+    expect(onClose).toHaveBeenCalledTimes(1)
+    expect(onOpenChange).toHaveBeenCalledTimes(1)
+    expect(onOpenChange).toHaveBeenCalledWith(false)
+    expect(screen.queryByText('Alpha')).not.toBeInTheDocument()
+  })
+
   it('stops propagation when close button is clicked', async () => {
     const onTagClick = vi.fn()
 
@@ -144,12 +179,13 @@ describe('Tag', () => {
     expect(screen.getByRole('button', { name: '關閉標籤' })).toBeInTheDocument()
   })
 
-  it('renders custom closeAriaLabel on close button', () => {
+  it('renders custom closeAriaLabel for component content', () => {
+    const Label = () => h('strong', 'Alpha')
     render(Tag, {
-      props: { closable: true, closeAriaLabel: 'Remove' },
-      slots: { default: 'Tag' }
+      props: { closable: true, closeAriaLabel: 'Remove Alpha' },
+      slots: { default: () => h(Label) }
     })
 
-    expect(screen.getByRole('button', { name: 'Remove' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Remove Alpha' })).toBeInTheDocument()
   })
 })

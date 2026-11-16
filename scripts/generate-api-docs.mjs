@@ -508,7 +508,7 @@ const COMPONENT_USAGE_NOTES = {
   },
   Tag: {
     notes:
-      '默认不是 live region。`closable` 只发 close；组件不自己藏，父级卸载或 `open={false}`。关闭按钮可用 Tab + Enter / Space，关闭名走 locale。`pill` 全圆角。'
+      '默认不是 live region。`closable` 发 close 与 `onOpenChange(false)`（Vue 为 `open-change`）；组件不自己藏，父级卸载或 `open={false}`。关闭按钮可用 Tab + Enter / Space，关闭名走 locale。子组件内部渲染的文字不进入默认关闭名，须显式传 `closeAriaLabel`。`pill` 全圆角。'
   },
   Space: {
     notes: '`wrap` 只在窄容器里折行。Vue 声明 `className`，不会盖掉基类。'

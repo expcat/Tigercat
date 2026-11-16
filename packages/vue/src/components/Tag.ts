@@ -94,7 +94,7 @@ export const Tag = defineComponent({
 
     /**
      * Accessible label for the close button (when `closable` is true).
-     * Defaults to ConfigProvider locale `status.tagCloseAriaLabel`.
+     * Text rendered inside child components requires an explicit label.
      */
     closeAriaLabel: {
       type: String,
@@ -134,7 +134,7 @@ export const Tag = defineComponent({
       default: undefined
     }
   },
-  emits: ['close'],
+  emits: ['close', 'openChange'],
   setup(props, { slots, emit, attrs }) {
     const config = useTigerConfig()
     const labels = computed(() =>
@@ -159,6 +159,7 @@ export const Tag = defineComponent({
     const handleClose = (event: MouseEvent) => {
       event.stopPropagation()
       emit('close', event)
+      emit('openChange', false)
     }
 
     const visibleText = (nodes: unknown): string => {

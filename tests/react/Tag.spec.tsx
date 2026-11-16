@@ -86,6 +86,37 @@ describe('Tag', () => {
     expect(screen.getByText('Beta')).toBeInTheDocument()
   })
 
+  it.each(['{Enter}', ' '])('requests a controlled close once with %s', async (key) => {
+    const user = userEvent.setup()
+    const onClose = vi.fn()
+    const onOpenChange = vi.fn()
+
+    function Host() {
+      const [open, setOpen] = useState(true)
+      return (
+        <Tag
+          closable
+          open={open}
+          onClose={onClose}
+          onOpenChange={(next) => {
+            onOpenChange(next)
+            setOpen(next)
+          }}>
+          Alpha
+        </Tag>
+      )
+    }
+
+    render(<Host />)
+    await user.tab()
+    expect(screen.getByRole('button', { name: 'Close Alpha' })).toHaveFocus()
+    await user.keyboard(key)
+    expect(onClose).toHaveBeenCalledTimes(1)
+    expect(onOpenChange).toHaveBeenCalledTimes(1)
+    expect(onOpenChange).toHaveBeenCalledWith(false)
+    expect(screen.queryByText('Alpha')).not.toBeInTheDocument()
+  })
+
   it('stops propagation when close button is clicked', async () => {
     const user = userEvent.setup()
     const onWrapperClick = vi.fn()
@@ -116,14 +147,15 @@ describe('Tag', () => {
     expect(screen.getByRole('button', { name: '關閉標籤' })).toBeInTheDocument()
   })
 
-  it('renders custom closeAriaLabel on close button', () => {
+  it('renders custom closeAriaLabel for component content', () => {
+    const Label = () => <strong>Alpha</strong>
     render(
-      <Tag closable closeAriaLabel="Remove">
-        Tag
+      <Tag closable closeAriaLabel="Remove Alpha">
+        <Label />
       </Tag>
     )
 
-    expect(screen.getByRole('button', { name: 'Remove' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Remove Alpha' })).toBeInTheDocument()
   })
 
   it('applies a pill shape when requested', () => {

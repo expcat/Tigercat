@@ -44,12 +44,14 @@ export interface TagProps {
   /**
    * Accessible label for the close button (when `closable` is true).
    * Defaults to the tag text plus `status.tagCloseAriaLabel`.
+   * Text rendered inside child components is not included in the default name;
+   * provide `closeAriaLabel` explicitly for such content.
    */
   closeAriaLabel?: string
 
   /**
    * When `false`, the tag is not rendered. Omitted / `true` keeps it shown.
-   * Closing emits one event; the parent unmounts the tag.
+   * Closing requests `onOpenChange(false)`; the parent controls visibility.
    */
   open?: boolean
   onOpenChange?: (open: boolean) => void
