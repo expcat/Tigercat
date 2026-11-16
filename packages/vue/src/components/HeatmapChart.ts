@@ -21,6 +21,8 @@ import {
   nextHeatmapCellIndex,
   getChartLabels,
   mergeTigerLocale,
+  resolveChartWritingDirection,
+  readPageWritingDirection,
   DEFAULT_HEATMAP_WIDTH,
   DEFAULT_HEATMAP_HEIGHT,
   DEFAULT_HEATMAP_PADDING,
@@ -106,6 +108,9 @@ export const HeatmapChart = defineComponent({
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getChartLabels(mergedLocale.value, props.labels))
+    const direction = computed(() =>
+      resolveChartWritingDirection(config.value.direction, readPageWritingDirection())
+    )
     const interactive = computed(
       () => props.hoverable || props.selectable || typeof props.onCellClick === 'function'
     )
@@ -127,7 +132,8 @@ export const HeatmapChart = defineComponent({
         maxColor: props.maxColor,
         colorSpace: props.colorSpace,
         min: props.min,
-        max: props.max
+        max: props.max,
+        direction: direction.value
       })
     )
     const cells = computed(() => layout.value.cells)
@@ -293,6 +299,7 @@ export const HeatmapChart = defineComponent({
           responsive: props.responsive,
           title: props.title,
           desc: props.desc,
+          'aria-label': props.title ? undefined : labels.value.heatmapChartAriaLabel,
           onResolvedSizeChange
         },
         {
@@ -318,7 +325,7 @@ export const HeatmapChart = defineComponent({
                   x: label.x,
                   y: label.y,
                   class: chartAxisTickTextClasses,
-                  'text-anchor': 'end',
+                  'text-anchor': direction.value === 'rtl' ? 'start' : 'end',
                   'dominant-baseline': 'middle'
                 },
                 label.text

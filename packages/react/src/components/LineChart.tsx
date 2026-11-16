@@ -361,6 +361,7 @@ export const LineChart: React.FC<LineChartProps> = ({
       responsive={responsive}
       title={title}
       desc={desc}
+      aria-label={title ? undefined : labels.lineChartAriaLabel}
       onResolvedSizeChange={onResolvedSizeChange}>
       {(seriesData.some((sd) => sd.showArea) || strokeGradient || pointGradient) && (
         <defs>

@@ -268,9 +268,10 @@ export function computeGaugeTicks(
   const safeMax = safeNumber(max, safeMin)
   const safeStart = safeNumber(startAngle)
   const safeEnd = safeNumber(endAngle, safeStart)
-  for (let i = 0; i <= safeTickCount; i++) {
-    const ratio = i / safeTickCount
-    const val = safeMax <= safeMin ? safeMin : safeMin + ratio * (safeMax - safeMin)
+  const intervals = safeMax <= safeMin ? 0 : safeTickCount
+  for (let i = 0; i <= intervals; i++) {
+    const ratio = intervals === 0 ? 0 : i / intervals
+    const val = intervals === 0 ? safeMin : safeMin + ratio * (safeMax - safeMin)
     const angle = safeStart + ratio * (safeEnd - safeStart)
     const rad = degToRad(angle - 90)
     const innerRadius = Math.max(0, safeRadius - 8)

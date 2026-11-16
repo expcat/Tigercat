@@ -152,6 +152,13 @@ describe('computeGaugeTicks', () => {
     expect(ticks.every((tick) => Number.isFinite(tick.x1) && Number.isFinite(tick.y1))).toBe(true)
   })
 
+  it('keeps a single tick when min is not below max', () => {
+    const ticks = computeGaugeTicks(100, 100, 80, 100, 0, -135, 135, 4)
+    expect(ticks).toHaveLength(1)
+    expect(ticks[0].value).toBe(100)
+    expect(ticks[0].label).toBe('100')
+  })
+
   it('clamps invalid geometry instead of emitting NaN path coordinates', () => {
     const arc = createGaugeArcPath(100, 100, -80, 0, 180, 200)
     const needle = createGaugeNeedlePath(100, 100, Number.NaN, 90)

@@ -4,6 +4,14 @@
 
 ## v3.0.1（未发布）
 
+- **仪表非法区间（Core / React / Vue，C148-F03）**：min 不小于 max 时只画一个刻度。min 100、max 0、tickCount 4 时刻度标签只有 100，aria-valuemin 不大于 aria-valuemax。
+- **仪表装饰节点（Vue，C148-F04）**：轨道、弧、刻度、针、圆心和文字都带 aria-hidden="true"，DOM 与 SSR 字符串一致。
+- **仪表分段渐变（React / Vue，C148-F05）**：segments 存在时 value 弧使用纯色，不再引用 url(# 渐变。注释里的 Ignored when segments is set 保持不变。
+- **热力图行标签方向（React / Vue，C149-F04）**：ConfigProvider dir 为 rtl 时，行标签在绘图区右侧且 text-anchor 为 start，列仍从左到右。
+- **热力图默认名称（React / Vue，C149-F05）**：不传 title 时使用 heatmapChartAriaLabel。zh-CN 下 SVG 的可访问名称是「热力图」。
+- **热力图空格颜色（Core，C149-F06）**：缺数据格子的 fill 改为 var(--tiger-surface-muted)，暗色跟随该 token。canvas 只在变量没有计算出颜色时回落到 #f3f4f6。
+- **折线图默认名称（React / Vue，C150-F02）**：不传 title 时使用 lineChartAriaLabel。zh-CN 下 svg 的 aria-label 是「折线图」，SSR 字符串里也有。
+
 - **图表 responsive 默认说明（Core / 文档 / MCP，C138-F02）**：Area、Bar、Funnel、Gauge、Heatmap、Line、Pie、Radar、Scatter、Sunburst、TreeMap 的 responsive 注释与生成表改为默认 true，与两端省略该 prop 时的行为一致。共享 BaseChartProps 仍是 false。
 - **坐标轴 aria-hidden（React，C140-F01）**：ChartAxis 根节点保留调用方传入的 aria-hidden；未传时根上没有该属性。
 - **画布初始尺寸（Vue，C141-F04）**：ChartCanvas 在 width 与 height 都为 0 时，挂载后发出一次 resolved-size-change，尺寸为 320×200。

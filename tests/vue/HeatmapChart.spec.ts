@@ -261,4 +261,33 @@ describe('HeatmapChart', () => {
     await fireEvent.mouseEnter(container.querySelector('[data-heatmap-cell]')!)
     expect(document.body.querySelector('[role="tooltip"]')?.textContent).toContain('A × One：1')
   })
+
+  it('places row labels on the inline-end side when direction is rtl', () => {
+    const { container } = render({
+      render: () =>
+        h(ConfigProvider, { dir: 'rtl' }, () =>
+          h(HeatmapChart, { ...defaultProps, responsive: false })
+        )
+    })
+    const label = (text: string) =>
+      [...container.querySelectorAll('text')].find((node) => node.textContent === text)
+    const row = label('One')
+    const leftColumn = label('A')
+    const rightColumn = label('B')
+    expect(row).toHaveAttribute('text-anchor', 'start')
+    expect(Number(row?.getAttribute('x'))).toBeGreaterThan(Number(rightColumn?.getAttribute('x')))
+    expect(Number(leftColumn?.getAttribute('x'))).toBeLessThan(
+      Number(rightColumn?.getAttribute('x'))
+    )
+  })
+
+  it('names an untitled heatmap from the zh-CN locale', () => {
+    const { container } = render({
+      render: () =>
+        h(ConfigProvider, { locale: zhCN }, () =>
+          h(HeatmapChart, { ...defaultProps, responsive: false })
+        )
+    })
+    expect(container.querySelector('svg')).toHaveAttribute('aria-label', '热力图')
+  })
 })

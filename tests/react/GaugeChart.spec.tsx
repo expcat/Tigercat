@@ -97,4 +97,38 @@ describe('GaugeChart (React)', () => {
     expect(meter).toHaveAttribute('aria-valuetext', `${expected}`)
     expect(container.querySelector('text')?.textContent).toBe(`${expected}`)
   })
+
+  it('keeps one tick label and an ordered meter range when min exceeds max', () => {
+    const { container } = renderWithProps(GaugeChart, {
+      value: 40,
+      min: 100,
+      max: 0,
+      tickCount: 4,
+      ...defaultSize
+    })
+    const tickLabels = [...container.querySelectorAll('text')].filter((node) =>
+      (node.getAttribute('style') || '').includes('10px')
+    )
+    expect(tickLabels).toHaveLength(1)
+    expect(tickLabels[0].textContent).toBe('100')
+    const meter = container.querySelector('[role="meter"]')
+    expect(Number(meter?.getAttribute('aria-valuemin'))).toBeLessThanOrEqual(
+      Number(meter?.getAttribute('aria-valuemax'))
+    )
+  })
+
+  it('does not paint the value arc with a gradient when segments cover the gauge', () => {
+    const { container } = renderWithProps(GaugeChart, {
+      value: 72,
+      gradient: true,
+      segments: [{ range: [0, 100], color: '#ccc' }],
+      ...defaultSize
+    })
+    const valueArc = [...container.querySelectorAll('path')].find((path) => {
+      const fill = path.getAttribute('fill') || ''
+      return fill !== 'var(--tiger-border)' && fill !== '#ccc'
+    })
+    expect(valueArc).toBeTruthy()
+    expect(valueArc?.getAttribute('fill')?.startsWith('url(#')).toBe(false)
+  })
 })

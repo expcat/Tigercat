@@ -4,8 +4,11 @@
 
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import React from 'react'
-import { act, fireEvent, waitFor } from '@testing-library/react'
+import { renderToString } from 'react-dom/server'
+import { act, fireEvent, render, waitFor } from '@testing-library/react'
 import { LineChart } from '@expcat/tigercat-react/LineChart'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { renderWithProps, expectNoA11yViolations } from '../utils/render-helpers-react'
 import { MockResizeObserver } from '../utils/mock-observers'
 import { installFrameScheduler } from '../utils/frame-scheduler'
@@ -344,5 +347,21 @@ describe('LineChart', () => {
     expect(onClick).not.toHaveBeenCalled()
     expect(hidden).toHaveAttribute('pointer-events', 'none')
     expect(hidden).not.toHaveAttribute('tabindex')
+  })
+
+  it('names an untitled line chart from the zh-CN locale, including SSR', () => {
+    const props = { data: basicData, ...defaultSize, responsive: false }
+    const { container } = render(
+      <ConfigProvider locale={zhCN}>
+        <LineChart {...props} />
+      </ConfigProvider>
+    )
+    expect(container.querySelector('svg')).toHaveAttribute('aria-label', '折线图')
+    const html = renderToString(
+      <ConfigProvider locale={zhCN}>
+        <LineChart {...props} />
+      </ConfigProvider>
+    )
+    expect(html).toContain('aria-label="折线图"')
   })
 })

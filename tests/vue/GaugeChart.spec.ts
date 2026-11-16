@@ -3,6 +3,8 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
+import { createSSRApp, h } from 'vue'
+import { renderToString } from '@vue/server-renderer'
 import { GaugeChart } from '@expcat/tigercat-vue/GaugeChart'
 import { renderWithProps, expectNoA11yViolations } from '../utils'
 import { render } from '@testing-library/vue'
@@ -106,5 +108,55 @@ describe('GaugeChart (Vue)', () => {
     expect(meter).toHaveAttribute('aria-valuenow', `${expected}`)
     expect(meter).toHaveAttribute('aria-valuetext', `${expected}`)
     expect(container.querySelector('text')?.textContent).toBe(`${expected}`)
+  })
+
+  it('keeps one tick label and an ordered meter range when min exceeds max', () => {
+    const { container } = renderWithProps(GaugeChart, {
+      value: 40,
+      min: 100,
+      max: 0,
+      tickCount: 4,
+      ...defaultSize
+    })
+    const tickLabels = [...container.querySelectorAll('text')].filter((node) =>
+      (node.getAttribute('style') || '').includes('10px')
+    )
+    expect(tickLabels).toHaveLength(1)
+    expect(tickLabels[0].textContent).toBe('100')
+    const meter = container.querySelector('[role="meter"]')
+    expect(Number(meter?.getAttribute('aria-valuemin'))).toBeLessThanOrEqual(
+      Number(meter?.getAttribute('aria-valuemax'))
+    )
+  })
+
+  it('hides decorative gauge marks from the accessibility tree in the DOM and SSR', async () => {
+    const props = { value: 50, ...defaultSize }
+    const { container } = renderWithProps(GaugeChart, props)
+    const html = await renderToString(createSSRApp({ render: () => h(GaugeChart, props) }))
+    const ssr = document.createElement('div')
+    ssr.innerHTML = html
+    expect(html).toContain('aria-hidden="true"')
+    for (const root of [container, ssr]) {
+      const marks = root.querySelectorAll('svg path, svg line, svg circle, svg text')
+      expect(marks.length).toBeGreaterThan(0)
+      for (const mark of marks) {
+        expect(mark.getAttribute('aria-hidden')).toBe('true')
+      }
+    }
+  })
+
+  it('does not paint the value arc with a gradient when segments cover the gauge', () => {
+    const { container } = renderWithProps(GaugeChart, {
+      value: 72,
+      gradient: true,
+      segments: [{ range: [0, 100], color: '#ccc' }],
+      ...defaultSize
+    })
+    const valueArc = [...container.querySelectorAll('path')].find((path) => {
+      const fill = path.getAttribute('fill') || ''
+      return fill !== 'var(--tiger-border)' && fill !== '#ccc'
+    })
+    expect(valueArc).toBeTruthy()
+    expect(valueArc?.getAttribute('fill')?.startsWith('url(#')).toBe(false)
   })
 })

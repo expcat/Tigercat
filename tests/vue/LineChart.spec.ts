@@ -3,9 +3,12 @@
  */
 
 import { describe, it, expect, vi, afterEach } from 'vitest'
-import { nextTick } from 'vue'
-import { fireEvent, waitFor } from '@testing-library/vue'
+import { createSSRApp, h, nextTick } from 'vue'
+import { renderToString } from '@vue/server-renderer'
+import { fireEvent, render, waitFor } from '@testing-library/vue'
 import { LineChart } from '@expcat/tigercat-vue/LineChart'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { renderWithProps, expectNoA11yViolations } from '../utils'
 import { MockResizeObserver } from '../utils/mock-observers'
 import { installFrameScheduler } from '../utils/frame-scheduler'
@@ -332,5 +335,19 @@ describe('LineChart', () => {
     expect(onClick).not.toHaveBeenCalled()
     expect(hidden).toHaveAttribute('pointer-events', 'none')
     expect(hidden).not.toHaveAttribute('tabindex')
+  })
+
+  it('names an untitled line chart from the zh-CN locale, including SSR', async () => {
+    const props = { data: basicData, ...defaultSize, responsive: false }
+    const { container } = render({
+      render: () => h(ConfigProvider, { locale: zhCN }, () => h(LineChart, props))
+    })
+    expect(container.querySelector('svg')).toHaveAttribute('aria-label', '折线图')
+    const html = await renderToString(
+      createSSRApp({
+        render: () => h(ConfigProvider, { locale: zhCN }, () => h(LineChart, props))
+      })
+    )
+    expect(html).toContain('aria-label="折线图"')
   })
 })

@@ -19,7 +19,7 @@ export const DEFAULT_HEATMAP_MIN_COLOR = '#f0f9ff'
 export const DEFAULT_HEATMAP_MAX_COLOR = '#2563eb'
 export const DEFAULT_HEATMAP_CELL_RADIUS = 2
 export const DEFAULT_HEATMAP_CELL_GAP = 1
-export const DEFAULT_HEATMAP_EMPTY_FILL = '#f3f4f6'
+export const DEFAULT_HEATMAP_EMPTY_FILL = 'var(--tiger-surface-muted)'
 export const DEFAULT_HEATMAP_CANVAS_THRESHOLD = 1000
 
 export const heatmapCellTransitionClasses =
@@ -521,6 +521,18 @@ export function paintHeatmapCanvas(
   cells: readonly HeatmapCell[],
   options: PaintHeatmapCanvasOptions
 ): void {
+  const paintColor = (fill: string): string => {
+    const variable = readCssVar(fill)
+    if (!variable) return fill
+    if (isBrowser() && typeof getComputedStyle === 'function') {
+      const resolved = getComputedStyle(document.documentElement)
+        .getPropertyValue(variable.token)
+        .trim()
+      if (resolved) return resolved
+    }
+    if (variable.fallback) return resolveChartColorHex(variable.fallback) ?? variable.fallback
+    return '#f3f4f6'
+  }
   const dpr = isFiniteNumber(options.dpr) && options.dpr > 0 ? options.dpr : 1
   const width = Math.max(0, options.width)
   const height = Math.max(0, options.height)
@@ -540,7 +552,7 @@ export function paintHeatmapCanvas(
           activeOpacity: options.activeOpacity,
           inactiveOpacity: options.inactiveOpacity
         }) ?? 1)
-    ctx.fillStyle = cell.fill
+    ctx.fillStyle = paintColor(cell.fill)
     const radius = Math.max(0, Math.min(cellRadius, cell.w / 2, cell.h / 2))
     if (radius > 0) {
       paintRoundedRect(ctx, cell.x, cell.y, cell.w, cell.h, radius)

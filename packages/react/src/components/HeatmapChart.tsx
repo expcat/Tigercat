@@ -20,6 +20,8 @@ import {
   nextHeatmapCellIndex,
   getChartLabels,
   mergeTigerLocale,
+  resolveChartWritingDirection,
+  readPageWritingDirection,
   DEFAULT_HEATMAP_WIDTH,
   DEFAULT_HEATMAP_HEIGHT,
   DEFAULT_HEATMAP_PADDING,
@@ -106,6 +108,10 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
     () => getChartLabels(mergedLocale, labelsOverride),
     [mergedLocale, labelsOverride]
   )
+  const direction = useMemo(
+    () => resolveChartWritingDirection(config.direction, readPageWritingDirection()),
+    [config.direction]
+  )
   const interactive = hoverable || selectable || Boolean(onCellClick)
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const { innerRect, onResolvedSizeChange } = useResponsiveChartSize(
@@ -126,7 +132,8 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
         maxColor,
         colorSpace,
         min,
-        max
+        max,
+        direction
       }),
     [
       data,
@@ -139,7 +146,8 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
       maxColor,
       colorSpace,
       min,
-      max
+      max,
+      direction
     ]
   )
   const cells = layout.cells
@@ -291,6 +299,7 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
       responsive={responsive}
       title={title}
       desc={desc}
+      aria-label={title ? undefined : labels.heatmapChartAriaLabel}
       onResolvedSizeChange={onResolvedSizeChange}>
       {layout.xAxisLabels.map((label, i) => (
         <text
@@ -308,7 +317,7 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
           x={label.x}
           y={label.y}
           className={chartAxisTickTextClasses}
-          textAnchor="end"
+          textAnchor={direction === 'rtl' ? 'start' : 'end'}
           dominantBaseline="middle">
           {label.text}
         </text>

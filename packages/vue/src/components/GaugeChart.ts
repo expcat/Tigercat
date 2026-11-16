@@ -168,8 +168,8 @@ export const GaugeChart = defineComponent({
           }),
           role: 'meter',
           'aria-valuenow': Number.isFinite(props.value) ? geometry.value.value : undefined,
-          'aria-valuemin': props.min,
-          'aria-valuemax': props.max,
+          'aria-valuemin': Math.min(props.min, props.max),
+          'aria-valuemax': Math.max(props.min, props.max),
           'aria-valuetext': formattedValue.value,
           'aria-label': props.label ?? props.title ?? formattedValue.value,
           onMousemove: (e: MouseEvent) => {
@@ -195,7 +195,7 @@ export const GaugeChart = defineComponent({
             },
             {
               default: () => [
-                props.gradient && valuePath.value
+                props.gradient && !(props.segments && props.segments.length > 0) && valuePath.value
                   ? h('defs', null, [
                       h(
                         'linearGradient',
@@ -222,20 +222,30 @@ export const GaugeChart = defineComponent({
                       )
                     ])
                   : null,
-                h('path', { d: geo.trackPath, fill: props.trackColor, 'stroke-width': 0 }),
+                h('path', {
+                  d: geo.trackPath,
+                  fill: props.trackColor,
+                  'stroke-width': 0,
+                  'aria-hidden': 'true'
+                }),
                 ...geo.segmentPaths.map((seg, index) =>
                   h('path', {
                     key: `seg-${index}`,
                     d: seg.path,
                     fill: seg.color,
-                    'stroke-width': 0
+                    'stroke-width': 0,
+                    'aria-hidden': 'true'
                   })
                 ),
                 valuePath.value
                   ? h('path', {
                       d: valuePath.value,
-                      fill: props.gradient ? `url(#${valueGradientId})` : props.color,
-                      'stroke-width': 0
+                      fill:
+                        props.gradient && !(props.segments && props.segments.length > 0)
+                          ? `url(#${valueGradientId})`
+                          : props.color,
+                      'stroke-width': 0,
+                      'aria-hidden': 'true'
                     })
                   : null,
                 ...geo.ticks.flatMap((tick, index) => [
@@ -246,7 +256,8 @@ export const GaugeChart = defineComponent({
                     x2: tick.x2,
                     y2: tick.y2,
                     stroke: 'var(--tiger-text-secondary)',
-                    'stroke-width': 1
+                    'stroke-width': 1,
+                    'aria-hidden': 'true'
                   }),
                   h(
                     'text',
@@ -257,17 +268,23 @@ export const GaugeChart = defineComponent({
                       class: chartAxisTickTextClasses,
                       'text-anchor': 'middle',
                       'dominant-baseline': 'middle',
-                      style: { fontSize: '10px' }
+                      style: { fontSize: '10px' },
+                      'aria-hidden': 'true'
                     },
                     tick.label
                   )
                 ]),
-                h('path', { d: needlePath.value, fill: 'var(--tiger-text)' }),
+                h('path', {
+                  d: needlePath.value,
+                  fill: 'var(--tiger-text)',
+                  'aria-hidden': 'true'
+                }),
                 h('circle', {
                   cx: geo.cx,
                   cy: geo.cy,
                   r: 5,
-                  fill: 'var(--tiger-text)'
+                  fill: 'var(--tiger-text)',
+                  'aria-hidden': 'true'
                 }),
                 h(
                   'text',
@@ -276,7 +293,8 @@ export const GaugeChart = defineComponent({
                     y: geo.valueText.y,
                     class: 'fill-[color:var(--tiger-text)] text-lg font-semibold tabular-nums',
                     'text-anchor': 'middle',
-                    'dominant-baseline': 'middle'
+                    'dominant-baseline': 'middle',
+                    'aria-hidden': 'true'
                   },
                   formattedValue.value
                 ),
@@ -288,7 +306,8 @@ export const GaugeChart = defineComponent({
                         y: geo.labelText.y,
                         class: chartAxisTickTextClasses,
                         'text-anchor': 'middle',
-                        'dominant-baseline': 'middle'
+                        'dominant-baseline': 'middle',
+                        'aria-hidden': 'true'
                       },
                       geo.labelText.text
                     )

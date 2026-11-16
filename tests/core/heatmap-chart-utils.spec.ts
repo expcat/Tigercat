@@ -142,4 +142,16 @@ describe('heatmap chart utils', () => {
     expect(nextHeatmapCellIndex(4, 'ArrowLeft', 3, 2)).toBe(3)
     expect(nextHeatmapCellIndex(3, 'ArrowUp', 3, 2)).toBe(0)
   })
+
+  it('paints a missing cell with the muted surface token', () => {
+    const layout = layoutHeatmap([{ x: 'A', y: 'One', value: 1 }], {
+      xLabels: ['A', 'B'],
+      yLabels: ['One'],
+      width: 80,
+      height: 40
+    })
+    const empty = layout.cells.find((cell) => cell.empty)
+    expect(empty?.fill).toBe('var(--tiger-surface-muted)')
+    expect(empty?.fill).not.toBe('#f3f4f6')
+  })
 })

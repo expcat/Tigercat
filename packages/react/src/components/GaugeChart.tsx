@@ -164,6 +164,7 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
     [gradientId]
   )
   const valueGradientId = `${gradientPrefix}-value`
+  const valueUsesGradient = gradient && !(segments && segments.length > 0)
 
   return (
     <div
@@ -175,8 +176,8 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
       })}
       role="meter"
       aria-valuenow={Number.isFinite(value) ? geometry.value : undefined}
-      aria-valuemin={min}
-      aria-valuemax={max}
+      aria-valuemin={Math.min(min, max)}
+      aria-valuemax={Math.max(min, max)}
       aria-valuetext={formattedValue}
       aria-label={label ?? chartTitle ?? formattedValue}
       onMouseMove={handleTooltipMove}
@@ -190,7 +191,7 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
         desc={desc}
         aria-label={chartTitle ? undefined : labels.gaugeChartAriaLabel}
         onResolvedSizeChange={onResolvedSizeChange}>
-        {gradient && valuePath && (
+        {valueUsesGradient && valuePath && (
           <defs>
             <linearGradient
               id={valueGradientId}
@@ -217,7 +218,7 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
         {valuePath && (
           <path
             d={valuePath}
-            fill={gradient ? `url(#${valueGradientId})` : color}
+            fill={valueUsesGradient ? `url(#${valueGradientId})` : color}
             strokeWidth={0}
             aria-hidden="true"
           />

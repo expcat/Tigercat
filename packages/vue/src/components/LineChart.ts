@@ -484,6 +484,7 @@ export const LineChart = defineComponent({
           responsive: props.responsive,
           title: props.title,
           desc: props.desc,
+          'aria-label': props.title ? undefined : labels.value.lineChartAriaLabel,
           onResolvedSizeChange
         },
         {
