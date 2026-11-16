@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, PropType, useId } from 'vue'
+import { defineComponent, computed, h, PropType, useId, ref } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -90,6 +90,7 @@ export const TreeMapChart = defineComponent({
   },
   emits: ['update:hoveredIndex', 'update:selectedIndex', 'node-click', 'node-hover'],
   setup(props, { emit, attrs }) {
+    const focusedIndex = ref<number | null>(null)
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getChartLabels(mergedLocale.value, props.labels))
@@ -187,6 +188,7 @@ export const TreeMapChart = defineComponent({
         event.preventDefault()
         const nextVisual = nextChartRovingIndex(visualIndex, event.key, current.length)
         const next = current[nextVisual]
+        focusedIndex.value = next.index
         const node = (event.currentTarget as Element | null)?.parentElement?.querySelector(
           `[data-treemap-node][data-index="${next.index}"]`
         )
@@ -200,7 +202,8 @@ export const TreeMapChart = defineComponent({
     return () => {
       const current = nodes.value
       const visualActive = current.findIndex(
-        (node) => node.index === (activeIndex.value ?? resolvedHoveredIndex.value)
+        (node) =>
+          node.index === (focusedIndex.value ?? activeIndex.value ?? resolvedHoveredIndex.value)
       )
       const chart = h(
         ChartCanvas,
@@ -300,7 +303,10 @@ export const TreeMapChart = defineComponent({
                     onMouseleave: isNodeHidden(node) ? undefined : handleMouseLeave,
                     onFocus:
                       interactive.value && !isNodeHidden(node)
-                        ? (e: FocusEvent) => handleMouseEnter(node.index, e)
+                        ? (e: FocusEvent) => {
+                            focusedIndex.value = node.index
+                            handleMouseEnter(node.index, e)
+                          }
                         : undefined,
                     onClick: isNodeHidden(node) ? undefined : () => handleClick(node.index),
                     onKeydown: isNodeHidden(node)

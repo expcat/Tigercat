@@ -19,6 +19,21 @@ const basicData = [
 const defaultSize = { width: 300, height: 200 }
 
 describe('LineChart', () => {
+  it('moves the point tab stop without tooltip tracking', () => {
+    const { container } = renderWithProps(LineChart, {
+      ...defaultSize,
+      data: basicData.slice(0, 2),
+      selectable: true,
+      showTooltip: false
+    })
+    const [first, second] = container.querySelectorAll<SVGElement>('circle[data-point-index]')
+    act(() => first.focus())
+    fireEvent.keyDown(first, { key: 'ArrowRight' })
+    expect(document.activeElement).toBe(second)
+    expect(first).toHaveAttribute('tabindex', '-1')
+    expect(second).toHaveAttribute('tabindex', '0')
+  })
+
   it('renders line path', () => {
     const { container } = renderWithProps(LineChart, {
       data: basicData,

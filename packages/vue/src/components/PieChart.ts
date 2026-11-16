@@ -1,4 +1,4 @@
-import { defineComponent, computed, getCurrentInstance, h, PropType, useId } from 'vue'
+import { defineComponent, computed, getCurrentInstance, h, PropType, useId, ref } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -114,6 +114,7 @@ export const PieChart = defineComponent({
   },
   emits: ['update:hoveredIndex', 'update:selectedIndex', 'slice-click', 'slice-hover'],
   setup(props, { emit, attrs }) {
+    const focusedIndex = ref<number | null>(null)
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getChartLabels(mergedLocale.value, props.labels))
@@ -238,7 +239,8 @@ export const PieChart = defineComponent({
       const laid = slices.value
       const r = radii.value
       const visualActive = laid.findIndex(
-        (slice) => slice.index === (activeIndex.value ?? resolvedHoveredIndex.value)
+        (slice) =>
+          slice.index === (focusedIndex.value ?? activeIndex.value ?? resolvedHoveredIndex.value)
       )
       const centerParts = [props.centerValue, props.centerLabel].filter(
         (part) => part !== undefined
@@ -252,7 +254,8 @@ export const PieChart = defineComponent({
           event.preventDefault()
           const nextVisual = nextChartRovingIndex(visualIndex, event.key, laid.length)
           const next = laid[nextVisual]
-          const node = (event.currentTarget as SVGGElement).parentElement?.querySelector(
+          focusedIndex.value = next.index
+          const node = (event.currentTarget as SVGElement).ownerSVGElement?.querySelector(
             `[data-pie-slice][data-index="${next.index}"]`
           )
           if (node instanceof SVGElement) node.focus()
@@ -368,7 +371,10 @@ export const PieChart = defineComponent({
                     onMouseleave: isLegendIndexHidden(slice.index) ? undefined : handleMouseLeave,
                     onFocus:
                       interactive.value && !isLegendIndexHidden(slice.index)
-                        ? (e: FocusEvent) => handleMouseEnter(slice.index, e)
+                        ? (e: FocusEvent) => {
+                            focusedIndex.value = slice.index
+                            handleMouseEnter(slice.index, e)
+                          }
                         : undefined,
                     onClick: isLegendIndexHidden(slice.index)
                       ? undefined

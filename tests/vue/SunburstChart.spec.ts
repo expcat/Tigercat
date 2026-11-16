@@ -37,6 +37,24 @@ const pagesData = [
 ]
 
 describe('SunburstChart (Vue)', () => {
+  it.each([{ showTooltip: false }, { selectedIndex: 0 }])(
+    'moves the tab stop independently of tooltip and selection: %j',
+    async (options) => {
+      const { container } = renderWithProps(SunburstChart, {
+        ...defaultSize,
+        data: sampleData.slice(0, 2),
+        selectable: true,
+        ...options
+      })
+      const [first, second] = container.querySelectorAll<SVGElement>('[data-sunburst-arc]')
+      first.focus()
+      await fireEvent.keyDown(first, { key: 'ArrowRight' })
+      expect(document.activeElement).toBe(second)
+      expect(first).toHaveAttribute('tabindex', '-1')
+      expect(second).toHaveAttribute('tabindex', '0')
+    }
+  )
+
   it('renders SVG with arcs', () => {
     const { container } = renderWithProps(SunburstChart, { data: sampleData, ...defaultSize })
     expect(container.querySelectorAll('[data-sunburst-arc]')).toHaveLength(3)

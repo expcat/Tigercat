@@ -3,7 +3,7 @@ import { PieChart } from '@expcat/tigercat-react/PieChart'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { renderWithProps, expectNoA11yViolations } from '../utils/render-helpers-react'
-import { fireEvent, render } from '@testing-library/react'
+import { act, fireEvent, render } from '@testing-library/react'
 
 const defaultSize = { width: 240, height: 160 }
 const data = [
@@ -12,6 +12,21 @@ const data = [
 ]
 
 describe('PieChart', () => {
+  it.each([true, false])('moves slice focus and tab stop with showTooltip=%s', (showTooltip) => {
+    const { container } = renderWithProps(PieChart, {
+      data,
+      ...defaultSize,
+      selectable: true,
+      showTooltip
+    })
+    const [first, second] = container.querySelectorAll<SVGElement>('[data-pie-slice]')
+    act(() => first.focus())
+    fireEvent.keyDown(first, { key: 'ArrowRight' })
+    expect(document.activeElement).toBe(second)
+    expect(first).toHaveAttribute('tabindex', '-1')
+    expect(second).toHaveAttribute('tabindex', '0')
+  })
+
   it('renders slices', () => {
     const { container } = renderWithProps(PieChart, {
       data: [{ value: 40 }, { value: 30 }, { value: 20 }],

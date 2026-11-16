@@ -16,6 +16,24 @@ const sampleData = [
 ]
 
 describe('TreeMapChart (Vue)', () => {
+  it.each([{ showTooltip: false }, { selectedIndex: 0 }])(
+    'moves the tab stop independently of tooltip and selection: %j',
+    async (options) => {
+      const { container } = renderWithProps(TreeMapChart, {
+        ...defaultSize,
+        data: sampleData.slice(0, 2),
+        selectable: true,
+        ...options
+      })
+      const [first, second] = container.querySelectorAll<SVGElement>('[data-treemap-node]')
+      first.focus()
+      await fireEvent.keyDown(first, { key: 'ArrowRight' })
+      expect(document.activeElement).toBe(second)
+      expect(first).toHaveAttribute('tabindex', '-1')
+      expect(second).toHaveAttribute('tabindex', '0')
+    }
+  )
+
   it('renders SVG with rect nodes', () => {
     const { container } = renderWithProps(TreeMapChart, { data: sampleData, ...defaultSize })
     expect(container.querySelectorAll('[data-treemap-node]')).toHaveLength(4)

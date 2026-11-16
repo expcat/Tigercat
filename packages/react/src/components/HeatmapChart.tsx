@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   classNames,
   formatChartTimeTick,
@@ -96,6 +96,7 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
   bind,
   ...rest
 }) => {
+  const [focusedIndex, setFocusedIndex] = useState<number | null>(null)
   const config = useTigerConfig()
   const mergedLocale = useMemo(
     () => mergeTigerLocale(config.locale, locale),
@@ -191,7 +192,7 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
   })
   const shouldRenderCanvas = resolvedRenderMode === 'canvas'
   const visualActive = cells.findIndex(
-    (cell) => cell.index === (activeIndex ?? resolvedHoveredIndex)
+    (cell) => cell.index === (focusedIndex ?? activeIndex ?? resolvedHoveredIndex)
   )
 
   useEffect(() => {
@@ -269,6 +270,7 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
     if (isChartNavigationKey(event.key)) {
       event.preventDefault()
       const next = nextHeatmapCellIndex(index, event.key, layout.cols, layout.rows)
+      setFocusedIndex(next)
       if (!shouldRenderCanvas) {
         const node = event.currentTarget.parentElement?.querySelector(
           `[data-heatmap-cell][data-index="${next}"]`
@@ -349,7 +351,14 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
                 onMouseEnter={(e) => handleMouseEnter(cell.index, e)}
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
-                onFocus={interactive ? (e) => handleMouseEnter(cell.index, e) : undefined}
+                onFocus={
+                  interactive
+                    ? (e) => {
+                        setFocusedIndex(cell.index)
+                        handleMouseEnter(cell.index, e)
+                      }
+                    : undefined
+                }
                 onClick={() => handleClick(cell.index)}
                 onKeyDown={(e) => handleCellKeyDown(e, cell.index)}
               />

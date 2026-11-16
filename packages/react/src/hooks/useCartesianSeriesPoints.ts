@@ -145,6 +145,7 @@ export function useCartesianSeriesPoints<T>({
           getSeriesKeys()[next.seriesIndex],
           next.pointIndex
         )?.focus()
+        setHoveredPointInfo(next)
         return
       }
       if (event.key === 'Enter' || event.key === ' ') {

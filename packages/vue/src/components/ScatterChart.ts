@@ -158,6 +158,7 @@ export const ScatterChart = defineComponent({
   },
   emits: ['update:hoveredIndex', 'update:selectedIndex', 'point-click', 'point-hover'],
   setup(props, { emit, attrs }) {
+    const focusedIndex = ref<number | null>(null)
     const config = useTigerConfig()
     const gradientPrefix = getStableChartGradientPrefix('scatter', useId())
     const mounted = ref(false)
@@ -381,7 +382,7 @@ export const ScatterChart = defineComponent({
                           ? `${Math.min(visualIndex * SCATTER_ENTRANCE_STAGGER_MS, SCATTER_ENTRANCE_STAGGER_MAX_MS)}ms`
                           : undefined
                       const visualActive = points.value.findIndex(
-                        (item) => item.index === (activeIndex.value ?? 0)
+                        (item) => item.index === (focusedIndex.value ?? activeIndex.value ?? 0)
                       )
                       const styleStr = {
                         ...chartSeriesColorStyle(point.color),
@@ -429,9 +430,10 @@ export const ScatterChart = defineComponent({
                               points.value.length
                             )
                             const next = points.value[nextVisual]
+                            focusedIndex.value = next.index
                             const node = (
                               e.currentTarget as SVGElement
-                            ).parentElement?.querySelector(`[data-point-index="${next.index}"]`)
+                            ).ownerSVGElement?.querySelector(`[data-point-index="${next.index}"]`)
                             if (node instanceof SVGElement) node.focus()
                             handleMouseEnter(next.index, e)
                             return

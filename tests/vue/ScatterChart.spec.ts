@@ -11,6 +11,27 @@ import { renderWithProps, expectNoA11yViolations } from '../utils'
 const defaultSize = { width: 240, height: 160 }
 
 describe('ScatterChart', () => {
+  it.each(['circle', 'square'] as const)(
+    'moves %s focus and tab stop with only a click handler',
+    async (pointStyle) => {
+      const { container } = renderWithProps(ScatterChart, {
+        ...defaultSize,
+        data: [
+          { x: 10, y: 20 },
+          { x: 30, y: 40 }
+        ],
+        pointStyle,
+        onPointClick: vi.fn()
+      })
+      const [first, second] = container.querySelectorAll<SVGElement>('[data-point-index]')
+      first.focus()
+      await fireEvent.keyDown(first, { key: 'ArrowRight' })
+      expect(document.activeElement).toBe(second)
+      expect(first).toHaveAttribute('tabindex', '-1')
+      expect(second).toHaveAttribute('tabindex', '0')
+    }
+  )
+
   it('renders points', () => {
     const { container } = renderWithProps(ScatterChart, {
       data: [

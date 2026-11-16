@@ -141,6 +141,7 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
   className,
   ...rest
 }) => {
+  const [focusedIndex, setFocusedIndex] = useState<number | null>(null)
   const config = useTigerConfig()
   const gradientId = useId()
   const gradientPrefix = useMemo(
@@ -359,7 +360,9 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
             animated && mounted
               ? `${Math.min(visualIndex * SCATTER_ENTRANCE_STAGGER_MS, SCATTER_ENTRANCE_STAGGER_MAX_MS)}ms`
               : undefined
-          const visualActive = points.findIndex((item) => item.index === (activeIndex ?? 0))
+          const visualActive = points.findIndex(
+            (item) => item.index === (focusedIndex ?? activeIndex ?? 0)
+          )
           const sharedProps = {
             fill: point.fill,
             opacity: isLegendIndexHidden(point.index) ? 0 : point.opacity,
@@ -400,7 +403,8 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
                 e.preventDefault()
                 const nextVisual = nextChartRovingIndex(visualIndex, e.key, points.length)
                 const next = points[nextVisual]
-                const node = (e.currentTarget as SVGElement).parentElement?.querySelector(
+                setFocusedIndex(next.index)
+                const node = (e.currentTarget as SVGElement).ownerSVGElement?.querySelector(
                   `[data-point-index="${next.index}"]`
                 )
                 if (node instanceof SVGElement) node.focus()

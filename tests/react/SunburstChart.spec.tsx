@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { SunburstChart } from '@expcat/tigercat-react/SunburstChart'
 import { renderWithProps, expectNoA11yViolations } from '../utils/render-helpers-react'
-import { fireEvent } from '@testing-library/react'
+import { act, fireEvent } from '@testing-library/react'
 
 const defaultSize = { width: 320, height: 320 }
 const sampleData = [
@@ -32,6 +32,24 @@ const pagesData = [
 ]
 
 describe('SunburstChart (React)', () => {
+  it.each([{ showTooltip: false }, { selectedIndex: 0 }])(
+    'moves the tab stop independently of tooltip and selection: %j',
+    (options) => {
+      const { container } = renderWithProps(SunburstChart, {
+        ...defaultSize,
+        data: sampleData.slice(0, 2),
+        selectable: true,
+        ...options
+      })
+      const [first, second] = container.querySelectorAll<SVGElement>('[data-sunburst-arc]')
+      act(() => first.focus())
+      fireEvent.keyDown(first, { key: 'ArrowRight' })
+      expect(document.activeElement).toBe(second)
+      expect(first).toHaveAttribute('tabindex', '-1')
+      expect(second).toHaveAttribute('tabindex', '0')
+    }
+  )
+
   it('renders SVG with arcs', () => {
     const { container } = renderWithProps(SunburstChart, { data: sampleData, ...defaultSize })
     expect(container.querySelectorAll('[data-sunburst-arc]')).toHaveLength(3)

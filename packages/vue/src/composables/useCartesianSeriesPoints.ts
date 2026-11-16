@@ -142,6 +142,7 @@ export function useCartesianSeriesPoints<T>(options: UseCartesianSeriesPointsOpt
         next.pointIndex
       )
       node?.focus()
+      hoveredPointInfo.value = next
       return
     }
     if (event.key === 'Enter' || event.key === ' ') {

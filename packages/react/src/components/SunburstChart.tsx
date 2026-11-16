@@ -1,4 +1,4 @@
-import React, { useId, useMemo } from 'react'
+import React, { useId, useMemo, useState } from 'react'
 import {
   classNames,
   layoutSunburst,
@@ -77,6 +77,7 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
   onArcHover,
   ...rest
 }) => {
+  const [focusedIndex, setFocusedIndex] = useState<number | null>(null)
   const config = useTigerConfig()
   const mergedLocale = useMemo(
     () => mergeTigerLocale(config.locale, locale),
@@ -176,12 +177,15 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
       percent: arc.percent.toFixed(1)
     })
   }, [resolvedHoveredIndex, arcs, tooltipFormatter, labels.sunburstTooltip])
-  const visualActive = arcs.findIndex((arc) => arc.index === (activeIndex ?? resolvedHoveredIndex))
+  const visualActive = arcs.findIndex(
+    (arc) => arc.index === (focusedIndex ?? activeIndex ?? resolvedHoveredIndex)
+  )
 
   const handleArcKeyDown = (event: React.KeyboardEvent<SVGPathElement>, index: number) => {
     if (isChartNavigationKey(event.key)) {
       event.preventDefault()
       const next = nextSunburstArcIndex(index, event.key, arcs)
+      setFocusedIndex(next)
       const node = event.currentTarget.parentElement?.querySelector(
         `[data-sunburst-arc][data-index="${next}"]`
       )
@@ -265,7 +269,12 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
               onMouseMove={isArcHidden(arc) ? undefined : handleMouseMove}
               onMouseLeave={isArcHidden(arc) ? undefined : handleMouseLeave}
               onFocus={
-                interactive && !isArcHidden(arc) ? (e) => handleMouseEnter(arc.index, e) : undefined
+                interactive && !isArcHidden(arc)
+                  ? (e) => {
+                      setFocusedIndex(arc.index)
+                      handleMouseEnter(arc.index, e)
+                    }
+                  : undefined
               }
               onClick={isArcHidden(arc) ? undefined : () => handleClick(arc.index)}
               onKeyDown={isArcHidden(arc) ? undefined : (e) => handleArcKeyDown(e, arc.index)}

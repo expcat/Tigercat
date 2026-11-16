@@ -18,16 +18,15 @@ charts 组 21 个组件（C138–C158），视觉与键盘全部 blocked。很�
 ## 依赖与顺序
 
 - 先做 ChartTooltip（C145）和 AreaChart 上的共享条目（C138-F02），它们并入了 6 到 10 张图。
-- roving tabindex 一组一起做：C147-F01、C149-F01、C150-F03、C152-F01、C155-F02、C155-F03、C156-F02。共享代码在 `useCartesianSeriesPoints` 和各图的键盘处理里。
 - 默认可访问名称一组一起做：C149-F05、C150-F02、C153-F01、C155-F01、C156-F01、C157-F01，都是无 title 时没读 `*ChartAriaLabel`。
 - OrgChart 的节点全是 `tabindex=0`、方向键无效，TreeMapChart 的 `nextTreeMapNodeIndex` 没有调用方。这两处报告没有编号，见 [13](13-evidence.md) 的未立项观察。
 
 ## 概览
 
-本篇 47 条：P1 0、P2 22、P3 25。
-按波次：W6 22、W9 25。
+本篇 40 条：P1 0、P2 15、P3 25。
+按波次：W6 15、W9 25。
 
-已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C141-F01、C141-F02、C141-F03、C144-F01、C145-F01、C145-F02、C138-F01、C139-F01、C139-F02、C146-F01。
+已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C141-F01、C141-F02、C141-F03、C144-F01、C145-F01、C145-F02、C138-F01、C139-F01、C139-F02、C146-F01、C147-F01、C149-F01、C150-F03、C152-F01、C155-F02、C155-F03、C156-F02。
 
 ## 波及多个组件的条目
 
@@ -38,7 +37,6 @@ charts 组 21 个组件（C138–C158），视觉与键盘全部 blocked。很�
 | C138-F02 responsive 注释默认 false，实际 true      | AreaChart    | BarChart、FunnelChart、GaugeChart、HeatmapChart、LineChart、PieChart、RadarChart、ScatterChart、SunburstChart、TreeMapChart |
 | C145-F03 content 只有换行时仍挂载空气泡            | ChartTooltip | FunnelChart、GaugeChart、HeatmapChart、LineChart、ScatterChart、SunburstChart、TreeMapChart                                 |
 | C146-F04 padding 注释默认是坐标轴对象，运行时是 24 | FunnelChart  | Gantt、GaugeChart、OrgChart、PieChart、RadarChart                                                                           |
-| C150-F03 关提示时方向键不移动点的 roving tabindex  | LineChart    | SunburstChart、TreeMapChart                                                                                                 |
 
 ## 条目
 
@@ -98,7 +96,6 @@ charts 组 21 个组件（C138–C158），视觉与键盘全部 blocked。很�
 
 | 编号     | 级别 | 波次 | 端   | 类别 | 条目                                          | 验收                                                                                       |
 | -------- | ---- | ---- | ---- | ---- | --------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| C147-F01 | P2   | W6   | Vue  | 键盘 | Vue 任务条无 roving tabindex，方向键无效      | 两个未禁用任务、selectable 时 Vue 的 tabindex 是 0、-1，ArrowDown 后变成 -1、0             |
 | C147-F02 | P2   | W6   | Core | 行为 | maxDate 不走闭区间，最后一天宽度为 0          | 任务 01-01 到 01-05、maxDate 2026-01-05 时，1 月 5 日在轴内有非零日期宽度                  |
 | C147-F03 | P2   | W6   | 双端 | 行为 | responsive 属性被丢掉，外壳和画布各走默认     | 传 responsive={false} 时画布宿主不带 h-full；传 true 时外壳带 w-full，外壳与画布取同一个值 |
 | C147-F04 | P3   | W9   | Vue  | 样式 | Vue 任务名没有 clipPath，长标签不受标签栏限制 | 任务名超出 taskLabelWidth 时，Vue 文字带 clip-path，指向按 labelX、labelWidth 建的裁切矩形 |
@@ -122,7 +119,6 @@ charts 组 21 个组件（C138–C158），视觉与键盘全部 blocked。很�
 
 | 编号     | 级别 | 波次 | 端    | 类别   | 条目                                          | 验收                                                                                      |
 | -------- | ---- | ---- | ----- | ------ | --------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| C149-F01 | P2   | W6   | 双端  | 键盘   | 关提示时方向键不移动 roving tabindex          | 关提示只传 onCellClick，ArrowRight 后第二格 tabindex 为 0，canvas 名含 B × One: 2         |
 | C149-F02 | P2   | W6   | React | 无障碍 | React 的 SVG 模式没有 sr-only 数值表          | React 小矩阵、renderMode auto、非交互时，DOM 和 SSR 都含 data-heatmap-table 及各格数值    |
 | C149-F03 | P2   | W6   | 双端  | 无障碍 | canvas 模式只剩尺寸摘要和单格名称，格值读不到 | renderMode=canvas 的 2×2 里隐藏文本含全部 4 个格值，不只是 2 rows by 2 columns            |
 | C149-F04 | P3   | W9   | 双端  | i18n   | RTL 下行标签不跟随书写方向                    | ConfigProvider direction 为 rtl 时行标签在绘图区右侧且 text-anchor 为 start，列仍从左到右 |
@@ -133,11 +129,10 @@ charts 组 21 个组件（C138–C158），视觉与键盘全部 blocked。很�
 
 报告 `groups/charts/LineChart.md`，队列状态 needs-evidence。另受 S01、S07、C138-F02、C145-F03 影响。
 
-| 编号     | 级别 | 波次 | 端        | 类别   | 条目                                     | 验收                                                                                   |
-| -------- | ---- | ---- | --------- | ------ | ---------------------------------------- | -------------------------------------------------------------------------------------- |
-| C150-F01 | P2   | W6   | Core+双端 | 行为   | 系列级 showArea、areaOpacity 没进布局    | 仅系列写 showArea、areaOpacity 0.9 时有面积且 stop-opacity 为 0.9；系列写 false 不填充 |
-| C150-F02 | P3   | W9   | 双端      | 无障碍 | 无标题时未用 lineChartAriaLabel          | zh-CN Provider 下不传 title 时，svg 的 aria-label 是「折线图」，SSR 字符串里也有       |
-| C150-F03 | P2   | W6   | 双端      | 键盘   | 关提示时方向键不移动点的 roving tabindex | 两个点、selectable、showTooltip=false，ArrowRight 后第二点 tabindex 为 0，第一点为 -1  |
+| 编号     | 级别 | 波次 | 端        | 类别   | 条目                                  | 验收                                                                                   |
+| -------- | ---- | ---- | --------- | ------ | ------------------------------------- | -------------------------------------------------------------------------------------- |
+| C150-F01 | P2   | W6   | Core+双端 | 行为   | 系列级 showArea、areaOpacity 没进布局 | 仅系列写 showArea、areaOpacity 0.9 时有面积且 stop-opacity 为 0.9；系列写 false 不填充 |
+| C150-F02 | P3   | W9   | 双端      | 无障碍 | 无标题时未用 lineChartAriaLabel       | zh-CN Provider 下不传 title 时，svg 的 aria-label 是「折线图」，SSR 字符串里也有       |
 
 ### C151 OrgChart
 
@@ -151,10 +146,6 @@ charts 组 21 个组件（C138–C158），视觉与键盘全部 blocked。很�
 ### C152 PieChart
 
 报告 `groups/charts/PieChart.md`，队列状态 needs-evidence。另受 S01、S07、C138-F02、C146-F04 影响。
-
-| 编号     | 级别 | 波次 | 端   | 类别 | 条目                                          | 验收                                                                                        |
-| -------- | ---- | ---- | ---- | ---- | --------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| C152-F01 | P2   | W6   | 双端 | 键盘 | 方向键在当前扇区的 g 里查下一扇区，焦点不移动 | 两个正值扇区、selectable，ArrowRight 后焦点在第二扇区且其 tabindex 为 0；关指针跟踪时也一样 |
 
 ### C153 RadarChart
 
@@ -185,22 +176,19 @@ charts 组 21 个组件（C138–C158），视觉与键盘全部 blocked。很�
 | 编号     | 级别 | 波次 | 端    | 类别   | 条目                                   | 验收                                                                                      |
 | -------- | ---- | ---- | ----- | ------ | -------------------------------------- | ----------------------------------------------------------------------------------------- |
 | C155-F01 | P3   | W9   | 双端  | 无障碍 | 无 title 时 svg 没有默认可访问名称     | zh-CN 下不传 title 时 svg 的 aria-label 为「散点图」；传 title=季度 时为「季度」          |
-| C155-F02 | P2   | W6   | 双端  | 键盘   | 圆点方向键移焦点但 tabindex 不跟随     | 两个圆点只传 onPointClick，聚焦第一点按 ArrowRight 后第二点 tabindex 为 0，第一点为 -1    |
-| C155-F03 | P2   | W6   | 双端  | 键盘   | 非圆形点之间方向键不移动焦点           | 两个方点只传 onPointClick，聚焦第一点按 ArrowRight 后 document.activeElement 是第二点     |
 | C155-F04 | P3   | W9   | React | 行为   | 只传 onPointClick 时两端图例标签不一致 | showLegend 且只传 onPointClick 时两端图例项都是 DIV，点击第一点 onPointClick 仍只调用一次 |
 
 ### C156 SunburstChart
 
-报告 `groups/charts/SunburstChart.md`，队列状态 needs-evidence。另受 S01、S07、C138-F02、C145-F03、C150-F03 影响。
+报告 `groups/charts/SunburstChart.md`，队列状态 needs-evidence。另受 S01、S07、C138-F02、C145-F03 影响。
 
-| 编号     | 级别 | 波次 | 端   | 类别   | 条目                                        | 验收                                                                             |
-| -------- | ---- | ---- | ---- | ------ | ------------------------------------------- | -------------------------------------------------------------------------------- |
-| C156-F01 | P3   | W9   | 双端 | 无障碍 | 无 title 时 svg 没有默认可访问名称          | zh-CN 下不传 title 时 svg 的 aria-label 为「旭日图」；传 title=区域 时为「区域」 |
-| C156-F02 | P2   | W6   | 双端 | 键盘   | 已有选中时方向键移焦点，tabindex 留在选中弧 | selectable 且 selectedIndex=0，聚焦第一弧按 ArrowRight 后第二弧 tabindex 为 0    |
+| 编号     | 级别 | 波次 | 端   | 类别   | 条目                               | 验收                                                                             |
+| -------- | ---- | ---- | ---- | ------ | ---------------------------------- | -------------------------------------------------------------------------------- |
+| C156-F01 | P3   | W9   | 双端 | 无障碍 | 无 title 时 svg 没有默认可访问名称 | zh-CN 下不传 title 时 svg 的 aria-label 为「旭日图」；传 title=区域 时为「区域」 |
 
 ### C157 TreeMapChart
 
-报告 `groups/charts/TreeMapChart.md`，队列状态 needs-evidence。另受 S01、S02、S07、C138-F02、C145-F03、C150-F03、C156-F02 影响。
+报告 `groups/charts/TreeMapChart.md`，队列状态 needs-evidence。另受 S01、S02、S07、C138-F02、C145-F03 影响。
 
 | 编号     | 级别 | 波次 | 端   | 类别   | 条目                                   | 验收                                                                                            |
 | -------- | ---- | ---- | ---- | ------ | -------------------------------------- | ----------------------------------------------------------------------------------------------- |

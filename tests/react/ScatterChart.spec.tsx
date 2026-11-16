@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { fireEvent, waitFor } from '@testing-library/react'
+import { act, fireEvent, waitFor } from '@testing-library/react'
 import { ScatterChart } from '@expcat/tigercat-react/ScatterChart'
 import { renderWithProps, expectNoA11yViolations } from '../utils/render-helpers-react'
 import { zhCN } from '../../packages/core/src/utils/i18n/locales/zh-CN'
@@ -7,6 +7,27 @@ import { zhCN } from '../../packages/core/src/utils/i18n/locales/zh-CN'
 const defaultSize = { width: 240, height: 160 }
 
 describe('ScatterChart', () => {
+  it.each(['circle', 'square'] as const)(
+    'moves %s focus and tab stop with only a click handler',
+    (pointStyle) => {
+      const { container } = renderWithProps(ScatterChart, {
+        ...defaultSize,
+        data: [
+          { x: 10, y: 20 },
+          { x: 30, y: 40 }
+        ],
+        pointStyle,
+        onPointClick: vi.fn()
+      })
+      const [first, second] = container.querySelectorAll<SVGElement>('[data-point-index]')
+      act(() => first.focus())
+      fireEvent.keyDown(first, { key: 'ArrowRight' })
+      expect(document.activeElement).toBe(second)
+      expect(first).toHaveAttribute('tabindex', '-1')
+      expect(second).toHaveAttribute('tabindex', '0')
+    }
+  )
+
   it('renders points', () => {
     const { container } = renderWithProps(ScatterChart, {
       data: [

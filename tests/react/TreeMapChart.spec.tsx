@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { TreeMapChart } from '@expcat/tigercat-react/TreeMapChart'
 import { renderWithProps, expectNoA11yViolations } from '../utils/render-helpers-react'
-import { fireEvent } from '@testing-library/react'
+import { act, fireEvent } from '@testing-library/react'
 
 const defaultSize = { width: 400, height: 300 }
 const sampleData = [
@@ -12,6 +12,24 @@ const sampleData = [
 ]
 
 describe('TreeMapChart (React)', () => {
+  it.each([{ showTooltip: false }, { selectedIndex: 0 }])(
+    'moves the tab stop independently of tooltip and selection: %j',
+    (options) => {
+      const { container } = renderWithProps(TreeMapChart, {
+        ...defaultSize,
+        data: sampleData.slice(0, 2),
+        selectable: true,
+        ...options
+      })
+      const [first, second] = container.querySelectorAll<SVGElement>('[data-treemap-node]')
+      act(() => first.focus())
+      fireEvent.keyDown(first, { key: 'ArrowRight' })
+      expect(document.activeElement).toBe(second)
+      expect(first).toHaveAttribute('tabindex', '-1')
+      expect(second).toHaveAttribute('tabindex', '0')
+    }
+  )
+
   it('renders SVG with rect nodes', () => {
     const { container } = renderWithProps(TreeMapChart, { data: sampleData, ...defaultSize })
     expect(container.querySelectorAll('[data-treemap-node]')).toHaveLength(4)

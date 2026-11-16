@@ -7,7 +7,7 @@ import { HeatmapChart } from '@expcat/tigercat-react/HeatmapChart'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { renderWithProps, expectNoA11yViolations } from '../utils/render-helpers-react'
-import { fireEvent, render } from '@testing-library/react'
+import { act, fireEvent, render } from '@testing-library/react'
 
 const data = [
   { x: 'A', y: 'One', value: 1 },
@@ -46,6 +46,31 @@ function createCanvasContextMock() {
 }
 
 describe('HeatmapChart', () => {
+  it.each(['svg', 'canvas'] as const)(
+    'moves the %s cell tab stop without tooltip tracking',
+    (renderMode) => {
+      const { container } = renderWithProps(HeatmapChart, {
+        ...defaultProps,
+        renderMode,
+        showTooltip: false,
+        onCellClick: vi.fn()
+      })
+      if (renderMode === 'canvas') {
+        const canvas = container.querySelector<HTMLCanvasElement>('[data-heatmap-canvas]')!
+        act(() => canvas.focus())
+        fireEvent.keyDown(canvas, { key: 'ArrowRight' })
+        expect(canvas).toHaveAttribute('aria-label', expect.stringContaining('B × One: 2'))
+      } else {
+        const [first, second] = container.querySelectorAll<SVGElement>('[data-heatmap-cell]')
+        act(() => first.focus())
+        fireEvent.keyDown(first, { key: 'ArrowRight' })
+        expect(document.activeElement).toBe(second)
+        expect(first).toHaveAttribute('tabindex', '-1')
+        expect(second).toHaveAttribute('tabindex', '0')
+      }
+    }
+  )
+
   let context: ReturnType<typeof createCanvasContextMock>
 
   beforeEach(() => {

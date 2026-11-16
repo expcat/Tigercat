@@ -47,6 +47,31 @@ function createCanvasContextMock() {
 }
 
 describe('HeatmapChart', () => {
+  it.each(['svg', 'canvas'] as const)(
+    'moves the %s cell tab stop without tooltip tracking',
+    async (renderMode) => {
+      const { container } = renderWithProps(HeatmapChart, {
+        ...defaultProps,
+        renderMode,
+        showTooltip: false,
+        onCellClick: vi.fn()
+      })
+      if (renderMode === 'canvas') {
+        const canvas = container.querySelector<HTMLCanvasElement>('[data-heatmap-canvas]')!
+        canvas.focus()
+        await fireEvent.keyDown(canvas, { key: 'ArrowRight' })
+        expect(canvas).toHaveAttribute('aria-label', expect.stringContaining('B × One: 2'))
+      } else {
+        const [first, second] = container.querySelectorAll<SVGElement>('[data-heatmap-cell]')
+        first.focus()
+        await fireEvent.keyDown(first, { key: 'ArrowRight' })
+        expect(document.activeElement).toBe(second)
+        expect(first).toHaveAttribute('tabindex', '-1')
+        expect(second).toHaveAttribute('tabindex', '0')
+      }
+    }
+  )
+
   let context: ReturnType<typeof createCanvasContextMock>
 
   beforeEach(() => {

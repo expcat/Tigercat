@@ -22,6 +22,18 @@ const data: GanttTask[] = [
 ]
 
 describe('Gantt', () => {
+  it('moves the task tab stop with arrow keys', async () => {
+    const { container } = render(Gantt, { props: { data, selectable: true } })
+    const [first, second] = container.querySelectorAll<SVGElement>('[data-gantt-task-id]')
+    expect(first).toHaveAttribute('tabindex', '0')
+    expect(second).toHaveAttribute('tabindex', '-1')
+    first.focus()
+    await fireEvent.keyDown(first, { key: 'ArrowDown' })
+    expect(document.activeElement).toBe(second)
+    expect(first).toHaveAttribute('tabindex', '-1')
+    expect(second).toHaveAttribute('tabindex', '0')
+  })
+
   it('renders svg tasks, rows and dependencies', () => {
     const { container } = render(Gantt, { props: { data } })
 

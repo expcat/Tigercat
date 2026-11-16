@@ -10,6 +10,9 @@ import {
 } from 'vue'
 import {
   classNames,
+  chartMarkTabIndex,
+  nextChartRovingIndex,
+  isChartNavigationKey,
   coerceClassValue,
   clampGanttDragDeltaX,
   computeGanttLayout,
@@ -141,6 +144,7 @@ export const Gantt = defineComponent({
     const labels = computed(() => getChartLabels(mergedLocale.value, props.labels))
     const innerSelectedId = ref<string | number | null>(null)
     const hoveredId = ref<string | number | null>(null)
+    const focusedIndex = ref(0)
     // shallowRef keeps sourceTask identity comparable to plain (non-reactive)
     // props items; a deep ref would wrap them in reactive proxies.
     const dragSession = shallowRef<GanttBarDragSession | null>(null)
@@ -182,6 +186,14 @@ export const Gantt = defineComponent({
       )
     )
     const activeId = computed(() => resolvedSelectedId.value ?? hoveredId.value)
+    const enabledTaskIndexes = computed(() =>
+      layout.value.tasks.filter((task) => !task.task.disabled).map((task) => task.index)
+    )
+    const resolvedFocusedIndex = computed(() =>
+      enabledTaskIndexes.value.includes(focusedIndex.value)
+        ? focusedIndex.value
+        : (enabledTaskIndexes.value[0] ?? null)
+    )
 
     const selectTask = (task: GanttLayoutTask) => {
       if (task.task.disabled) return
@@ -524,7 +536,10 @@ export const Gantt = defineComponent({
                           {
                             class: getGanttTaskClasses(interactive, selected, movable, grabbing),
                             role: interactive ? 'button' : 'group',
-                            tabindex: interactive ? 0 : undefined,
+                            tabindex: interactive
+                              ? chartMarkTabIndex(task.index, resolvedFocusedIndex.value)
+                              : undefined,
+                            'data-gantt-task-index': task.index,
                             'aria-label': getGanttTaskAriaLabel(task.task, {
                               template: labels.value.ganttTaskAriaLabel,
                               unknownDate: labels.value.ganttUnknownDate
@@ -540,6 +555,27 @@ export const Gantt = defineComponent({
                             onPointercancel: (event: PointerEvent) => finishBarDrag(event),
                             onClick: (event: MouseEvent) => handleBarClick(event, task),
                             onKeydown: (event: KeyboardEvent) => {
+                              if (isChartNavigationKey(event.key)) {
+                                event.preventDefault()
+                                const currentPos = enabledTaskIndexes.value.indexOf(task.index)
+                                if (currentPos < 0) return
+                                const next =
+                                  enabledTaskIndexes.value[
+                                    nextChartRovingIndex(
+                                      currentPos,
+                                      event.key,
+                                      enabledTaskIndexes.value.length
+                                    )
+                                  ]
+                                focusedIndex.value = next
+                                const node = (
+                                  event.currentTarget as SVGElement
+                                ).ownerSVGElement?.querySelector(
+                                  `[data-gantt-task-index="${next}"]`
+                                )
+                                if (node instanceof SVGElement) node.focus()
+                                return
+                              }
                               if (event.key === 'Enter' || event.key === ' ') {
                                 event.preventDefault()
                                 selectTask(task)

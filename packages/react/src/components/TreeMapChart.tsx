@@ -1,4 +1,4 @@
-import React, { useId, useMemo } from 'react'
+import React, { useId, useMemo, useState } from 'react'
 import {
   classNames,
   layoutTreeMap,
@@ -83,6 +83,7 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
   onNodeHover,
   ...rest
 }) => {
+  const [focusedIndex, setFocusedIndex] = useState<number | null>(null)
   const config = useTigerConfig()
   const mergedLocale = useMemo(
     () => mergeTigerLocale(config.locale, locale),
@@ -191,7 +192,7 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
     })
   }, [resolvedHoveredIndex, nodes, tooltipFormatter, rootTotal, labels.treemapTooltip])
   const visualActive = nodes.findIndex(
-    (node) => node.index === (activeIndex ?? resolvedHoveredIndex)
+    (node) => node.index === (focusedIndex ?? activeIndex ?? resolvedHoveredIndex)
   )
 
   const handleNodeKeyDown = (event: React.KeyboardEvent<SVGRectElement>, visualIndex: number) => {
@@ -199,6 +200,7 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
       event.preventDefault()
       const nextVisual = nextChartRovingIndex(visualIndex, event.key, nodes.length)
       const next = nodes[nextVisual]
+      setFocusedIndex(next.index)
       const node = event.currentTarget.parentElement?.querySelector(
         `[data-treemap-node][data-index="${next.index}"]`
       )
@@ -285,7 +287,10 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
                 onMouseLeave={isNodeHidden(node) ? undefined : handleMouseLeave}
                 onFocus={
                   interactive && !isNodeHidden(node)
-                    ? (e) => handleMouseEnter(node.index, e)
+                    ? (e) => {
+                        setFocusedIndex(node.index)
+                        handleMouseEnter(node.index, e)
+                      }
                     : undefined
                 }
                 onClick={isNodeHidden(node) ? undefined : () => handleClick(node.index)}

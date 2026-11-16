@@ -1,5 +1,5 @@
 import React from 'react'
-import { fireEvent, render } from '@testing-library/react'
+import { act, fireEvent, render } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { Gantt } from '@expcat/tigercat-react/Gantt'
 import type { GanttTask } from '@expcat/tigercat-core'
@@ -18,6 +18,18 @@ const data: GanttTask[] = [
 ]
 
 describe('Gantt', () => {
+  it('moves the task tab stop with arrow keys', () => {
+    const { container } = render(<Gantt data={data} selectable />)
+    const [first, second] = container.querySelectorAll<SVGElement>('[data-gantt-task-id]')
+    expect(first).toHaveAttribute('tabindex', '0')
+    expect(second).toHaveAttribute('tabindex', '-1')
+    act(() => first.focus())
+    fireEvent.keyDown(first, { key: 'ArrowDown' })
+    expect(document.activeElement).toBe(second)
+    expect(first).toHaveAttribute('tabindex', '-1')
+    expect(second).toHaveAttribute('tabindex', '0')
+  })
+
   it('renders svg tasks, rows and dependencies', () => {
     const { container } = render(<Gantt data={data} />)
 

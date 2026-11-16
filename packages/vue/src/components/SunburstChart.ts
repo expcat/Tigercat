@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, PropType, useId } from 'vue'
+import { defineComponent, computed, h, PropType, useId, ref } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -87,6 +87,7 @@ export const SunburstChart = defineComponent({
   },
   emits: ['update:hoveredIndex', 'update:selectedIndex', 'arc-click', 'arc-hover'],
   setup(props, { emit, attrs }) {
+    const focusedIndex = ref<number | null>(null)
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getChartLabels(mergedLocale.value, props.labels))
@@ -179,6 +180,7 @@ export const SunburstChart = defineComponent({
       if (isChartNavigationKey(event.key)) {
         event.preventDefault()
         const next = nextSunburstArcIndex(index, event.key, arcs.value)
+        focusedIndex.value = next
         const node = (event.currentTarget as Element | null)?.parentElement?.querySelector(
           `[data-sunburst-arc][data-index="${next}"]`
         )
@@ -202,7 +204,8 @@ export const SunburstChart = defineComponent({
     return () => {
       const current = arcs.value
       const visualActive = current.findIndex(
-        (arc) => arc.index === (activeIndex.value ?? resolvedHoveredIndex.value)
+        (arc) =>
+          arc.index === (focusedIndex.value ?? activeIndex.value ?? resolvedHoveredIndex.value)
       )
       const chart = h(
         ChartCanvas,
@@ -289,7 +292,10 @@ export const SunburstChart = defineComponent({
                   onMouseleave: isArcHidden(arc) ? undefined : handleMouseLeave,
                   onFocus:
                     interactive.value && !isArcHidden(arc)
-                      ? (e: FocusEvent) => handleMouseEnter(arc.index, e)
+                      ? (e: FocusEvent) => {
+                          focusedIndex.value = arc.index
+                          handleMouseEnter(arc.index, e)
+                        }
                       : undefined,
                   onClick: isArcHidden(arc) ? undefined : () => handleClick(arc.index),
                   onKeydown: isArcHidden(arc)

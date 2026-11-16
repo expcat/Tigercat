@@ -102,6 +102,7 @@ export const HeatmapChart = defineComponent({
   },
   emits: ['update:hoveredIndex', 'update:selectedIndex', 'cell-click', 'cell-hover'],
   setup(props, { emit, attrs }) {
+    const focusedIndex = ref<number | null>(null)
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getChartLabels(mergedLocale.value, props.labels))
@@ -240,6 +241,7 @@ export const HeatmapChart = defineComponent({
       if (isChartNavigationKey(event.key)) {
         event.preventDefault()
         const next = nextHeatmapCellIndex(index, event.key, layout.value.cols, layout.value.rows)
+        focusedIndex.value = next
         if (!shouldRenderCanvas.value) {
           const node = (event.currentTarget as Element | null)?.parentElement?.querySelector(
             `[data-heatmap-cell][data-index="${next}"]`
@@ -258,7 +260,8 @@ export const HeatmapChart = defineComponent({
       const currentLayout = layout.value
       const currentCells = currentLayout.cells
       const visualActive = currentCells.findIndex(
-        (cell) => cell.index === (activeIndex.value ?? resolvedHoveredIndex.value)
+        (cell) =>
+          cell.index === (focusedIndex.value ?? activeIndex.value ?? resolvedHoveredIndex.value)
       )
 
       const hiddenTable = h('table', { class: 'sr-only', 'data-heatmap-table': '' }, [
@@ -359,7 +362,10 @@ export const HeatmapChart = defineComponent({
                       onMousemove: handleMouseMove,
                       onMouseleave: handleMouseLeave,
                       onFocus: interactive.value
-                        ? (e: FocusEvent) => handleMouseEnter(cell.index, e)
+                        ? (e: FocusEvent) => {
+                            focusedIndex.value = cell.index
+                            handleMouseEnter(cell.index, e)
+                          }
                         : undefined,
                       onClick: () => handleClick(cell.index),
                       onKeydown: (e: KeyboardEvent) => handleCellKeyDown(e, cell.index)

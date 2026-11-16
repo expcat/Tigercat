@@ -1,4 +1,4 @@
-import React, { useCallback, useId, useMemo } from 'react'
+import React, { useCallback, useId, useMemo, useState } from 'react'
 import {
   classNames,
   getStableChartGradientPrefix,
@@ -105,6 +105,7 @@ export const PieChart: React.FC<PieChartProps> = ({
   onSliceHover,
   ...rest
 }) => {
+  const [focusedIndex, setFocusedIndex] = useState<number | null>(null)
   const config = useTigerConfig()
   const mergedLocale = useMemo(
     () => mergeTigerLocale(config.locale, locale),
@@ -279,7 +280,7 @@ export const PieChart: React.FC<PieChartProps> = ({
   )
 
   const visualActive = slices.findIndex(
-    (slice) => slice.index === (activeIndex ?? resolvedHoveredIndex)
+    (slice) => slice.index === (focusedIndex ?? activeIndex ?? resolvedHoveredIndex)
   )
   const centerParts = [centerValue, centerLabel].filter((part) => part !== undefined)
   const resolvedDesc = [desc, ...centerParts.map((part) => String(part))].filter(Boolean).join(' ')
@@ -289,7 +290,8 @@ export const PieChart: React.FC<PieChartProps> = ({
       event.preventDefault()
       const nextVisual = nextChartRovingIndex(visualIndex, event.key, slices.length)
       const next = slices[nextVisual]
-      const node = event.currentTarget.parentElement?.querySelector(
+      setFocusedIndex(next.index)
+      const node = event.currentTarget.ownerSVGElement?.querySelector(
         `[data-pie-slice][data-index="${next.index}"]`
       )
       if (node instanceof SVGElement) node.focus()
@@ -385,7 +387,10 @@ export const PieChart: React.FC<PieChartProps> = ({
               onMouseLeave={isLegendIndexHidden(slice.index) ? undefined : handleMouseLeave}
               onFocus={
                 interactive && !isLegendIndexHidden(slice.index)
-                  ? (e) => handleMouseEnter(slice.index, e)
+                  ? (e) => {
+                      setFocusedIndex(slice.index)
+                      handleMouseEnter(slice.index, e)
+                    }
                   : undefined
               }
               onClick={
