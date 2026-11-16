@@ -90,27 +90,27 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 
 ### layout
 
-| 任务 | 组件         | 队列           | 现状                                                                                                                                                                   |
-| ---- | ------------ | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| C033 | AspectRatio  | complete       | C033-F01/F02 已修复；47 项 spec（含 axe）通过，IAB 不可用待视觉复验。既有视觉 8 pass / 16 图片 blocked（picsum 封锁）、键盘 24/24 pass；hydration、E2E、读屏未测       |
-| C034 | Card         | complete       | 补采：视觉 01/02 的 16 格 pass，03/04 的 16 格封面图片 blocked（picsum 封锁）；键盘 16 组全通过；hover 抬起、href Card Enter、读屏未测；无 hydration/E2E               |
-| C035 | Carousel     | complete       | 补采：视觉 16/16 pass、键盘 8/8 组 pass（暗色沿用同视口亮色证据）；RTL、pauseOnHover 悬停、读屏、F02/F03 受控场景未实测；e2e/mobile-touch 未运行，无 hydration         |
-| C036 | Col          | needs-evidence | 视觉 0/24 blocked、真实键盘 0/24 blocked、截图 0（24 格 owner 均为 C046 Row）；未跑 hydration、浏览器 E2E、读屏；容器断点、offset/RTL 几何、flex 尺寸未实测            |
-| C037 | Container    | needs-evidence | 视觉 0/8 blocked、真实外壳键盘 0/8 blocked、截图 0（8 格 owner 均为 C042 Layout）；未跑 hydration、浏览器 E2E、读屏；Terra 运行时模型未独立核验                        |
-| C038 | Content      | needs-evidence | 视觉 0/24 blocked、真实外壳键盘 0/24 blocked、截图 0（24 格 owner 均为 C042 Layout）；未启动 Demo 服务；未跑 hydration、浏览器 E2E、读屏；跳转链接点击与真实滚动未测   |
-| C039 | Descriptions | needs-evidence | 视觉 0/16 blocked、键盘 0/16 blocked、截图 0；视觉代理因 Terra 额度超限未执行；未跑 hydration、读屏；docs:links exit 1（.local 资料 1128 个链接错误）                  |
-| C040 | Footer       | needs-evidence | 视觉 0/16 blocked、外壳键盘 0/16 blocked、截图 0（owner 均为 C042）；未启动服务；未跑 hydration、浏览器 E2E、读屏、docs:links；无 Footer 专属 E2E                      |
-| C041 | Header       | needs-evidence | 视觉 0/24 blocked、外壳键盘 0/24 blocked、截图 0（owner 均为 C042）；未跑 hydration、浏览器 E2E、读屏；docs:links exit 1（.local 目录 1143 处失效链接）                |
-| C042 | Layout       | needs-evidence | 视觉 0/32 blocked、键盘 0/32 blocked、截图 0；未跑 hydration、浏览器 E2E、全仓构建、读屏；skip link 激活与滚动未测；docs:links exit 1（.local 1156 处）                |
-| C043 | List         | needs-evidence | 视觉 0/40 blocked；键盘 0/40 blocked；截图 0；双端 SSR 探针已跑，hydration、读屏、浏览器 E2E、全仓构建未执行；Terra 二次审核不可核验                                   |
-| C044 | Masonry      | needs-evidence | 视觉 0/24 blocked；键盘 0/24 blocked；截图 0；双端 SSR 与纯函数探针已跑，hydration、读屏、浏览器 E2E、全仓构建未执行；Terra 二次审核不可核验                           |
-| C045 | Resizable    | needs-evidence | 视觉 0/16 blocked；键盘 0/16 blocked；截图 0；双端 SSR 探针三场景已跑，真实布局、输入、hydration、读屏、浏览器 E2E、全仓构建未执行；Terra 审核不可核验                 |
-| C046 | Row          | needs-evidence | 视觉 0/24 blocked；键盘 0/24 blocked；截图 0；未执行新的 SSR/hydration、Example 构建、浏览器 E2E、读屏；Vue 属性更新探针为合成 DOM；Terra 两阶段只读复核完成但无图可审 |
-| C047 | ScrollArea   | needs-evidence | 视觉 0/24 blocked；键盘 0/24 blocked；截图 0；E2E 未运行（既有 E2E 仅查两端 Demo01）；SSR、读屏、全构建未执行；探针为 happy-dom 注入尺寸与合成事件；补拍 0/2           |
-| C048 | Sidebar      | needs-evidence | 视觉 0/16 blocked；键盘 0/16 blocked；截图 0；SSR/happy-dom/TS 探针已跑；E2E、全量构建、读屏未执行；docs:links 退出 1（均来自 .local/review）；Terra 未审图            |
-| C049 | Skeleton     | needs-evidence | 视觉 0/16 blocked；键盘 0/16 blocked；截图 0；双端 SSR 与 happy-dom 探针已跑；E2E、完整构建、读屏未执行；docs:links 退出 1（均在 .local/review）；Terra 未审图         |
-| C050 | Space        | needs-evidence | 视觉 0/24 blocked；键盘 0/24 blocked；截图 0；28 个双端 SSR 输出与 TS 诊断已跑；hydration、E2E、全量构建、读屏未执行；C012 旧截图未重审，不计入 C050 pass              |
-| C051 | Splitter     | needs-evidence | 视觉 0/24 blocked；键盘 0/24 blocked；截图 0；双端 SSR 成功，hydration 未验证；E2E 未运行且无直接 Splitter 用例；docs:links 退出 1（均在 .local/review）               |
+| 任务 | 组件         | 队列           | 现状                                                                                                                                                                          |
+| ---- | ------------ | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| C033 | AspectRatio  | complete       | C033-F01/F02 已修复；47 项 spec（含 axe）通过，IAB 不可用待视觉复验。既有视觉 8 pass / 16 图片 blocked（picsum 封锁）、键盘 24/24 pass；hydration、E2E、读屏未测              |
+| C034 | Card         | complete       | F01/F02/F03/F05/F06 已修复；51 spec（axe）、类型/SSR 通过，文档/MCP 同步；IAB 不可用。旧视觉16 pass/16封面blocked、键盘16组pass；hover/href Enter/RTL/读屏/hydration/E2E 未测 |
+| C035 | Carousel     | complete       | 补采：视觉 16/16 pass、键盘 8/8 组 pass（暗色沿用同视口亮色证据）；RTL、pauseOnHover 悬停、读屏、F02/F03 受控场景未实测；e2e/mobile-touch 未运行，无 hydration                |
+| C036 | Col          | needs-evidence | 视觉 0/24 blocked、真实键盘 0/24 blocked、截图 0（24 格 owner 均为 C046 Row）；未跑 hydration、浏览器 E2E、读屏；容器断点、offset/RTL 几何、flex 尺寸未实测                   |
+| C037 | Container    | needs-evidence | 视觉 0/8 blocked、真实外壳键盘 0/8 blocked、截图 0（8 格 owner 均为 C042 Layout）；未跑 hydration、浏览器 E2E、读屏；Terra 运行时模型未独立核验                               |
+| C038 | Content      | needs-evidence | 视觉 0/24 blocked、真实外壳键盘 0/24 blocked、截图 0（24 格 owner 均为 C042 Layout）；未启动 Demo 服务；未跑 hydration、浏览器 E2E、读屏；跳转链接点击与真实滚动未测          |
+| C039 | Descriptions | needs-evidence | 视觉 0/16 blocked、键盘 0/16 blocked、截图 0；视觉代理因 Terra 额度超限未执行；未跑 hydration、读屏；docs:links exit 1（.local 资料 1128 个链接错误）                         |
+| C040 | Footer       | needs-evidence | 视觉 0/16 blocked、外壳键盘 0/16 blocked、截图 0（owner 均为 C042）；未启动服务；未跑 hydration、浏览器 E2E、读屏、docs:links；无 Footer 专属 E2E                             |
+| C041 | Header       | needs-evidence | 视觉 0/24 blocked、外壳键盘 0/24 blocked、截图 0（owner 均为 C042）；未跑 hydration、浏览器 E2E、读屏；docs:links exit 1（.local 目录 1143 处失效链接）                       |
+| C042 | Layout       | needs-evidence | 视觉 0/32 blocked、键盘 0/32 blocked、截图 0；未跑 hydration、浏览器 E2E、全仓构建、读屏；skip link 激活与滚动未测；docs:links exit 1（.local 1156 处）                       |
+| C043 | List         | needs-evidence | 视觉 0/40 blocked；键盘 0/40 blocked；截图 0；双端 SSR 探针已跑，hydration、读屏、浏览器 E2E、全仓构建未执行；Terra 二次审核不可核验                                          |
+| C044 | Masonry      | needs-evidence | 视觉 0/24 blocked；键盘 0/24 blocked；截图 0；双端 SSR 与纯函数探针已跑，hydration、读屏、浏览器 E2E、全仓构建未执行；Terra 二次审核不可核验                                  |
+| C045 | Resizable    | needs-evidence | 视觉 0/16 blocked；键盘 0/16 blocked；截图 0；双端 SSR 探针三场景已跑，真实布局、输入、hydration、读屏、浏览器 E2E、全仓构建未执行；Terra 审核不可核验                        |
+| C046 | Row          | needs-evidence | 视觉 0/24 blocked；键盘 0/24 blocked；截图 0；未执行新的 SSR/hydration、Example 构建、浏览器 E2E、读屏；Vue 属性更新探针为合成 DOM；Terra 两阶段只读复核完成但无图可审        |
+| C047 | ScrollArea   | needs-evidence | 视觉 0/24 blocked；键盘 0/24 blocked；截图 0；E2E 未运行（既有 E2E 仅查两端 Demo01）；SSR、读屏、全构建未执行；探针为 happy-dom 注入尺寸与合成事件；补拍 0/2                  |
+| C048 | Sidebar      | needs-evidence | 视觉 0/16 blocked；键盘 0/16 blocked；截图 0；SSR/happy-dom/TS 探针已跑；E2E、全量构建、读屏未执行；docs:links 退出 1（均来自 .local/review）；Terra 未审图                   |
+| C049 | Skeleton     | needs-evidence | 视觉 0/16 blocked；键盘 0/16 blocked；截图 0；双端 SSR 与 happy-dom 探针已跑；E2E、完整构建、读屏未执行；docs:links 退出 1（均在 .local/review）；Terra 未审图                |
+| C050 | Space        | needs-evidence | 视觉 0/24 blocked；键盘 0/24 blocked；截图 0；28 个双端 SSR 输出与 TS 诊断已跑；hydration、E2E、全量构建、读屏未执行；C012 旧截图未重审，不计入 C050 pass                     |
+| C051 | Splitter     | needs-evidence | 视觉 0/24 blocked；键盘 0/24 blocked；截图 0；双端 SSR 成功，hydration 未验证；E2E 未运行且无直接 Splitter 用例；docs:links 退出 1（均在 .local/review）                      |
 
 ### form
 

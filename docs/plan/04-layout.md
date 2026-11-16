@@ -18,8 +18,8 @@ layout 组 19 个组件（C033–C051）。只有 AspectRatio、Card、Carousel 
 
 ## 概览
 
-本篇 41 条：P1 0、P2 40、P3 1。
-按波次：W5 40、W9 1。
+本篇 36 条：P1 0、P2 35、P3 1。
+按波次：W5 35、W9 1。
 
 已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C034-F04（S13）、C037-F01（S11）、C039-F03（S08）、C040-F01（S01）、C048-F02（S13）、C050-F02（S13）、C051-F03（S13）。
 
@@ -29,14 +29,9 @@ layout 组 19 个组件（C033–C051）。只有 AspectRatio、Card、Carousel 
 
 报告 `groups/layout/Card.md`，队列状态 complete。另受 S11 影响。
 
-| 编号     | 级别 | 波次 | 端          | 类别   | 条目                                                  | 验收                                                                                     |
-| -------- | ---- | ---- | ----------- | ------ | ----------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| C034-F01 | P2   | W5   | 文档·生成器 | 文档   | 生成文档与 MCP 把 title 的语义写反                    | Card Props、示例与 MCP 写明 title 是可见 heading、htmlTitle 是原生提示，生成物无漂移     |
-| C034-F02 | P2   | W5   | 双端        | 无障碍 | 独立标题链接丢标题结构，Vue 还生成无名链接            | href+内部 button+titleLevel=4 双端仍出 h4；Vue 仅 header slot 时链接有可访问名称         |
-| C034-F03 | P2   | W5   | 双端        | 行为   | 双端漏识别库内 Input，输入控件事件激活 Card           | onClick Card 含库 Input 时根静态，input 上 Enter/Space/click 不触发 Card 回调            |
-| C034-F05 | P2   | W5   | Vue         | 样式   | Vue 内部控件加 href 分支丢封面内容列与 padding        | cover+horizontal+href+内部 button 时 Vue 含 data-tiger-card-body 与 p-4                  |
-| C034-F06 | P2   | W5   | 双端        | 行为   | 条件空 actions 改掉交互，Vue 空 cover slot 留下封面壳 | actions 为 false 时无空壳且根仍 role=button 可激活；Vue cover slot 返回 false 不出封面壳 |
-| C034-F07 | P3   | W9   | 双端        | 类型   | 键盘路径给 onClick 的事件与公开类型不同               | Enter/Space 激活 Card 时 onClick 收到的事件符合声明的点击类型，不再是 keydown            |
+| 编号     | 级别 | 波次 | 端   | 类别 | 条目                                    | 验收                                                                          |
+| -------- | ---- | ---- | ---- | ---- | --------------------------------------- | ----------------------------------------------------------------------------- |
+| C034-F07 | P3   | W9   | 双端 | 类型 | 键盘路径给 onClick 的事件与公开类型不同 | Enter/Space 激活 Card 时 onClick 收到的事件符合声明的点击类型，不再是 keydown |
 
 ### C035 Carousel
 

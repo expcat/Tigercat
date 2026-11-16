@@ -37,6 +37,16 @@ export interface CardProps
   onClick?: React.MouseEventHandler<HTMLElement>
 }
 
+function nodeHasContent(node: React.ReactNode): boolean {
+  if (node == null || typeof node === 'boolean') return false
+  if (typeof node === 'string') return node.length > 0
+  if (Array.isArray(node)) return node.some(nodeHasContent)
+  if (React.isValidElement(node) && node.type === React.Fragment) {
+    return nodeHasContent((node.props as { children?: React.ReactNode }).children)
+  }
+  return true
+}
+
 function nodeHasControl(node: React.ReactNode): boolean {
   if (
     node == null ||
@@ -54,7 +64,7 @@ function nodeHasControl(node: React.ReactNode): boolean {
   if (typeof type === 'function' || (typeof type === 'object' && type)) {
     const named = type as { displayName?: string; name?: string }
     const name = named.displayName || named.name || ''
-    if (/button|link/i.test(name)) return true
+    if (/button|link/i.test(name) || name === 'Input') return true
   }
   return nodeHasControl(props.children as React.ReactNode)
 }
@@ -64,7 +74,7 @@ function renderCover(
   coverAlt: string,
   horizontal: boolean
 ): React.ReactNode {
-  if (cover == null || cover === false) return null
+  if (!nodeHasContent(cover)) return null
   const wrapperClass = getCardCoverWrapperClasses(horizontal)
   if (typeof cover === 'string') {
     return (
@@ -109,8 +119,8 @@ export const Card = forwardRef<HTMLElement, CardProps>(function Card(
   ref
 ) {
   const isHorizontal = orientation === 'horizontal'
-  const hasCover = cover != null && cover !== false
-  const hasActions = actions != null
+  const hasCover = nodeHasContent(cover)
+  const hasActions = nodeHasContent(actions)
   const foreign =
     nodeHasControl(header) ||
     nodeHasControl(children) ||
@@ -144,12 +154,11 @@ export const Card = forwardRef<HTMLElement, CardProps>(function Card(
     ) : null
   const bodyNode = children != null ? <div>{children}</div> : null
   const footerNode = footer != null ? <div className={cardFooterClasses}>{footer}</div> : null
-  const actionsNode =
-    actions != null ? (
-      <div className={classNames(cardActionsClasses, cardFooterClasses, cardActionsRaisedClasses)}>
-        {actions}
-      </div>
-    ) : null
+  const actionsNode = hasActions ? (
+    <div className={classNames(cardActionsClasses, cardFooterClasses, cardActionsRaisedClasses)}>
+      {actions}
+    </div>
+  ) : null
 
   const coverNode = renderCover(cover, coverAlt, isHorizontal)
   const main = (
@@ -182,6 +191,7 @@ export const Card = forwardRef<HTMLElement, CardProps>(function Card(
   const handleKeyDown: React.KeyboardEventHandler<HTMLElement> = (event) => {
     onKeyDown?.(event)
     if (event.defaultPrevented || event.key === 'Escape') return
+    if (event.target !== event.currentTarget) return
     if (activation.rootRole !== 'button') return
     handleCardActivation(event, () => {
       onClick?.(event as unknown as React.MouseEvent<HTMLElement>)
@@ -222,7 +232,7 @@ export const Card = forwardRef<HTMLElement, CardProps>(function Card(
       rel={activation.link.rel}
       data-tiger-card-link=""
       aria-label={activation.link.stretch || titleText ? undefined : activation.link.href}>
-      {activation.link.stretch ? main : titleText || null}
+      {activation.link.stretch ? main : header == null ? headerNode : titleText || null}
     </a>
   ) : null
 

@@ -13,7 +13,7 @@ description: Compact generated Tigercat Layout props reference
 
 `packages/core/src/types/card.ts` · `CardProps` · 4/19 compact props · [Complete props](#remaining-props-complete-public-api)
 
-Note: `hoverable` 只抬起。`onClick`/`href` 才是控件；有 actions 时根不再当按钮。有封面时 padding 在内容列。`coverAlt` 默认空（装饰）。原生 `title=` 是 HTML tooltip，不是视觉标题；视觉标题走 `#header` / `header`。
+Note: `hoverable` 只抬起。`onClick`/`href` 才是控件；有 actions 时根不再当按钮。有封面时 padding 在内容列。`coverAlt` 默认空（装饰）。`title` 是可见 heading，`titleLevel` 控制标题级别；`#header` / `header` 优先。`htmlTitle` 是原生 HTML tooltip。
 
 | Prop         | Type      | Default | Notes                                                                                      |
 | ------------ | --------- | ------- | ------------------------------------------------------------------------------------------ |

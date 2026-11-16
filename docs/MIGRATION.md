@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+双端 Card 的独立标题链接现在保留 `titleLevel`，Vue 的 header slot 链接使用标题文本命名，无文本时回退到链接地址。含库内 Input 时根节点保持静态，Input 的 Enter / Space / click 不再触发 Card；Card 的键盘激活只响应根节点事件。空 actions / cover 不再生成区域外壳，数字 0 仍保留；Vue 横向封面加内部控件时保留内容列和 padding。调用方式不用改，依赖旧 DOM 或事件冒泡的断言需调整。
+
 双端 Statistic 的动画 SSR 现在直接显示目标值，挂载后开始动画；省略 precision 时，1e-7 / 1.23e-7 分别显示为 0.0000001 / 0.000000123。React 的 title / prefix / suffix 传入数字 0 时现在保留。调用方式不用改，依赖旧零值或空节点输出的断言需相应调整。
 
 React SplitButton 现在识别 Fragment 内的 DropdownMenu / DropdownItem，保留独立菜单 trigger，主按钮内不再包含菜单项。双端 Dropdown（含 SplitButton）从键盘进入首项或末项时立即显示焦点环。调用方式不用改，依赖旧 DOM 或焦点样式的断言需相应调整。

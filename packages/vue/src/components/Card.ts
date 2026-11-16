@@ -1,4 +1,14 @@
-import { defineComponent, computed, h, isVNode, PropType, type VNodeChild } from 'vue'
+import {
+  Comment,
+  Fragment,
+  Text,
+  defineComponent,
+  computed,
+  h,
+  isVNode,
+  PropType,
+  type VNodeChild
+} from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -42,6 +52,26 @@ export interface VueCardProps {
   style?: Record<string, string | number>
 }
 
+function nodesHaveContent(nodes: VNodeChild | VNodeChild[] | undefined): boolean {
+  if (nodes == null || typeof nodes === 'boolean') return false
+  if (typeof nodes === 'string') return nodes.length > 0
+  if (typeof nodes === 'number') return true
+  if (Array.isArray(nodes)) return nodes.some(nodesHaveContent)
+  if (!isVNode(nodes) || nodes.type === Comment) return false
+  if (nodes.type === Text || nodes.type === Fragment) {
+    return nodesHaveContent(nodes.children as VNodeChild)
+  }
+  return true
+}
+
+function nodesText(nodes: VNodeChild | VNodeChild[] | undefined): string {
+  if (Array.isArray(nodes)) return nodes.map(nodesText).join('')
+  if (typeof nodes === 'string' || typeof nodes === 'number') return String(nodes)
+  if (!isVNode(nodes) || nodes.type === Comment) return ''
+  if (nodes.props?.['aria-hidden'] === true || nodes.props?.['aria-hidden'] === 'true') return ''
+  return nodesText(nodes.children as VNodeChild)
+}
+
 function nodesHaveControl(nodes: VNodeChild | VNodeChild[] | undefined): boolean {
   const list = Array.isArray(nodes) ? nodes : nodes == null ? [] : [nodes]
   for (const node of list) {
@@ -51,7 +81,7 @@ function nodesHaveControl(nodes: VNodeChild | VNodeChild[] | undefined): boolean
     if (typeof type === 'string' && cardElementTypeIsInteractive(type, props)) return true
     if (type && typeof type === 'object' && 'name' in type) {
       const name = String((type as { name?: string }).name ?? '')
-      if (/button|link/i.test(name)) return true
+      if (/button|link/i.test(name) || name === 'TigerInput') return true
     }
     if (props && (props.onClick || props.href || props.role === 'button')) return true
     if (nodesHaveControl(node.children as VNodeChild)) return true
@@ -89,11 +119,13 @@ export const Card = defineComponent({
       const headerNodes = slots.header?.()
       const defaultNodes = slots.default?.()
       const footerNodes = slots.footer?.()
-      const coverNodes = slots.cover?.()
+      const coverSlot = slots.cover?.()
+      const coverNodes = nodesHaveContent(coverSlot) ? coverSlot : undefined
       const hasCover = Boolean(coverNodes) || Boolean(props.cover)
-      const hasActions = Boolean(actionNodes && actionNodes.length)
+      const hasActions = nodesHaveContent(actionNodes)
+      const headerHasControl = nodesHaveControl(headerNodes)
       const foreign =
-        nodesHaveControl(headerNodes) ||
+        headerHasControl ||
         nodesHaveControl(defaultNodes) ||
         nodesHaveControl(footerNodes) ||
         nodesHaveControl(coverNodes)
@@ -142,7 +174,9 @@ export const Card = defineComponent({
           )
         : null
 
-      const bodyChildren = [headerNode, bodyNode, footerNode]
+      const titleLivesInLink =
+        Boolean(activation.link && !activation.link.stretch) && !headerHasControl
+      const bodyChildren = [titleLivesInLink ? null : headerNode, bodyNode, footerNode]
       const mainChildren = hasCover
         ? [
             coverNode,
@@ -169,6 +203,7 @@ export const Card = defineComponent({
         const user = attrsRecord.onKeydown
         if (typeof user === 'function') (user as (event: KeyboardEvent) => void)(event)
         if (event.defaultPrevented || event.key === 'Escape') return
+        if (event.target !== event.currentTarget) return
         if (activation.rootRole !== 'button') return
         handleCardActivation(event, () => {
           const click = attrsRecord.onClick
@@ -187,6 +222,7 @@ export const Card = defineComponent({
       delete domAttrs.tabindex
       delete domAttrs.tabIndex
 
+      const titleText = headerNodes ? nodesText(headerNodes).trim() : props.title
       const linkNode =
         activation.link?.href &&
         h(
@@ -197,21 +233,16 @@ export const Card = defineComponent({
             target: activation.link.target,
             rel: activation.link.rel,
             'data-tiger-card-link': '',
-            'aria-label':
-              activation.link.stretch || props.title || headerNodes
-                ? undefined
-                : activation.link.href
+            'aria-label': activation.link.stretch || titleText ? undefined : activation.link.href
           },
           activation.link.stretch
             ? mainChildren.filter((child) => child != null)
-            : props.title || undefined
+            : titleLivesInLink
+              ? headerNode
+              : titleText || undefined
         )
 
-      const beside = activation.link?.stretch
-        ? []
-        : activation.link
-          ? [coverNode, props.title && !headerNodes ? null : headerNode, bodyNode, footerNode]
-          : mainChildren
+      const beside = activation.link?.stretch ? [] : mainChildren
 
       const content = [linkNode, ...beside, actionsNode]
 
