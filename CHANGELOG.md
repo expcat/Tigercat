@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **NavigationMenuList current 指示器（Vue / React，C106-F01、C106-F02）**：React current 指示器补上与 Vue 相同的绝对定位、h-0.5 高度和主色。双端在视口或列表几何变化后重测 current 项，指示器起点和宽度继续对齐。
+
 - **NavigationMenuLink 根禁用（Vue / React，C105-F01）**：面板已经打开后再把根设为 `disabled` 时，双端面板内 Link 去掉 href、带 `aria-disabled`，点击不再执行调用方回调。
 
 - **NavigationMenuItem 根禁用与生成示例（Vue / React / 文档生成器，C104-F01、C104-F02）**：双端根 `disabled` 且 `defaultValue` 或受控 `value` 命中某 Item 时，Content 保持关闭。Item 生成示例补上 Content 与 Link，重跑 `pnpm docs:api` 后 Examples 与 MCP 片段构成有效组合。

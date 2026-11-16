@@ -288,6 +288,38 @@ describe('NavigationMenu', () => {
     expect(indicator?.style.insetInlineStart).toBe('40px')
   })
 
+  it('remeasures the current indicator when geometry changes without rendering', async () => {
+    render(NavigationMenu, {
+      props: { delayDuration: 0, skipDelayDuration: 0, current: 'products' },
+      slots: {
+        default: () => [
+          h(NavigationMenuList, null, () => [
+            h(NavigationMenuItem, { value: 'products' }, () => [
+              h(NavigationMenuTrigger, null, () => 'Products')
+            ])
+          ])
+        ]
+      }
+    })
+
+    const item = await screen.findByRole('menuitem', { name: 'Products' })
+    const list = screen.getByRole('menubar')
+    item.getBoundingClientRect = () => new DOMRect(12, 0, 24, 32)
+    list.getBoundingClientRect = () => new DOMRect(0, 0, 200, 32)
+    window.dispatchEvent(new Event('resize'))
+    await nextTick()
+
+    const indicator = document.querySelector<HTMLElement>('[data-tiger-navigation-indicator]')
+    expect(indicator?.style.insetInlineStart).toBe('12px')
+    expect(indicator?.style.inlineSize).toBe('24px')
+
+    item.getBoundingClientRect = () => new DOMRect(48, 0, 36, 32)
+    window.dispatchEvent(new Event('resize'))
+    await nextTick()
+    expect(indicator?.style.insetInlineStart).toBe('48px')
+    expect(indicator?.style.inlineSize).toBe('36px')
+  })
+
   it('keeps keyboard focus and panel keys inside a shared viewport', async () => {
     renderNav({ viewport: true })
     const trigger = screen.getByRole('menuitem', { name: 'Products' })

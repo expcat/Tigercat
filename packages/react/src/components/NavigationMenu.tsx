@@ -751,28 +751,62 @@ export const NavigationMenuList: React.FC<NavigationMenuListProps> = ({
 
   useLayoutEffect(() => {
     const list = listRef.current
-    if (!list || root?.current == null) {
+    const current = root?.current
+    if (!list || current == null) {
       setIndicatorStyle(undefined)
       return
     }
+    const measure = () => {
+      const currentList = listRef.current
+      if (!currentList) {
+        setIndicatorStyle(undefined)
+        return
+      }
+      const trigger = currentList.querySelector<HTMLElement>(
+        `[${NAVIGATION_MENU_ITEM_VALUE_ATTR}="${navigationMenuValueId(current)}"]`
+      )
+      if (!trigger) {
+        setIndicatorStyle(undefined)
+        return
+      }
+      const dir = getComputedStyle(currentList).direction === 'rtl' ? 'rtl' : 'ltr'
+      const measured = measureNavigationIndicator(
+        trigger.getBoundingClientRect(),
+        currentList.getBoundingClientRect(),
+        dir
+      )
+      const nextStyle = getNavigationMenuIndicatorStyle(measured.start, measured.size)
+      setIndicatorStyle((prev) => {
+        if (
+          prev?.insetInlineStart === nextStyle.insetInlineStart &&
+          prev?.inlineSize === nextStyle.inlineSize
+        ) {
+          return prev
+        }
+        return {
+          insetInlineStart: nextStyle.insetInlineStart,
+          inlineSize: nextStyle.inlineSize
+        }
+      })
+    }
+
+    measure()
     const trigger = list.querySelector<HTMLElement>(
-      `[${NAVIGATION_MENU_ITEM_VALUE_ATTR}="${navigationMenuValueId(root.current)}"]`
+      `[${NAVIGATION_MENU_ITEM_VALUE_ATTR}="${navigationMenuValueId(current)}"]`
     )
-    if (!trigger) {
-      setIndicatorStyle(undefined)
-      return
+    const observer =
+      typeof ResizeObserver === 'undefined'
+        ? null
+        : new ResizeObserver(() => {
+            measure()
+          })
+    observer?.observe(list)
+    if (trigger) observer?.observe(trigger)
+    window.addEventListener('resize', measure)
+    return () => {
+      observer?.disconnect()
+      window.removeEventListener('resize', measure)
     }
-    const dir = getComputedStyle(list).direction === 'rtl' ? 'rtl' : 'ltr'
-    const measured = measureNavigationIndicator(
-      trigger.getBoundingClientRect(),
-      list.getBoundingClientRect(),
-      dir
-    )
-    const nextStyle = getNavigationMenuIndicatorStyle(measured.start, measured.size)
-    setIndicatorStyle({
-      insetInlineStart: nextStyle.insetInlineStart,
-      inlineSize: nextStyle.inlineSize
-    })
   }, [root, children])
 
   useLayoutEffect(() => {
@@ -796,7 +830,12 @@ export const NavigationMenuList: React.FC<NavigationMenuListProps> = ({
       role="menubar"
       data-tiger-navigation-menu-list="">
       {root?.current != null ? (
-        <span data-tiger-navigation-indicator="" aria-hidden="true" style={indicatorStyle} />
+        <span
+          data-tiger-navigation-indicator=""
+          aria-hidden="true"
+          className="absolute bottom-0 h-0.5 bg-[var(--tiger-primary)]"
+          style={indicatorStyle}
+        />
       ) : null}
       {children}
     </ul>

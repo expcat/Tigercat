@@ -9,6 +9,7 @@ import {
   onBeforeUnmount,
   onMounted,
   nextTick,
+  watch,
   useId,
   Fragment,
   Teleport,
@@ -867,6 +868,8 @@ export const NavigationMenuList = defineComponent({
     const attrsRecord = attrs as Record<string, unknown>
     const root = inject<NavigationMenuContext | null>(NavigationMenuContextKey, null)
     const listRef = ref<HTMLElement | null>(null)
+    const indicatorBox = ref<Record<string, string> | undefined>(undefined)
+    let resizeObserver: ResizeObserver | null = null
 
     const syncTabStop = () => {
       if (root) root.menubarRef.value = listRef.value
@@ -880,7 +883,56 @@ export const NavigationMenuList = defineComponent({
       }
     }
 
-    onMounted(syncTabStop)
+    const publishIndicator = () => {
+      const next = indicatorStyle(listRef.value, root?.current.value)
+      const prev = indicatorBox.value
+      if (
+        prev?.insetInlineStart === next.insetInlineStart &&
+        prev?.inlineSize === next.inlineSize
+      ) {
+        return
+      }
+      indicatorBox.value = next
+    }
+
+    const bindIndicatorGeometry = () => {
+      resizeObserver?.disconnect()
+      resizeObserver = null
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', publishIndicator)
+      }
+      const list = listRef.value
+      const current = root?.current.value
+      if (!list || current == null || typeof window === 'undefined') return
+      publishIndicator()
+      window.addEventListener('resize', publishIndicator)
+      if (typeof ResizeObserver === 'undefined') return
+      const trigger = list.querySelector<HTMLElement>(
+        `[${NAVIGATION_MENU_ITEM_VALUE_ATTR}="${navigationMenuValueId(current)}"]`
+      )
+      resizeObserver = new ResizeObserver(() => {
+        publishIndicator()
+      })
+      resizeObserver.observe(list)
+      if (trigger) resizeObserver.observe(trigger)
+    }
+
+    onMounted(() => {
+      syncTabStop()
+      bindIndicatorGeometry()
+    })
+    onBeforeUnmount(() => {
+      resizeObserver?.disconnect()
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', publishIndicator)
+      }
+    })
+    watch(
+      () => root?.current.value,
+      () => {
+        bindIndicatorGeometry()
+      }
+    )
 
     const listClasses = computed(() =>
       classNames(
@@ -913,7 +965,7 @@ export const NavigationMenuList = defineComponent({
             ? h('span', {
                 'data-tiger-navigation-indicator': '',
                 class: 'absolute bottom-0 h-0.5 bg-[var(--tiger-primary)]',
-                style: indicatorStyle(listRef.value, root.current.value)
+                style: indicatorBox.value ?? indicatorStyle(listRef.value, root.current.value)
               })
             : null
         ]

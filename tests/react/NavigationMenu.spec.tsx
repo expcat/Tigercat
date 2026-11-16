@@ -294,6 +294,52 @@ describe('NavigationMenu', () => {
     expect(indicator?.style.insetInlineStart).toBe('40px')
   })
 
+  it('paints the current indicator with the same position, height, and color as Vue', () => {
+    render(
+      <NavigationMenu delayDuration={0} skipDelayDuration={0} current="products">
+        <NavigationMenuList>
+          <NavigationMenuItem value="products">
+            <NavigationMenuTrigger>Products</NavigationMenuTrigger>
+          </NavigationMenuItem>
+        </NavigationMenuList>
+      </NavigationMenu>
+    )
+
+    const indicator = document.querySelector('[data-tiger-navigation-indicator]')
+    expect(indicator).toHaveClass('absolute', 'bottom-0', 'h-0.5', 'bg-[var(--tiger-primary)]')
+  })
+
+  it('remeasures the current indicator when geometry changes without rendering', () => {
+    render(
+      <NavigationMenu delayDuration={0} skipDelayDuration={0} current="products">
+        <NavigationMenuList>
+          <NavigationMenuItem value="products">
+            <NavigationMenuTrigger>Products</NavigationMenuTrigger>
+          </NavigationMenuItem>
+        </NavigationMenuList>
+      </NavigationMenu>
+    )
+
+    const item = screen.getByRole('menuitem', { name: 'Products' })
+    const list = screen.getByRole('menubar')
+    item.getBoundingClientRect = () => new DOMRect(12, 0, 24, 32)
+    list.getBoundingClientRect = () => new DOMRect(0, 0, 200, 32)
+    act(() => {
+      window.dispatchEvent(new Event('resize'))
+    })
+
+    const indicator = document.querySelector<HTMLElement>('[data-tiger-navigation-indicator]')
+    expect(indicator?.style.insetInlineStart).toBe('12px')
+    expect(indicator?.style.inlineSize).toBe('24px')
+
+    item.getBoundingClientRect = () => new DOMRect(48, 0, 36, 32)
+    act(() => {
+      window.dispatchEvent(new Event('resize'))
+    })
+    expect(indicator?.style.insetInlineStart).toBe('48px')
+    expect(indicator?.style.inlineSize).toBe('36px')
+  })
+
   it('keeps keyboard focus and panel keys inside a shared viewport', async () => {
     render(<Demo viewport />)
     const trigger = screen.getByRole('menuitem', { name: 'Products' })
