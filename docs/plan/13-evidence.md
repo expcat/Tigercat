@@ -76,7 +76,7 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | C019 | ImageGroup     | complete       | 普通 16 格视觉、键盘各 8 pass / 8 finding；r1 回退 8 格各 4 pass / 4 finding，0 blocked；37 项测试通过；未跑 E2E、SSR；组级固定索引未浏览器验证                        |
 | C020 | ImagePreview   | complete       | 主责 24 格：视觉、键盘各 8 pass / 12 finding / 4 blocked；关联 48 格键盘 24 finding / 24 pending；156 项测试通过；无 E2E；Demo03 第二图与下载后路径缺证据              |
 | C021 | Inplace        | complete       | 主路径 8 格：视觉、键盘各 0 pass / 8 finding / 0 blocked；四桌面格页面起点纯键盘入口 blocked 未验证；2 项既有测试通过（无 axe 调用）；无 E2E；F02 未做原生 IME 复现    |
-| C022 | Kbd            | needs-evidence | 24 格：视觉 8 pass / 16 finding（均 F01）；键盘 24 blocked（两轮额度耗尽，采集环境限制）；r2 verifier exit 1（runDir mismatch）；33 项测试通过；无 E2E；读屏未测       |
+| C022 | Kbd            | needs-evidence | C022-F01/F02 已修复。组合改为可见文本，空内容与注释 slot 不留尾随分隔符；双端 spec 启用 aria-prohibited-attr 后通过。键盘仍 blocked，读屏未测                          |
 | C023 | Link           | needs-evidence | 16 格：视觉 8 pass / 8 finding（均 F01）；键盘 16 blocked（外站终态未验证，sandbox 无 allow-popups）；页面起点键盘入口未验证；20 项测试通过；无 E2E；F02 未做跨站导航  |
 | C024 | Marquee        | complete       | 11-13 补采 32 格：视觉 32 pass；键盘 8 pass / 8 finding / 16 not-applicable（finding 均 F01）；67 项测试通过；F02/F03 仅 happy-dom 证据；无 E2E                        |
 | C025 | QRCode         | complete       | 视觉 32 格 28 pass / 4 finding / 0 blocked；键盘 88 次按键、32 格预定链路通过；定向 spec 33 passed / 2 failed；SSR 探针已跑；读屏、独立扫码未执行                      |

@@ -1,11 +1,10 @@
-import React, { forwardRef } from 'react'
+import React, { Fragment, forwardRef, isValidElement } from 'react'
 import {
   formatKbdSeparatorText,
   getKbdParts,
   getKbdRootClasses,
   kbdKeyClasses,
   kbdSeparatorClasses,
-  resolveKbdAccessibleName,
   type KbdProps as CoreKbdProps
 } from '@expcat/tigercat-core'
 
@@ -19,7 +18,12 @@ export interface KbdProps
 
 function hasRenderableChildren(children: React.ReactNode): boolean {
   if (children == null || typeof children === 'boolean') return false
-  if (typeof children === 'string' && children.length === 0) return false
+  if (typeof children === 'string') return children.length > 0
+  if (typeof children === 'number') return true
+  if (Array.isArray(children)) return children.some(hasRenderableChildren)
+  if (isValidElement(children) && children.type === Fragment) {
+    return hasRenderableChildren((children.props as { children?: React.ReactNode }).children)
+  }
   return true
 }
 
@@ -30,7 +34,6 @@ export const Kbd = forwardRef<HTMLElement, KbdProps>(
   ) => {
     const parts = getKbdParts(keys, separator)
     const hasChildren = hasRenderableChildren(children)
-    const accessibleName = resolveKbdAccessibleName(keys, separator)
     const isEmpty = !hasChildren && parts.length === 0
 
     return (
@@ -42,25 +45,20 @@ export const Kbd = forwardRef<HTMLElement, KbdProps>(
         className={getKbdRootClasses({ size, variant, className })}
         style={style}
         {...rest}
-        aria-label={rest['aria-label'] ?? accessibleName}
         aria-hidden={isEmpty ? true : rest['aria-hidden']}>
         {parts.map((part, index) =>
           part.type === 'separator' ? (
-            <span
-              key={`sep-${index}`}
-              className={kbdSeparatorClasses}
-              data-kbd-separator=""
-              aria-hidden="true">
+            <span key={`sep-${index}`} className={kbdSeparatorClasses} data-kbd-separator="">
               {` ${part.value} `}
             </span>
           ) : (
-            <kbd key={`key-${index}`} className={kbdKeyClasses} data-kbd-key="" aria-hidden="true">
+            <kbd key={`key-${index}`} className={kbdKeyClasses} data-kbd-key="">
               {part.value}
             </kbd>
           )
         )}
         {hasChildren && parts.length > 0 ? (
-          <span className={kbdSeparatorClasses} data-kbd-separator="" aria-hidden="true">
+          <span className={kbdSeparatorClasses} data-kbd-separator="">
             {formatKbdSeparatorText(separator)}
           </span>
         ) : null}

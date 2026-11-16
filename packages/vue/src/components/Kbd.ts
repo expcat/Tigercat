@@ -1,4 +1,13 @@
-import { defineComponent, h, PropType, type VNodeChild } from 'vue'
+import {
+  Comment,
+  Fragment,
+  Text,
+  defineComponent,
+  h,
+  isVNode,
+  PropType,
+  type VNodeChild
+} from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -8,7 +17,6 @@ import {
   kbdKeyClasses,
   kbdSeparatorClasses,
   mergeStyleValues,
-  resolveKbdAccessibleName,
   type KbdKeys,
   type KbdSize,
   type KbdVariant
@@ -23,8 +31,19 @@ export interface VueKbdProps {
   style?: Record<string, unknown>
 }
 
+function hasRenderableSlotNode(node: unknown): boolean {
+  if (node == null || typeof node === 'boolean') return false
+  if (typeof node === 'string') return node.length > 0
+  if (typeof node === 'number') return true
+  if (Array.isArray(node)) return node.some(hasRenderableSlotNode)
+  if (!isVNode(node)) return false
+  if (node.type === Comment) return false
+  if (node.type === Text || node.type === Fragment) return hasRenderableSlotNode(node.children)
+  return true
+}
+
 function hasSlotContent(nodes: unknown): boolean {
-  return Array.isArray(nodes) && nodes.length > 0
+  return hasRenderableSlotNode(nodes)
 }
 
 export const Kbd = defineComponent({
@@ -84,27 +103,16 @@ export const Kbd = defineComponent({
       const parts = getKbdParts(props.keys, props.separator)
       const slotNodes = slots.default?.()
       const hasSlot = hasSlotContent(slotNodes)
-      const accessibleName = resolveKbdAccessibleName(props.keys, props.separator)
       const isEmpty = !hasSlot && parts.length === 0
       const children: VNodeChild[] = []
 
       for (const part of parts) {
         if (part.type === 'separator') {
           children.push(
-            h(
-              'span',
-              { class: kbdSeparatorClasses, 'data-kbd-separator': '', 'aria-hidden': 'true' },
-              ` ${part.value} `
-            )
+            h('span', { class: kbdSeparatorClasses, 'data-kbd-separator': '' }, ` ${part.value} `)
           )
         } else {
-          children.push(
-            h(
-              'kbd',
-              { class: kbdKeyClasses, 'data-kbd-key': '', 'aria-hidden': 'true' },
-              part.value
-            )
-          )
+          children.push(h('kbd', { class: kbdKeyClasses, 'data-kbd-key': '' }, part.value))
         }
       }
 
@@ -113,7 +121,7 @@ export const Kbd = defineComponent({
           children.push(
             h(
               'span',
-              { class: kbdSeparatorClasses, 'data-kbd-separator': '', 'aria-hidden': 'true' },
+              { class: kbdSeparatorClasses, 'data-kbd-separator': '' },
               formatKbdSeparatorText(props.separator)
             )
           )
@@ -137,7 +145,6 @@ export const Kbd = defineComponent({
           'data-kbd': '',
           'data-kbd-size': props.size,
           'data-kbd-variant': props.variant,
-          'aria-label': (attrsRecord['aria-label'] as string | undefined) ?? accessibleName,
           'aria-hidden': isEmpty ? 'true' : attrsRecord['aria-hidden']
         },
         children

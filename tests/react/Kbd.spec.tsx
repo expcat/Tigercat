@@ -4,12 +4,26 @@
 
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import { renderToStaticMarkup } from 'react-dom/server'
 import React from 'react'
 import { Kbd } from '@expcat/tigercat-react/Kbd'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 function getRoot(container: HTMLElement): HTMLElement {
   return container.querySelector('[data-kbd]') as HTMLElement
+}
+
+function mountSSR(html: string): HTMLElement {
+  const host = document.createElement('div')
+  host.innerHTML = html
+  document.body.appendChild(host)
+  return host
+}
+
+// The shared isolated helper disables aria-prohibited-attr for other components.
+// Kbd opts back in so a native kbd cannot keep a prohibited aria-label.
+const kbdAxeOptions = {
+  rules: { 'aria-prohibited-attr': { enabled: true } }
 }
 
 describe('Kbd', () => {
@@ -33,13 +47,11 @@ describe('Kbd', () => {
       const { container } = render(<Kbd keys={['Ctrl', 'K']} />)
       const root = getRoot(container)
       expect(root).toHaveTextContent('Ctrl + K')
-      expect(root).toHaveAttribute('aria-label', 'Ctrl + K')
+      expect(root.getAttribute('aria-label')).toBeNull()
       const keyLabels = [...root.querySelectorAll('[data-kbd-key]')].map((node) => node.textContent)
       expect(keyLabels).toEqual(['Ctrl', 'K'])
       expect(root.querySelectorAll('kbd[data-kbd-key]')).toHaveLength(2)
-      const visibleKbd = container.querySelectorAll('kbd:not([aria-hidden="true"])')
-      expect(visibleKbd).toHaveLength(1)
-      expect(visibleKbd[0]).toBe(root)
+      expect(root.querySelector('[aria-hidden="true"]')).toBeNull()
     })
 
     it('appends children after keys', () => {
@@ -113,7 +125,30 @@ describe('Kbd', () => {
       expect(root.tagName).toBe('KBD')
       expect(root.querySelector('[role]')).toBeNull()
       expect(screen.queryByRole('button')).not.toBeInTheDocument()
-      await expectNoA11yViolationsIsolated(container)
+      await expectNoA11yViolationsIsolated(container, kbdAxeOptions)
+    })
+
+    it('names a keys combo from visible SSR text without a prohibited aria-label', async () => {
+      const combo = mountSSR(renderToStaticMarkup(<Kbd keys={['Ctrl', 'K']} />))
+      const trailing = mountSSR(renderToStaticMarkup(<Kbd keys={['Ctrl']}>S</Kbd>))
+      try {
+        const comboRoot = getRoot(combo)
+        expect(comboRoot.getAttribute('role')).toBeNull()
+        expect(comboRoot.getAttribute('aria-label')).toBeNull()
+        expect(comboRoot.textContent).toContain('Ctrl')
+        expect(comboRoot.textContent).toContain('K')
+        await expectNoA11yViolationsIsolated(combo, kbdAxeOptions)
+
+        const trailingRoot = getRoot(trailing)
+        expect(trailingRoot.getAttribute('aria-label')).toBeNull()
+        expect(trailingRoot.querySelector('[aria-hidden="true"]')).toBeNull()
+        expect(trailingRoot.textContent).toContain('Ctrl')
+        expect(trailingRoot.textContent).toContain('S')
+        await expectNoA11yViolationsIsolated(trailing, kbdAxeOptions)
+      } finally {
+        combo.remove()
+        trailing.remove()
+      }
     })
 
     it('passes a11y checks for children and the subtle variant', async () => {
@@ -123,7 +158,7 @@ describe('Kbd', () => {
           <Kbd variant="subtle" keys={['Shift', 'Enter']} />
         </>
       )
-      await expectNoA11yViolationsIsolated(container)
+      await expectNoA11yViolationsIsolated(container, kbdAxeOptions)
     })
   })
 
@@ -147,6 +182,26 @@ describe('Kbd', () => {
       const { container } = render(<Kbd keys={['', '  ', 'S']} />)
       expect(getRoot(container)).toHaveTextContent('S')
       expect(getRoot(container).querySelectorAll('[data-kbd-key]')).toHaveLength(1)
+    })
+
+    it('does not append a separator for empty children', () => {
+      const hosts = [
+        mountSSR(renderToStaticMarkup(<Kbd keys={['Ctrl']}>{[]}</Kbd>)),
+        mountSSR(
+          renderToStaticMarkup(
+            <Kbd keys={['Ctrl']}>
+              <></>
+            </Kbd>
+          )
+        )
+      ]
+      try {
+        for (const host of hosts) {
+          expect(getRoot(host).textContent).toBe('Ctrl')
+        }
+      } finally {
+        for (const host of hosts) host.remove()
+      }
     })
   })
 })

@@ -140,8 +140,9 @@ export function getKbdVariantClasses(variant?: KbdVariant): string {
 }
 
 /**
- * Accessible name comes from the key list. Nodes that are not key names
- * are not part of the combo.
+ * Keys-only combo text such as `Ctrl + K`. Native `kbd` has no valid
+ * naming role, so callers must not apply this as `aria-label`. Children
+ * and slot text are not included.
  */
 export function resolveKbdAccessibleName(
   keys?: KbdKeys | null,
