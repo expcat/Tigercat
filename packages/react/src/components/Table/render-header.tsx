@@ -108,8 +108,12 @@ export function renderTableHeader(ctx: TableContext, view: RenderHeaderViewProps
             )
           }
           const column = entry.column
-          const isSorted = ctx.sortState.key === column.key
-          const sortDirection = isSorted ? ctx.sortState.direction : null
+          const sortDirection =
+            ctx.multiSort !== undefined
+              ? (ctx.multiSort.find((level) => level.key === column.key)?.direction ?? null)
+              : ctx.sortState.key === column.key
+                ? ctx.sortState.direction
+                : null
 
           const ariaSort = column.sortable
             ? sortDirection === 'asc'

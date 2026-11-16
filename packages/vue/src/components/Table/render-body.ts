@@ -63,6 +63,7 @@ export function renderTableBody(
     onActiveRowIndex?: (index: number) => void
     /** Scrolls a row into the virtual window and focuses it after render. */
     onVirtualRowFocus?: (index: number, edge: 'down' | 'up') => void
+    gridCell?: { row: number; column: number }
   },
   slots: Slots,
   labels: Required<TigerLocaleTable>
@@ -246,6 +247,7 @@ export function renderTableBody(
     const bodyEntries =
       (props as TableInternalProps & { columnEntries?: TableColumnRenderEntry[] }).columnEntries ??
       getTableColumnRenderEntries(ctx.displayColumns.value)
+    let dataColumnIndex = 0
     bodyEntries.forEach((entry) => {
       if (entry.kind === 'spacer') {
         cells.push(
@@ -258,6 +260,8 @@ export function renderTableBody(
         return
       }
       const column = entry.column
+      const columnIndex = dataColumnIndex
+      dataColumnIndex += 1
       const dataKey = column.dataKey || column.key
       const cellValue = record[dataKey]
 
@@ -366,6 +370,12 @@ export function renderTableBody(
               isEditableCell && !isEditing && getEditableCellClasses(false)
             ),
             style,
+            tabindex: props.grid
+              ? props.gridCell?.row === index && props.gridCell.column === columnIndex
+                ? 0
+                : -1
+              : undefined,
+            'data-tiger-grid-cell': props.grid ? `${index}-${columnIndex}` : undefined,
             onDblclick:
               isEditableCell && !isEditing
                 ? () => ctx.startEditing(sourceIndex, column.key, cellValue)

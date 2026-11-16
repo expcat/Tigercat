@@ -78,6 +78,7 @@ export interface RenderBodyViewProps {
   /** Scrolls a row into the virtual window and focuses it after render. */
   onVirtualRowFocus?: (index: number, edge: 'down' | 'up') => void
   grid?: boolean
+  gridCell?: { row: number; column: number }
 }
 
 export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): React.ReactNode {
@@ -99,6 +100,7 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
     selectionName,
     activeRowIndex = 0,
     grid = false,
+    gridCell,
     onActiveRowIndex,
     onVirtualRowFocus
   } = view
@@ -241,6 +243,7 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
       return slot === 'expand' ? expandToggleCell : selectionCell
     }
 
+    let dataColumnIndex = 0
     const rowNode = (
       <tr
         key={key}
@@ -315,6 +318,8 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
             )
           }
           const column = entry.column
+          const columnIndex = dataColumnIndex
+          dataColumnIndex += 1
           const dataKey = column.dataKey || column.key
           const cellValue = record[dataKey]
 
@@ -367,6 +372,14 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
                 cellEditable && getEditableCellClasses(!!isEditing)
               )}
               style={style}
+              tabIndex={
+                grid
+                  ? gridCell?.row === index && gridCell.column === columnIndex
+                    ? 0
+                    : -1
+                  : undefined
+              }
+              data-tiger-grid-cell={grid ? `${index}-${columnIndex}` : undefined}
               onDoubleClick={
                 cellEditable
                   ? () => ctx.startEditing(sourceIndex, column.key, cellValue)

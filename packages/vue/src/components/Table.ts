@@ -76,7 +76,6 @@ import { renderTableHeader } from './Table/render-header'
 import { renderTableBody } from './Table/render-body'
 import { renderSummaryRow } from './Table/render-summary'
 import { renderPagination } from './Table/render-pagination'
-import { TableW9Panel } from './Table/w9-panel'
 import type { TableInternalProps } from './Table/types'
 
 export type { VueTableProps, VueTableProps as TableProps }
@@ -478,10 +477,12 @@ export const Table = defineComponent({
         onActiveRowIndex: (index: number) => {
           activeRowIndex.value = index
         },
-        onVirtualRowFocus: focusVirtualRow
+        onVirtualRowFocus: focusVirtualRow,
+        gridCell: gridCell.value
       } as TableInternalProps & {
         virtualWindow?: ReturnType<typeof getTableVirtualWindow>
         selectionName?: string
+        gridCell?: { row: number; column: number }
       }
 
       const shouldPinColumns =
@@ -544,9 +545,16 @@ export const Table = defineComponent({
                   columnCount: ctx.displayColumns.value.length,
                   key: event.key
                 })
-                if (!next || next === undefined) return
-                if (!event.key.startsWith('Arrow')) return
+                if (!next || !event.key.startsWith('Arrow')) return
+                if (next.row === gridCell.value.row && next.column === gridCell.value.column) {
+                  return
+                }
                 event.preventDefault()
+                tableRef.value
+                  ?.querySelector<HTMLElement>(
+                    `[data-tiger-grid-cell="${next.row}-${next.column}"]`
+                  )
+                  ?.focus()
                 gridCell.value = next
               }
             : undefined,
@@ -1041,37 +1049,6 @@ export const Table = defineComponent({
           'aria-busy': resolvedProps.loading
         },
         [
-          h(TableW9Panel, {
-            locale: { ...tableLocale.value, table: tableLabels.value },
-            active: resolvedProps.sorts !== undefined,
-            columns: ctx.displayColumns.value,
-            sorts: ctx.multiSort.value,
-            pageKeys: ctx.paginatedRowKeys.value,
-            loadedKeys: ctx.loadedSelectableRowKeys.value,
-            disabledKeys: ctx.paginatedData.value.flatMap((record, index) => {
-              const key = ctx.paginatedRowKeys.value[index]
-              const checkbox = resolvedProps.rowSelection?.getCheckboxProps?.(record)
-              return checkbox?.disabled && key !== undefined ? [key] : []
-            }),
-            pageRecords: ctx.paginatedData.value as Record<string, unknown>[],
-            processedRecords: ctx.processedData.value,
-            processedKeys: ctx.processedRowKeys.value,
-            selectedKeys: ctx.selectedRowKeys.value,
-            onSort: (key: string) => ctx.applyMultiSort(key),
-            onFilter: (key: string, value: string) => ctx.handleFilter(key, value),
-            onHide: (key: string) => {
-              const hidden = ctx.hiddenColumnKeys.value.includes(key)
-                ? ctx.hiddenColumnKeys.value.filter((item) => item !== key)
-                : [...ctx.hiddenColumnKeys.value, key]
-              ctx.handleSetHiddenColumns(hidden)
-            },
-            onResize: (key: string, width: number) => ctx.applyColumnWidth(key, width),
-            onSelection: (keys: (string | number)[], announcement: string) => {
-              ctx.replaceSelectedKeys(keys)
-              if (announcement) ctx.selectionLive.value = announcement
-            },
-            onRemoteSelect: () => ctx.handleSelectLoaded(true)
-          }),
           ctx.dragLive.value
             ? h('div', { role: 'status', 'data-tiger-drag-live': '' }, ctx.dragLive.value)
             : null,

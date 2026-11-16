@@ -3,7 +3,10 @@
  */
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render } from '@testing-library/react'
+import { useState } from 'react'
 import { Table } from '../../packages/react/src/components/Table'
+import { TableW9Panel } from '../../packages/react/src/components/Table/w9-panel'
+import { nextMultiSort } from '../../packages/core/src/utils/w9-data'
 import { Timeline } from '../../packages/react/src/components/Timeline'
 import { Collapse } from '../../packages/react/src/components/Collapse'
 import { CollapsePanel } from '../../packages/react/src/components/CollapsePanel'
@@ -39,18 +42,72 @@ const columns = [
   }
 ]
 
+function W9MenuFixture({
+  dataSource,
+  rowSelection,
+  onSelectionChange
+}: {
+  dataSource: { id: number; name: string; qty: number }[]
+  rowSelection?: {
+    getCheckboxProps: (record: { id: number }) => { disabled?: boolean }
+  }
+  onSelectionChange?: (keys: (string | number)[]) => void
+}) {
+  const [filters, setFilters] = useState<Record<string, unknown>>({})
+  const [sorts, setSorts] = useState<{ key: string; direction: 'asc' | 'desc' }[]>([])
+  const [hidden, setHidden] = useState<string[]>([])
+  const [widths, setWidths] = useState<Record<string, number>>({})
+  const keys = dataSource.map((row) => row.id)
+  const disabledKeys = dataSource.flatMap((row) =>
+    rowSelection?.getCheckboxProps(row).disabled ? [row.id] : []
+  )
+  const visibleColumns = columns.filter((column) => !hidden.includes(column.key))
+  return (
+    <>
+      <TableW9Panel
+        active
+        columns={visibleColumns}
+        sorts={sorts}
+        pageKeys={keys}
+        loadedKeys={keys}
+        disabledKeys={disabledKeys}
+        pageRecords={dataSource}
+        processedRecords={dataSource}
+        processedKeys={keys}
+        selectedKeys={[]}
+        onSort={(key) => setSorts((current) => nextMultiSort(current, key))}
+        onFilter={(key, value) => setFilters((current) => ({ ...current, [key]: value }))}
+        onHide={(key) =>
+          setHidden((current) =>
+            current.includes(key) ? current.filter((item) => item !== key) : [...current, key]
+          )
+        }
+        onResize={(key, width) => setWidths((current) => ({ ...current, [key]: width }))}
+        onSelection={(next) => onSelectionChange?.(next)}
+      />
+      <Table
+        columns={columns}
+        dataSource={dataSource}
+        rowKey="id"
+        pagination={false}
+        filters={filters}
+        hiddenColumnKeys={hidden}
+        columnWidths={widths}
+        rowSelection={rowSelection}
+        onSelectionChange={onSelectionChange}
+      />
+    </>
+  )
+}
+
 describe('W9 view bindings', () => {
   it('filters, sorts, hides, and resizes from the header menu', () => {
     const { container } = render(
-      <Table
-        columns={columns}
+      <W9MenuFixture
         dataSource={[
           { id: 1, name: 'b', qty: 2 },
           { id: 2, name: 'a', qty: 1 }
         ]}
-        rowKey="id"
-        pagination={false}
-        sorts={[]}
       />
     )
     expect(container.querySelector('[data-tiger-header-menu]')).toBeTruthy()
@@ -74,16 +131,12 @@ describe('W9 view bindings', () => {
   it('selects the page, a shift range, and announces once', () => {
     const onSelectionChange = vi.fn()
     const { container } = render(
-      <Table
-        columns={columns}
+      <W9MenuFixture
         dataSource={[
           { id: 1, name: 'a', qty: 1 },
           { id: 2, name: 'b', qty: 2 },
           { id: 3, name: 'c', qty: 3 }
         ]}
-        rowKey="id"
-        pagination={false}
-        sorts={[]}
         rowSelection={{
           getCheckboxProps: (record: { id: number }) => ({ disabled: record.id === 2 })
         }}
@@ -102,15 +155,7 @@ describe('W9 view bindings', () => {
   })
 
   it('exports the current page with formatted cells', () => {
-    const { container } = render(
-      <Table
-        columns={columns}
-        dataSource={[{ id: 1, name: 'a', qty: 4 }]}
-        rowKey="id"
-        pagination={false}
-        sorts={[]}
-      />
-    )
+    const { container } = render(<W9MenuFixture dataSource={[{ id: 1, name: 'a', qty: 4 }]} />)
     fireEvent.click(container.querySelector('[data-tiger-export-scope="page"]')!)
     expect(container.querySelector('[data-tiger-export-text]')?.textContent).toContain('n:4')
   })

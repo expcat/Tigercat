@@ -331,6 +331,10 @@ export function useTableState(
   function handleSort(columnKey: string) {
     const column = displayColumns.value.find((item) => item.key === columnKey)
     if (!column || !column.sortable) return
+    if (multiSort.value !== undefined) {
+      applyMultiSort(columnKey)
+      return
+    }
     handleSetSort(getNextTableSortState(sortState.value, columnKey))
   }
 

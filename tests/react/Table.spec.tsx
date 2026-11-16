@@ -1333,6 +1333,63 @@ describe('Table', () => {
         })
       )
     })
+
+    it('does not mount a header menu for empty sorts and still multi-sorts from headers', async () => {
+      const sortableColumns: TableColumn[] = [
+        { key: 'name', title: 'Name', sortable: true },
+        { key: 'age', title: 'Age', sortable: true }
+      ]
+      const rows = [
+        { id: 1, name: 'b', age: 1 },
+        { id: 2, name: 'a', age: 2 },
+        { id: 3, name: 'a', age: 1 }
+      ]
+      const { container } = render(
+        <Table
+          columns={sortableColumns}
+          dataSource={rows}
+          rowKey="id"
+          pagination={false}
+          sorts={[]}
+        />
+      )
+      expect(container.querySelector('[data-tiger-header-menu]')).toBeNull()
+      const sortButtons = container.querySelectorAll('[data-tiger-table-sort]')
+      await fireEvent.click(sortButtons[0]!)
+      await fireEvent.click(sortButtons[1]!)
+      const body = [...container.querySelectorAll('tbody tr')].map((row) =>
+        [...row.querySelectorAll('td')].map((cell) => (cell.textContent ?? '').trim()).join('|')
+      )
+      expect(body).toEqual(['a|1', 'a|2', 'b|1'])
+    })
+
+    it('moves grid focus or the active descendant to the next cell on ArrowRight', () => {
+      const { container } = render(
+        <Table
+          columns={[
+            { key: 'name', title: 'Name' },
+            { key: 'age', title: 'Age' }
+          ]}
+          dataSource={[
+            { id: 1, name: 'Ada', age: 1 },
+            { id: 2, name: 'Bea', age: 2 }
+          ]}
+          rowKey="id"
+          pagination={false}
+          grid
+        />
+      )
+      const table = container.querySelector('table')!
+      const cells = container.querySelector('tbody tr')!.querySelectorAll('td')
+      const start = cells[0] as HTMLElement
+      start.focus()
+      fireEvent.keyDown(start, { key: 'ArrowRight' })
+      const activeId = table.getAttribute('aria-activedescendant')
+      const active = activeId
+        ? container.querySelector('#' + CSS.escape(activeId))
+        : document.activeElement
+      expect(active).toBe(cells[1])
+    })
   })
 
   describe('Expandable Rows', () => {

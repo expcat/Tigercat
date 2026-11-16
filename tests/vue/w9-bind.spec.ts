@@ -3,8 +3,10 @@
  */
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render } from '@testing-library/vue'
-import { defineComponent, h } from 'vue'
+import { defineComponent, h, ref } from 'vue'
 import { Table } from '../../packages/vue/src/components/Table'
+import { TableW9Panel } from '../../packages/vue/src/components/Table/w9-panel'
+import { nextMultiSort } from '../../packages/core/src/utils/w9-data'
 import { Timeline } from '../../packages/vue/src/components/Timeline'
 import { Collapse } from '../../packages/vue/src/components/Collapse'
 import { CollapsePanel } from '../../packages/vue/src/components/CollapsePanel'
@@ -40,18 +42,80 @@ const columns = [
   }
 ]
 
+const W9MenuFixture = defineComponent({
+  name: 'W9MenuFixture',
+  props: {
+    dataSource: { type: Array, required: true },
+    rowSelection: { type: Object, default: undefined }
+  },
+  emits: ['selection-change'],
+  setup(props, { emit }) {
+    const filters = ref<Record<string, unknown>>({})
+    const sorts = ref<{ key: string; direction: 'asc' | 'desc' }[]>([])
+    const hidden = ref<string[]>([])
+    const widths = ref<Record<string, number>>({})
+    return () => {
+      const dataSource = props.dataSource as { id: number; name: string; qty: number }[]
+      const keys = dataSource.map((row) => row.id)
+      const rowSelection = props.rowSelection as
+        { getCheckboxProps?: (record: { id: number }) => { disabled?: boolean } } | undefined
+      const disabledKeys = dataSource.flatMap((row) =>
+        rowSelection?.getCheckboxProps?.(row)?.disabled ? [row.id] : []
+      )
+      const visibleColumns = columns.filter((column) => !hidden.value.includes(column.key))
+      return h('div', [
+        h(TableW9Panel, {
+          active: true,
+          columns: visibleColumns,
+          sorts: sorts.value,
+          pageKeys: keys,
+          loadedKeys: keys,
+          disabledKeys,
+          pageRecords: dataSource,
+          processedRecords: dataSource,
+          processedKeys: keys,
+          selectedKeys: [],
+          onSort: (key: string) => {
+            sorts.value = nextMultiSort(sorts.value, key)
+          },
+          onFilter: (key: string, value: string) => {
+            filters.value = { ...filters.value, [key]: value }
+          },
+          onHide: (key: string) => {
+            hidden.value = hidden.value.includes(key)
+              ? hidden.value.filter((item) => item !== key)
+              : [...hidden.value, key]
+          },
+          onResize: (key: string, width: number) => {
+            widths.value = { ...widths.value, [key]: width }
+          },
+          onSelection: (next: (string | number)[]) => {
+            emit('selection-change', next)
+          }
+        }),
+        h(Table, {
+          columns,
+          dataSource,
+          rowKey: 'id',
+          pagination: false,
+          filters: filters.value,
+          hiddenColumnKeys: hidden.value,
+          columnWidths: widths.value,
+          rowSelection
+        })
+      ])
+    }
+  }
+})
+
 describe('W9 view bindings', () => {
   it('filters, sorts, hides, and resizes from the header menu', async () => {
-    const { container } = render(Table, {
+    const { container } = render(W9MenuFixture, {
       props: {
-        columns,
         dataSource: [
           { id: 1, name: 'b', qty: 2 },
           { id: 2, name: 'a', qty: 1 }
-        ],
-        rowKey: 'id',
-        pagination: false,
-        sorts: []
+        ]
       }
     })
     const menu = container.querySelector('[data-tiger-header-menu]')
@@ -74,17 +138,13 @@ describe('W9 view bindings', () => {
   })
 
   it('selects the page, a shift range, and announces once', async () => {
-    const { container, emitted } = render(Table, {
+    const { container, emitted } = render(W9MenuFixture, {
       props: {
-        columns,
         dataSource: [
           { id: 1, name: 'a', qty: 1 },
           { id: 2, name: 'b', qty: 2 },
           { id: 3, name: 'c', qty: 3 }
         ],
-        rowKey: 'id',
-        pagination: false,
-        sorts: [],
         rowSelection: {
           getCheckboxProps: (record: { id: number }) => ({ disabled: record.id === 2 })
         }
@@ -104,13 +164,9 @@ describe('W9 view bindings', () => {
   })
 
   it('exports the current page with formatted cells', async () => {
-    const { container } = render(Table, {
+    const { container } = render(W9MenuFixture, {
       props: {
-        columns,
-        dataSource: [{ id: 1, name: 'a', qty: 4 }],
-        rowKey: 'id',
-        pagination: false,
-        sorts: []
+        dataSource: [{ id: 1, name: 'a', qty: 4 }]
       }
     })
     await fireEvent.click(container.querySelector('[data-tiger-export-scope="page"]')!)

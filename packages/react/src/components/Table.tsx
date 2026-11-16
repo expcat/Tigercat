@@ -64,7 +64,6 @@ import { renderTableHeader } from './Table/render-header'
 import { renderTableBody } from './Table/render-body'
 import { renderSummaryRow } from './Table/render-summary'
 import { renderPagination } from './Table/render-pagination'
-import { TableW9Panel } from './Table/w9-panel'
 import type { TableProps } from './Table/types'
 
 export type { TableProps } from './Table/types'
@@ -561,8 +560,15 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
             columnCount: ctx.displayColumns.length,
             key: event.key
           })
-          if (next && event.key.startsWith('Arrow')) {
+          if (
+            next &&
+            event.key.startsWith('Arrow') &&
+            (next.row !== gridCell.row || next.column !== gridCell.column)
+          ) {
             event.preventDefault()
+            tableRef.current
+              ?.querySelector<HTMLElement>(`[data-tiger-grid-cell="${next.row}-${next.column}"]`)
+              ?.focus()
             setGridCell(next)
           }
         }
@@ -635,7 +641,8 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
         activeRowIndex,
         onActiveRowIndex: setActiveRowIndex,
         onVirtualRowFocus: focusVirtualRow,
-        grid
+        grid,
+        gridCell
       })}
       {renderSummaryRow(ctx, {
         size,
@@ -699,34 +706,6 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
       data-tiger-measured-row-height={Object.values(measuredRowHeights)[0] || undefined}
       data-tiger-table-layout={showCardTree ? 'card' : 'table'}
       aria-busy={loading}>
-      <TableW9Panel
-        locale={{ ...tableLocale, table: tableLabels }}
-        active={sorts !== undefined}
-        columns={ctx.displayColumns}
-        sorts={ctx.multiSort}
-        pageKeys={ctx.pageRowKeys}
-        loadedKeys={ctx.loadedSelectableRowKeys}
-        disabledKeys={ctx.paginatedData.flatMap((record, index) => {
-          const key = ctx.pageRowKeys[index]
-          const checkbox = internalRowSelection?.getCheckboxProps?.(record)
-          return checkbox?.disabled && key !== undefined ? [key] : []
-        })}
-        pageRecords={ctx.paginatedData}
-        processedRecords={ctx.processedData}
-        processedKeys={ctx.processedRowKeys}
-        selectedKeys={ctx.selectedRowKeys ?? []}
-        onSort={(key) => ctx.applyMultiSort(key)}
-        onFilter={(key, value) => ctx.handleFilter(key, value)}
-        onHide={(key) => {
-          const hidden = ctx.hiddenColumnKeys.includes(key)
-            ? ctx.hiddenColumnKeys.filter((item) => item !== key)
-            : [...ctx.hiddenColumnKeys, key]
-          ctx.handleSetHiddenColumns(hidden)
-        }}
-        onResize={(key, width) => ctx.applyColumnWidth(key, width)}
-        onSelection={(keys) => ctx.replaceSelectedKeys(keys)}
-        onRemoteSelect={() => ctx.handleSelectLoaded(true)}
-      />
       {ctx.dragLive ? (
         <div role="status" data-tiger-drag-live="">
           {ctx.dragLive}

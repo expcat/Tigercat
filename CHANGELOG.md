@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Table 排序面板与 grid 焦点（React / Vue，C136-F01、C136-F02）**：传入 sorts（含空数组）不再把 W9 面板挂进文档，多列排序改由表头完成。开启 grid 后 ArrowRight 把焦点移到下一格；到边界时不拦截按键。
+
 - **DataExport 默认三项与 customExport 载荷（Core / React / Vue / Demo / 文档 / MCP，C135-F01、C135-F02）**：笔记与两端 Demo 写默认 xlsx、csv、markdown，多格式菜单含 Export CSV，触发器名走 triggerAriaLabel。隐藏 secret 时 customExport 收不到 secret 和 render-only 列，name 为 X:Ada。
 
 - **Countdown timer 可访问名（React / Vue，C134-F01）**：无 title、interval 为 0、ariaLabel 为「付款倒计时」时，timer 可访问名是 00:00:05，根节点仍用 ariaLabel。React 未传 ariaLabel 时保留调用方的 aria-label。
