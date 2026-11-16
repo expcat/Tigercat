@@ -172,9 +172,85 @@ describe('Menu', () => {
       expect(title?.className).not.toContain('justify-between')
       expect(container.querySelector('.tiger-tooltip')?.className).toContain('w-full')
     })
+
+    it('preserves inline indentation with caller styles and owns the start padding', () => {
+      render(
+        <Menu mode="inline" defaultOpenKeys={['sub']}>
+          <SubMenu itemKey="sub" title="Submenu">
+            <MenuItem itemKey="plain" style={{ margin: '13px' }}>
+              Plain
+            </MenuItem>
+            <MenuItem itemKey="custom" style={{ margin: '13px', paddingInlineStart: '99px' }}>
+              Custom
+            </MenuItem>
+          </SubMenu>
+        </Menu>
+      )
+
+      for (const name of ['Plain', 'Custom']) {
+        expect(getItem(name)).toHaveStyle({ margin: '13px', paddingInlineStart: '24px' })
+      }
+    })
   })
 
   describe('Selection', () => {
+    it('composes caller click and keydown with selection and arrow navigation', async () => {
+      const order: string[] = []
+      const onClick = vi.fn(() => order.push('click'))
+      const onKeyDown = vi.fn((event: React.KeyboardEvent<HTMLElement>) => {
+        expect(event.defaultPrevented).toBe(false)
+      })
+      const onSelect = vi.fn(() => order.push('select'))
+      render(
+        <Menu onSelect={onSelect}>
+          <MenuItem itemKey="a" onClick={onClick} onKeyDown={onKeyDown}>
+            Alpha
+          </MenuItem>
+          <MenuItem itemKey="b">Beta</MenuItem>
+        </Menu>
+      )
+
+      const alpha = getItem('Alpha')
+      fireEvent.click(alpha)
+      expect(onClick).toHaveBeenCalledTimes(1)
+      expect.soft(onSelect).toHaveBeenCalledTimes(1)
+      expect.soft(order).toEqual(['click', 'select'])
+      expect.soft(alpha).toHaveAttribute('data-tiger-selected', 'true')
+
+      alpha.focus()
+      fireEvent.keyDown(alpha, { key: 'ArrowDown' })
+      expect(onKeyDown).toHaveBeenCalledTimes(1)
+      await waitFor(() => expect(getItem('Beta')).toHaveFocus())
+    })
+
+    it('honors caller preventDefault and disabled items before internal actions', () => {
+      const onSelect = vi.fn()
+      const onClick = vi.fn((event: React.MouseEvent<HTMLElement>) => event.preventDefault())
+      const onKeyDown = vi.fn((event: React.KeyboardEvent<HTMLElement>) => event.preventDefault())
+      render(
+        <Menu onSelect={onSelect}>
+          <MenuItem itemKey="a" onClick={onClick} onKeyDown={onKeyDown}>
+            Alpha
+          </MenuItem>
+          <MenuItem itemKey="b" disabled>
+            Beta
+          </MenuItem>
+        </Menu>
+      )
+
+      const alpha = getItem('Alpha')
+      alpha.focus()
+      fireEvent.click(alpha)
+      fireEvent.keyDown(alpha, { key: 'ArrowDown' })
+      fireEvent.click(getItem('Beta'))
+      fireEvent.keyDown(getItem('Beta'), { key: 'b' })
+      expect(onClick).toHaveBeenCalledTimes(1)
+      expect(onKeyDown).toHaveBeenCalledTimes(1)
+      expect(onSelect).not.toHaveBeenCalled()
+      expect(alpha).toHaveFocus()
+      expect(alpha).toHaveAttribute('data-tiger-selected', 'false')
+    })
+
     it('keeps the selected item selected when it is clicked again', async () => {
       const user = userEvent.setup()
       const onSelect = vi.fn()
@@ -207,6 +283,42 @@ describe('Menu', () => {
   })
 
   describe('Keyboard', () => {
+    it('keeps typeahead out of a closed inline submenu', () => {
+      render(
+        <Menu mode="inline" defaultOpenKeys={['sub']}>
+          <MenuItem itemKey="a">Alpha</MenuItem>
+          <SubMenu itemKey="sub" title="Submenu">
+            <MenuItem itemKey="b">Beta</MenuItem>
+          </SubMenu>
+        </Menu>
+      )
+
+      const beta = getItem('Beta')
+      fireEvent.click(getItem('Submenu'))
+      expect(getItem('Submenu')).toHaveAttribute('aria-expanded', 'false')
+      expect(beta.closest('[data-tiger-menu-hidden="true"]')).not.toBeNull()
+      const alpha = getItem('Alpha')
+      alpha.focus()
+      fireEvent.keyDown(alpha, { key: 'b' })
+      expect(alpha).toHaveFocus()
+    })
+
+    it('moves the roving tab stop with a typeahead match', () => {
+      render(
+        <Menu>
+          <MenuItem itemKey="a">Alpha</MenuItem>
+          <MenuItem itemKey="b">Beta</MenuItem>
+        </Menu>
+      )
+
+      const alpha = getItem('Alpha')
+      const beta = getItem('Beta')
+      alpha.focus()
+      fireEvent.keyDown(alpha, { key: 'b' })
+      expect(beta).toHaveFocus()
+      expect([alpha, beta].map((item) => item.getAttribute('tabindex'))).toEqual(['-1', '0'])
+    })
+
     it('keeps one tab stop on a vertical menu and moves it with arrows', async () => {
       const user = userEvent.setup()
       render(

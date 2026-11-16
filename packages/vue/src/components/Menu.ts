@@ -16,6 +16,7 @@ import {
   useId
 } from 'vue'
 import {
+  callUnknownEventHandler,
   classNames,
   collectMenuRootTabStops,
   getSecureRel,
@@ -26,6 +27,7 @@ import {
   focusFirstChildItem,
   focusMenuEdge,
   getMenuClasses,
+  getMenuButtons,
   getMenuCollapsedInitial,
   menuCollapsedTooltip,
   normalizeMenuItemBadge,
@@ -581,28 +583,26 @@ export const MenuItem = defineComponent({
       return rest
     })
 
-    const handleClick = () => {
-      if (!props.disabled && menuContext) menuContext.handleSelect(props.itemKey)
+    const handleClick = (event: MouseEvent) => {
+      callUnknownEventHandler(attrs.onClick, event)
+      if (event.defaultPrevented || props.disabled || !menuContext) return
+      menuContext.handleSelect(props.itemKey)
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (!menuContext) return
+      callUnknownEventHandler(attrs.onKeydown, event)
+      if (event.defaultPrevented || props.disabled || !menuContext) return
       const current = event.currentTarget as HTMLElement
       const list = current.closest('[data-tiger-menu-list]') as HTMLElement | null
       if (list) {
-        const nodes = Array.from(list.querySelectorAll<HTMLElement>('[data-tiger-menuitem="true"]'))
+        const nodes = getMenuButtons(list)
         const labels = nodes.map((node) => node.textContent ?? '')
         const from = nodes.indexOf(current)
-        const highlight = menuContext.typeahead.push(
-          event.key,
-          labels,
-          from,
-          nodes.map((node) => node.getAttribute('aria-disabled') === 'true')
-        )
+        const highlight = menuContext.typeahead.push(event.key, labels, from)
         if (highlight && highlight.index >= 0) {
           event.preventDefault()
           markTypeaheadMatch(nodes, highlight.index)
-          nodes[highlight.index]?.focus()
+          moveFocusInMenu(current, highlight.index - from)
           return
         }
       }
@@ -690,10 +690,10 @@ export const MenuItem = defineComponent({
         'data-tiger-selected': isSelected.value ? 'true' : 'false',
         'aria-disabled': props.disabled ? 'true' : undefined,
         tabindex: tabIndex,
-        onClick: handleClick,
-        onKeydown: handleKeyDown,
         role,
-        ...passthroughAttrs.value
+        ...passthroughAttrs.value,
+        onClick: handleClick,
+        onKeydown: handleKeyDown
       }
 
       const safeHref = resolveLinkHref(props.href, { disabled: props.disabled })
@@ -964,7 +964,8 @@ export const SubMenu = defineComponent({
     }
 
     const handleTitleClick = (event: MouseEvent) => {
-      if (!menuContext || props.disabled) return
+      callUnknownEventHandler(attrs.onClick, event)
+      if (event.defaultPrevented || props.disabled || !menuContext) return
       if (!isPopup.value) hasRenderedInline.value = true
       const pointerType = 'pointerType' in event ? (event as PointerEvent).pointerType : ''
       if (isPopup.value && isExpanded.value && pointerType === 'mouse') return
@@ -990,7 +991,8 @@ export const SubMenu = defineComponent({
     }
 
     const handleTitleKeyDown = (event: KeyboardEvent) => {
-      if (!menuContext || props.disabled) return
+      callUnknownEventHandler(attrs.onKeydown, event)
+      if (event.defaultPrevented || props.disabled || !menuContext) return
       const current = event.currentTarget as HTMLButtonElement
       const rootMenu = current.closest('[data-tiger-menu-root="true"]') as HTMLElement | null
       const isRoot = Boolean(rootMenu && current.closest('[data-tiger-menu-list]') === rootMenu)
@@ -1104,8 +1106,6 @@ export const SubMenu = defineComponent({
           ref: titleEl,
           class: titleClasses.value,
           style: titleStyle.value,
-          onClick: handleTitleClick,
-          onKeydown: handleTitleKeyDown,
           role: titleRole,
           'data-tiger-menuitem': 'true',
           'data-tiger-submenu-title': '',
@@ -1116,7 +1116,9 @@ export const SubMenu = defineComponent({
           'data-state': isExpanded.value ? 'open' : 'closed',
           disabled: props.disabled,
           tabindex: props.disabled ? -1 : roving ? (isTabStop ? 0 : -1) : 0,
-          ...passthroughAttrs.value
+          ...passthroughAttrs.value,
+          onClick: handleTitleClick,
+          onKeydown: handleTitleKeyDown
         },
         titleChildren
       )

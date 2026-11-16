@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+双端 MenuItem 的原生 click / keydown 现在先调用调用方 handler，再执行内部选择与导航；需要取消本次内部动作时调用 `event.preventDefault()`。Vue SubMenu 同样适用。React inline 子项的自定义 style 现在与层级缩进合并，冲突时内部 `paddingInlineStart` 优先，其他样式保留。双端字符定位只匹配当前层可用项，并让命中项成为唯一 tab stop；关闭子菜单内的隐藏项不会获得焦点。
+
 Vue Menu 现在与 React 一致：`items` 非 `null` / `undefined` 时只渲染数据项，包括 `items=[]`；默认 slot / children 不再追加。需要渲染默认内容时，移除 `items` 或传 `undefined`；需要追加菜单项时，将它们放入同一个 `items` 数组。
 
 双端 FullscreenButton 与 `useFullscreen` 的 target 变化现在会重新同步全屏状态：A 全屏期间改为 B 后，按钮显示进入全屏，下一次点击对 B 发出进入请求，`onChange` / `change` 同步为 false。调用方式不用改。SSR 首屏仍不禁用，挂载后检查浏览器支持，Demo 说明已对齐。

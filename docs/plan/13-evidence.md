@@ -168,7 +168,7 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | C096 | FloatButtonGroup      | needs-evidence | 视觉 24 blocked、原生键盘 24 blocked、截图 0（owner 均 C095，仅 02 渲染 Group）；浏览器 E2E 未执行；hydration 未测，SSR 仅 6 份；亮暗主题、窄屏、RTL 未验收               |
 | C097 | FullscreenButton      | needs-evidence | 视觉 8 blocked、原生键盘 8 blocked、截图 0（CUA browsers=[]）；无 Core 专项或 E2E 用例；hydration 未测，SSR 仅 2 份字符串；真实全屏进入/退出与外部状态同步未验            |
 | C098 | Menu                  | needs-evidence | 视觉 40 blocked、原生键盘 40 blocked、截图 0；TIGER_A11Y=1 下 182 项 2 failed（即 F01）；浏览器 E2E、hydration、读屏未执行，SSR 仅 2 份                                   |
-| C099 | MenuItem              | needs-evidence | Demo（owner C098）视觉 40 blocked、原生键盘 40 blocked、截图 0；TIGER_A11Y=1 下 83 项 2 failed（归 C098-F01）；无专属 E2E；hydration 未测                                 |
+| C099 | MenuItem              | needs-evidence | F01–F04 已修复并通过定向自动门禁；原 Demo（owner C098）视觉 40 blocked、原生键盘 40 blocked、截图 0；无专属 E2E；hydration 未测                                           |
 | C100 | MenuItemGroup         | needs-evidence | Demo（owner C098）视觉 40 blocked、原生键盘 40 blocked、截图 0；TIGER_A11Y=1 下 79 项 2 failed（归 C098-F01）；无专属 E2E；hydration、读屏未测                            |
 | C101 | SubMenu               | needs-evidence | 视觉 0/40 blocked；原生键盘 0/40 blocked；截图 0；无专属 E2E；SSR 字符串无警告，hydration 未测；TIGER_A11Y 79 项 77 passed/2 failed；读屏、RTL 几何未测                   |
 | C102 | NavigationMenu        | needs-evidence | 视觉 0/16 blocked；原生键盘 0/16 blocked；截图 0；E2E、SSR 未跑；TIGER_A11Y 100 项 99 passed/1 failed（React axe）；RTL 几何未测                                          |

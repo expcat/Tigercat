@@ -30,6 +30,9 @@ export const MenuItem: React.FC<MenuItemProps> = ({
   icon,
   href,
   className,
+  style,
+  onClick,
+  onKeyDown,
   children,
   level = 0,
   collapsed: collapsedOverride,
@@ -67,31 +70,35 @@ export const MenuItem: React.FC<MenuItemProps> = ({
       ? getMenuItemIndent(level, menuContext.inlineIndent)
       : {}
 
-  const handleClick = useCallback(() => {
-    if (!disabled && menuContext) {
+  const handleClick = useCallback(
+    (event: React.MouseEvent<HTMLElement>) => {
+      onClick?.(event)
+      if (event.defaultPrevented || disabled || !menuContext) return
       menuContext.handleSelect(itemKey)
-    }
-  }, [disabled, menuContext, itemKey])
+    },
+    [disabled, menuContext, itemKey, onClick]
+  )
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLElement>) => {
-      if (!menuContext) return
+      onKeyDown?.(event)
+      if (event.defaultPrevented || disabled || !menuContext) return
       const current = event.currentTarget
       const typeaheadList = current.closest<HTMLElement>('ul[data-tiger-menu-list]')
       if (typeaheadList) {
-        const nodes = Array.from(
-          typeaheadList.querySelectorAll<HTMLElement>('[data-tiger-menuitem]')
-        )
+        const nodes = getMenuButtons(typeaheadList)
         const hit = menuContext.typeahead.push(
           event.key,
           nodes.map((node) => (node.textContent ?? '').trim()),
-          Math.max(0, nodes.indexOf(current)),
-          nodes.map((node) => node.getAttribute('aria-disabled') === 'true')
+          Math.max(0, nodes.indexOf(current))
         )
         if (hit && hit.index >= 0) {
           event.preventDefault()
           markTypeaheadMatch(nodes, hit.index)
-          nodes[hit.index]?.focus()
+          const next = nodes[hit.index]
+          const key = next?.getAttribute('data-tiger-menuitem-key')
+          if (key != null) setLayerStop?.(parseMenuKeyId(key))
+          next?.focus()
           return
         }
       }
@@ -150,7 +157,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({
         submenuScope.titleRef.current?.focus()
       }
     },
-    [itemKey, menuContext, setLayerStop, submenuScope]
+    [itemKey, menuContext, onKeyDown, setLayerStop, submenuScope]
   )
 
   const label = getReactMenuPlainText(children)
@@ -200,7 +207,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({
   const safeHref = resolveLinkHref(href, { disabled })
   const shared = {
     className: itemClasses,
-    style: indentStyle,
+    style: { ...style, ...indentStyle },
     'data-tiger-menuitem': 'true' as const,
     'data-tiger-menuitem-key': menuKeyId(itemKey),
     'data-tiger-selected': isSelected ? 'true' : 'false',

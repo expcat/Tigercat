@@ -168,6 +168,63 @@ describe('Menu', () => {
   })
 
   describe('Selection', () => {
+    it('composes caller click and keydown with selection and arrow navigation', async () => {
+      const order: string[] = []
+      const onClick = vi.fn(() => order.push('click'))
+      const onKeydown = vi.fn((event: KeyboardEvent) => {
+        expect(event.defaultPrevented).toBe(false)
+      })
+      const onSelect = vi.fn(() => order.push('select'))
+      render(Menu, {
+        attrs: { onSelect },
+        slots: {
+          default: () => [
+            h(MenuItem, { itemKey: 'a', onClick, onKeydown }, () => 'Alpha'),
+            h(MenuItem, { itemKey: 'b' }, () => 'Beta')
+          ]
+        }
+      })
+
+      const alpha = getItem('Alpha')
+      await fireEvent.click(alpha)
+      expect(onClick).toHaveBeenCalledTimes(1)
+      expect.soft(onSelect).toHaveBeenCalledTimes(1)
+      expect.soft(order).toEqual(['click', 'select'])
+      expect.soft(alpha).toHaveAttribute('data-tiger-selected', 'true')
+
+      alpha.focus()
+      await fireEvent.keyDown(alpha, { key: 'ArrowDown' })
+      expect(onKeydown).toHaveBeenCalledTimes(1)
+      expect(getItem('Beta')).toHaveFocus()
+    })
+
+    it('honors caller preventDefault and disabled items before internal actions', async () => {
+      const onSelect = vi.fn()
+      const onClick = vi.fn((event: MouseEvent) => event.preventDefault())
+      const onKeydown = vi.fn((event: KeyboardEvent) => event.preventDefault())
+      render(Menu, {
+        attrs: { onSelect },
+        slots: {
+          default: () => [
+            h(MenuItem, { itemKey: 'a', onClick, onKeydown }, () => 'Alpha'),
+            h(MenuItem, { itemKey: 'b', disabled: true }, () => 'Beta')
+          ]
+        }
+      })
+
+      const alpha = getItem('Alpha')
+      alpha.focus()
+      await fireEvent.click(alpha)
+      await fireEvent.keyDown(alpha, { key: 'ArrowDown' })
+      await fireEvent.click(getItem('Beta'))
+      await fireEvent.keyDown(getItem('Beta'), { key: 'b' })
+      expect(onClick).toHaveBeenCalledTimes(1)
+      expect(onKeydown).toHaveBeenCalledTimes(1)
+      expect(onSelect).not.toHaveBeenCalled()
+      expect(alpha).toHaveFocus()
+      expect(alpha).toHaveAttribute('data-tiger-selected', 'false')
+    })
+
     it('keeps 1 and "1" distinct and a second click stays selected', async () => {
       const { emitted } = render(Menu, {
         props: { defaultSelectedKeys: ['1'] },
@@ -186,6 +243,47 @@ describe('Menu', () => {
   })
 
   describe('Keyboard', () => {
+    it('keeps typeahead out of a closed inline submenu', async () => {
+      render(Menu, {
+        props: { mode: 'inline', defaultOpenKeys: ['sub'] },
+        slots: {
+          default: () => [
+            h(MenuItem, { itemKey: 'a' }, () => 'Alpha'),
+            h(SubMenu, { itemKey: 'sub', title: 'Submenu' }, () =>
+              h(MenuItem, { itemKey: 'b' }, () => 'Beta')
+            )
+          ]
+        }
+      })
+
+      const beta = getItem('Beta')
+      await fireEvent.click(getItem('Submenu'))
+      expect(getItem('Submenu')).toHaveAttribute('aria-expanded', 'false')
+      expect(beta.closest('[data-tiger-menu-hidden="true"]')).not.toBeNull()
+      const alpha = getItem('Alpha')
+      alpha.focus()
+      await fireEvent.keyDown(alpha, { key: 'b' })
+      expect(alpha).toHaveFocus()
+    })
+
+    it('moves the roving tab stop with a typeahead match', async () => {
+      render(Menu, {
+        slots: {
+          default: () => [
+            h(MenuItem, { itemKey: 'a' }, () => 'Alpha'),
+            h(MenuItem, { itemKey: 'b' }, () => 'Beta')
+          ]
+        }
+      })
+
+      const alpha = getItem('Alpha')
+      const beta = getItem('Beta')
+      alpha.focus()
+      await fireEvent.keyDown(alpha, { key: 'b' })
+      expect(beta).toHaveFocus()
+      expect([alpha, beta].map((item) => item.getAttribute('tabindex'))).toEqual(['-1', '0'])
+    })
+
     it('moves between vertical items with arrows and keeps one tab stop', async () => {
       render(Menu, {
         slots: {
@@ -262,6 +360,31 @@ describe('Menu', () => {
   })
 
   describe('SubMenu', () => {
+    it('composes caller click and keydown with submenu opening and child focus', async () => {
+      const onClick = vi.fn()
+      const onKeydown = vi.fn((event: KeyboardEvent) => {
+        expect(event.defaultPrevented).toBe(false)
+      })
+      render(Menu, {
+        props: { mode: 'inline' },
+        slots: {
+          default: () =>
+            h(SubMenu, { itemKey: 'sub', title: 'Submenu', onClick, onKeydown }, () =>
+              h(MenuItem, { itemKey: 'child' }, () => 'Child')
+            )
+        }
+      })
+
+      const trigger = getItem('Submenu')
+      await fireEvent.click(trigger)
+      expect(onClick).toHaveBeenCalledTimes(1)
+      expect.soft(trigger).toHaveAttribute('aria-expanded', 'true')
+      trigger.focus()
+      await fireEvent.keyDown(trigger, { key: 'ArrowRight' })
+      expect(onKeydown).toHaveBeenCalledTimes(1)
+      await waitFor(() => expect(getItem('Child')).toHaveFocus())
+    })
+
     it('opens a horizontal submenu from click', async () => {
       render(Menu, {
         props: { mode: 'horizontal' },
