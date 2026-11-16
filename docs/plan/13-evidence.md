@@ -92,7 +92,7 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 
 | 任务 | 组件         | 队列           | 现状                                                                                                                                                                   |
 | ---- | ------------ | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| C033 | AspectRatio  | complete       | 2026-11-13 补采：视觉 24 格 8 pass / 16 blocked（picsum.photos 封锁，仅图片载入与裁切维度）；键盘 24/24 pass；未做 hydration、E2E、全仓门禁；读屏未测                  |
+| C033 | AspectRatio  | complete       | C033-F01/F02 已修复；47 项 spec（含 axe）通过，IAB 不可用待视觉复验。既有视觉 8 pass / 16 图片 blocked（picsum 封锁）、键盘 24/24 pass；hydration、E2E、读屏未测       |
 | C034 | Card         | complete       | 补采：视觉 01/02 的 16 格 pass，03/04 的 16 格封面图片 blocked（picsum 封锁）；键盘 16 组全通过；hover 抬起、href Card Enter、读屏未测；无 hydration/E2E               |
 | C035 | Carousel     | complete       | 补采：视觉 16/16 pass、键盘 8/8 组 pass（暗色沿用同视口亮色证据）；RTL、pauseOnHover 悬停、读屏、F02/F03 受控场景未实测；e2e/mobile-touch 未运行，无 hydration         |
 | C036 | Col          | needs-evidence | 视觉 0/24 blocked、真实键盘 0/24 blocked、截图 0（24 格 owner 均为 C046 Row）；未跑 hydration、浏览器 E2E、读屏；容器断点、offset/RTL 几何、flex 尺寸未实测            |

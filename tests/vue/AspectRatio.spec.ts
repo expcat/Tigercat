@@ -3,9 +3,10 @@
  */
 
 import { describe, expect, it } from 'vitest'
-import { render } from '@testing-library/vue'
+import { fireEvent, render } from '@testing-library/vue'
 import { h } from 'vue'
 import { AspectRatio } from '@expcat/tigercat-vue/AspectRatio'
+import AspectRatioOverlayDemo from '../../examples/example/vue3/src/examples/aspect-ratio/03/App.vue'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 function getRoot(container: HTMLElement): HTMLElement {
@@ -126,6 +127,16 @@ describe('AspectRatio', () => {
       expect(root.className).toContain('overflow-visible')
       expect(img).toBeTruthy()
     })
+  })
+
+  it('keeps Demo03 selected preset light and dark color classes exclusive', async () => {
+    const { getByRole } = render(AspectRatioOverlayDemo)
+    const selected = getByRole('button', { name: '4/3' })
+    await fireEvent.click(selected)
+    expect(selected).toHaveClass('border-blue-500', 'text-blue-600')
+    expect(selected).toHaveClass('dark:border-blue-400', 'dark:text-blue-400')
+    expect(selected.className).not.toMatch(/(?:text|border)-gray-/)
+    expect(getByRole('button', { name: '16/9' }).className).not.toMatch(/(?:text|border)-blue-/)
   })
 
   describe('a11y', () => {

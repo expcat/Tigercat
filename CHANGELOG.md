@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **AspectRatio 示例说明与选中态（Demo，C033-F01、C033-F02）**：两端 Demo01 写明显式 fit=cover 才铺满并裁切媒体；Vue Demo03 的蓝色选中类与灰色未选中类互斥，亮暗主题均保留可辨的选中态。
+
 - **Watermark 回退、内容更新与异步状态（Core / React / Vue / 文档 / MCP，C032-F01、C032-F02、C032-F03、C032-F04、C032-F05）**：图片失败时绘制已提供的文字；React 区分字符串与数组内容，Vue 跟踪响应式数组原地修改。图块和错误状态只由当前请求提交。文档撤下覆盖层自动重挂承诺。
 
 - **Tag 关闭回调与名称边界（Core / React / Vue / 文档 / MCP，C031-F01、C031-F02）**：两端关闭时通知一次 `onOpenChange(false)`（Vue 为 `open-change`），保留 close，由父级回写 open 或卸载。Core 注释与生成笔记明确子组件内部文字不进入默认关闭名，此时须显式传 `closeAriaLabel`。

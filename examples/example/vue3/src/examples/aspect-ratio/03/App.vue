@@ -24,11 +24,11 @@ const cover = 'https://picsum.photos/seed/tiger-overlay/640/360'
         v-for="option in options"
         :key="option"
         type="button"
-        class="rounded-md border border-gray-300 px-3 py-1.5 font-mono text-xs text-gray-700 transition-colors hover:bg-gray-100 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-800"
+        class="rounded-md border px-3 py-1.5 font-mono text-xs transition-colors"
         :class="
           ratio === option
             ? 'border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-400'
-            : ''
+            : 'border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-800'
         "
         @click="ratio = option">
         {{ option }}
