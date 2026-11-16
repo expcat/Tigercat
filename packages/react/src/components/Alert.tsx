@@ -99,6 +99,7 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
       onElapsed: () => requestCloseRef.current(false)
     })
   ).current
+  const interaction = useRef({ pointer: false, focus: false })
   const requestCloseRef = useRef<(fromCloseButton: boolean) => void>(() => undefined)
 
   const colorScheme = useMemo(() => getAlertTypeClasses(type, defaultAlertThemeColors), [type])
@@ -140,6 +141,19 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
   )
 
   const shown = open === false ? false : open === true ? true : !dismissed
+
+  const syncPaused = (
+    event: React.SyntheticEvent<HTMLDivElement>,
+    key: 'pointer' | 'focus',
+    active: boolean
+  ) => {
+    if (key === 'focus') {
+      const next = event.nativeEvent instanceof FocusEvent ? event.nativeEvent.relatedTarget : null
+      if (next instanceof Node && event.currentTarget.contains(next)) return
+    }
+    interaction.current[key] = active
+    countdown.setPaused(interaction.current.pointer || interaction.current.focus)
+  }
 
   const requestClose = useCallback((fromCloseButton: boolean) => {
     onCloseRef.current?.(new Event('close', { cancelable: true }))
@@ -194,7 +208,23 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
       }}
       className={alertClasses}
       role={role}
-      aria-live={live.ariaLive}>
+      aria-live={live.ariaLive}
+      onPointerEnter={(event) => {
+        props.onPointerEnter?.(event)
+        syncPaused(event, 'pointer', true)
+      }}
+      onPointerLeave={(event) => {
+        props.onPointerLeave?.(event)
+        syncPaused(event, 'pointer', false)
+      }}
+      onFocus={(event) => {
+        props.onFocus?.(event)
+        syncPaused(event, 'focus', true)
+      }}
+      onBlur={(event) => {
+        props.onBlur?.(event)
+        syncPaused(event, 'focus', false)
+      }}>
       {showIcon && (
         <div className={alertIconContainerClasses}>
           <StatusIcon
@@ -212,7 +242,11 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
           {hasDescription && (
             <div className={descriptionClasses}>{descriptionSlot ?? description}</div>
           )}
-          {action != null ? <div data-tiger-alert-action="">{action}</div> : null}
+          {action != null ? (
+            <div data-tiger-alert-action="" className={descriptionClasses}>
+              {action}
+            </div>
+          ) : null}
           {hasChildren && (
             <div className={hasTitle || hasDescription ? descriptionClasses : titleClasses}>
               {children}

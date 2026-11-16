@@ -18,10 +18,43 @@ describe('Alert', () => {
       title: 'Alert Title',
       description: 'Alert description'
     })
+    const root = screen.getByText('Alert Title').closest('.relative')
 
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
+    expect(root).not.toHaveAttribute('role')
+    expect(root).not.toHaveAttribute('aria-live')
     expect(screen.getByText('Alert Title')).toBeInTheDocument()
     expect(screen.getByText('Alert description')).toBeInTheDocument()
+  })
+
+  it('announces info inserted after the document has painted', () => {
+    const performanceRef = document.defaultView?.performance
+    if (!performanceRef) throw new Error('missing performance')
+    const original = performanceRef.getEntriesByType
+    performanceRef.getEntriesByType = (type: string) => {
+      if (type === 'paint') {
+        return [
+          {
+            name: 'first-contentful-paint',
+            entryType: 'paint',
+            startTime: 1,
+            duration: 0,
+            toJSON: () => ({})
+          } as PerformanceEntry
+        ]
+      }
+      return original.call(performanceRef, type)
+    }
+
+    try {
+      renderWithProps(Alert, { type: 'info', title: 'Inserted' })
+      const root = screen.getByText('Inserted').closest('.relative')
+      expect(root).toHaveAttribute('role', 'status')
+      expect(root).toHaveAttribute('aria-live', 'polite')
+    } finally {
+      performanceRef.getEntriesByType = original
+    }
   })
 
   it('uses role=alert only for error content', () => {
@@ -251,6 +284,68 @@ describe('Alert', () => {
       expect(onClose).toHaveBeenCalledTimes(1)
       vi.useRealTimers()
     })
+
+    it('pauses while the pointer or focus is inside and continues after leaving', async () => {
+      vi.useFakeTimers()
+      const onClose = vi.fn()
+      const first = renderWithSlots(
+        Alert,
+        { default: () => h('button', { type: 'button' }, 'Stay') },
+        { title: 'Hold', duration: 5000, onClose }
+      )
+      const root = screen.getByText('Hold').closest('.relative')
+      if (!root) throw new Error('missing alert root')
+
+      await fireEvent.pointerEnter(root)
+      vi.advanceTimersByTime(5000)
+      expect(onClose).not.toHaveBeenCalled()
+      expect(screen.getByText('Hold')).toBeInTheDocument()
+
+      await fireEvent.pointerLeave(root)
+      vi.advanceTimersByTime(4999)
+      expect(onClose).not.toHaveBeenCalled()
+      vi.advanceTimersByTime(50)
+      await vi.waitFor(() => {
+        expect(onClose).toHaveBeenCalledTimes(1)
+      })
+      first.unmount()
+
+      onClose.mockClear()
+      renderWithSlots(
+        Alert,
+        { default: () => h('button', { type: 'button' }, 'Stay') },
+        { title: 'Focus', duration: 5000, onClose }
+      )
+      await fireEvent.focusIn(screen.getByRole('button', { name: 'Stay' }))
+      vi.advanceTimersByTime(5000)
+      expect(onClose).not.toHaveBeenCalled()
+
+      await fireEvent.focusOut(screen.getByRole('button', { name: 'Stay' }))
+      vi.advanceTimersByTime(5000)
+      await vi.waitFor(() => {
+        expect(onClose).toHaveBeenCalledTimes(1)
+      })
+      vi.useRealTimers()
+    })
+  })
+
+  it('renders the action after the description with the description classes', () => {
+    renderWithSlots(
+      Alert,
+      { action: () => h('button', { type: 'button' }, 'Act') },
+      { title: 'Title', description: 'Description' }
+    )
+    const title = screen.getByText('Title')
+    const description = screen.getByText('Description')
+    const action = screen.getByRole('button', { name: 'Act' }).parentElement
+    expect(action).toHaveAttribute('data-tiger-alert-action', '')
+    expect(title.compareDocumentPosition(description) & Node.DOCUMENT_POSITION_FOLLOWING).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING
+    )
+    expect(
+      description.compareDocumentPosition(action as Node) & Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
+    expect(action).toHaveClass('text-sm', 'mt-1', 'text-[var(--tiger-text-secondary)]')
   })
 
   it('renders in banner mode', () => {

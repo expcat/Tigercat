@@ -230,6 +230,20 @@ export const Alert = defineComponent({
       enabled: isBrowser(),
       onElapsed: () => requestClose(false)
     })
+    let pointerInside = false
+    let focusInside = false
+    const syncPaused = () => countdown.setPaused(pointerInside || focusInside)
+    const invokeAttr = (handler: unknown, event: Event) => {
+      if (typeof handler === 'function') (handler as (event: Event) => void)(event)
+    }
+    const enteringAlert = (event: FocusEvent) => {
+      const next = event.relatedTarget
+      return !(
+        next instanceof Node &&
+        event.currentTarget instanceof Node &&
+        event.currentTarget.contains(next)
+      )
+    }
     const stopCountdown = countdown.subscribe(() => {
       ratio.value = countdown.getRatio()
     })
@@ -299,6 +313,15 @@ export const Alert = defineComponent({
           h('div', { class: titleClasses.value }, slots.title ? slots.title() : props.title)
         )
       }
+      if (hasDescription) {
+        contentChildren.push(
+          h(
+            'div',
+            { class: descriptionClasses.value },
+            slots.description ? slots.description() : props.description
+          )
+        )
+      }
 
       if (slots.action) {
         contentChildren.push(
@@ -306,16 +329,6 @@ export const Alert = defineComponent({
             'div',
             { 'data-tiger-alert-action': '', class: descriptionClasses.value },
             slots.action()
-          )
-        )
-      }
-
-      if (hasDescription) {
-        contentChildren.push(
-          h(
-            'div',
-            { class: descriptionClasses.value },
-            slots.description ? slots.description() : props.description
           )
         )
       }
@@ -375,7 +388,29 @@ export const Alert = defineComponent({
           class: classNames(alertClasses.value, props.className, coerceClassValue(attrsClass)),
           style: mergeStyleValues(attrsStyle, props.style),
           role,
-          'aria-live': live.ariaLive
+          'aria-live': live.ariaLive,
+          onPointerenter: (event: PointerEvent) => {
+            invokeAttr(attrsRecord.onPointerenter, event)
+            pointerInside = true
+            syncPaused()
+          },
+          onPointerleave: (event: PointerEvent) => {
+            invokeAttr(attrsRecord.onPointerleave, event)
+            pointerInside = false
+            syncPaused()
+          },
+          onFocusin: (event: FocusEvent) => {
+            invokeAttr(attrsRecord.onFocusin, event)
+            if (!enteringAlert(event)) return
+            focusInside = true
+            syncPaused()
+          },
+          onFocusout: (event: FocusEvent) => {
+            invokeAttr(attrsRecord.onFocusout, event)
+            if (!enteringAlert(event)) return
+            focusInside = false
+            syncPaused()
+          }
         },
         children
       )

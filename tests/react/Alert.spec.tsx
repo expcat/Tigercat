@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import React from 'react'
-import { render, screen, act } from '@testing-library/react'
+import { render, screen, act, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Alert } from '@expcat/tigercat-react/Alert'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
@@ -16,10 +16,43 @@ import { expectNoA11yViolationsIsolated } from '../utils/react'
 describe('Alert', () => {
   it('renders title and description without a live role by default', () => {
     render(<Alert title="Alert Title" description="Alert description" />)
+    const root = screen.getByText('Alert Title').closest('.relative')
 
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
+    expect(root).not.toHaveAttribute('role')
+    expect(root).not.toHaveAttribute('aria-live')
     expect(screen.getByText('Alert Title')).toBeInTheDocument()
     expect(screen.getByText('Alert description')).toBeInTheDocument()
+  })
+
+  it('announces info inserted after the document has painted', () => {
+    const performanceRef = document.defaultView?.performance
+    if (!performanceRef) throw new Error('missing performance')
+    const original = performanceRef.getEntriesByType
+    performanceRef.getEntriesByType = (type: string) => {
+      if (type === 'paint') {
+        return [
+          {
+            name: 'first-contentful-paint',
+            entryType: 'paint',
+            startTime: 1,
+            duration: 0,
+            toJSON: () => ({})
+          } as PerformanceEntry
+        ]
+      }
+      return original.call(performanceRef, type)
+    }
+
+    try {
+      render(<Alert type="info" title="Inserted" />)
+      const root = screen.getByText('Inserted').closest('.relative')
+      expect(root).toHaveAttribute('role', 'status')
+      expect(root).toHaveAttribute('aria-live', 'polite')
+    } finally {
+      performanceRef.getEntriesByType = original
+    }
   })
 
   it('uses role=alert only for error content', () => {
@@ -227,6 +260,72 @@ describe('Alert', () => {
       const { container } = render(<Alert title="Ticking" duration={5000} showCountdown />)
       expect(container.querySelector('[style*="width"]')).toBeInTheDocument()
     })
+
+    it('pauses while the pointer or focus is inside and continues after leaving', async () => {
+      vi.useFakeTimers()
+      const onClose = vi.fn()
+      const { unmount } = render(
+        <Alert title="Hold" duration={5000} onClose={onClose}>
+          <button type="button">Stay</button>
+        </Alert>
+      )
+      const root = screen.getByText('Hold').closest('.relative')
+      if (!root) throw new Error('missing alert root')
+
+      fireEvent.pointerEnter(root)
+      await act(() => {
+        vi.advanceTimersByTime(5000)
+      })
+      expect(onClose).not.toHaveBeenCalled()
+      expect(screen.getByText('Hold')).toBeInTheDocument()
+
+      fireEvent.pointerLeave(root)
+      await act(() => {
+        vi.advanceTimersByTime(4999)
+      })
+      expect(onClose).not.toHaveBeenCalled()
+      await act(() => {
+        vi.advanceTimersByTime(50)
+      })
+      expect(onClose).toHaveBeenCalledTimes(1)
+      unmount()
+
+      onClose.mockClear()
+      render(
+        <Alert title="Focus" duration={5000} onClose={onClose}>
+          <button type="button">Stay</button>
+        </Alert>
+      )
+      fireEvent.focusIn(screen.getByRole('button', { name: 'Stay' }))
+      await act(() => {
+        vi.advanceTimersByTime(5000)
+      })
+      expect(onClose).not.toHaveBeenCalled()
+
+      fireEvent.focusOut(screen.getByRole('button', { name: 'Stay' }))
+      await act(() => {
+        vi.advanceTimersByTime(5000)
+      })
+      expect(onClose).toHaveBeenCalledTimes(1)
+      vi.useRealTimers()
+    })
+  })
+
+  it('renders the action after the description with the description classes', () => {
+    render(
+      <Alert title="Title" description="Description" action={<button type="button">Act</button>} />
+    )
+    const title = screen.getByText('Title')
+    const description = screen.getByText('Description')
+    const action = screen.getByRole('button', { name: 'Act' }).parentElement
+    expect(action).toHaveAttribute('data-tiger-alert-action', '')
+    expect(title.compareDocumentPosition(description) & Node.DOCUMENT_POSITION_FOLLOWING).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING
+    )
+    expect(
+      description.compareDocumentPosition(action as Node) & Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
+    expect(action).toHaveClass('text-sm', 'mt-1', 'text-[var(--tiger-text-secondary)]')
   })
 
   it('renders in banner mode', () => {

@@ -106,17 +106,21 @@ export interface AlertLiveState {
   ariaLive?: 'polite'
 }
 
-let alertPaintSettled = false
-
-if (typeof queueMicrotask === 'function') {
-  queueMicrotask(() => {
-    alertPaintSettled = true
-  })
-}
-
-/** True after the first browser turn. Later mounts are new status, not static copy. */
+/**
+ * True after this document's first paint.
+ * The first screen and each server request stay quiet. There is no process-wide flag.
+ */
 export function isAlertInsertedAfterPaint(): boolean {
-  return alertPaintSettled
+  if (typeof document === 'undefined') return false
+  const view = document.defaultView
+  if (!view) return false
+  const read = view.performance?.getEntriesByType
+  if (typeof read !== 'function') return false
+  try {
+    return read.call(view.performance, 'paint').length > 0
+  } catch {
+    return false
+  }
 }
 
 /**
@@ -176,6 +180,8 @@ export interface AlertCountdown {
    * Reduced motion freezes the clock and the bar together.
    */
   sync(duration: number | undefined, reducedMotion: boolean): void
+  /** Freeze the remaining time while the pointer or focus is inside. */
+  setPaused(paused: boolean): void
   dispose(): void
 }
 
@@ -203,6 +209,7 @@ export function createAlertCountdown(options: {
   let timer: ReturnType<typeof setInterval> | null = null
   let elapsedNotified = false
   let runningStamp = 0
+  let paused = false
 
   function emit(): void {
     listeners.forEach((listener) => listener())
@@ -231,7 +238,7 @@ export function createAlertCountdown(options: {
 
   function startTimer(): void {
     stopTimer()
-    if (options.enabled === false || reduced || total <= 0) return
+    if (options.enabled === false || reduced || paused || total <= 0 || remaining <= 0) return
     runningStamp = now() - (total - remaining)
     timer = schedule(tick, ALERT_COUNTDOWN_TICK_MS)
   }
@@ -263,9 +270,32 @@ export function createAlertCountdown(options: {
         remaining = next
         elapsedNotified = false
       }
-      if (reduced || options.enabled === false) {
+      if (reduced || paused || options.enabled === false) {
         stopTimer()
         emit()
+        return
+      }
+      if (timer === null) startTimer()
+      emit()
+    },
+    setPaused(next) {
+      if (paused === next) return
+      if (next && timer !== null) {
+        remaining = Math.max(0, total - (now() - runningStamp))
+      }
+      paused = next
+      if (paused || reduced || options.enabled === false || total <= 0) {
+        stopTimer()
+        emit()
+        return
+      }
+      if (remaining <= 0) {
+        stopTimer()
+        emit()
+        if (!elapsedNotified) {
+          elapsedNotified = true
+          options.onElapsed()
+        }
         return
       }
       if (timer === null) startTimer()
