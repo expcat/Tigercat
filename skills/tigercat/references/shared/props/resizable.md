@@ -13,7 +13,7 @@ description: Compact generated Tigercat Layout props reference
 
 `packages/core/src/types/resizable.ts` · `ResizableProps` · 4/15 compact props · [Complete props](#remaining-props-complete-public-api)
 
-Note: `left`/`top` 手柄移动被抓的那条边。`lockAspectRatio` 按手柄选主轴。角手柄不进 Tab。`width`/`height` 传入即受控。
+Note: `left`/`top` 手柄移动被抓的那条边。`lockAspectRatio` 按手柄选主轴。未禁用的边手柄和角手柄都进入 Tab。`width`/`height` 传入即受控。
 
 | Prop             | Type     | Default | Notes                                                                                     |
 | ---------------- | -------- | ------- | ----------------------------------------------------------------------------------------- |

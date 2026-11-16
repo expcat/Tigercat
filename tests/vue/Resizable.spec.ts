@@ -153,6 +153,36 @@ describe('Resizable', () => {
   })
 
   describe('Accessibility', () => {
+    it('sets an explicit aria-valuemax for the current size when no maximum is configured', () => {
+      const { container } = renderResizable()
+      const right = handle(container, 'right')
+      expect(right.getAttribute('aria-valuenow')).toBe('300')
+      expect(right.getAttribute('aria-valuemax')).toBe('300')
+    })
+
+    it('reports inline style width and height on the handles', () => {
+      const { container } = render(Resizable, {
+        props: { style: { width: '320px', height: '180px' } },
+        slots: { default: () => [h('div', 'Box')] }
+      })
+      expect(handle(container, 'right').getAttribute('aria-valuenow')).toBe('320')
+      expect(handle(container, 'bottom').getAttribute('aria-valuenow')).toBe('180')
+    })
+
+    it('keeps handle names when the root has aria-labelledby', () => {
+      const { container } = render(Resizable, {
+        props: { defaultWidth: 300, defaultHeight: 200 },
+        attrs: { 'aria-labelledby': 'panel-name' },
+        slots: { default: () => [h('div', { id: 'panel-name' }, 'Panel')] }
+      })
+      expect(container.firstElementChild?.getAttribute('aria-labelledby')).toBe('panel-name')
+      expect(handle(container, 'right').getAttribute('aria-label')).toBe('Resize right')
+      expect(handle(container, 'bottom').getAttribute('aria-label')).toBe('Resize bottom')
+      expect(handle(container, 'bottom-right').getAttribute('aria-label')).toBe(
+        'Resize bottom-right'
+      )
+    })
+
     it('has no accessibility violations with labeled handles', async () => {
       const { container } = renderResizable({ handles: ['right', 'bottom'] })
       await expectNoA11yViolations(container)

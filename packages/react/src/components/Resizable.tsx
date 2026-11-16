@@ -16,6 +16,8 @@ import {
   isSplitterRtl,
   mergeResizableBoxStyle,
   resizableBaseClasses,
+  reportedResizableSize,
+  resizableAriaValueMax,
   resolveVisibleResizeHandles,
   type DocumentDragSession,
   type ResizableProps as CoreResizableProps,
@@ -340,6 +342,8 @@ export const Resizable = forwardRef<HTMLDivElement, ResizableProps>(function Res
     offset.x,
     offset.y
   ) as React.CSSProperties
+  const reportedWidth = reportedResizableSize(width, style?.width)
+  const reportedHeight = reportedResizableSize(height, style?.height)
 
   return (
     <div
@@ -363,9 +367,9 @@ export const Resizable = forwardRef<HTMLDivElement, ResizableProps>(function Res
       {children}
       {visibleHandles.map((pos) => {
         const usesHeight = pos === 'top' || pos === 'bottom'
-        const valueNow = Math.round((usesHeight ? height : width) ?? 0)
+        const valueNow = Math.round(usesHeight ? reportedHeight : reportedWidth)
         const valueMin = usesHeight ? minHeight : minWidth
-        const valueMax = usesHeight ? maxHeight : maxWidth
+        const valueMax = resizableAriaValueMax(usesHeight ? maxHeight : maxWidth, valueNow)
         const handleName = formatResizableHandleLabel(labels.handleAriaLabel, pos)
         return (
           <div
@@ -373,7 +377,7 @@ export const Resizable = forwardRef<HTMLDivElement, ResizableProps>(function Res
             className={getResizableHandleClasses(pos, draggingHandle === pos, disabled)}
             data-handle={pos}
             role="separator"
-            aria-label={ariaLabelledby ? undefined : handleName}
+            aria-label={handleName}
             aria-orientation={getResizeHandleOrientation(pos)}
             aria-valuenow={valueNow}
             aria-valuemin={valueMin}

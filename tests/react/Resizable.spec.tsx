@@ -101,7 +101,7 @@ describe('Resizable', () => {
   })
 
   describe('Keyboard resize', () => {
-    it('exposes edge handles as named separators and keeps corners off the tab order', () => {
+    it('exposes edge and corner handles as named separators in the tab order', () => {
       const { container } = renderResizable()
       const right = handle(container, 'right')
       expect(right).toHaveAttribute('role', 'separator')
@@ -168,6 +168,35 @@ describe('Resizable', () => {
   })
 
   describe('Accessibility', () => {
+    it('sets an explicit aria-valuemax for the current size when no maximum is configured', () => {
+      const { container } = renderResizable()
+      const right = handle(container, 'right')
+      expect(right).toHaveAttribute('aria-valuenow', '300')
+      expect(right).toHaveAttribute('aria-valuemax', '300')
+    })
+
+    it('reports inline style width and height on the handles', () => {
+      const { container } = render(
+        <Resizable style={{ width: '320px', height: '180px' }}>
+          <div>Box</div>
+        </Resizable>
+      )
+      expect(handle(container, 'right')).toHaveAttribute('aria-valuenow', '320')
+      expect(handle(container, 'bottom')).toHaveAttribute('aria-valuenow', '180')
+    })
+
+    it('keeps handle names when the root has aria-labelledby', () => {
+      const { container } = render(
+        <Resizable defaultWidth={300} defaultHeight={200} aria-labelledby="panel-name">
+          <div id="panel-name">Panel</div>
+        </Resizable>
+      )
+      expect(container.firstElementChild).toHaveAttribute('aria-labelledby', 'panel-name')
+      expect(handle(container, 'right')).toHaveAttribute('aria-label', 'Resize right')
+      expect(handle(container, 'bottom')).toHaveAttribute('aria-label', 'Resize bottom')
+      expect(handle(container, 'bottom-right')).toHaveAttribute('aria-label', 'Resize bottom-right')
+    })
+
     it('has no accessibility violations with labeled handles', async () => {
       const { container } = renderResizable({ handles: ['right', 'bottom'] })
       await expectNoA11yViolations(container)

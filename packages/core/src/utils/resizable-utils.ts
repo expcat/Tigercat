@@ -482,3 +482,35 @@ export function formatResizableLiveText(width: number, height: number, template:
     .replace('{width}', String(Math.round(width)))
     .replace('{height}', String(Math.round(height)))
 }
+
+/** Finite px length. Percent, calc, and keywords are not a number. */
+export function readResizableCssPx(value: string | number | undefined): number | undefined {
+  if (typeof value === 'number' && Number.isFinite(value)) return value
+  if (typeof value !== 'string') return undefined
+  const matched = /^(-?(?:\d+\.?\d*|\.\d+))px$/i.exec(value.trim())
+  if (!matched) return undefined
+  const parsed = Number(matched[1])
+  return Number.isFinite(parsed) ? parsed : undefined
+}
+
+/**
+ * Numeric size wins. Otherwise an inline px length.
+ * Other CSS stays unresolved so SSR and the first client frame match.
+ */
+export function reportedResizableSize(
+  numeric: number | undefined,
+  styleValue: string | number | undefined
+): number {
+  if (numeric !== undefined && Number.isFinite(numeric)) return numeric
+  return readResizableCssPx(styleValue) ?? 0
+}
+
+/**
+ * Focusable separators need an explicit maximum.
+ * A finite max is that constraint. With none, resize math is unbounded, so the
+ * current value is the ceiling instead of WAI-ARIA's implicit 100.
+ */
+export function resizableAriaValueMax(configured: number | undefined, valueNow: number): number {
+  if (configured !== undefined && Number.isFinite(configured)) return configured
+  return valueNow
+}

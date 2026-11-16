@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Resizable 手柄焦点、上限与名称（Core / React / Vue / 文档 / MCP，C045-F01、C045-F02、C045-F03、C045-F04）**：生成笔记与 MCP 写明未禁用的边手柄和角手柄都进入 Tab。未传最大值时 `aria-valuemax` 取当前值，不再落到隐式 100。仅 style 为 320×180 时，right 为 320、bottom 为 180。根节点 `aria-labelledby` 不再清空手柄的 locale 名称。
+
 - **Masonry 间距分配与示例（Core / Demo，C044-F01、C044-F02、C044-F03）**：最短列按含列内间距的占用高度选列。heights=[100,1,1,1]、columns=2、gap=100 时第 4 项进入第 1 列，列高为 [201,102]。两端 masonry/01、03 显式传入 shortest。masonry/02 去掉 672px 上限，改用预览里可达的 md：宽屏 4 列、24px，sm 为 16px，窄屏仍是 1 列、8px。
 
 - **List 悬停与页大小（Demo，C043-F04、C043-F05）**：两端 list/01 显式传入 hoverable，行带悬停底色。两端 list/03 保存并回传 pageSize，选择新页大小后列表条数与选择器保持该值。

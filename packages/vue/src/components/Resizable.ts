@@ -18,6 +18,8 @@ import {
   mergeResizableBoxStyle,
   mergeStyleValues,
   resizableBaseClasses,
+  reportedResizableSize,
+  resizableAriaValueMax,
   resolveVisibleResizeHandles,
   type DocumentDragSession,
   type ResizeAxis,
@@ -258,20 +260,24 @@ export const Resizable = defineComponent({
     })
 
     return () => {
-      const labelledby = attrs['aria-labelledby']
+      const reportedWidth = reportedResizableSize(width.value, props.style?.width)
+      const reportedHeight = reportedResizableSize(height.value, props.style?.height)
       const handleNodes = visibleHandles.value.map((pos) => {
         const usesHeight = pos === 'top' || pos === 'bottom'
-        const valueNow = Math.round((usesHeight ? height.value : width.value) ?? 0)
+        const valueNow = Math.round(usesHeight ? reportedHeight : reportedWidth)
         const handleName = formatResizableHandleLabel(labels.value.handleAriaLabel, pos)
         return h('div', {
           class: getResizableHandleClasses(pos, draggingHandle.value === pos, props.disabled),
           'data-handle': pos,
           role: 'separator',
-          'aria-label': typeof labelledby === 'string' ? undefined : handleName,
+          'aria-label': handleName,
           'aria-orientation': getResizeHandleOrientation(pos),
           'aria-valuenow': valueNow,
           'aria-valuemin': usesHeight ? props.minHeight : props.minWidth,
-          'aria-valuemax': usesHeight ? props.maxHeight : props.maxWidth,
+          'aria-valuemax': resizableAriaValueMax(
+            usesHeight ? props.maxHeight : props.maxWidth,
+            valueNow
+          ),
           tabindex: props.disabled ? -1 : 0,
           onPointerdown: (e: PointerEvent) => onPointerDown(pos, e),
           onKeydown: (e: KeyboardEvent) => onKeyDown(pos, e)

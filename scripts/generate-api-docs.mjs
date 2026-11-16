@@ -358,7 +358,7 @@ const COMPONENT_USAGE_NOTES = {
   },
   Resizable: {
     notes:
-      '`left`/`top` 手柄移动被抓的那条边。`lockAspectRatio` 按手柄选主轴。角手柄不进 Tab。`width`/`height` 传入即受控。'
+      '`left`/`top` 手柄移动被抓的那条边。`lockAspectRatio` 按手柄选主轴。未禁用的边手柄和角手柄都进入 Tab。`width`/`height` 传入即受控。'
   },
   Image: {
     notes:
