@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   createWatermarkRenderController,
   getWatermarkOverlayStyle,
+  paintWatermark,
   renderWatermarkCanvas,
   renderWatermarkDataUrl,
   resolveWatermarkFont,
@@ -132,6 +133,10 @@ describe('watermark-utils', () => {
     await expect(
       renderWatermarkDataUrl({ ...renderOptions(), image: '/missing.png' })
     ).resolves.toBe('data:image/png;base64,canvas')
+    await expect(paintWatermark({ ...renderOptions(), image: '/missing.png' })).resolves.toEqual({
+      url: 'data:image/png;base64,canvas',
+      imageFailed: true
+    })
     expect(ctx.fillText).toHaveBeenCalledWith('Demo', 60, 32)
     createElement.mockRestore()
   })
@@ -269,7 +274,7 @@ describe('watermark-utils', () => {
     await controller.flush()
 
     expect(render).toHaveBeenCalledTimes(1)
-    expect(onRender).toHaveBeenCalledWith('data:image/png;base64,next')
+    expect(onRender).toHaveBeenCalledWith('data:image/png;base64,next', false)
   })
 
   it('does not re-encode the tile when the host is observed', async () => {
@@ -329,7 +334,7 @@ describe('watermark-utils', () => {
     await controller.flush()
 
     expect(controller.isPending()).toBe(false)
-    expect(onRender).toHaveBeenCalledWith('data:image/png;base64,flush')
+    expect(onRender).toHaveBeenCalledWith('data:image/png;base64,flush', false)
   })
 
   it('watermarkDefaults contains expected keys', () => {

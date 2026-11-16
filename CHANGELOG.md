@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Watermark 回退、内容更新与异步状态（Core / React / Vue / 文档 / MCP，C032-F01、C032-F02、C032-F03、C032-F04、C032-F05）**：图片失败时绘制已提供的文字；React 区分字符串与数组内容，Vue 跟踪响应式数组原地修改。图块和错误状态只由当前请求提交。文档撤下覆盖层自动重挂承诺。
+
 - **Tag 关闭回调与名称边界（Core / React / Vue / 文档 / MCP，C031-F01、C031-F02）**：两端关闭时通知一次 `onOpenChange(false)`（Vue 为 `open-change`），保留 close，由父级回写 open 或卸载。Core 注释与生成笔记明确子组件内部文字不进入默认关闭名，此时须显式传 `closeAriaLabel`。
 
 - **Statistic SSR、精度与零节点（Core / React / Vue，C030-F01、C030-F02、C030-F03）**：两端动画初值使用目标值，SSR 与首次客户端渲染一致，挂载后启动动画。Core 按科学计数法的尾数与指数推断小数位。React 保留 title / prefix / suffix 的数字 0，空值与 false 仍省略。

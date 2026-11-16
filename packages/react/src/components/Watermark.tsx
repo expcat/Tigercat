@@ -8,7 +8,6 @@ import {
   getWatermarkLabels,
   getWatermarkOverlayStyle,
   mergeTigerLocale,
-  paintWatermark,
   watermarkOverlayClasses,
   type WatermarkRenderController,
   type WatermarkProps as CoreWatermarkProps
@@ -69,12 +68,10 @@ export const Watermark = forwardRef<HTMLDivElement, WatermarkProps>(function Wat
           host: wrapperRef.current
         }
       },
-      render: async (options) => {
-        const painted = await paintWatermark(options)
-        setImageFailed(painted.imageFailed)
-        return painted.url
-      },
-      onRender: setBase64
+      onRender: (base64Url, failed) => {
+        setBase64(base64Url)
+        setImageFailed(failed)
+      }
     })
 
     renderControllerRef.current = controller
@@ -90,7 +87,7 @@ export const Watermark = forwardRef<HTMLDivElement, WatermarkProps>(function Wat
   }, [])
 
   const fontKey = `${font?.fontSize ?? ''}|${font?.fontFamily ?? ''}|${font?.fontWeight ?? ''}|${font?.color ?? ''}`
-  const contentKey = Array.isArray(content) ? content.join('\n') : (content ?? '')
+  const contentKey = JSON.stringify(content)
 
   useEffect(() => {
     renderControllerRef.current?.render()

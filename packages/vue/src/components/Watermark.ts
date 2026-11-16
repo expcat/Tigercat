@@ -11,7 +11,6 @@ import {
   getWatermarkLabels,
   getWatermarkOverlayStyle,
   mergeTigerLocale,
-  paintWatermark,
   watermarkOverlayClasses,
   type WatermarkRenderController,
   type WatermarkFont
@@ -91,13 +90,9 @@ export const Watermark = defineComponent({
           font: resolveWatermarkFont(props.font),
           host: wrapperRef.value
         }),
-        render: async (options) => {
-          const painted = await paintWatermark(options)
-          imageFailed.value = painted.imageFailed
-          return painted.url
-        },
-        onRender: (base64Url) => {
+        onRender: (base64Url, failed) => {
           base64.value = base64Url
+          imageFailed.value = failed
         }
       })
       renderController.observe(wrapperRef.value)
@@ -122,7 +117,8 @@ export const Watermark = defineComponent({
       ],
       () => {
         renderController?.render()
-      }
+      },
+      { deep: true }
     )
 
     onBeforeUnmount(() => {

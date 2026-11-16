@@ -86,7 +86,7 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | C029 | SplitButton    | needs-evidence | C029-F01/F04 已修复（F02/F03 此前已修）。Fragment SSR/DOM、首项键盘焦点样式通过；312 项 spec（含 axe）、types:check 通过。IAB 不可用，待人工视觉复验；历史 r4 失败保留，禁用点击与第二次 Tab 去向仍缺证；读屏未测    |
 | C030 | Statistic      | complete       | C030-F01/F02/F03 已修复。49 项 spec（含 axe）与 types:check 通过；双端 SSR 终值、科学计数法与 happy-dom 水合、React 零节点通过。既有视觉 24/24 pass、键盘 pass；本次未做浏览器复验，StrictMode 动画专项未测          |
 | C031 | Tag            | complete       | C031-F01/F02 已修复。24 项 spec（含 axe）与 types:check 通过；双端 Enter/Space 各通知一次 false，父级隐藏；显式 Remove Alpha 正常，文档/MCP 同步。既有视觉/键盘 32/32 pass；本次 DOM 验证，hydration、读屏未测       |
-| C032 | Watermark      | complete       | 2026-11-13 glm-r1：视觉 24/24 pass、键盘 12 组 pass、0 blocked；43 项 spec 通过；SSR 与合成 DOM 探针已跑（Canvas mock）；未跑 hydration；真实打印无证据                                                              |
+| C032 | Watermark      | complete       | C032-F01–F05 已修复。47 项 spec（含 axe）与 types:check 通过；Canvas/DOM 覆盖图片回退、内容更新和旧请求；文档/MCP 同步。既有视觉 24/24 pass、键盘 12 组 pass；本次未做浏览器复验，hydration、真实打印未测            |
 
 ### layout
 

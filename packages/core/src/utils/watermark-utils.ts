@@ -249,13 +249,15 @@ export function renderWatermarkCanvas(opts: {
 export async function paintWatermark(
   opts: WatermarkRenderOptions
 ): Promise<{ url?: string; imageFailed: boolean }> {
+  let imageFailed = false
   if (opts.image) {
     const image = await loadWatermarkImage(opts.image)
-    if (!image) return { imageFailed: true }
-    return { url: renderWatermarkToDomCanvas(opts, image), imageFailed: false }
+    if (image) return { url: renderWatermarkToDomCanvas(opts, image), imageFailed: false }
+    imageFailed = true
+    if (!opts.content?.length) return { imageFailed }
   }
   const offscreenResult = await renderWatermarkToOffscreenCanvas(opts)
-  return { url: offscreenResult ?? renderWatermarkToDomCanvas(opts), imageFailed: false }
+  return { url: offscreenResult ?? renderWatermarkToDomCanvas(opts), imageFailed }
 }
 
 export async function renderWatermarkDataUrl(
@@ -281,7 +283,7 @@ export type WatermarkFrameCancel = (handle: number) => void
 
 export interface WatermarkRenderControllerOptions {
   getRenderOptions: () => WatermarkRenderOptions
-  onRender: (base64Url: string | undefined) => void
+  onRender: (base64Url: string | undefined, imageFailed: boolean) => void
   requestFrame?: WatermarkFrameRequest
   cancelFrame?: WatermarkFrameCancel
   render?: (options: WatermarkRenderOptions) => Promise<string | undefined> | string | undefined
@@ -374,7 +376,7 @@ export function createWatermarkRenderController(
 ): WatermarkRenderController {
   const requestFrame = options.requestFrame ?? requestDefaultWatermarkFrame
   const cancelFrame = options.cancelFrame ?? cancelDefaultWatermarkFrame
-  const render = options.render ?? renderWatermarkDataUrl
+  const render = options.render
 
   let frameHandle: number | undefined
   let pending = false
@@ -387,12 +389,15 @@ export function createWatermarkRenderController(
     pending = false
     const currentVersion = renderVersion
     try {
-      const result = await render(options.getRenderOptions())
+      const renderOptions = options.getRenderOptions()
+      const result = render
+        ? { url: await render(renderOptions), imageFailed: false }
+        : await paintWatermark(renderOptions)
       if (currentVersion !== renderVersion) return
-      options.onRender(result)
+      options.onRender(result.url, result.imageFailed)
     } catch {
       if (currentVersion !== renderVersion) return
-      options.onRender(undefined)
+      options.onRender(undefined, false)
     }
   }
 
