@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Header 示例说明（Demo，C041-F01）**：两端 layout/01 改为写 blur 半透明顶栏，不再写未启用的 sticky 盖住滚动内容。
+
 - **Descriptions 属性、标题与组合语义（React / Vue，C039-F01、C039-F02、C039-F04、C039-F05）**：children/default slot 保留根属性与样式；Vue title slot 关联 table/dl 名称；空数据仍显示标题，有数据时保留 caption；DescriptionsItem 使用 dl 容纳 dt/dd。
 
 - **Content 跳转目标 id（React / Vue，C038-F01）**：双端 Content 与 Layout 共用 Core id 解析，首尾空格会修剪，纯空格回退为 tiger-main；跳转链接 href 与实际 main.id 保持一致。

@@ -100,7 +100,7 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | C038 | Content      | needs-evidence | F01 已修复；50 spec（双端 SSR/DOM）、types:check 通过；IAB 不可用，改用 href/id 断言。视觉/键盘 0/24 blocked（owner C042）；跳转点击、真实滚动及 hydration/E2E/读屏未测       |
 | C039 | Descriptions | needs-evidence | F01/F02/F04/F05 已修复（F03 此前 S08 完成）；41 spec（双端 SSR/DOM/axe）、types:check 通过。本次未做浏览器复验；视觉/键盘 0/16 blocked、截图 0；hydration、读屏未测           |
 | C040 | Footer       | needs-evidence | 视觉 0/16 blocked、外壳键盘 0/16 blocked、截图 0（owner 均为 C042）；未启动服务；未跑 hydration、浏览器 E2E、读屏、docs:links；无 Footer 专属 E2E                             |
-| C041 | Header       | needs-evidence | 视觉 0/24 blocked、外壳键盘 0/24 blocked、截图 0（owner 均为 C042）；未跑 hydration、浏览器 E2E、读屏；docs:links exit 1（.local 目录 1143 处失效链接）                       |
+| C041 | Header       | needs-evidence | F01 已修复。两端 layout/01 改为 blur 半透明顶栏，不再称未启用的 sticky。视觉/键盘 0/24 blocked、截图 0（owner 均为 C042）；hydration、浏览器 E2E、读屏未测                    |
 | C042 | Layout       | needs-evidence | 视觉 0/32 blocked、键盘 0/32 blocked、截图 0；未跑 hydration、浏览器 E2E、全仓构建、读屏；skip link 激活与滚动未测；docs:links exit 1（.local 1156 处）                       |
 | C043 | List         | needs-evidence | 视觉 0/40 blocked；键盘 0/40 blocked；截图 0；双端 SSR 探针已跑，hydration、读屏、浏览器 E2E、全仓构建未执行；Terra 二次审核不可核验                                          |
 | C044 | Masonry      | needs-evidence | 视觉 0/24 blocked；键盘 0/24 blocked；截图 0；双端 SSR 与纯函数探针已跑，hydration、读屏、浏览器 E2E、全仓构建未执行；Terra 二次审核不可核验                                  |
