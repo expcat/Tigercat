@@ -349,7 +349,8 @@ export const idID: TigerLocale = {
     collapseRowAriaLabel: 'Ciutkan baris',
     sortMenuAriaLabel: 'Urutkan',
     filterColumnAriaLabel: 'Saring {column}',
-    groupHeaderText: '{key} ({count})'
+    groupHeaderText: '{key} ({count})',
+    resetText: 'Atur ulang'
   },
   dataExport: {
     triggerText: 'Ekspor',

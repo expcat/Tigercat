@@ -349,7 +349,8 @@ export const koKR: TigerLocale = {
     collapseRowAriaLabel: '행 접기',
     sortMenuAriaLabel: '정렬',
     filterColumnAriaLabel: '{column} 필터',
-    groupHeaderText: '{key} ({count})'
+    groupHeaderText: '{key} ({count})',
+    resetText: '초기화'
   },
   dataExport: {
     triggerText: '내보내기',

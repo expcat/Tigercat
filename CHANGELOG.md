@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **查询条与 SchemaForm 接线（Core / React / Vue / Demo / 文档 / MCP，C175-F01、C175-F02、C175-F03、C175-F05、C175-F06、C179-F01、C179-F02）**：查询区重置按钮走 table locale，zh-CN 为「重置」。React 受控 name 重置后输入框、onReset 和行集仍是 Ann。Vue 后传入或替换的 query.api.getQueryValues 仍是 function。两端 data-table-with-toolbar/02 关闭不筛表的搜索框。生成的 Custom Filters 示例让 Input onChange 直接收值。input 的 maxLength 与 prefix 传到控件；DatePicker 没有的 picker、showTime 移出允许列表，未知参数按键各自警告。生成示例和优先列表改用 Vue modelValue、React value。
+
 - **聊天窗与评论串（Core / React / Vue / Demo / 文档 / MCP，C173-F01、C173-F02、C173-F03、C174-F01、C174-F02、C174-F03、C174-F04、C174-F05）**：不传 virtual 时满 40 条自动开窗，传 false 仍是普通 log；类型注释和生成 Props 默认写 auto (>=40)。Vue 关掉自动滚动后，挂载一帧 scrollTop 为 0。React 虚拟模式下同一条正文从 hello 改成 hello world，礼貌区跟着更新。replyPlaceholder 为「写下回复」时，两端行内回复框 aria-label 也是「写下回复」。Vue 的 onReply 同步抛错后根草稿仍是 top。两端 02 从根输入框发送 top 后列表出现 top。只传 onMore 就显示 More actions。nodes 里两个 id 为 a 时 alert 为 Duplicate comment id a，且只有一篇 article。
 
 - **受理人选择器键盘、过滤与文档回写（Core / React / Vue / 文档 / MCP，C172-F01、C172-F02、C172-F03、C172-F04、C172-F05、C172-F06）**：搜索框方向键把活动项从 Ada 移到 Bea，名称不再与列表相同。点击 Cy 后 Enter 作用在 Cy，不会把 Bea 加进已选。三人名单搜索 zzz 显示 No results found，zh-CN 为「暂无结果」；options 为空仍是 The directory is empty /「目录为空」。选中 Cy 和 Bea 后搜索 Design 仍显示 2 selected。30 人按 End 时列表含 overflow-auto 和最大高度，最后一人滚进容器。生成 Props 与示例写明 Vue v-model:selected-ids 和 React onChange。

@@ -567,6 +567,8 @@ export interface TigerLocaleTable {
   filterColumnAriaLabel?: string
   /** Template: supports {key} and {count} */
   groupHeaderText?: string
+  /** Query-area reset button */
+  resetText?: string
 }
 
 export interface TigerLocaleDataExport {

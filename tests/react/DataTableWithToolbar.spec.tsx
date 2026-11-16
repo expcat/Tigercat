@@ -8,6 +8,7 @@ import { act, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { DataTableWithToolbar } from '@expcat/tigercat-react/DataTableWithToolbar'
+import { Input } from '@expcat/tigercat-react/Input'
 import { Table } from '@expcat/tigercat-react/Table'
 import type { TableColumn } from '@expcat/tigercat-core'
 import { enUS } from '@expcat/tigercat-core/locales/en-US'
@@ -161,6 +162,38 @@ describe('DataTableWithToolbar (React)', () => {
     expect(onFiltersChange).toHaveBeenLastCalledWith({
       ageRange: { min: '21' }
     })
+  })
+
+  it('writes an Input value from filtersExtra without reading a DOM event', async () => {
+    const onFiltersChange = vi.fn()
+
+    render(
+      <DataTableWithToolbar<RowData>
+        columns={columns}
+        dataSource={[{ id: 1, name: 'A' }]}
+        toolbar={{
+          filtersExtra: ({ filters, setFilter }) => {
+            const ageRange =
+              filters.ageRange && typeof filters.ageRange === 'object'
+                ? (filters.ageRange as { min?: string | number })
+                : {}
+            return (
+              <Input
+                aria-label="年龄"
+                value={ageRange.min ?? ''}
+                onChange={(value) => setFilter('ageRange', { ...ageRange, min: value })}
+              />
+            )
+          },
+          onFiltersChange
+        }}
+        pagination={false}
+      />
+    )
+
+    await userEvent.type(screen.getByLabelText('年龄'), '5')
+
+    expect(onFiltersChange).toHaveBeenLastCalledWith({ ageRange: { min: '5' } })
   })
 
   it('delegates pagination rendering to Table', async () => {
@@ -328,16 +361,64 @@ describe('DataTableWithToolbar (React)', () => {
       <DataTableWithToolbar<RowData>
         columns={columns}
         dataSource={[]}
-        labels={{ searchButtonText: 'Find', expandText: 'Show query', collapseText: 'Hide query' }}
+        labels={{
+          searchButtonText: 'Find',
+          resetText: 'Clear',
+          expandText: 'Show query',
+          collapseText: 'Hide query'
+        }}
         query={{ fields: [{ key: 'name', label: 'Name' }], defaultCollapsed: true }}
         pagination={false}
       />
     )
 
     expect(screen.getByRole('button', { name: 'Find' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Reset' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Clear' })).toBeInTheDocument()
     await userEvent.click(screen.getByRole('button', { name: 'Show query' }))
     expect(screen.getByRole('button', { name: 'Hide query' })).toBeInTheDocument()
+  })
+
+  it('uses the table locale for the query reset button', () => {
+    const { container } = render(
+      <ConfigProvider locale={zhCN}>
+        <DataTableWithToolbar<RowData>
+          columns={columns}
+          dataSource={[]}
+          query={{ fields: [{ key: 'name', label: 'Name' }] }}
+          pagination={false}
+        />
+      </ConfigProvider>
+    )
+
+    const names = [...container.querySelectorAll('[data-tiger-table-query] button')].map(
+      (button) => button.textContent
+    )
+    expect(names).toEqual(['搜索', '重置', '收起'])
+  })
+
+  it('keeps a controlled query value in the input, reset payload, and rows', async () => {
+    const onReset = vi.fn()
+    render(
+      <DataTableWithToolbar<RowData>
+        columns={columns}
+        dataSource={[
+          { id: 1, name: 'Ann' },
+          { id: 2, name: 'Bob' }
+        ]}
+        query={{
+          fields: [{ key: 'name', label: 'Name', value: 'Ann' }],
+          onReset
+        }}
+        pagination={false}
+      />
+    )
+
+    await userEvent.click(screen.getByRole('button', { name: 'Reset' }))
+
+    expect(screen.getByPlaceholderText('Name')).toHaveValue('Ann')
+    expect(onReset).toHaveBeenCalledWith({ name: 'Ann' })
+    expect(screen.getByText('Ann')).toBeInTheDocument()
+    expect(screen.queryByText('Bob')).not.toBeInTheDocument()
   })
 
   it('submits search on enter without search button', async () => {

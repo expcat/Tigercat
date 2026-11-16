@@ -20,10 +20,10 @@ composite 组 16 个组件（C170–C185），视觉与键盘全部 blocked。
 
 ## 概览
 
-本篇 39 条：P1 0、P2 20、P3 19。
-按波次：W1 0、W7 20、W9 19。
+本篇 32 条：P1 0、P2 13、P3 19。
+按波次：W1 0、W7 13、W9 19。
 
-已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C170-F02、C170-F03、C170-F04、C171-F01、C171-F02、C172-F01、C172-F02、C172-F03、C172-F04、C172-F05、C172-F06、C173-F01、C173-F02、C173-F03、C174-F01、C174-F02、C174-F03、C174-F04、C174-F05。
+已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C170-F02、C170-F03、C170-F04、C171-F01、C171-F02、C172-F01、C172-F02、C172-F03、C172-F04、C172-F05、C172-F06、C173-F01、C173-F02、C173-F03、C174-F01、C174-F02、C174-F03、C174-F04、C174-F05、C175-F01、C175-F02、C175-F03、C175-F05、C175-F06、C179-F01、C179-F02。
 
 ## 波及多个组件的条目
 
@@ -79,14 +79,9 @@ composite 组 16 个组件（C170–C185），视觉与键盘全部 blocked。
 
 报告 `groups/composite/DataTableWithToolbar.md`，队列状态 needs-evidence。另受 S01 影响。
 
-| 编号     | 级别 | 波次 | 端          | 类别 | 条目                                         | 验收                                                                                     |
-| -------- | ---- | ---- | ----------- | ---- | -------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| C175-F01 | P2   | W7   | Core+双端   | i18n | 查询区重置按钮写死 Reset，不走 locale        | zhCN 的 ConfigProvider 下、query 有一个字段时，查询区按钮依次是搜索、重置、收起          |
-| C175-F02 | P2   | W7   | React       | 行为 | React 受控查询字段重置后显示与实际筛选不一致 | name 受控为 Ann、数据 Ann 和 Bob，点 Reset 后 React 输入框、onReset、行集都是 Ann        |
-| C175-F03 | P2   | W7   | Vue         | 行为 | Vue 后传入或替换的 query 拿不到 api          | 先不传 query、下一拍传入再替换，Vue 两个对象的 query.api.getQueryValues 都是 function    |
-| C175-F04 | P3   | W9   | React       | 行为 | 空 query 对象：React 画查询区，Vue 不画      | query 传 {} 时两端都没有 data-tiger-table-query 和 Reset，或两端都有                     |
-| C175-F05 | P2   | W7   | Demo        | 示例 | 02 Demo 多出一个不筛表的搜索框               | 两端 02 不再出现搜索框；或输入 Ann 后表格只剩 Ann 且 demo.json 写明远程搜索              |
-| C175-F06 | P2   | W7   | 文档·生成器 | 文档 | React 生成示例误把 onChange 当 DOM 事件      | 照生成的 Custom Filters 示例把 Input 放进 filtersExtra 输入 5，不抛错，ageRange 写入该值 |
+| 编号     | 级别 | 波次 | 端    | 类别 | 条目                                    | 验收                                                                 |
+| -------- | ---- | ---- | ----- | ---- | --------------------------------------- | -------------------------------------------------------------------- |
+| C175-F04 | P3   | W9   | React | 行为 | 空 query 对象：React 画查询区，Vue 不画 | query 传 {} 时两端都没有 data-tiger-table-query 和 Reset，或两端都有 |
 
 ### C176 FormWizard
 
@@ -126,12 +121,10 @@ composite 组 16 个组件（C170–C185），视觉与键盘全部 blocked。
 
 报告 `groups/composite/SchemaForm.md`，队列状态 needs-evidence。另受 S01 影响。
 
-| 编号     | 级别 | 波次 | 端          | 类别   | 条目                                          | 验收                                                                        |
-| -------- | ---- | ---- | ----------- | ------ | --------------------------------------------- | --------------------------------------------------------------------------- |
-| C179-F01 | P2   | W7   | 双端+Core   | 行为   | widgetParams 允许键未传给控件，未知键警告被吞 | input 写 maxLength:4、prefix:'YEN' 后有 maxlength 并显示 YEN；rows 触发警告 |
-| C179-F02 | P2   | W7   | 文档·生成器 | 文档   | 生成示例与优先列表使用不存在的 model 绑定     | 生成示例用 modelValue / value，不再出现 :model 或 model={model}             |
-| C179-F03 | P3   | W9   | 双端        | 行为   | Reset 时模型更新通知多发一次                  | 改成 Grace 后点 Reset，update:modelValue 与 onChange 各只收一次 Ada         |
-| C179-F04 | P3   | W9   | React       | 无障碍 | React 调用方 aria-label 被默认文案盖掉        | React 只传 aria-label=From attr 时根上保留 From attr；ariaLabel prop 仍优先 |
+| 编号     | 级别 | 波次 | 端    | 类别   | 条目                                   | 验收                                                                        |
+| -------- | ---- | ---- | ----- | ------ | -------------------------------------- | --------------------------------------------------------------------------- |
+| C179-F03 | P3   | W9   | 双端  | 行为   | Reset 时模型更新通知多发一次           | 改成 Grace 后点 Reset，update:modelValue 与 onChange 各只收一次 Ada         |
+| C179-F04 | P3   | W9   | React | 无障碍 | React 调用方 aria-label 被默认文案盖掉 | React 只传 aria-label=From attr 时根上保留 From attr；ariaLabel prop 仍优先 |
 
 ### C180 TaskBoard
 

@@ -171,7 +171,12 @@ function renderWidget(field: SchemaFormField): VNode | null {
     )
     return null
   }
-  return h(Input, { placeholder, disabled })
+  return h(Input, {
+    placeholder,
+    disabled,
+    maxLength: typeof params.maxLength === 'number' ? params.maxLength : undefined,
+    prefix: typeof params.prefix === 'string' ? params.prefix : undefined
+  })
 }
 
 export const SchemaForm = defineComponent({

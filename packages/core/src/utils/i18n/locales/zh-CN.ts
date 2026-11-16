@@ -348,7 +348,8 @@ export const zhCN: TigerLocale = {
     collapseRowAriaLabel: '收起行',
     sortMenuAriaLabel: '排序',
     filterColumnAriaLabel: '筛选 {column}',
-    groupHeaderText: '{key} ({count})'
+    groupHeaderText: '{key} ({count})',
+    resetText: '重置'
   },
   dataExport: {
     triggerText: '导出',

@@ -344,16 +344,53 @@ describe('DataTableWithToolbar (Vue)', () => {
       props: {
         columns,
         dataSource: [],
-        labels: { searchButtonText: 'Find', expandText: 'Show query', collapseText: 'Hide query' },
+        labels: {
+          searchButtonText: 'Find',
+          resetText: 'Clear',
+          expandText: 'Show query',
+          collapseText: 'Hide query'
+        },
         query: { fields: [{ key: 'name', label: 'Name' }], defaultCollapsed: true },
         pagination: false
       }
     })
 
     expect(screen.getByRole('button', { name: 'Find' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Reset' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Clear' })).toBeInTheDocument()
     await userEvent.click(screen.getByRole('button', { name: 'Show query' }))
     expect(screen.getByRole('button', { name: 'Hide query' })).toBeInTheDocument()
+  })
+
+  it('uses the table locale for the query reset button', () => {
+    const { container } = render({
+      render() {
+        return h(ConfigProvider, { locale: zhCN }, () =>
+          h(DataTableWithToolbar, {
+            columns,
+            dataSource: [],
+            query: { fields: [{ key: 'name', label: 'Name' }] },
+            pagination: false
+          })
+        )
+      }
+    })
+
+    const names = [...container.querySelectorAll('[data-tiger-table-query] button')].map(
+      (button) => button.textContent
+    )
+    expect(names).toEqual(['搜索', '重置', '收起'])
+  })
+
+  it('keeps query api when query is passed and replaced after mount', async () => {
+    const { rerender } = render(DataTableWithToolbar, {
+      props: { columns, dataSource: [], pagination: false }
+    })
+    const first = { fields: [{ key: 'name', label: 'Name' }] }
+    await rerender({ columns, dataSource: [], pagination: false, query: first })
+    const second = { fields: [{ key: 'city', label: 'City' }] }
+    await rerender({ columns, dataSource: [], pagination: false, query: second })
+    expect(typeof first.api?.getQueryValues).toBe('function')
+    expect(typeof second.api?.getQueryValues).toBe('function')
   })
 
   it('submits search on enter without search button', async () => {

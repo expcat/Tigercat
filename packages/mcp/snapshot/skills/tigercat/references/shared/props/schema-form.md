@@ -20,14 +20,15 @@ Note: 用 JSON schema 渲 Form / FormItem，不是表单设计器。字段 `name
 | Prop          | Type               | Default | Notes                                                                                      |
 | ------------- | ------------------ | ------- | ------------------------------------------------------------------------------------------ |
 | `schema`      | `SchemaFormSchema` | `-`     | Field / group schema.                                                                      |
-| `rules?`      | `FormRules`        | `-`     | Extra rules merged over schema-derived rules (caller wins on conflict).                    |
+| `modelValue?` | `FormValues`       | `-`     | -                                                                                          |
 | `value?`      | `FormValues`       | `-`     | Form values. Controlled when passed (including `{}`). Vue: `modelValue` / `v-model`. Re... |
-| `conditions?` | `FormConditions`   | `-`     | Extra conditions merged over schema-derived conditions.                                    |
+| `rules?`      | `FormRules`        | `-`     | Extra rules merged over schema-derived rules (caller wins on conflict).                    |
 
 ### Remaining props (complete public API)
 
 - `defaultValue?`: `FormValues`; default `-`. Uncontrolled initial values, merged over schema defaults.
 - `source?`: `FormValues`; default `-`. Remote/DTO object run through field `mapIn` / `valuePath`. Form `value` still wins.
+- `conditions?`: `FormConditions`; default `-`. Extra conditions merged over schema-derived conditions.
 - `showActions?`: `boolean`; default `true`. Show submit / reset actions.
 - `submitText?`: `string`; default `-`. Submit button text. Falls back to locale.
 - `resetText?`: `string`; default `-`. Reset button text. Falls back to locale.
@@ -50,6 +51,5 @@ Note: 用 JSON schema 渲 Form / FormItem，不是表单设计器。字段 `name
 - `maxHistorySize?`: `number`; default `50`. Maximum undo history size
 - `locale?`: `Partial<TigerLocale>`; default `-`. Locale override for built-in validation messages. Merged on top of the ConfigProvider l...
 - `renderField?`: `(field: SchemaFormField) => React.ReactNode`; default `-`. -
-- `modelValue?`: `FormValues`; default `-`. -
 
 Events/callback props: `onChange?`, `onSubmit?`, `onReset?`, `onValidate?`.

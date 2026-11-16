@@ -350,7 +350,8 @@ export const esES: TigerLocale = {
     collapseRowAriaLabel: 'Contraer fila',
     sortMenuAriaLabel: 'Ordenar',
     filterColumnAriaLabel: 'Filtrar {column}',
-    groupHeaderText: '{key} ({count})'
+    groupHeaderText: '{key} ({count})',
+    resetText: 'Restablecer'
   },
   dataExport: {
     triggerText: 'Exportar',

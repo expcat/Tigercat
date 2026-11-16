@@ -575,11 +575,12 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
                   query.fields?.map((field) => ({ ...field, value: undefined }))
                 )
                 setQueryDraft(cleared)
-                setSubmittedQuery(cleared)
-                query.onReset?.(cleared)
+                const values = readQueryValues(query.fields, cleared)
+                setSubmittedQuery(values)
+                query.onReset?.(values)
                 resetPageToFirst()
               }}>
-              Reset
+              {tableLabels.resetText}
             </Button>
             <Button
               type="button"

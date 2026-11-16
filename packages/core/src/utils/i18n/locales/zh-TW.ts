@@ -349,7 +349,8 @@ export const zhTW: TigerLocale = {
     collapseRowAriaLabel: '收合列',
     sortMenuAriaLabel: '排序',
     filterColumnAriaLabel: '篩選 {column}',
-    groupHeaderText: '{key} ({count})'
+    groupHeaderText: '{key} ({count})',
+    resetText: '重設'
   },
   dataExport: {
     triggerText: '匯出',

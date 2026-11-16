@@ -168,7 +168,14 @@ function renderWidget(field: SchemaFormField): React.ReactNode {
     )
     return null
   }
-  return <Input placeholder={placeholder} disabled={disabled} />
+  return (
+    <Input
+      placeholder={placeholder}
+      disabled={disabled}
+      maxLength={typeof params.maxLength === 'number' ? params.maxLength : undefined}
+      prefix={typeof params.prefix === 'string' ? params.prefix : undefined}
+    />
+  )
 }
 
 function SchemaFormFieldCell({

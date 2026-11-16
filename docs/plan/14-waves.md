@@ -14,12 +14,12 @@
 | W4   | 导航与反馈             |    0 |   0 |   0 |   0 | 06、07                                     |
 | W5   | 基础与布局             |    0 |   0 |   0 |   0 | 03、04                                     |
 | W6   | 数据、图表与高级       |    0 |   0 |   0 |   0 | 08、09、10                                 |
-| W7   | 组合组件               |   20 |   0 |  20 |   0 | 11                                         |
+| W7   | 组合组件               |   13 |   0 |  13 |   0 | 11                                         |
 | W8   | 工具链、文档与示例平台 |    7 |   0 |   7 |   0 | 12                                         |
 | W9   | P3 收尾                |   99 |   0 |   0 |  99 | 02、03、04、05、06、07、08、09、10、11、12 |
 | W10  | 证据补采与复验         |   11 |   — |   — |   — | 13                                         |
 
-W1–W9 合计 126 条 Review 发现（P2 27、P3 99）。W10 的 11 条是 E01–E11。已完成条目见 [CHANGELOG.md](../../CHANGELOG.md)。
+W1–W9 合计 119 条 Review 发现（P2 20、P3 99）。W10 的 11 条是 E01–E11。已完成条目见 [CHANGELOG.md](../../CHANGELOG.md)。
 
 ## 各波在收什么
 
@@ -45,17 +45,16 @@ W1–W9 合计 126 条 Review 发现（P2 27、P3 99）。W10 的 11 条是 E01�
 
 这些条目的报告给了两种改法，或者指出契约还没定。选哪一种会改变验收，要先由维护者定。
 
-| 发现     | 组件                 | 落点                   | 报告给出的改法                                                                                  |
-| -------- | -------------------- | ---------------------- | ----------------------------------------------------------------------------------------------- |
-| C017-F02 | ImageCompare         | [03](03-basic.md)      | Vue 发事件前比较归一化位置，或先明确并统一无变化输入语义；不扩大到其他组件                      |
-| C111-F05 | Spotlight            | [06](06-navigation.md) | 有查询时仍让命中的 recentIds 排在其余命中前，或把注释改为只约束空查询；未命中的 recent 不硬插回 |
-| C117-F04 | Alert                | [07](07-feedback.md)   | defaultPrevented 时停止关闭，或不再把事件标成 cancelable                                        |
-| C118-F06 | Drawer               | [07](07-feedback.md)   | 让分隔条可聚焦并响应方向键；做到之前不要把它标成可操作的 separator                              |
-| C175-F05 | DataTableWithToolbar | [11](11-composite.md)  | 两个 02 的 toolbar 加 search: false；若要演示远程搜索，就接 onSearch 并改 demo.json             |
-| C177-F04 | NotificationBell     | [11](11-composite.md)  | 两端都做成真正的受控 open，或删掉 Vue 的 update:open；不让 open 留在根节点属性上                |
-| C181-F03 | WorkflowDesigner     | [11](11-composite.md)  | 用 Number.isFinite 区分空串与 0，空串才回落 1；若下限为 1 则显示与提交同规则并写进类型          |
-| C184-F01 | WorkflowActionBar    | [11](11-composite.md)  | 多人加签就让 onChange 或另一回调能增删数组；若只支持单人，加签时 multiple 保持 false            |
-| C184-F02 | WorkflowActionBar    | [11](11-composite.md)  | 按注释接权限判断且数组须全部通过，或改注释写明字符串是 viewerRole、命中一个即可                 |
+| 发现     | 组件              | 落点                   | 报告给出的改法                                                                                  |
+| -------- | ----------------- | ---------------------- | ----------------------------------------------------------------------------------------------- |
+| C017-F02 | ImageCompare      | [03](03-basic.md)      | Vue 发事件前比较归一化位置，或先明确并统一无变化输入语义；不扩大到其他组件                      |
+| C111-F05 | Spotlight         | [06](06-navigation.md) | 有查询时仍让命中的 recentIds 排在其余命中前，或把注释改为只约束空查询；未命中的 recent 不硬插回 |
+| C117-F04 | Alert             | [07](07-feedback.md)   | defaultPrevented 时停止关闭，或不再把事件标成 cancelable                                        |
+| C118-F06 | Drawer            | [07](07-feedback.md)   | 让分隔条可聚焦并响应方向键；做到之前不要把它标成可操作的 separator                              |
+| C177-F04 | NotificationBell  | [11](11-composite.md)  | 两端都做成真正的受控 open，或删掉 Vue 的 update:open；不让 open 留在根节点属性上                |
+| C181-F03 | WorkflowDesigner  | [11](11-composite.md)  | 用 Number.isFinite 区分空串与 0，空串才回落 1；若下限为 1 则显示与提交同规则并写进类型          |
+| C184-F01 | WorkflowActionBar | [11](11-composite.md)  | 多人加签就让 onChange 或另一回调能增删数组；若只支持单人，加签时 multiple 保持 false            |
+| C184-F02 | WorkflowActionBar | [11](11-composite.md)  | 按注释接权限判断且数组须全部通过，或改注释写明字符串是 viewerRole、命中一个即可                 |
 
 ## 每条怎么算做完
 

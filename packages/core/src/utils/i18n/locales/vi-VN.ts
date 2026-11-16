@@ -349,7 +349,8 @@ export const viVN: TigerLocale = {
     collapseRowAriaLabel: 'Thu gọn hàng',
     sortMenuAriaLabel: 'Sắp xếp',
     filterColumnAriaLabel: 'Lọc {column}',
-    groupHeaderText: '{key} ({count})'
+    groupHeaderText: '{key} ({count})',
+    resetText: 'Đặt lại'
   },
   dataExport: {
     triggerText: 'Xuất',

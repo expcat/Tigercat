@@ -29,6 +29,7 @@ const dataSource = computed(() => rows.filter((row) => row.score >= minimumScore
 
 const toolbar: VueTableToolbarProps = {
   searchMode: 'remote',
+  search: false,
   filters: [
     {
       key: 'minimumScore',

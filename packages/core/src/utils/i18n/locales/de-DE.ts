@@ -350,7 +350,8 @@ export const deDE: TigerLocale = {
     collapseRowAriaLabel: 'Zeile reduzieren',
     sortMenuAriaLabel: 'Sortieren',
     filterColumnAriaLabel: '{column} filtern',
-    groupHeaderText: '{key} ({count})'
+    groupHeaderText: '{key} ({count})',
+    resetText: 'Zurücksetzen'
   },
   dataExport: {
     triggerText: 'Exportieren',

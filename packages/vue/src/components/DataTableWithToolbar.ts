@@ -622,11 +622,13 @@ export const DataTableWithToolbar = defineComponent({
       resetPageToFirst()
     }
     expose({ getQueryValues: currentQuery })
-    if (props.query) {
-      const api = props.query.api ?? { getQueryValues: currentQuery }
+    const bindQueryApi = (query: TableQueryConfig | undefined) => {
+      if (!query) return
+      const api = query.api ?? { getQueryValues: currentQuery }
       api.getQueryValues = currentQuery
-      props.query.api = api
+      query.api = api
     }
+    watch(() => props.query, bindQueryApi, { immediate: true })
 
     const renderQuery = () => {
       const fields = props.query?.fields
@@ -677,7 +679,7 @@ export const DataTableWithToolbar = defineComponent({
             h(
               Button,
               { type: 'button', variant: 'outline', onClick: resetQuery },
-              { default: () => 'Reset' }
+              { default: () => tableLabels.value.resetText }
             ),
             h(
               Button,

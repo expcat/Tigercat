@@ -1422,8 +1422,7 @@ const WIDGET_PARAMS: Record<string, readonly string[]> = {
   input: ['maxLength', 'prefix'],
   number: ['min', 'max', 'step', 'precision'],
   select: ['multiple', 'showSearch'],
-  slider: ['min', 'max', 'step'],
-  date: ['picker', 'showTime']
+  slider: ['min', 'max', 'step']
 }
 
 export function narrowWidgetParams(
@@ -1431,15 +1430,14 @@ export function narrowWidgetParams(
   params: Record<string, unknown> | undefined
 ): Record<string, unknown> {
   if (!params) return {}
-  const allowed = WIDGET_PARAMS[widget]
-  if (!allowed) {
-    devWarn('SchemaForm.widgetParams', `Unknown widget params for ${widget}`)
-    return {}
-  }
+  const allowed = WIDGET_PARAMS[widget] ?? []
   const next: Record<string, unknown> = {}
   for (const [key, value] of Object.entries(params)) {
-    if (allowed.includes(key)) next[key] = value
-    else devWarn('SchemaForm.widgetParams', `Unknown ${widget} param "${key}"`)
+    if (Object.prototype.hasOwnProperty.call(WIDGET_PARAMS, widget) && allowed.includes(key)) {
+      next[key] = value
+    } else {
+      devWarn(`SchemaForm.widgetParams.${widget}.${key}`, `Unknown ${widget} param "${key}"`)
+    }
   }
   return next
 }

@@ -673,16 +673,16 @@ React \`filtersExtra\` age range:
           <Input
             value={ageRange.min ?? ''}
             placeholder="最小"
-            onChange={(event) =>
-              setFilter('ageRange', { ...ageRange, min: event.currentTarget.value })
+            onChange={(value) =>
+              setFilter('ageRange', { ...ageRange, min: value })
             }
           />
           <span>-</span>
           <Input
             value={ageRange.max ?? ''}
             placeholder="最大"
-            onChange={(event) =>
-              setFilter('ageRange', { ...ageRange, max: event.currentTarget.value })
+            onChange={(value) =>
+              setFilter('ageRange', { ...ageRange, max: value })
             }
           />
         </div>
@@ -727,7 +727,7 @@ const COMPONENT_SNIPPETS = {
       '<DataTableWithToolbar :columns="cardColumns" :data-source="rows" responsive-mode="card" card-breakpoint="lg" :card-layout="cardLayout" :toolbar="toolbar" />',
     Table: '<Table :columns="columns" :data-source="rows" row-key="id" :pagination="false" />',
     FormWizard: '<FormWizard :steps="steps" :before-next="beforeNext" @finish="onFinish" />',
-    SchemaForm: '<SchemaForm :schema="schema" :model="model" @submit="onSubmit" />',
+    SchemaForm: '<SchemaForm :schema="schema" :model-value="model" @submit="onSubmit" />',
     WorkflowDetailShell:
       '<WorkflowDetailShell><template #form /><template #tabs /><template #action /></WorkflowDetailShell>',
     TaskBoard: '<TaskBoard :columns="columns" />',
@@ -791,7 +791,7 @@ const COMPONENT_SNIPPETS = {
       '<DataTableWithToolbar columns={cardColumns} dataSource={rows} responsiveMode="card" cardBreakpoint="lg" cardLayout={cardLayout} toolbar={toolbar} />',
     Table: '<Table columns={columns} dataSource={rows} rowKey="id" pagination={false} />',
     FormWizard: '<FormWizard steps={steps} beforeNext={beforeNext} onFinish={onFinish} />',
-    SchemaForm: '<SchemaForm schema={schema} model={model} onSubmit={onSubmit} />',
+    SchemaForm: '<SchemaForm schema={schema} value={model} onSubmit={onSubmit} />',
     WorkflowDetailShell: '<WorkflowDetailShell form={form} tabs={tabs} action={actions} />',
     TaskBoard: '<TaskBoard columns={columns} />',
     VirtualTable:

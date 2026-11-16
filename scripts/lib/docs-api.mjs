@@ -740,7 +740,7 @@ export const COMPONENT_PROP_PRIORITY = {
     'labels?',
     'onFinish?'
   ],
-  SchemaForm: ['schema', 'model?', 'rules?', 'onSubmit?'],
+  SchemaForm: ['schema', 'modelValue?', 'value?', 'rules?', 'onSubmit?'],
   FileManager: [
     'files?',
     'currentPath?',
@@ -961,7 +961,7 @@ export const REQUIRED_USAGE_SNIPPETS = {
     WorkflowDesigner: '<WorkflowDesigner v-model="steps" />',
     WorkflowDetailShell:
       '<WorkflowDetailShell><template #form /><template #tabs /><template #action /></WorkflowDetailShell>',
-    SchemaForm: '<SchemaForm :schema="schema" :model="model" @submit="onSubmit" />',
+    SchemaForm: '<SchemaForm :schema="schema" :model-value="model" @submit="onSubmit" />',
     Countdown: '<Countdown :value="deadline" />',
     Progress: '<Progress :percentage="64" />',
     Alert: '<Alert type="info" title="Saved" />',
@@ -1100,7 +1100,7 @@ export const REQUIRED_USAGE_SNIPPETS = {
     WorkflowViewer: '<WorkflowViewer steps={steps} />',
     WorkflowDesigner: '<WorkflowDesigner value={steps} onChange={setSteps} />',
     WorkflowDetailShell: '<WorkflowDetailShell form={form} tabs={tabs} action={actions} />',
-    SchemaForm: '<SchemaForm schema={schema} model={model} onSubmit={onSubmit} />',
+    SchemaForm: '<SchemaForm schema={schema} value={model} onSubmit={onSubmit} />',
     Countdown: '<Countdown value={deadline} />',
     Progress: '<Progress percentage={64} />',
     Alert: '<Alert type="info" title="Saved" />',

@@ -9,6 +9,7 @@ import { SchemaForm } from '@expcat/tigercat-vue/SchemaForm'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import type { FormHandle, SchemaFormSchema } from '@expcat/tigercat-core'
+import { resetDevWarnCache } from '@expcat/tigercat-core'
 import { expectNoA11yViolations } from '../utils'
 
 const basicSchema: SchemaFormSchema = {
@@ -278,6 +279,32 @@ describe('SchemaForm (Vue)', () => {
     )
     expect(cityLabel?.closest('.tiger-schema-form__group-title')).toBeNull()
     expect(cityLabel?.closest('[data-schema-group="city"]')).toBeTruthy()
+  })
+
+  it('passes allowed input widget params and warns for textarea rows', () => {
+    resetDevWarnCache()
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+    const { container } = render(SchemaForm, {
+      props: {
+        showActions: false,
+        schema: {
+          fields: [
+            {
+              name: 'amount',
+              label: 'Amount',
+              widgetParams: { maxLength: 4, prefix: 'YEN', extra: 'nope' }
+            },
+            { name: 'note', label: 'Note', type: 'textarea', widgetParams: { rows: 6 } }
+          ]
+        }
+      }
+    })
+
+    const input = container.querySelector('input') as HTMLInputElement
+    expect(input).toHaveAttribute('maxlength', '4')
+    expect(screen.getByText('YEN')).toBeInTheDocument()
+    expect(warn.mock.calls.map((call) => String(call[0])).join('\n')).toContain('rows')
+    warn.mockRestore()
   })
 
   it('has no obvious a11y violations', async () => {

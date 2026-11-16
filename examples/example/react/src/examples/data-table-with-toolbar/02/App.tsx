@@ -33,6 +33,7 @@ export default function App() {
       pagination={false}
       toolbar={{
         searchMode: 'remote',
+        search: false,
         filters: [
           {
             key: 'minimumScore',

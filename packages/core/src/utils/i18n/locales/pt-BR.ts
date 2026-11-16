@@ -349,7 +349,8 @@ export const ptBR: TigerLocale = {
     collapseRowAriaLabel: 'Recolher linha',
     sortMenuAriaLabel: 'Ordenar',
     filterColumnAriaLabel: 'Filtrar {column}',
-    groupHeaderText: '{key} ({count})'
+    groupHeaderText: '{key} ({count})',
+    resetText: 'Redefinir'
   },
   dataExport: {
     triggerText: 'Exportar',

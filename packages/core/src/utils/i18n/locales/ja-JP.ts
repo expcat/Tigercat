@@ -349,7 +349,8 @@ export const jaJP: TigerLocale = {
     collapseRowAriaLabel: '行を折りたたむ',
     sortMenuAriaLabel: '並べ替え',
     filterColumnAriaLabel: '{column} を絞り込む',
-    groupHeaderText: '{key} ({count})'
+    groupHeaderText: '{key} ({count})',
+    resetText: 'リセット'
   },
   dataExport: {
     triggerText: '書き出す',

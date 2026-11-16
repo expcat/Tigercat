@@ -19,9 +19,9 @@ Uses: `Form`, `FormItem`, `Input`, `Select`, `Button`.
 
 Note: 用 JSON schema 渲 Form / FormItem，不是表单设计器。字段 `name` 支持点路径；`groups` 可嵌套。FormItem 收到的规则是补过 `required` 的那一份。`disabled` 不跑必填。未知 `type` 留空，等 `renderField`。模型按路径合并，后写只盖同路径；`source` / `defaultValue` / `schema` 变化时，没编辑过的非受控字段跟新种子走。`mapIn` / `mapOut` / `valuePath` 做值映射；submit 的 `mapped` 是映射后的对象。转发 Form 的 `controller` / `undoable` / `maxHistorySize` / `fieldDependencies` / `onValidate`。radio 走 RadioGroup `options`。工作流节点字段权限用 `applyWorkflowFieldPermissions` 派生 schema（initiate / approve / readonly）；隐藏字段不进校验。权限函数不从 `@expcat/tigercat-core/schema-form` 导出。Vue `v-model` / `modelValue`，React `value` + `onChange`。可选 `source` 跑 `mapIn`。
 
-Vue: `<SchemaForm :schema="schema" :model="model" @submit="onSubmit" />`
+Vue: `<SchemaForm :schema="schema" :model-value="model" @submit="onSubmit" />`
 
-React: `<SchemaForm schema={schema} model={model} onSubmit={onSubmit} />`
+React: `<SchemaForm schema={schema} value={model} onSubmit={onSubmit} />`
 
 Imports: use PascalCase subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`. Hooks and `notification` use the same subpath rule. Shared types and helpers come from `@expcat/tigercat-core`.
 
@@ -83,17 +83,13 @@ React `filtersExtra` age range:
           <Input
             value={ageRange.min ?? ''}
             placeholder="最小"
-            onChange={(event) =>
-              setFilter('ageRange', { ...ageRange, min: event.currentTarget.value })
-            }
+            onChange={(value) => setFilter('ageRange', { ...ageRange, min: value })}
           />
           <span>-</span>
           <Input
             value={ageRange.max ?? ''}
             placeholder="最大"
-            onChange={(event) =>
-              setFilter('ageRange', { ...ageRange, max: event.currentTarget.value })
-            }
+            onChange={(value) => setFilter('ageRange', { ...ageRange, max: value })}
           />
         </div>
       )

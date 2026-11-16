@@ -349,7 +349,8 @@ export const thTH: TigerLocale = {
     collapseRowAriaLabel: 'ยุบแถว',
     sortMenuAriaLabel: 'เรียงลำดับ',
     filterColumnAriaLabel: 'กรอง {column}',
-    groupHeaderText: '{key} ({count})'
+    groupHeaderText: '{key} ({count})',
+    resetText: 'รีเซ็ต'
   },
   dataExport: {
     triggerText: 'ส่งออก',

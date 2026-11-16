@@ -349,7 +349,8 @@ export const arSA: TigerLocale = {
     collapseRowAriaLabel: 'طي الصف',
     sortMenuAriaLabel: 'فرز',
     filterColumnAriaLabel: 'تصفية {column}',
-    groupHeaderText: '{key} ({count})'
+    groupHeaderText: '{key} ({count})',
+    resetText: 'إعادة تعيين'
   },
   dataExport: {
     triggerText: 'تصدير',
