@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Statistic SSR、精度与零节点（Core / React / Vue，C030-F01、C030-F02、C030-F03）**：两端动画初值使用目标值，SSR 与首次客户端渲染一致，挂载后启动动画。Core 按科学计数法的尾数与指数推断小数位。React 保留 title / prefix / suffix 的数字 0，空值与 false 仍省略。
+
 - **SplitButton Fragment 与首次键盘焦点（Core / React / Vue，C029-F01、C029-F04）**：React 递归分类 Fragment 中的菜单，保留独立 trigger，主按钮内不再嵌入菜单项。双端 Dropdown 的键盘落项使用共享焦点标识补齐首帧焦点环，指针交互或失焦后清除，指针打开不添加标识。
 
 - **Segmented 方向、暗色底板与窄屏标签（Core / React / Vue，C028-F01、C028-V01、C028-V02）**：两端键盘优先使用 Provider 显式方向，否则读取最近 DOM `dir`。暗色选中底板混入前景色以区分轨道；lg 在窄屏缩小水平内边距，图标后的「日」字完整显示，桌面内边距保留。

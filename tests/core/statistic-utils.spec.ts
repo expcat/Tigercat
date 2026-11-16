@@ -4,7 +4,8 @@ import {
   createStatisticNumberAnimation,
   easeOutCubic,
   formatStatisticValue,
-  interpolateStatisticValue
+  interpolateStatisticValue,
+  resolveStatisticPrecision
 } from '@expcat/tigercat-core'
 
 function createFrameScheduler() {
@@ -39,6 +40,17 @@ describe('statistic-utils', () => {
 
     it('keeps string values unchanged', () => {
       expect(formatStatisticValue('Active', 2, true)).toBe('Active')
+    })
+
+    it.each([
+      [1e-7, undefined, 7, '0.0000001'],
+      [1.23e-7, undefined, 9, '0.000000123'],
+      [-1e-7, undefined, 7, '-0.0000001'],
+      [1e-6, undefined, 6, '0.000001'],
+      [1e-7, 7, 7, '0.0000001']
+    ])('preserves %s with precision %s', (value, precision, digits, expected) => {
+      expect(resolveStatisticPrecision(value, precision)).toBe(digits)
+      expect(formatStatisticValue(value, precision, false, 'en-US')).toBe(expected)
     })
   })
 

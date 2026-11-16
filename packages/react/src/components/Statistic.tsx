@@ -48,9 +48,7 @@ export const Statistic = forwardRef<HTMLDivElement, StatisticProps>(function Sta
     [config.locale, locale]
   )
   const localeId = mergedLocale?.locale
-  const [displayValue, setDisplayValue] = useState<string | number | undefined>(() =>
-    animated && canAnimateStatisticValue(value) ? 0 : value
-  )
+  const [displayValue, setDisplayValue] = useState<string | number | undefined>(value)
   const currentNumberRef = useRef(canAnimateStatisticValue(value) ? value : 0)
   const hasPlayedRef = useRef(false)
 
@@ -91,11 +89,17 @@ export const Statistic = forwardRef<HTMLDivElement, StatisticProps>(function Sta
 
   return (
     <div ref={ref} className={classNames(statisticBaseClasses, className)} {...rest}>
-      {title ? <div className={getStatisticTitleClasses(size)}>{title}</div> : null}
+      {title != null && title !== false ? (
+        <div className={getStatisticTitleClasses(size)}>{title}</div>
+      ) : null}
       <div className={getStatisticValueClasses(size)}>
-        {prefix ? <span className={statisticPrefixClasses}>{prefix}</span> : null}
+        {prefix != null && prefix !== false ? (
+          <span className={statisticPrefixClasses}>{prefix}</span>
+        ) : null}
         <span>{formatted}</span>
-        {suffix ? <span className={statisticSuffixClasses}>{suffix}</span> : null}
+        {suffix != null && suffix !== false ? (
+          <span className={statisticSuffixClasses}>{suffix}</span>
+        ) : null}
       </div>
     </div>
   )

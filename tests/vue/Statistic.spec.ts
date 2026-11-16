@@ -4,6 +4,8 @@
 
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen } from '@testing-library/vue'
+import { createSSRApp, h } from 'vue'
+import { renderToString } from 'vue/server-renderer'
 import { Statistic } from '@expcat/tigercat-vue/Statistic'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
@@ -60,6 +62,14 @@ describe('Statistic', () => {
     expect(screen.getByText('123.40')).toBeInTheDocument()
   })
 
+  it.each([
+    [1e-7, '0.0000001'],
+    [1.23e-7, '0.000000123'],
+    [-1e-7, '-0.0000001']
+  ])('preserves the inferred precision of %s during SSR', async (value, expected) => {
+    expect(await renderToString(h(Statistic, { value }))).toContain(`<span>${expected}</span>`)
+  })
+
   // --- Group separator ---
   it('formats value with group separator enabled', () => {
     renderWithProps(Statistic, { title: 'T', value: 1234567, groupSeparator: true })
@@ -90,6 +100,31 @@ describe('Statistic', () => {
   })
 
   // --- Animation ---
+  it.each([undefined, 0])(
+    'renders the animated final value during SSR and hydrates with duration %s',
+    async (animationDuration) => {
+      const scheduler = createFrameScheduler()
+      vi.stubGlobal('requestAnimationFrame', scheduler.requestAnimationFrame)
+      vi.stubGlobal('cancelAnimationFrame', vi.fn())
+      const app = createSSRApp(Statistic, {
+        title: 'Users',
+        value: 86520,
+        animated: true,
+        groupSeparator: true,
+        animationDuration
+      })
+      const container = document.createElement('div')
+      container.innerHTML = await renderToString(app)
+      expect(container.textContent).toBe('Users86,520')
+
+      const warnHandler = vi.fn()
+      app.config.warnHandler = warnHandler
+      app.mount(container)
+      expect(warnHandler).not.toHaveBeenCalled()
+      app.unmount()
+    }
+  )
+
   it('supports animated numeric values', async () => {
     const scheduler = createFrameScheduler()
     vi.stubGlobal('requestAnimationFrame', scheduler.requestAnimationFrame)

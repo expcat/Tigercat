@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+双端 Statistic 的动画 SSR 现在直接显示目标值，挂载后开始动画；省略 precision 时，1e-7 / 1.23e-7 分别显示为 0.0000001 / 0.000000123。React 的 title / prefix / suffix 传入数字 0 时现在保留。调用方式不用改，依赖旧零值或空节点输出的断言需相应调整。
+
 React SplitButton 现在识别 Fragment 内的 DropdownMenu / DropdownItem，保留独立菜单 trigger，主按钮内不再包含菜单项。双端 Dropdown（含 SplitButton）从键盘进入首项或末项时立即显示焦点环。调用方式不用改，依赖旧 DOM 或焦点样式的断言需相应调整。
 
 双端 Segmented 未指定 Provider 方向时，现在按最近 DOM `dir` 决定左右键顺序；例如祖先 `dir="rtl"` 下 ArrowRight 移到前一个可用选项。调用方式不用改，依赖旧 LTR 顺序的键盘断言需调整。暗色选中底板与轨道分开，lg 在窄屏缩小水平内边距。

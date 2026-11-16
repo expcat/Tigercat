@@ -5,6 +5,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { act, render, screen } from '@testing-library/react'
 import React from 'react'
+import { renderToString } from 'react-dom/server'
 import { Statistic } from '@expcat/tigercat-react/Statistic'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
@@ -48,6 +49,14 @@ describe('Statistic', () => {
     expect(screen.getByText('123.40')).toBeInTheDocument()
   })
 
+  it.each([
+    [1e-7, '0.0000001'],
+    [1.23e-7, '0.000000123'],
+    [-1e-7, '-0.0000001']
+  ])('preserves the inferred precision of %s during SSR', (value, expected) => {
+    expect(renderToString(<Statistic value={value} />)).toContain(`<span>${expected}</span>`)
+  })
+
   // --- Group separator ---
   it('formats value with group separator enabled', () => {
     render(<Statistic title="T" value={1234567} groupSeparator />)
@@ -77,7 +86,50 @@ describe('Statistic', () => {
     expect(screen.getByText('99')).toBeInTheDocument()
   })
 
+  it('renders numeric zero nodes like strings and omits empty content', () => {
+    const { container, rerender } = render(<Statistic title={0} prefix={0} suffix={0} value={12} />)
+    expect(screen.getAllByText('0')).toHaveLength(3)
+    const numericMarkup = container.innerHTML
+
+    rerender(<Statistic title="0" prefix="0" suffix="0" value={12} />)
+    expect(container.innerHTML).toBe(numericMarkup)
+
+    for (const empty of [null, undefined, false]) {
+      rerender(<Statistic title={empty} prefix={empty} suffix={empty} value={12} />)
+      expect(container.firstElementChild?.children).toHaveLength(1)
+      expect(container.querySelectorAll('span')).toHaveLength(1)
+      expect(container.textContent).toBe('12')
+    }
+  })
+
   // --- Animation ---
+  it.each([undefined, 0])(
+    'renders the animated final value during SSR and hydrates with duration %s',
+    async (animationDuration) => {
+      const scheduler = createFrameScheduler()
+      vi.stubGlobal('requestAnimationFrame', scheduler.requestAnimationFrame)
+      vi.stubGlobal('cancelAnimationFrame', vi.fn())
+      const ui = (
+        <Statistic
+          title="Users"
+          value={86520}
+          animated
+          groupSeparator
+          animationDuration={animationDuration}
+        />
+      )
+      const container = document.createElement('div')
+      container.innerHTML = renderToString(ui)
+      expect(container.textContent).toBe('Users86,520')
+
+      const onRecoverableError = vi.fn()
+      await act(async () => {
+        render(ui, { container, hydrate: true, onRecoverableError })
+      })
+      expect(onRecoverableError).not.toHaveBeenCalled()
+    }
+  )
+
   it('supports animated numeric values', () => {
     const scheduler = createFrameScheduler()
     vi.stubGlobal('requestAnimationFrame', scheduler.requestAnimationFrame)

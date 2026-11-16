@@ -131,10 +131,9 @@ export function resolveStatisticPrecision(value: number, precision: number | und
   if (precision !== undefined && Number.isFinite(precision)) {
     return Math.max(0, Math.min(20, Math.floor(precision)))
   }
-  const text = String(value)
-  const dot = text.indexOf('.')
-  if (dot === -1) return 0
-  return text.length - dot - 1
+  const [mantissa, exponent = '0'] = String(value).split('e')
+  const fractionDigits = (mantissa.split('.')[1] ?? '').length
+  return Math.max(0, Math.min(20, fractionDigits - Number(exponent)))
 }
 
 export function formatStatisticValue(

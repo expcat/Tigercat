@@ -84,7 +84,7 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | C027 | Result         | complete       | C027-F02 已修复（F01 此前 S11 完成）。2026-11-13 二次补采：视觉 24 pass / 0 blocked；键盘 16 pass / 8 not-applicable（Demo02 无可聚焦控件）；48 项 spec 通过（未重跑）；SSR 探针已跑；读屏未执行                     |
 | C028 | Segmented      | complete       | C028-F01/V01/V02 已修复。38 项 spec（含 axe）与 types:check 通过；DOM/Provider RTL、两套暗色 token 和窄屏几何回归通过。IAB 不可用，待人工视觉复验；读屏未测                                                          |
 | C029 | SplitButton    | needs-evidence | C029-F01/F04 已修复（F02/F03 此前已修）。Fragment SSR/DOM、首项键盘焦点样式通过；312 项 spec（含 axe）、types:check 通过。IAB 不可用，待人工视觉复验；历史 r4 失败保留，禁用点击与第二次 Tab 去向仍缺证；读屏未测    |
-| C030 | Statistic      | complete       | 2026-11-13 glm-r1：视觉 24/24 pass / 0 blocked；键盘 pass（亮色 6 组实测，暗色沿用）；动画 2 组；33 项 spec 通过；未运行 hydration、StrictMode 动画专项                                                              |
+| C030 | Statistic      | complete       | C030-F01/F02/F03 已修复。49 项 spec（含 axe）与 types:check 通过；双端 SSR 终值、科学计数法与 happy-dom 水合、React 零节点通过。既有视觉 24/24 pass、键盘 pass；本次未做浏览器复验，StrictMode 动画专项未测          |
 | C031 | Tag            | complete       | 2026-11-13 glm-r1：视觉/键盘 32/32 格 pass、0 blocked；React 16 格全审、Vue 抽查 8 格；22 + 10 项 spec 通过；未跑 hydration、读屏                                                                                    |
 | C032 | Watermark      | complete       | 2026-11-13 glm-r1：视觉 24/24 pass、键盘 12 组 pass、0 blocked；43 项 spec 通过；SSR 与合成 DOM 探针已跑（Canvas mock）；未跑 hydration；真实打印无证据                                                              |
 
