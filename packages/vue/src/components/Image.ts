@@ -169,6 +169,11 @@ export const Image = defineComponent({
       isImageHoverPreviewEnabled(props.zoomOnHover, Boolean(group))
     )
     const clickPreviewEnabled = computed(() => previewEnabled.value)
+    const previewHostActive = computed(
+      () =>
+        previewEnabled.value &&
+        (Boolean(group) || Boolean(resolveImagePreviewSrc(loadState.value, props.src)))
+    )
     const hoverPlacement = computed(() => resolveImageHoverPlacement(config.value.direction))
 
     const floatingPopupProps = {
@@ -255,6 +260,7 @@ export const Image = defineComponent({
         group.openPreview(instanceId)
         return
       }
+      if (!resolveImagePreviewSrc(loadState.value, props.src)) return
       previewVisible.value = true
       emit('preview-open-change', true)
     }
@@ -278,8 +284,8 @@ export const Image = defineComponent({
 
     const containerClasses = computed(() =>
       classNames(
-        previewEnabled.value ? imagePreviewHostClasses : imageBaseClasses,
-        previewEnabled.value && imagePreviewCursorClass,
+        previewHostActive.value ? imagePreviewHostClasses : imageBaseClasses,
+        previewHostActive.value && imagePreviewCursorClass,
         props.className,
         coerceClassValue((attrs as Record<string, unknown>).class)
       )
@@ -384,6 +390,7 @@ export const Image = defineComponent({
             })
           : null
 
+      const previewHost = previewHostActive.value
       const hoverPreviewEl =
         hoverPreviewEnabled.value && hoverVisible.value && previewSrc
           ? renderVueOverlayTeleport(
@@ -411,10 +418,8 @@ export const Image = defineComponent({
             )
           : null
 
-      const hostTag = previewEnabled.value ? 'button' : 'div'
-      const inner = previewEnabled.value
-        ? h('span', { class: imageFrameClasses }, [content])
-        : content
+      const hostTag = previewHost ? 'button' : 'div'
+      const inner = previewHost ? h('span', { class: imageFrameClasses }, [content]) : content
 
       return h(
         hostTag,
@@ -423,8 +428,8 @@ export const Image = defineComponent({
           ref: setContainerRef,
           class: containerClasses.value,
           style: containerStyle.value,
-          type: previewEnabled.value ? 'button' : undefined,
-          'aria-label': previewEnabled.value ? previewName : undefined,
+          type: previewHost ? 'button' : undefined,
+          'aria-label': previewHost ? previewName : undefined,
           ...(hoverPreviewEnabled.value ? hoverTriggerHandlers.value : {}),
           onClick: handleClick,
           onKeydown: handleKeydown,

@@ -181,6 +181,23 @@ describe('Image', () => {
     expect(emitted()['preview-open-change']).toBeUndefined()
   })
 
+  it('does not notify preview open when a failed image has no fallback', async () => {
+    const { container, emitted, rerender } = render(Image, {
+      props: { src: '/broken.jpg', alt: 'Broken', preview: true }
+    })
+
+    await fireEvent.error(container.querySelector('img') as Element)
+    await fireEvent.click(container.firstElementChild as HTMLElement)
+
+    expect(emitted()['preview-open-change']).toBeUndefined()
+    expect(document.querySelector('[role="dialog"]')).toBeNull()
+
+    await rerender({ src: '/ok.jpg', alt: 'Broken', preview: true })
+
+    expect(emitted()['preview-open-change']).toBeUndefined()
+    expect(document.querySelector('[role="dialog"]')).toBeNull()
+  })
+
   it('emits preview-open-change when preview opens', async () => {
     const { emitted } = render(Image, { props: { src: '/test.jpg' } })
     await fireEvent.click(screen.getByRole('button'))

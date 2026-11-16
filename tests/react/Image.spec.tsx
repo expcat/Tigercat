@@ -183,6 +183,24 @@ describe('Image', () => {
     expect(onPreviewOpenChange).not.toHaveBeenCalled()
   })
 
+  it('does not notify preview open when a failed image has no fallback', () => {
+    const onPreviewOpenChange = vi.fn()
+    const { container, rerender } = render(
+      <Image src="/broken.jpg" alt="Broken" preview onPreviewOpenChange={onPreviewOpenChange} />
+    )
+
+    fireEvent.error(container.querySelector('img') as Element)
+    fireEvent.click(container.firstElementChild as HTMLElement)
+
+    expect(onPreviewOpenChange).not.toHaveBeenCalledWith(true)
+    expect(document.querySelector('[role="dialog"]')).toBeNull()
+
+    rerender(<Image src="/ok.jpg" alt="Broken" preview onPreviewOpenChange={onPreviewOpenChange} />)
+
+    expect(onPreviewOpenChange).not.toHaveBeenCalledWith(true)
+    expect(document.querySelector('[role="dialog"]')).toBeNull()
+  })
+
   it('calls onPreviewOpenChange when standalone preview closes', () => {
     const onPreviewOpenChange = vi.fn()
     render(<Image src="/test.jpg" preview onPreviewOpenChange={onPreviewOpenChange} />)

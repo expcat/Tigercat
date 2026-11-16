@@ -232,10 +232,11 @@ export const Image = forwardRef<ImageHandle, ImageProps>(function Image(
         group.openPreview(instanceId)
         return
       }
+      if (!resolveImagePreviewSrc(loadState, src)) return
       setPreviewVisible(true)
       onPreviewOpenChange?.(true)
     },
-    [clickPreviewEnabled, group, instanceId, onClick, onPreviewOpenChange]
+    [clickPreviewEnabled, group, instanceId, loadState, onClick, onPreviewOpenChange, src]
   )
 
   const handleKeyDown = useCallback(
@@ -261,14 +262,17 @@ export const Image = forwardRef<ImageHandle, ImageProps>(function Image(
     [hoverPreviewEnabled, onBlur, setHoverVisible]
   )
 
+  const previewSrc = resolveImagePreviewSrc(loadState, src)
+  const previewHostActive = previewEnabled && (Boolean(group) || Boolean(previewSrc))
+
   const containerClasses = useMemo(
     () =>
       classNames(
-        previewEnabled ? imagePreviewHostClasses : imageBaseClasses,
-        previewEnabled && imagePreviewCursorClass,
+        previewHostActive ? imagePreviewHostClasses : imageBaseClasses,
+        previewHostActive && imagePreviewCursorClass,
         className
       ),
-    [previewEnabled, className]
+    [previewHostActive, className]
   )
 
   const imgClasses = useMemo(() => getImageImgClasses(fit), [fit])
@@ -282,7 +286,6 @@ export const Image = forwardRef<ImageHandle, ImageProps>(function Image(
     return next
   }, [width, height, style])
 
-  const previewSrc = resolveImagePreviewSrc(loadState, src)
   const previewName = formatImagePreviewAriaLabel(
     labels.previewAriaLabel,
     alt,
@@ -347,7 +350,7 @@ export const Image = forwardRef<ImageHandle, ImageProps>(function Image(
 
   return (
     <>
-      {previewEnabled ? (
+      {previewHostActive ? (
         <button {...hostProps} type="button" aria-label={previewName}>
           <span className={imageFrameClasses}>{content}</span>
         </button>

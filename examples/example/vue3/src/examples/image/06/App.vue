@@ -11,7 +11,7 @@ const index = ref(0)
   <ImageGroup v-model:open="open" v-model:current-index="index">
     <Image src="https://picsum.photos/seed/group-a/240/160" alt="甲" />
     <Image
-      src="https://picsum.photos/seed/group-missing/240/160"
+      src="/missing-photo.jpg"
       fallback-src="https://picsum.photos/seed/group-b/240/160"
       alt="乙" />
   </ImageGroup>

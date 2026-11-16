@@ -13,7 +13,7 @@ export default function App() {
       onCurrentIndexChange={setIndex}>
       <Image src="https://picsum.photos/seed/group-a/240/160" alt="甲" />
       <Image
-        src="https://picsum.photos/seed/group-missing/240/160"
+        src="/missing-photo.jpg"
         fallbackSrc="https://picsum.photos/seed/group-b/240/160"
         alt="乙"
       />
