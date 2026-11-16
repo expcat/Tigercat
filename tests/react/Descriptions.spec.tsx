@@ -1,7 +1,11 @@
 import React from 'react'
+import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { Descriptions } from '../../packages/react/src/components/Descriptions'
+import {
+  Descriptions,
+  DescriptionsItem as DescriptionsItemComponent
+} from '../../packages/react/src/components/Descriptions'
 import type { DescriptionsItem } from '../../packages/core/src/types/descriptions'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
@@ -29,6 +33,28 @@ describe('Descriptions (React)', () => {
     const { container } = render(<Descriptions items={basicItems}>{0}</Descriptions>)
     expect(container.textContent).toBe('0')
     expect(screen.queryByText('John Doe')).not.toBeInTheDocument()
+  })
+
+  it('preserves root attributes and styles with children', () => {
+    const { container } = render(
+      <Descriptions
+        id="details"
+        data-probe="children"
+        aria-label="Details"
+        style={{ color: 'red' }}>
+        Custom content
+      </Descriptions>
+    )
+    const root = container.firstElementChild
+    expect(root).toHaveAttribute('id', 'details')
+    expect(root).toHaveAttribute('data-probe', 'children')
+    expect(root).toHaveAttribute('aria-label', 'Details')
+    expect(root).toHaveStyle({ color: 'red' })
+  })
+
+  it('preserves an empty collection title during SSR', () => {
+    const html = renderToStaticMarkup(<Descriptions title="Empty title" items={[]} />)
+    expect(html).toContain('Empty title')
   })
 
   it('hides header when no title or extra', () => {
@@ -161,7 +187,13 @@ describe('Descriptions (React)', () => {
   })
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
-      const { container } = render(<Descriptions />)
+      const { container } = render(
+        <Descriptions>
+          <DescriptionsItemComponent label="CPU">8C</DescriptionsItemComponent>
+        </Descriptions>
+      )
+      expect(container.querySelector('dt')).toHaveTextContent('CPU')
+      expect(container.querySelector('dd')).toHaveTextContent('8C')
       await expectNoA11yViolationsIsolated(container)
     })
   })

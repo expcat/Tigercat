@@ -103,10 +103,7 @@ export const Descriptions = forwardRef<HTMLDivElement, DescriptionsProps>(functi
 
   if (children != null) {
     return (
-      <div
-        ref={setRootRef}
-        data-tiger-descriptions=""
-        className={classNames(getDescriptionsClasses(size, bordered), className)}>
+      <div ref={setRootRef} data-tiger-descriptions="" className={rootClasses} {...props}>
         {children}
       </div>
     )
@@ -241,7 +238,8 @@ export const Descriptions = forwardRef<HTMLDivElement, DescriptionsProps>(functi
     )
   }
 
-  const useCaption = title != null && extra == null && (layout === 'horizontal' || bordered)
+  const useCaption =
+    items.length > 0 && title != null && extra == null && (layout === 'horizontal' || bordered)
   const showHeader = extra != null || (title != null && !useCaption)
 
   return (
@@ -271,10 +269,10 @@ export function DescriptionsItem({
   children?: React.ReactNode
 }) {
   return (
-    <div data-tiger-descriptions-item="">
+    <dl data-tiger-descriptions-item="">
       <dt>{label}</dt>
       <dd>{children}</dd>
-    </div>
+    </dl>
   )
 }
 

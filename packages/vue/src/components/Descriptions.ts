@@ -123,8 +123,10 @@ export const Descriptions = defineComponent({
 
     const column = computed(() => resolveResponsiveValue(props.column, containerWidth.value, 3))
     const rows = computed(() => groupItemsIntoRows(props.items, column.value))
+    const labelledBy = computed(() => (props.title != null || slots.title ? titleId : undefined))
     const useCaption = computed(() =>
       Boolean(
+        props.items.length > 0 &&
         props.title != null &&
         props.extra == null &&
         !slots.extra &&
@@ -150,7 +152,7 @@ export const Descriptions = defineComponent({
         'table',
         {
           class: getDescriptionsTableClasses(props.bordered),
-          'aria-labelledby': props.title != null ? titleId : undefined
+          'aria-labelledby': labelledBy.value
         },
         [
           useCaption.value
@@ -203,7 +205,7 @@ export const Descriptions = defineComponent({
           'table',
           {
             class: getDescriptionsTableClasses(true),
-            'aria-labelledby': props.title != null ? titleId : undefined
+            'aria-labelledby': labelledBy.value
           },
           [
             useCaption.value
@@ -261,7 +263,7 @@ export const Descriptions = defineComponent({
         {
           class: 'grid w-full',
           style: getDescriptionsVerticalGridStyle(column.value),
-          'aria-labelledby': props.title != null ? titleId : undefined
+          'aria-labelledby': labelledBy.value
         },
         rows.value.flatMap((rowItems) =>
           rowItems.map((item) =>
@@ -308,56 +310,48 @@ export const Descriptions = defineComponent({
           '[Tigercat] Descriptions received both items and children. Children are used.'
         )
       }
+      const rootProps = {
+        ...attrs,
+        ref: rootRef,
+        class: classNames(
+          getDescriptionsClasses(props.size, props.bordered),
+          props.className,
+          coerceClassValue(attrs.class)
+        ),
+        style: mergeStyleValues(props.style, attrs.style)
+      }
       if (slots.default) {
         return h(
           'div',
           {
-            ...attrs,
-            class: classNames(
-              getDescriptionsClasses(props.size, props.bordered),
-              props.className,
-              coerceClassValue(attrs.class)
-            ),
+            ...rootProps,
             'data-tiger-descriptions': ''
           },
           slots.default()
         )
       }
 
-      return h(
-        'div',
-        {
-          ...attrs,
-          ref: rootRef,
-          class: classNames(
-            getDescriptionsClasses(props.size, props.bordered),
-            props.className,
-            coerceClassValue(attrs.class)
-          ),
-          style: mergeStyleValues(props.style, attrs.style)
-        },
-        [
-          showHeader.value
-            ? h('div', { class: descriptionsHeaderClasses }, [
-                props.title != null || slots.title
-                  ? h(
-                      'div',
-                      { class: descriptionsTitleClasses, id: titleId },
-                      slots.title?.() ?? props.title
-                    )
-                  : null,
-                props.extra != null || slots.extra
-                  ? h(
-                      'div',
-                      { class: descriptionsExtraClasses },
-                      slots.extra?.() ?? (props.extra as HChildren)
-                    )
-                  : null
-              ])
-            : null,
-          props.layout === 'horizontal' ? renderHorizontal() : renderVertical()
-        ]
-      )
+      return h('div', rootProps, [
+        showHeader.value
+          ? h('div', { class: descriptionsHeaderClasses }, [
+              props.title != null || slots.title
+                ? h(
+                    'div',
+                    { class: descriptionsTitleClasses, id: titleId },
+                    slots.title?.() ?? props.title
+                  )
+                : null,
+              props.extra != null || slots.extra
+                ? h(
+                    'div',
+                    { class: descriptionsExtraClasses },
+                    slots.extra?.() ?? (props.extra as HChildren)
+                  )
+                : null
+            ])
+          : null,
+        props.layout === 'horizontal' ? renderHorizontal() : renderVertical()
+      ])
     }
   }
 })
@@ -369,7 +363,7 @@ export const DescriptionsItem = defineComponent({
   },
   setup(props, { slots }) {
     return () =>
-      h('div', { 'data-tiger-descriptions-item': '' }, [
+      h('dl', { 'data-tiger-descriptions-item': '' }, [
         h('dt', slots.label ? slots.label() : props.label),
         h('dd', slots.default?.())
       ])

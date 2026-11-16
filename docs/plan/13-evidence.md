@@ -98,7 +98,7 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | C036 | Col          | needs-evidence | F01 已修复；35 spec（双端 SSR）、types:check 通过；IAB 不可用，改用变量/CSS 断言。视觉/键盘 0/24 blocked（owner C046）；断点、offset/RTL/flex 几何及 hydration/E2E/读屏未测   |
 | C037 | Container    | needs-evidence | 视觉 0/8 blocked、真实外壳键盘 0/8 blocked、截图 0（8 格 owner 均为 C042 Layout）；未跑 hydration、浏览器 E2E、读屏；Terra 运行时模型未独立核验                               |
 | C038 | Content      | needs-evidence | F01 已修复；50 spec（双端 SSR/DOM）、types:check 通过；IAB 不可用，改用 href/id 断言。视觉/键盘 0/24 blocked（owner C042）；跳转点击、真实滚动及 hydration/E2E/读屏未测       |
-| C039 | Descriptions | needs-evidence | 视觉 0/16 blocked、键盘 0/16 blocked、截图 0；视觉代理因 Terra 额度超限未执行；未跑 hydration、读屏；docs:links exit 1（.local 资料 1128 个链接错误）                         |
+| C039 | Descriptions | needs-evidence | F01/F02/F04/F05 已修复（F03 此前 S08 完成）；41 spec（双端 SSR/DOM/axe）、types:check 通过。本次未做浏览器复验；视觉/键盘 0/16 blocked、截图 0；hydration、读屏未测           |
 | C040 | Footer       | needs-evidence | 视觉 0/16 blocked、外壳键盘 0/16 blocked、截图 0（owner 均为 C042）；未启动服务；未跑 hydration、浏览器 E2E、读屏、docs:links；无 Footer 专属 E2E                             |
 | C041 | Header       | needs-evidence | 视觉 0/24 blocked、外壳键盘 0/24 blocked、截图 0（owner 均为 C042）；未跑 hydration、浏览器 E2E、读屏；docs:links exit 1（.local 目录 1143 处失效链接）                       |
 | C042 | Layout       | needs-evidence | 视觉 0/32 blocked、键盘 0/32 blocked、截图 0；未跑 hydration、浏览器 E2E、全仓构建、读屏；skip link 激活与滚动未测；docs:links exit 1（.local 1156 处）                       |

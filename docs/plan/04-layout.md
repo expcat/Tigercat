@@ -18,8 +18,8 @@ layout 组 19 个组件（C033–C051）。只有 AspectRatio、Card、Carousel 
 
 ## 概览
 
-本篇 31 条：P1 0、P2 30、P3 1。
-按波次：W5 30、W9 1。
+本篇 27 条：P1 0、P2 26、P3 1。
+按波次：W5 26、W9 1。
 
 已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C034-F04（S13）、C037-F01（S11）、C039-F03（S08）、C040-F01（S01）、C048-F02（S13）、C050-F02（S13）、C051-F03（S13）。
 
@@ -32,17 +32,6 @@ layout 组 19 个组件（C033–C051）。只有 AspectRatio、Card、Carousel 
 | 编号     | 级别 | 波次 | 端   | 类别 | 条目                                    | 验收                                                                          |
 | -------- | ---- | ---- | ---- | ---- | --------------------------------------- | ----------------------------------------------------------------------------- |
 | C034-F07 | P3   | W9   | 双端 | 类型 | 键盘路径给 onClick 的事件与公开类型不同 | Enter/Space 激活 Card 时 onClick 收到的事件符合声明的点击类型，不再是 keydown |
-
-### C039 Descriptions
-
-报告 `groups/layout/Descriptions.md`，队列状态 needs-evidence。
-
-| 编号     | 级别 | 波次 | 端   | 类别   | 条目                                | 验收                                                                               |
-| -------- | ---- | ---- | ---- | ------ | ----------------------------------- | ---------------------------------------------------------------------------------- |
-| C039-F01 | P2   | W5   | 双端 | 行为   | children 分支丢失调用方属性         | children/default slot 模式根节点保留 id、data-probe、aria-label 与 style           |
-| C039-F02 | P2   | W5   | Vue  | 无障碍 | Vue title slot 未关联可访问名称     | Vue 只提供 title slot 且 items 非空时，table 或 dl 的 aria-labelledby 指向 titleId |
-| C039-F04 | P2   | W5   | 双端 | 行为   | 空 items 的默认水平布局丢失标题     | 默认水平布局、items=[]、title 为 Empty title 时双端 SSR 仍输出该标题               |
-| C039-F05 | P2   | W5   | 双端 | 无障碍 | 组合子组件产生无效的 dt/dd 父级结构 | Descriptions 包裹 DescriptionsItem 的双端静态 DOM 经 axe 扫描不再报 dlitem         |
 
 ### C041 Header
 

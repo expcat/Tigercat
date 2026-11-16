@@ -4,7 +4,12 @@
 
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/vue'
-import { Descriptions } from '@expcat/tigercat-vue/Descriptions'
+import { createSSRApp, h } from 'vue'
+import { renderToString } from '@vue/server-renderer'
+import {
+  Descriptions,
+  DescriptionsItem as DescriptionsItemComponent
+} from '@expcat/tigercat-vue/Descriptions'
 import type { DescriptionsItem } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
@@ -31,6 +36,40 @@ describe('Descriptions (Vue)', () => {
 
     await rerender({ extra: undefined })
     expect(container.querySelector('caption')).toHaveTextContent('0')
+  })
+
+  it('preserves root attributes and styles with the default slot', () => {
+    const { container } = render(Descriptions, {
+      props: { style: { color: 'red' } },
+      attrs: { id: 'details', 'data-probe': 'slot', 'aria-label': 'Details' },
+      slots: { default: 'Custom content' }
+    })
+    const root = container.firstElementChild
+    expect(root).toHaveAttribute('id', 'details')
+    expect(root).toHaveAttribute('data-probe', 'slot')
+    expect(root).toHaveAttribute('aria-label', 'Details')
+    expect(root).toHaveStyle({ color: 'red' })
+  })
+
+  it.each([
+    { layout: 'horizontal', bordered: false },
+    { layout: 'vertical', bordered: true },
+    { layout: 'vertical', bordered: false }
+  ] as const)('names the $layout bordered=$bordered structure from the title slot', (props) => {
+    const { container } = render(Descriptions, {
+      props: { ...props, items: basicItems },
+      slots: { title: 'Slot title' }
+    })
+    const title = screen.getByText('Slot title')
+    expect(title.id).not.toBe('')
+    expect(container.querySelector('table, dl')).toHaveAttribute('aria-labelledby', title.id)
+  })
+
+  it('preserves an empty collection title during SSR', async () => {
+    const html = await renderToString(
+      createSSRApp(Descriptions, { title: 'Empty title', items: [] })
+    )
+    expect(html).toContain('Empty title')
   })
 
   it('hides header when no title or extra', () => {
@@ -160,7 +199,13 @@ describe('Descriptions (Vue)', () => {
   })
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
-      const { container } = render(Descriptions)
+      const { container } = render(Descriptions, {
+        slots: {
+          default: () => h(DescriptionsItemComponent, { label: 'CPU' }, { default: () => '8C' })
+        }
+      })
+      expect(container.querySelector('dt')).toHaveTextContent('CPU')
+      expect(container.querySelector('dd')).toHaveTextContent('8C')
       await expectNoA11yViolationsIsolated(container)
     })
   })
