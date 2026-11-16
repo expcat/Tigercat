@@ -675,6 +675,7 @@ function toHighlightTokens(tokens: Token[], theme: CodeEditorTheme): HighlightTo
 }
 
 let tokenCacheKey = ''
+let tokenCacheHighlighter: CodeHighlighter['highlightLine'] | CodeHighlighter['highlightCode']
 let tokenCacheRows: HighlightToken[][] = []
 
 function rowsFromHighlighter(
@@ -708,8 +709,10 @@ export function buildCodeEditorLineModels(options: {
   const lines = options.value.split('\n')
   const showActive = options.highlightActiveLine && !options.disabled
   const key = `${options.language}\0${options.theme}\0${options.highlighter?.name ?? ''}\0${options.value}`
-  if (key !== tokenCacheKey) {
+  const highlighter = options.highlighter?.highlightLine ?? options.highlighter?.highlightCode
+  if (key !== tokenCacheKey || highlighter !== tokenCacheHighlighter) {
     tokenCacheKey = key
+    tokenCacheHighlighter = highlighter
     tokenCacheRows = rowsFromHighlighter(
       options.value,
       options.language,

@@ -256,6 +256,7 @@ function ListInner<T extends ListItem>(
     const {
       className: dragClassName,
       onPointerDown,
+      onKeyDown: onDragKeyDown,
       draggable: _d,
       ...dragRest
     } = bindings as Record<string, unknown>
@@ -282,16 +283,16 @@ function ListInner<T extends ListItem>(
         key={key}
         className={classNames(itemClasses, dragClassName as string | undefined)}
         tabIndex={clickable && renderItem ? (loading ? -1 : 0) : undefined}
-        onKeyDown={
-          clickable && renderItem
-            ? (event) => {
-                if (loading || event.target !== event.currentTarget) return
-                if (event.key !== 'Enter' && event.key !== ' ') return
-                event.preventDefault()
-                onItemClick?.(item, sourceIndex)
-              }
-            : undefined
-        }
+        onKeyDown={(event) => {
+          if (drag.isDragging) {
+            ;(onDragKeyDown as ((event: React.KeyboardEvent) => void) | undefined)?.(event)
+            if (event.defaultPrevented) return
+          }
+          if (!clickable || !renderItem || loading || event.target !== event.currentTarget) return
+          if (event.key !== 'Enter' && event.key !== ' ') return
+          event.preventDefault()
+          onItemClick?.(item, sourceIndex)
+        }}
         onClick={
           clickable
             ? (event) => {

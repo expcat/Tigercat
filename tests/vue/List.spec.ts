@@ -84,7 +84,7 @@ describe('List', () => {
     const onItemClick = vi.fn()
     const onAction = vi.fn()
     render(List, {
-      props: { dataSource: sampleData, onItemClick },
+      props: { dataSource: sampleData, draggable: true, onItemClick },
       slots: {
         renderItem: ({ item }: { item: (typeof sampleData)[number] }) => [
           h('span', item.title),
@@ -99,6 +99,7 @@ describe('List', () => {
     await user.keyboard('{Enter} ')
     expect(onItemClick).toHaveBeenCalledTimes(2)
     expect(onItemClick).toHaveBeenLastCalledWith(sampleData[0], 0)
+    await user.tab()
     await user.tab()
     await user.keyboard('{Enter} ')
     expect(onAction).toHaveBeenCalledTimes(2)

@@ -248,8 +248,8 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 
 | 任务 | 组件            | 队列           | 现状                                                                                                                                                                           |
 | ---- | --------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| C159 | CodeEditor      | needs-evidence | 视觉 0/24 blocked；键盘 0/24 blocked；截图 0；未启动 Example；定向 spec 44 项通过；临时探针 6 过 2 败；w9-bind.spec 未跑                                                       |
-| C160 | Drag            | needs-evidence | 视觉 0/8 blocked；键盘 0/8 blocked；截图 0；未启动 Example；定向 spec 63 项通过（happy-dom，无键盘用例）；临时探针 5 败 1 过                                                   |
+| C159 | CodeEditor      | needs-evidence | F01 已修复：同名 highlighter 返回当前 token；定向测试、axe、types:check 通过。IAB 不可用；原视觉 0/24、键盘 0/24 blocked，截图 0；未启动 Example，读屏待补。                   |
+| C160 | Drag            | needs-evidence | F01–F03 已修复：键盘重排、zh-CN 悬停项号、React 根属性回归通过；323 项（含 axe）、types:check 通过。IAB 不可用；原视觉 0/8、键盘 0/8 blocked，截图 0；真实键盘与读屏待补。     |
 | C161 | FileManager     | needs-evidence | 视觉 0/16 blocked；键盘 0/16 blocked；截图 0；未启动 Example；定向 spec 120 项通过（happy-dom）；临时探针 4 项通过并留快照；未跑 SSR                                           |
 | C162 | ImageAnnotation | needs-evidence | 视觉 0/16 blocked；键盘 0/16 blocked；截图 0；未启动 Example；定向 spec 72 项通过（happy-dom，React 有 act 警告）；临时探针 6 项通过并留快照；未跑 SSR                         |
 | C163 | InfiniteScroll  | needs-evidence | 视觉 0/16 blocked；键盘 0/16 blocked；截图 0；未启动 Example、未在页面滚到哨兵；定向 spec 79 项通过；custom-text 7 项通过（不含错误文案）；探针含 SSR 字符串快照，汇总行未落盘 |

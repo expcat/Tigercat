@@ -54,15 +54,9 @@ export const Drag = defineComponent({
       containerId: props.containerId,
       onDragStart: (event: DragStartEvent) => emit('drag-start', event),
       onDragOver: (event: DragOverEvent) => {
-        const from = props.items.findIndex((item) => item.id === event.item.id)
-        const to = event.overItem
-          ? props.items.findIndex((item) => item.id === event.overItem?.id)
-          : from
-        announcement.value = dragMoveAnnouncement(
-          Math.max(0, from),
-          Math.max(0, to),
-          tigerConfig.value.locale
-        )
+        const from = event.item.index
+        const to = event.overItem?.index ?? from
+        announcement.value = dragMoveAnnouncement(from, to, tigerConfig.value.locale)
         emit('drag-over', event)
       },
       onDragEnd: (event: DragEndEvent) => {
@@ -137,7 +131,10 @@ export const Drag = defineComponent({
             announcement.value
           ),
           ...props.items.map((item) => {
-            const itemAttrs = drag.getDragItemAttrs(item)
+            const itemAttrs: Record<string, unknown> = {
+              ...drag.getDragItemAttrs(item),
+              tabindex: props.config?.disabled ? -1 : 0
+            }
             const isDragging = itemAttrs['data-dragging'] === true
             const custom = slots.item?.({ item, attrs: itemAttrs, isDragging })
             if (custom) return custom

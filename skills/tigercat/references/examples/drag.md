@@ -15,6 +15,8 @@ description: Compact Tigercat Advanced Vue and React usage routes
 
 Runnable modules: `examples/example/vue3/src/examples/drag/01/`, `examples/example/react/src/examples/drag/01/`.
 
+Note: Tab 聚焦未禁用项，Space / Enter 拿起或放下，方向键按 `config.axis` 调整目标，Escape 取消。悬停项号使用目标列表的位置。React 根透传原生属性和监听。
+
 Vue: `<Drag />`
 
 React: `<Drag />`

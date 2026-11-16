@@ -15,7 +15,10 @@ export interface DragRenderContext {
   isDragging: boolean
 }
 
-export interface DragProps<T extends DragItem = DragItem> extends CoreDragProps<T> {
+export interface DragProps<T extends DragItem = DragItem>
+  extends
+    CoreDragProps<T>,
+    Omit<React.HTMLAttributes<HTMLUListElement>, keyof CoreDragProps<T> | 'children'> {
   children?: (item: T, context: DragRenderContext) => React.ReactNode
   renderItem?: (item: T, context: DragRenderContext) => React.ReactNode
 }
@@ -31,7 +34,8 @@ export function Drag<T extends DragItem = DragItem>({
   onDragEnd,
   className,
   children,
-  renderItem
+  renderItem,
+  ...restProps
 }: DragProps<T>) {
   const tigerConfig = useTigerConfig()
   const itemsRef = React.useRef(items)
@@ -47,9 +51,9 @@ export function Drag<T extends DragItem = DragItem>({
     containerId,
     onDragStart,
     onDragOver: (event) => {
-      const from = items.findIndex((item) => item.id === event.item.id)
-      const to = event.overItem ? items.findIndex((item) => item.id === event.overItem?.id) : from
-      setAnnouncement(dragMoveAnnouncement(Math.max(0, from), Math.max(0, to), tigerConfig.locale))
+      const from = event.item.index
+      const to = event.overItem?.index ?? from
+      setAnnouncement(dragMoveAnnouncement(from, to, tigerConfig.locale))
       onDragOver?.(event)
     },
     onDragEnd: (event) => {
@@ -82,6 +86,7 @@ export function Drag<T extends DragItem = DragItem>({
 
   return (
     <ul
+      {...restProps}
       {...zoneProps}
       className={classNames('m-0 list-none p-0', className)}
       data-tiger-drag=""
@@ -95,7 +100,10 @@ export function Drag<T extends DragItem = DragItem>({
         {announcement}
       </div>
       {items.map((item) => {
-        const itemProps = drag.getDragItemProps(item)
+        const itemProps: Record<string, unknown> = {
+          ...drag.getDragItemProps(item),
+          tabIndex: config?.disabled ? -1 : 0
+        }
         const node = render?.(item, {
           dragItemProps: itemProps,
           isDragging: itemProps['data-dragging'] === true

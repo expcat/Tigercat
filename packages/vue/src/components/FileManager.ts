@@ -552,7 +552,7 @@ export const FileManager = defineComponent({
             style: dragProps?.style,
             onKeydown: (event: KeyboardEvent) => {
               const onKey = dragProps?.onKeydown as ((event: KeyboardEvent) => void) | undefined
-              onKey?.(event)
+              if (drag.isDragging.value) onKey?.(event)
               if (event.defaultPrevented) return
               handleItemKeydown(event, item, index)
             },

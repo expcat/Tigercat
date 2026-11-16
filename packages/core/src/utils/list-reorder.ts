@@ -441,8 +441,21 @@ export function createListReorderController(
   }
 
   const onItemKeyDown = (item: DragItem, event: DragKeyBindingEvent): void => {
-    if (!session?.state.isDragging) return
+    if (!session?.state.isDragging) {
+      if (event.key !== ' ' && event.key !== 'Enter') return
+      if (!isDragEnabled(configOf())) return
+      event.preventDefault()
+      event.stopPropagation()
+      startDrag(item)
+      return
+    }
     if (session.state.draggedItem?.id !== item.id) return
+    if (event.key === ' ' || event.key === 'Enter') {
+      event.preventDefault()
+      event.stopPropagation()
+      drop()
+      return
+    }
     if (event.key === 'Escape') {
       event.preventDefault()
       event.stopPropagation()
@@ -510,6 +523,8 @@ export function createListReorderController(
 
   const getZoneBindings = (): ListDragZoneBindings => ({
     onDragOver: (event) => {
+      const target = event.target as Element | null
+      if (target?.closest?.('[data-drag-index]')) return
       dragOver(null, event, containerOf())
     },
     onDrop: (event) => {

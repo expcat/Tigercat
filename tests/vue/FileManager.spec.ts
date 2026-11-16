@@ -238,7 +238,7 @@ describe('FileManager (Vue)', () => {
 
   it('supports roving keyboard selection and folder open', async () => {
     const wrapper = render(FileManager, {
-      props: { files, showHidden: true, multiple: true }
+      props: { files, showHidden: true, multiple: true, draggable: true }
     })
 
     let options = wrapper.getAllByRole('option')

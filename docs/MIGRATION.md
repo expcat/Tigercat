@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+CodeEditor 替换同名 highlighter 后立即使用新函数生成 token。Drag 未禁用项现在进入 Tab 顺序，Space / Enter 拿起和放下、方向键移动目标、Escape 取消；悬停播报使用目标列表的位置。React Drag 的原生属性、样式和点击现在落到列表根。调用方式不用改。
+
 双端 SankeyChart 节点与 WaterfallChart 柱现在使用布局 label 作为可访问名称，矩形带 role=img；padding 和 desc 传入画布，默认 padding 仍分别为 16 和 24。OrgChart 02 示例改用 HTTPS 头像，data: 地址仍不渲染。
 
 Gantt 的 `YYYY-MM-DD` 式 maxDate 现在包含当天，与任务 end 一致；需要精确截止时刻时传 Date、时间戳或带时间的字符串。responsive 同时作用于外壳与画布，省略时按类型约定默认 false；需要随容器缩放时显式传 true。两端 gantt/02 示例均支持拖拽后回写任务日期。

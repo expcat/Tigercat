@@ -611,7 +611,7 @@ export const FileManager: React.FC<FileManagerProps> = ({
           if (!item.disabled) setFocusedIndex(index)
         }}
         onKeyDown={(event) => {
-          onDragKeyDown?.(event)
+          if (drag.isDragging) onDragKeyDown?.(event)
           if (event.defaultPrevented) return
           handleItemKeyDown(event, item, index)
         }}

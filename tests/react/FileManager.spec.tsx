@@ -225,6 +225,7 @@ describe('FileManager (React)', () => {
         files={files}
         showHidden
         multiple
+        draggable
         onSelect={onSelect}
         onCurrentPathChange={onCurrentPathChange}
         onSelectedKeysChange={onSelectedKeysChange}

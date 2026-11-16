@@ -298,6 +298,7 @@ export const List = defineComponent({
       const {
         class: dragClass,
         onPointerdown,
+        onKeydown: onDragKeydown,
         draggable: _d,
         ...dragRest
       } = bindings as Record<string, unknown>
@@ -325,15 +326,23 @@ export const List = defineComponent({
           key,
           class: classNames(itemClasses, dragClass as string | undefined),
           tabindex: clickable && slots.renderItem ? (props.loading ? -1 : 0) : undefined,
-          onKeydown:
-            clickable && slots.renderItem
-              ? (event: KeyboardEvent) => {
-                  if (props.loading || event.target !== event.currentTarget) return
-                  if (event.key !== 'Enter' && event.key !== ' ') return
-                  event.preventDefault()
-                  emit('item-click', item, sourceIndex)
-                }
-              : undefined,
+          onKeydown: (event: KeyboardEvent) => {
+            if (drag.isDragging.value) {
+              ;(onDragKeydown as ((event: KeyboardEvent) => void) | undefined)?.(event)
+              if (event.defaultPrevented) return
+            }
+            if (
+              !clickable ||
+              !slots.renderItem ||
+              props.loading ||
+              event.target !== event.currentTarget
+            ) {
+              return
+            }
+            if (event.key !== 'Enter' && event.key !== ' ') return
+            event.preventDefault()
+            emit('item-click', item, sourceIndex)
+          },
           onClick: clickable
             ? (event: MouseEvent) => {
                 if (props.loading || isInteractiveTarget(event.target)) return

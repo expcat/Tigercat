@@ -13,6 +13,8 @@ description: Compact generated Tigercat Advanced props reference
 
 `packages/core/src/types/drag.ts` · `DragProps` · 3/6 compact props · [Complete props](#remaining-props-complete-public-api)
 
+Note: Tab 聚焦未禁用项，Space / Enter 拿起或放下，方向键按 `config.axis` 调整目标，Escape 取消。悬停项号使用目标列表的位置。React 根透传原生属性和监听。
+
 | Prop         | Type         | Default | Notes                                                            |
 | ------------ | ------------ | ------- | ---------------------------------------------------------------- |
 | `items?`     | `T[]`        | `-`     | Items to reorder. Each item must have a stable `id` and `index`. |

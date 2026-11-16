@@ -72,6 +72,7 @@ describe('List', () => {
     render(
       <List
         dataSource={sampleData}
+        draggable
         onItemClick={onItemClick}
         renderItem={(item) => (
           <>
@@ -88,6 +89,7 @@ describe('List', () => {
     await user.keyboard('{Enter} ')
     expect(onItemClick).toHaveBeenCalledTimes(2)
     expect(onItemClick).toHaveBeenLastCalledWith(sampleData[0], 0)
+    await user.tab()
     await user.tab()
     await user.keyboard('{Enter} ')
     expect(onAction).toHaveBeenCalledTimes(2)

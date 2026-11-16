@@ -6,6 +6,7 @@ import {
   getLineNumberClasses,
   countLines,
   generateLineNumbers,
+  buildCodeEditorLineModels,
   handleTabKey,
   getActiveLineIndex,
   tokenClassesLight,
@@ -13,6 +14,28 @@ import {
 } from '@expcat/tigercat-core'
 
 describe('code-editor-utils', () => {
+  it('uses the current implementation when highlighters share a name', () => {
+    const options = {
+      value: 'same source',
+      language: 'plain',
+      theme: 'light',
+      activeLine: 0,
+      highlightActiveLine: false,
+      disabled: false
+    } as const
+    const first = buildCodeEditorLineModels({
+      ...options,
+      highlighter: { name: 'same', highlightLine: () => [{ text: 'AAA' }] }
+    })
+    const second = buildCodeEditorLineModels({
+      ...options,
+      highlighter: { name: 'same', highlightLine: () => [{ text: 'BBB' }] }
+    })
+
+    expect(first.lines[0].tokens).toEqual([{ text: 'AAA' }])
+    expect(second.lines[0].tokens).toEqual([{ text: 'BBB' }])
+  })
+
   describe('tokenizeLine', () => {
     it('should tokenize plain text', () => {
       const tokens = tokenizeLine('hello world', 'plain')

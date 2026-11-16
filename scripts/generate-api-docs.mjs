@@ -563,6 +563,10 @@ const COMPONENT_USAGE_NOTES = {
     notes:
       '`column.fixed` 钉列；`columnLockable` 是表头锁定钮（与 `hideable` 可见性不同）。有固定列时 `<colgroup>` 钉宽。卡片模式要显式 `responsiveMode="card"`。`hiddenColumnKeys` 受控。默认开分页（`pageSize` 10）；List 分页默认关。`pagination.remote: true` 不做本地筛排切（与工具栏 `toolbar.searchMode: \'remote\'` 不是同一个 remote）。内置导出只出 CSV。'
   },
+  Drag: {
+    notes:
+      'Tab 聚焦未禁用项，Space / Enter 拿起或放下，方向键按 `config.axis` 调整目标，Escape 取消。悬停项号使用目标列表的位置。React 根透传原生属性和监听。'
+  },
   VirtualTable: {
     uses: ['TableColumn', 'virtual scroll range', 'fixed column offsets'],
     notes:
