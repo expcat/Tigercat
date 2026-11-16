@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Button 默认加载描边（Core / Vue，C004-F002）**：共享 SVG descriptor 在 Vue 渲染前转换现有描边属性，默认 loading 圆环输出 stroke-width="4"，与 React 一致。
+
 - **Text 复制回调类型与标签示例（React / Demo，C003-F001、C003-F002）**：React 顶层 onCopy 排除原生剪贴板事件类型，回调接收复制文本；Vue 标签改用 for，两端示例补上对应输入目标。
 
 - **Icon 字符串样式与注册说明（Vue / Core / Demo / MCP，C002-F001、C002-F003）**：Vue 保留字符串 style 的颜色与宽高，显式 color 只覆盖颜色；类型注释、生成文档与两端示例改用 createIconRegistry 的 register / registerMany，并通过 ConfigProvider.iconRegistry 接线。

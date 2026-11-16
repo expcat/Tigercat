@@ -2,8 +2,8 @@
  * SVG attribute helpers.
  *
  * Some utilities (e.g. `getSpinnerSVG`) may return React-flavored attribute keys
- * like `className`. When rendering SVG with Vue `h()`, we need to normalize to
- * Vue's `class` key.
+ * like `className` and `strokeWidth`. When rendering SVG with Vue `h()`, normalize
+ * class and paint keys to their native SVG attribute names.
  */
 
 /**
@@ -169,13 +169,18 @@ export function toVueSvgAttrs(attrs: ResolvedIconSvgAttrs): Record<string, unkno
 }
 
 export function normalizeSvgAttrs(svgAttrs: Record<string, unknown>): Record<string, unknown> {
-  if ('className' in svgAttrs && !('class' in svgAttrs)) {
-    const { className, ...rest } = svgAttrs
-    return {
-      ...rest,
-      class: className
+  const attrs = { ...svgAttrs }
+  if ('className' in attrs && !('class' in attrs)) {
+    attrs.class = attrs.className
+    delete attrs.className
+  }
+
+  for (const key of ['strokeWidth', 'strokeLinecap', 'strokeDasharray']) {
+    if (key in attrs) {
+      attrs[key.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)] = attrs[key]
+      delete attrs[key]
     }
   }
 
-  return svgAttrs
+  return attrs
 }

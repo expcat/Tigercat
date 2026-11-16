@@ -134,6 +134,7 @@ describe('Button', () => {
     expect(button).toHaveAttribute('aria-disabled', 'true')
     expect(container.querySelector('svg.animate-spin')).toBeInTheDocument()
     expect(container.querySelector('svg.animate-spin')).toHaveAttribute('aria-hidden', 'true')
+    expect(container.querySelector('svg circle')).toHaveAttribute('stroke-width', '4')
 
     await fireEvent.click(button)
     expect(onClick).not.toHaveBeenCalled()
