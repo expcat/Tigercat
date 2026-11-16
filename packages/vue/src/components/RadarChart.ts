@@ -273,17 +273,19 @@ export const RadarChart = defineComponent({
     )
     const flatPoints = computed(() =>
       flattenChartPoints(
-        laid.value.series.map((item) => ({
-          seriesIndex: item.seriesIndex,
-          points: item.points.map((point) => ({ pointIndex: point.index }))
-        }))
+        laid.value.series
+          .filter((item) => !isLegendIndexHidden(item.seriesIndex))
+          .map((item) => ({
+            seriesIndex: item.seriesIndex,
+            points: item.points.map((point) => ({ pointIndex: point.index }))
+          }))
       )
     )
     const seriesName = (item: RadarChartSeries, index: number) =>
       item.name ?? defaultChartSeriesName(index, labels.value.seriesName)
     const tooltipContent = computed(() => {
       const hovered = hoveredPoint.value
-      if (!hovered) return ''
+      if (!hovered || isLegendIndexHidden(hovered.seriesIndex)) return ''
       const seriesItem = laid.value.series[hovered.seriesIndex]
       const point = seriesItem?.points.find((item) => item.index === hovered.pointIndex)
       if (!point) return ''
@@ -325,7 +327,7 @@ export const RadarChart = defineComponent({
         pointIndex: number,
         event: MouseEvent | FocusEvent
       ) => {
-        if (!trackPointer.value) return
+        if (!trackPointer.value || isLegendIndexHidden(seriesIndex)) return
         hoveredPoint.value = { seriesIndex, pointIndex }
         handleHoverEnter(seriesIndex, event)
       }
@@ -334,7 +336,7 @@ export const RadarChart = defineComponent({
         handleHoverLeave()
       }
       onAreaFrame = (sample) => {
-        if (!trackPointer.value) return
+        if (!trackPointer.value || isLegendIndexHidden(sample.seriesIndex)) return
         const axisPoints = layout.angles.map((angle) =>
           polarToCartesian(layout.cx, layout.cy, layout.radius, angle)
         )
@@ -346,7 +348,7 @@ export const RadarChart = defineComponent({
         handleMouseMove(event)
       }
       const handleAreaMove = (seriesIndex: number, event: MouseEvent) => {
-        if (!trackPointer.value) return
+        if (!trackPointer.value || isLegendIndexHidden(seriesIndex)) return
         const path = event.currentTarget as SVGPathElement
         const svg = path.ownerSVGElement
         if (!svg) return
@@ -547,14 +549,15 @@ export const RadarChart = defineComponent({
                       'stroke-width': item.series.pointBorderWidth ?? props.pointBorderWidth,
                       class: 'transition-[r] duration-150 ease-out motion-reduce:transition-none',
                       'aria-hidden': focusableMarks ? undefined : true,
-                      tabindex: focusableMarks
-                        ? chartPointTabIndex(
-                            item.seriesIndex,
-                            point.index,
-                            activePoint.value,
-                            flatPoints.value
-                          )
-                        : undefined,
+                      tabindex:
+                        focusableMarks && !isLegendIndexHidden(item.seriesIndex)
+                          ? chartPointTabIndex(
+                              item.seriesIndex,
+                              point.index,
+                              activePoint.value,
+                              flatPoints.value
+                            )
+                          : undefined,
                       role: focusableMarks ? 'button' : undefined,
                       'aria-label': focusableMarks
                         ? formatChartTemplate(labels.value.pointAriaLabel, {
@@ -594,14 +597,15 @@ export const RadarChart = defineComponent({
                             y: point.value
                           })
                         : undefined,
-                      tabindex: focusableMarks
-                        ? chartPointTabIndex(
-                            item.seriesIndex,
-                            point.index,
-                            activePoint.value,
-                            flatPoints.value
-                          )
-                        : undefined,
+                      tabindex:
+                        focusableMarks && !isLegendIndexHidden(item.seriesIndex)
+                          ? chartPointTabIndex(
+                              item.seriesIndex,
+                              point.index,
+                              activePoint.value,
+                              flatPoints.value
+                            )
+                          : undefined,
                       'data-radar-point': 'true',
                       'data-series-index': item.seriesIndex,
                       'data-point-index': point.index,
@@ -620,6 +624,7 @@ export const RadarChart = defineComponent({
                   'data-series-key': item.seriesKey,
                   'data-series-name': item.series.name,
                   opacity: isLegendIndexHidden(item.seriesIndex) ? 0 : item.opacity,
+                  'pointer-events': isLegendIndexHidden(item.seriesIndex) ? 'none' : undefined,
                   onMouseenter: (e: MouseEvent) => handleHoverEnter(item.seriesIndex, e),
                   onMouseleave: handlePointLeave,
                   onClick: () => handleSelectIndex(item.seriesIndex),

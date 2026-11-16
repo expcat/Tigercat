@@ -255,4 +255,28 @@ describe('LineChart', () => {
     const points = [...container.querySelectorAll('circle[data-point-index]')]
     expect(points.filter((point) => point.getAttribute('tabindex') === '0')).toHaveLength(1)
   })
+  it('ignores hover and click on legend-hidden marks', async () => {
+    const onHover = vi.fn()
+    const onClick = vi.fn()
+    const { container } = renderWithProps(LineChart, {
+      series: [
+        { name: 'Hidden', data: basicData },
+        { name: 'Visible', data: basicData }
+      ],
+      showLegend: true,
+      hoverable: true,
+      selectable: true,
+      onSeriesHover: onHover,
+      onSeriesClick: onClick
+    })
+    await fireEvent.click(container.querySelector('[data-legend-item]')!)
+    onHover.mockClear()
+    const hidden = container.querySelector('g[data-series-type="line"]')!
+    await fireEvent.mouseEnter(hidden)
+    await fireEvent.click(hidden)
+    expect(onHover).not.toHaveBeenCalled()
+    expect(onClick).not.toHaveBeenCalled()
+    expect(hidden).toHaveAttribute('pointer-events', 'none')
+    expect(hidden).not.toHaveAttribute('tabindex')
+  })
 })

@@ -361,10 +361,11 @@ export const PieChart: React.FC<PieChartProps> = ({
               stroke={borderColor}
               strokeWidth={borderWidth}
               strokeLinejoin="round"
+              pointerEvents={isLegendIndexHidden(slice.index) ? 'none' : undefined}
               data-pie-slice="true"
               data-index={slice.index}
               tabIndex={
-                interactive
+                interactive && !isLegendIndexHidden(slice.index)
                   ? chartMarkTabIndex(visualIndex, visualActive < 0 ? null : visualActive)
                   : undefined
               }
@@ -375,12 +376,26 @@ export const PieChart: React.FC<PieChartProps> = ({
               style={{
                 filter: shadow ? (isEmphasized ? PIE_EMPHASIS_SHADOW : PIE_BASE_SHADOW) : undefined
               }}
-              onMouseEnter={(e) => handleMouseEnter(slice.index, e)}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-              onFocus={interactive ? (e) => handleMouseEnter(slice.index, e) : undefined}
-              onClick={() => handleClick(slice.index)}
-              onKeyDown={(e) => handleSliceKeyDown(e, visualIndex)}
+              onMouseEnter={
+                isLegendIndexHidden(slice.index)
+                  ? undefined
+                  : (e) => handleMouseEnter(slice.index, e)
+              }
+              onMouseMove={isLegendIndexHidden(slice.index) ? undefined : handleMouseMove}
+              onMouseLeave={isLegendIndexHidden(slice.index) ? undefined : handleMouseLeave}
+              onFocus={
+                interactive && !isLegendIndexHidden(slice.index)
+                  ? (e) => handleMouseEnter(slice.index, e)
+                  : undefined
+              }
+              onClick={
+                isLegendIndexHidden(slice.index) ? undefined : () => handleClick(slice.index)
+              }
+              onKeyDown={
+                isLegendIndexHidden(slice.index)
+                  ? undefined
+                  : (e) => handleSliceKeyDown(e, visualIndex)
+              }
             />
           </g>
         )

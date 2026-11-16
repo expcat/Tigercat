@@ -8,7 +8,7 @@ import { PieChart } from '@expcat/tigercat-vue/PieChart'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { renderWithProps, expectNoA11yViolations } from '../utils'
-import { render } from '@testing-library/vue'
+import { fireEvent, render } from '@testing-library/vue'
 
 const defaultSize = { width: 240, height: 160 }
 const data = [
@@ -128,5 +128,29 @@ describe('PieChart', () => {
       ...defaultSize
     })
     expect(container.querySelector('[data-donut-center]')).toBeNull()
+  })
+  it('ignores hover and click on legend-hidden marks', async () => {
+    const onHover = vi.fn()
+    const onClick = vi.fn()
+    const { container } = renderWithProps(PieChart, {
+      data: [
+        { label: 'Hidden', value: 40 },
+        { label: 'Visible', value: 20 }
+      ],
+      showLegend: true,
+      hoverable: true,
+      selectable: true,
+      'onUpdate:hoveredIndex': onHover,
+      onSliceClick: onClick
+    })
+    await fireEvent.click(container.querySelector('[data-legend-item]')!)
+    onHover.mockClear()
+    const hidden = container.querySelector('[data-pie-slice][data-index="0"]')!
+    await fireEvent.mouseEnter(hidden)
+    await fireEvent.click(hidden)
+    expect(onHover).not.toHaveBeenCalled()
+    expect(onClick).not.toHaveBeenCalled()
+    expect(hidden).toHaveAttribute('pointer-events', 'none')
+    expect(hidden).not.toHaveAttribute('tabindex')
   })
 })

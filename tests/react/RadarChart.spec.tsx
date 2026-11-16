@@ -262,4 +262,30 @@ describe('RadarChart', () => {
     expect(fills).toContain('#f8fafc')
     expect(fills).toContain('#eef2ff')
   })
+  it('ignores hover and click on legend-hidden marks', async () => {
+    const onHover = vi.fn()
+    const onClick = vi.fn()
+    const { container } = renderWithProps(RadarChart, {
+      series: multiSeriesData,
+      showLegend: true,
+      hoverable: true,
+      selectable: true,
+      onSeriesHover: onHover,
+      onSeriesClick: onClick
+    })
+    fireEvent.click(container.querySelector('[data-legend-item]')!)
+    onHover.mockClear()
+    const hidden = container.querySelector('g[data-series-type="radar"]')!
+    fireEvent.mouseEnter(hidden)
+    fireEvent.click(hidden)
+    const point = hidden.querySelector('[data-radar-point]')!
+    fireEvent.focus(point)
+    fireEvent.mouseEnter(point)
+    fireEvent.click(point)
+    expect(onHover).not.toHaveBeenCalled()
+    expect(onClick).not.toHaveBeenCalled()
+    expect(hidden).toHaveAttribute('pointer-events', 'none')
+    expect(hidden).not.toHaveAttribute('tabindex')
+    expect(point).not.toHaveAttribute('tabindex')
+  })
 })

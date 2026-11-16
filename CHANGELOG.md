@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **图表图例隐藏与动画（Core / React / Vue，C138-F01、C139-F01、C139-F02、C146-F01）**：隐藏图形不再响应指针或进入点焦点与最近邻扫描，层级图同时屏蔽隐藏根的后代；BarChart 按每根柱显示和切换图例；共享图表动画规则接入 Tailwind 插件，并修正无效 easing 引用。
+
 - **图表基础层（React / Vue / 文档 / MCP，C141-F01、C141-F02、C141-F03、C144-F01、C145-F01、C145-F02）**：Vue ChartCanvas 接受字符串 style，两端保留调用方 ARIA 引用，显式 aria-label 优先于 title；生成说明对齐固定 role=group。ChartSeries 不再用空 paint 清掉调用方 fill/stroke。Vue ChartTooltip 仅在有 dismiss 监听时拦截 Escape，两端 SSR 首次坐标均保留 x/y，挂载后再定位。
 
 - **Timeline pending 播报（React / Vue，C137-F01）**：元素 pendingContent 不再被 String() 成 [object Object]。Vue 使用 pending 槽时，live region 不再播报被槽替换的 Loading...。

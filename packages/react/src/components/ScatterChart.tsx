@@ -363,6 +363,7 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
           const sharedProps = {
             fill: point.fill,
             opacity: isLegendIndexHidden(point.index) ? 0 : point.opacity,
+            pointerEvents: isLegendIndexHidden(point.index) ? ('none' as const) : undefined,
             stroke: pointBorderColor,
             strokeWidth: pointBorderWidth,
             className: classNames(
@@ -375,9 +376,10 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
               ...(filterStyle ? { filter: filterStyle } : {}),
               ...(animDelay ? { animationDelay: animDelay } : {})
             } as React.CSSProperties,
-            tabIndex: interactive
-              ? chartMarkTabIndex(visualIndex, visualActive < 0 ? 0 : visualActive)
-              : undefined,
+            tabIndex:
+              interactive && !isLegendIndexHidden(point.index)
+                ? chartMarkTabIndex(visualIndex, visualActive < 0 ? 0 : visualActive)
+                : undefined,
             role: interactive ? ('button' as const) : undefined,
             'aria-hidden': interactive ? undefined : true,
             'aria-label': interactive

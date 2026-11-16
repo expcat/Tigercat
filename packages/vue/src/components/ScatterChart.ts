@@ -392,6 +392,7 @@ export const ScatterChart = defineComponent({
                       const shared = {
                         fill: point.fill,
                         opacity: isLegendIndexHidden(point.index) ? 0 : point.opacity,
+                        'pointer-events': isLegendIndexHidden(point.index) ? 'none' : undefined,
                         stroke: props.pointBorderColor,
                         'stroke-width': props.pointBorderWidth,
                         class: classNames(
@@ -400,9 +401,10 @@ export const ScatterChart = defineComponent({
                           interactive && 'cursor-pointer'
                         ),
                         style: styleStr || undefined,
-                        tabindex: interactive
-                          ? chartMarkTabIndex(visualIndex, visualActive < 0 ? 0 : visualActive)
-                          : undefined,
+                        tabindex:
+                          interactive && !isLegendIndexHidden(point.index)
+                            ? chartMarkTabIndex(visualIndex, visualActive < 0 ? 0 : visualActive)
+                            : undefined,
                         role: interactive ? 'button' : undefined,
                         'aria-hidden': interactive ? undefined : true,
                         'aria-label': interactive

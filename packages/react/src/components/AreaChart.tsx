@@ -312,14 +312,18 @@ export const AreaChart: React.FC<AreaChartProps> = ({
 
   const handlePointClick = useCallback(
     (seriesIndex: number, pointIndex: number) => {
+      if (isLegendIndexHidden(seriesIndex)) return
       onPointClick?.(seriesIndex, pointIndex, resolvedSeries[seriesIndex]?.data[pointIndex])
     },
-    [onPointClick, resolvedSeries]
+    [onPointClick, resolvedSeries, isLegendIndexHidden]
   )
 
   const pointClickable = Boolean(onPointClick)
   const trackPointHover = showTooltip || hoverable
-  const flatPoints = useMemo(() => flattenChartPoints(seriesData), [seriesData])
+  const flatPoints = useMemo(
+    () => flattenChartPoints(seriesData.filter((sd) => !isLegendIndexHidden(sd.seriesIndex))),
+    [seriesData, isLegendIndexHidden]
+  )
   const {
     hoveredPointInfo,
     tooltipPosition,
@@ -334,6 +338,7 @@ export const AreaChart: React.FC<AreaChartProps> = ({
     hoverable,
     innerRect,
     getSeriesPoints: () => seriesData,
+    isSeriesHidden: isLegendIndexHidden,
     getDatum: (seriesIndex, pointIndex) => resolvedSeries[seriesIndex]?.data[pointIndex],
     getSeriesKeys: () => seriesKeys,
     getFlatPoints: () => flatPoints,
@@ -470,6 +475,7 @@ export const AreaChart: React.FC<AreaChartProps> = ({
               name={sd.series.name}
               type="area"
               opacity={isLegendIndexHidden(sd.seriesIndex) ? 0 : sd.opacity}
+              pointerEvents={isLegendIndexHidden(sd.seriesIndex) ? 'none' : undefined}
               data-series-key={sd.seriesKey}
               className={classNames(
                 sd.series.className,
@@ -516,6 +522,7 @@ export const AreaChart: React.FC<AreaChartProps> = ({
               <g
                 key={`points-${sd.seriesKey}`}
                 opacity={isLegendIndexHidden(sd.seriesIndex) ? 0 : sd.opacity}
+                pointerEvents={isLegendIndexHidden(sd.seriesIndex) ? 'none' : undefined}
                 data-series-key={sd.seriesKey}>
                 {sd.points.map((point) => {
                   const isHovered =
@@ -523,7 +530,9 @@ export const AreaChart: React.FC<AreaChartProps> = ({
                     hoveredPointInfo?.pointIndex === point.pointIndex
                   const hoverSize = sd.pointSize + 2
                   const datum = point.datum
-                  const pointInteractive = hoverable || selectable || pointClickable
+                  const pointInteractive =
+                    !isLegendIndexHidden(sd.seriesIndex) &&
+                    (hoverable || selectable || pointClickable)
                   return (
                     <circle
                       key={`point-${sd.seriesKey}-${point.pointIndex}`}

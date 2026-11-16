@@ -29,6 +29,7 @@ import { spaceBaseStyles } from './utils/space'
 import { stepConnectorBaseStyles } from './utils/steps-utils'
 import { timelineBaseStyles } from './utils/timeline-utils'
 import { workflowDetailShellBaseStyles } from './utils/workflow-detail-shell-utils'
+import { cartesianChartAnimationBaseStyles } from './utils/chart/color'
 import { chartCanvasFocusStyles } from './utils/chart/focus-styles'
 import { watermarkBaseStyles } from './utils/watermark-utils'
 import { workflowDesignerCanvasBaseStyles } from './utils/workflow-designer-utils'
@@ -69,7 +70,8 @@ const tigercatComponentStyleParts: Array<Record<string, unknown>> = [
   workflowDetailShellBaseStyles,
   watermarkBaseStyles,
   workflowDesignerCanvasBaseStyles,
-  chartCanvasFocusStyles
+  chartCanvasFocusStyles,
+  cartesianChartAnimationBaseStyles
 ]
 
 function cssVarsForPreset(preset: ThemePreset | undefined, scheme: 'light' | 'dark') {

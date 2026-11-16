@@ -137,6 +137,7 @@ export function useChartInteraction<T = unknown>(
   }
 
   const handleMouseEnter = (index: number, event: MouseEvent | FocusEvent | KeyboardEvent) => {
+    if (isLegendHidden(legendHiddenKeys.value, String(index))) return
     const position = tooltipPositionFromEvent(event)
     if (shouldTrackChartPointer(isHoverable(), isShowTooltip())) {
       tooltipPosition.value = position
@@ -155,10 +156,12 @@ export function useChartInteraction<T = unknown>(
   }
 
   const handleClick = (index: number) => {
+    if (isLegendHidden(legendHiddenKeys.value, String(index))) return
     handlersFor().onClick(index, getData?.(index))
   }
 
   const handleKeyDown = (event: KeyboardEvent, index: number) => {
+    if (isLegendHidden(legendHiddenKeys.value, String(index))) return
     if (!isChartActivationKey(event.key)) return
     const position = tooltipPositionFromEvent(event)
     if (shouldTrackChartPointer(isHoverable(), isShowTooltip())) {

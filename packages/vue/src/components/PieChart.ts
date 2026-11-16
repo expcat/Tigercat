@@ -331,6 +331,7 @@ export const PieChart = defineComponent({
                   h('path', {
                     d: slice.path,
                     fill: slice.fill,
+                    'pointer-events': isLegendIndexHidden(slice.index) ? 'none' : undefined,
                     opacity: isLegendIndexHidden(slice.index)
                       ? 0
                       : getChartElementOpacity(slice.index, activeIndex.value, {
@@ -342,9 +343,10 @@ export const PieChart = defineComponent({
                     'stroke-linejoin': 'round',
                     'data-pie-slice': 'true',
                     'data-index': slice.index,
-                    tabindex: interactive.value
-                      ? chartMarkTabIndex(visualIndex, visualActive < 0 ? null : visualActive)
-                      : undefined,
+                    tabindex:
+                      interactive.value && !isLegendIndexHidden(slice.index)
+                        ? chartMarkTabIndex(visualIndex, visualActive < 0 ? null : visualActive)
+                        : undefined,
                     role: interactive.value ? 'button' : undefined,
                     'aria-hidden': interactive.value ? undefined : true,
                     'aria-label': interactive.value ? ariaLabel : undefined,
@@ -359,14 +361,21 @@ export const PieChart = defineComponent({
                           : PIE_BASE_SHADOW
                         : undefined
                     },
-                    onMouseenter: (e: MouseEvent) => handleMouseEnter(slice.index, e),
-                    onMousemove: handleMouseMove,
-                    onMouseleave: handleMouseLeave,
-                    onFocus: interactive.value
-                      ? (e: FocusEvent) => handleMouseEnter(slice.index, e)
-                      : undefined,
-                    onClick: () => handleClick(slice.index),
-                    onKeydown: (e: KeyboardEvent) => handleSliceKeyDown(e, visualIndex)
+                    onMouseenter: isLegendIndexHidden(slice.index)
+                      ? undefined
+                      : (e: MouseEvent) => handleMouseEnter(slice.index, e),
+                    onMousemove: isLegendIndexHidden(slice.index) ? undefined : handleMouseMove,
+                    onMouseleave: isLegendIndexHidden(slice.index) ? undefined : handleMouseLeave,
+                    onFocus:
+                      interactive.value && !isLegendIndexHidden(slice.index)
+                        ? (e: FocusEvent) => handleMouseEnter(slice.index, e)
+                        : undefined,
+                    onClick: isLegendIndexHidden(slice.index)
+                      ? undefined
+                      : () => handleClick(slice.index),
+                    onKeydown: isLegendIndexHidden(slice.index)
+                      ? undefined
+                      : (e: KeyboardEvent) => handleSliceKeyDown(e, visualIndex)
                   })
                 ]
               )

@@ -400,7 +400,9 @@ export const AreaChart = defineComponent({
       }))
     })
 
-    const flatPoints = computed(() => flattenChartPoints(seriesData.value))
+    const flatPoints = computed(() =>
+      flattenChartPoints(seriesData.value.filter((sd) => !isLegendIndexHidden(sd.seriesIndex)))
+    )
 
     const legendItems = computed<ChartLegendItem[]>(() =>
       buildChartLegendItems({
@@ -419,6 +421,7 @@ export const AreaChart = defineComponent({
     )
 
     const handlePointClick = (seriesIndex: number, pointIndex: number) => {
+      if (isLegendIndexHidden(seriesIndex)) return
       const datum = resolvedSeries.value[seriesIndex]?.data[pointIndex]
       emit('point-click', seriesIndex, pointIndex, datum)
     }
@@ -437,6 +440,7 @@ export const AreaChart = defineComponent({
       hoverable: () => props.hoverable,
       innerRect,
       getSeriesPoints: () => seriesData.value,
+      isSeriesHidden: isLegendIndexHidden,
       getDatum: (seriesIndex, pointIndex) => resolvedSeries.value[seriesIndex]?.data[pointIndex],
       getSeriesKeys: () => seriesKeys.value,
       getFlatPoints: () => flatPoints.value,
@@ -635,6 +639,7 @@ export const AreaChart = defineComponent({
                         name: sd.series.name,
                         type: 'area',
                         opacity: isLegendIndexHidden(sd.seriesIndex) ? 0 : sd.opacity,
+                        'pointer-events': isLegendIndexHidden(sd.seriesIndex) ? 'none' : undefined,
                         'data-series-key': sd.seriesKey,
                         class: classNames(
                           sd.series.className,
@@ -693,6 +698,9 @@ export const AreaChart = defineComponent({
                         {
                           key: `points-${sd.seriesKey}`,
                           opacity: isLegendIndexHidden(sd.seriesIndex) ? 0 : sd.opacity,
+                          'pointer-events': isLegendIndexHidden(sd.seriesIndex)
+                            ? 'none'
+                            : undefined,
                           'data-series-key': sd.seriesKey
                         },
                         sd.points.map((point) => {
@@ -702,7 +710,8 @@ export const AreaChart = defineComponent({
                           const hoverSize = sd.pointSize + 2
                           const datum = point.datum
                           const pointInteractive =
-                            props.hoverable || props.selectable || pointClickable
+                            !isLegendIndexHidden(sd.seriesIndex) &&
+                            (props.hoverable || props.selectable || pointClickable)
                           return h('circle', {
                             key: `point-${sd.seriesKey}-${point.pointIndex}`,
                             cx: point.x,

@@ -2,7 +2,7 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { fireEvent, waitFor } from '@testing-library/vue'
 import { ScatterChart } from '@expcat/tigercat-vue/ScatterChart'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
@@ -160,6 +160,30 @@ describe('ScatterChart', () => {
     expect(view.container.querySelector('[aria-label="图表图例"]')).toBeTruthy()
     await fireEvent.mouseEnter(view.container.querySelector('circle[data-point-index]')!)
     expect(document.body.querySelector('[data-chart-tooltip]')?.textContent).toContain('第 1 个点')
+  })
+  it('ignores hover and click on legend-hidden marks', async () => {
+    const onHover = vi.fn()
+    const onClick = vi.fn()
+    const { container } = renderWithProps(ScatterChart, {
+      data: [
+        { x: 1, y: 10 },
+        { x: 2, y: 20 }
+      ],
+      showLegend: true,
+      hoverable: true,
+      selectable: true,
+      'onUpdate:hoveredIndex': onHover,
+      onPointClick: onClick
+    })
+    await fireEvent.click(container.querySelector('[data-legend-item]')!)
+    onHover.mockClear()
+    const hidden = container.querySelector('[data-point-index="0"]')!
+    await fireEvent.mouseEnter(hidden)
+    await fireEvent.click(hidden)
+    expect(onHover).not.toHaveBeenCalled()
+    expect(onClick).not.toHaveBeenCalled()
+    expect(hidden).toHaveAttribute('pointer-events', 'none')
+    expect(hidden).not.toHaveAttribute('tabindex')
   })
 })
 

@@ -970,4 +970,30 @@ describe('chart-utils', () => {
       ).toBe('2px solid Highlight')
     })
   })
+  it('emits the shared chart animation rules through the Tailwind plugin', () => {
+    const rules: Record<string, Record<string, string>> = {}
+    type PluginInstance = {
+      handler: (api: { addBase: (rules: Record<string, Record<string, string>>) => void }) => void
+    }
+    ;(tigercatPlugin as unknown as PluginInstance).handler({
+      addBase: (rule) => Object.assign(rules, rule)
+    })
+    expect(rules['.tiger-bar-animated']?.transition).toMatch(
+      /^y .*, height .*, opacity .*, filter /
+    )
+    expect(rules['.tiger-line-animated']?.animation).toContain('tiger-line-draw')
+    expect(rules['.tiger-scatter-entrance']?.animation).toContain('tiger-scatter-entrance')
+    expect(rules['.tiger-donut-entrance']?.animation).toContain('tiger-donut-entrance')
+    for (const selector of [
+      '.tiger-bar-animated',
+      '.tiger-line-animated',
+      '.tiger-scatter-entrance',
+      '.tiger-donut-entrance'
+    ]) {
+      const rule = rules[selector]
+      for (const [, token] of (rule.transition ?? rule.animation).matchAll(/var\((--[\w-]+)/g)) {
+        expect(rules[':root'][token], token).toBeDefined()
+      }
+    }
+  })
 })

@@ -279,26 +279,33 @@ export const TreeMapChart = defineComponent({
                     rx: props.nodeRadius,
                     fill: props.gradient ? `url(#${gradientPrefix}-${node.index})` : node.color,
                     opacity,
+                    'pointer-events': isNodeHidden(node) ? 'none' : undefined,
                     'data-treemap-node': '',
                     'data-index': node.index,
                     class: classNames(
                       interactive.value && 'cursor-pointer',
                       treemapNodeTransitionClasses
                     ),
-                    tabindex: interactive.value
-                      ? chartMarkTabIndex(visualIndex, visualActive < 0 ? null : visualActive)
-                      : undefined,
+                    tabindex:
+                      interactive.value && !isNodeHidden(node)
+                        ? chartMarkTabIndex(visualIndex, visualActive < 0 ? null : visualActive)
+                        : undefined,
                     role: interactive.value ? 'button' : undefined,
                     'aria-hidden': interactive.value ? undefined : true,
                     'aria-label': interactive.value ? ariaLabel : undefined,
-                    onMouseenter: (e: MouseEvent) => handleMouseEnter(node.index, e),
-                    onMousemove: handleMouseMove,
-                    onMouseleave: handleMouseLeave,
-                    onFocus: interactive.value
-                      ? (e: FocusEvent) => handleMouseEnter(node.index, e)
-                      : undefined,
-                    onClick: () => handleClick(node.index),
-                    onKeydown: (e: KeyboardEvent) => handleNodeKeyDown(e, visualIndex)
+                    onMouseenter: isNodeHidden(node)
+                      ? undefined
+                      : (e: MouseEvent) => handleMouseEnter(node.index, e),
+                    onMousemove: isNodeHidden(node) ? undefined : handleMouseMove,
+                    onMouseleave: isNodeHidden(node) ? undefined : handleMouseLeave,
+                    onFocus:
+                      interactive.value && !isNodeHidden(node)
+                        ? (e: FocusEvent) => handleMouseEnter(node.index, e)
+                        : undefined,
+                    onClick: isNodeHidden(node) ? undefined : () => handleClick(node.index),
+                    onKeydown: isNodeHidden(node)
+                      ? undefined
+                      : (e: KeyboardEvent) => handleNodeKeyDown(e, visualIndex)
                   })
                 ]
                 if (props.showLabels && node.showLabel) {

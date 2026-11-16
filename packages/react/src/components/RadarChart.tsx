@@ -269,21 +269,23 @@ export const RadarChart: React.FC<RadarChartProps> = ({
   const flatPoints = useMemo(
     () =>
       flattenChartPoints(
-        laid.series.map((item) => ({
-          seriesIndex: item.seriesIndex,
-          points: item.points.map((point) => ({ pointIndex: point.index }))
-        }))
+        laid.series
+          .filter((item) => !isLegendIndexHidden(item.seriesIndex))
+          .map((item) => ({
+            seriesIndex: item.seriesIndex,
+            points: item.points.map((point) => ({ pointIndex: point.index }))
+          }))
       ),
-    [laid.series]
+    [laid.series, isLegendIndexHidden]
   )
 
   const handlePointEnter = useCallback(
     (seriesIndex: number, pointIndex: number, event: React.MouseEvent | React.FocusEvent) => {
-      if (!trackPointer) return
+      if (!trackPointer || isLegendIndexHidden(seriesIndex)) return
       setHoveredPoint({ seriesIndex, pointIndex })
       handleHoverEnter(seriesIndex, event)
     },
-    [trackPointer, handleHoverEnter]
+    [trackPointer, handleHoverEnter, isLegendIndexHidden]
   )
 
   const handlePointLeave = useCallback(() => {
@@ -296,9 +298,17 @@ export const RadarChart: React.FC<RadarChartProps> = ({
     handleHoverEnter,
     handleMouseMove,
     trackPointer,
-    setHoveredPoint
+    setHoveredPoint,
+    isLegendIndexHidden
   })
-  areaScanRef.current = { laid, handleHoverEnter, handleMouseMove, trackPointer, setHoveredPoint }
+  areaScanRef.current = {
+    laid,
+    handleHoverEnter,
+    handleMouseMove,
+    trackPointer,
+    setHoveredPoint,
+    isLegendIndexHidden
+  }
   const [areaScan] = useState(() =>
     createChartFrameCoalescer<{
       seriesIndex: number
@@ -309,7 +319,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
     }>({
       onFrame: (sample) => {
         const current = areaScanRef.current
-        if (!current.trackPointer) return
+        if (!current.trackPointer || current.isLegendIndexHidden(sample.seriesIndex)) return
         const axisPoints = current.laid.angles.map((angle) =>
           polarToCartesian(current.laid.cx, current.laid.cy, current.laid.radius, angle)
         )
@@ -325,7 +335,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
   useEffect(() => () => areaScan.cancel(), [areaScan])
   const handleAreaMove = useCallback(
     (seriesIndex: number, event: React.MouseEvent<SVGPathElement>) => {
-      if (!trackPointer) return
+      if (!trackPointer || isLegendIndexHidden(seriesIndex)) return
       const svg = event.currentTarget.ownerSVGElement
       if (!svg) return
       const ctm = event.currentTarget.getScreenCTM()
@@ -342,7 +352,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
         clientY: event.clientY
       })
     },
-    [areaScan, trackPointer]
+    [areaScan, trackPointer, isLegendIndexHidden]
   )
 
   const seriesName = useCallback(
@@ -352,7 +362,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
   )
 
   const tooltipContent = useMemo(() => {
-    if (!hoveredPoint) return ''
+    if (!hoveredPoint || isLegendIndexHidden(hoveredPoint.seriesIndex)) return ''
     const seriesItem = laid.series[hoveredPoint.seriesIndex]
     const point = seriesItem?.points.find((item) => item.index === hoveredPoint.pointIndex)
     if (!point) return ''
@@ -371,7 +381,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
       seriesItem.series,
       labels.seriesName
     )
-  }, [hoveredPoint, laid.series, tooltipFormatter, labels.seriesName])
+  }, [hoveredPoint, laid.series, tooltipFormatter, labels.seriesName, isLegendIndexHidden])
 
   const legendItems = useMemo(
     () =>
@@ -541,6 +551,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
             data-series-key={item.seriesKey}
             data-series-name={item.series.name}
             opacity={isLegendIndexHidden(item.seriesIndex) ? 0 : item.opacity}
+            pointerEvents={isLegendIndexHidden(item.seriesIndex) ? 'none' : undefined}
             onMouseEnter={(e) => handleHoverEnter(item.seriesIndex, e)}
             onMouseLeave={handlePointLeave}
             onClick={() => handleSelectIndex(item.seriesIndex)}
@@ -596,7 +607,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
                       className="transition-[r] duration-150 ease-out motion-reduce:transition-none"
                       aria-hidden={focusable ? undefined : true}
                       tabIndex={
-                        focusable
+                        focusable && !isLegendIndexHidden(item.seriesIndex)
                           ? chartPointTabIndex(
                               item.seriesIndex,
                               point.index,
@@ -650,7 +661,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
                         : undefined
                     }
                     tabIndex={
-                      focusable
+                      focusable && !isLegendIndexHidden(item.seriesIndex)
                         ? chartPointTabIndex(item.seriesIndex, point.index, activePoint, flatPoints)
                         : undefined
                     }

@@ -148,11 +148,12 @@ export function useChartInteraction<T = unknown>(
 
   const handleMouseEnter = useCallback(
     (index: number, event: React.MouseEvent | React.FocusEvent | React.KeyboardEvent) => {
+      if (isLegendHidden(legendHiddenKeys, String(index))) return
       const position = tooltipPositionFromEvent(event)
       if (shouldTrackChartPointer(hoverable, showTooltip)) setTooltipPosition(position)
       handlersFor().onMouseEnter(index, getData?.(index), position)
     },
-    [handlersFor, hoverable, showTooltip, getData]
+    [handlersFor, hoverable, showTooltip, getData, legendHiddenKeys]
   )
 
   const handleMouseMove = useCallback(
@@ -170,19 +171,21 @@ export function useChartInteraction<T = unknown>(
 
   const handleClick = useCallback(
     (index: number) => {
+      if (isLegendHidden(legendHiddenKeys, String(index))) return
       handlersFor().onClick(index, getData?.(index))
     },
-    [handlersFor, getData]
+    [handlersFor, getData, legendHiddenKeys]
   )
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent, index: number) => {
+      if (isLegendHidden(legendHiddenKeys, String(index))) return
       if (!isChartActivationKey(event.key)) return
       const position = tooltipPositionFromEvent(event)
       if (shouldTrackChartPointer(hoverable, showTooltip)) setTooltipPosition(position)
       handlersFor().onKeyDown(event, index, getData?.(index), position)
     },
-    [handlersFor, hoverable, showTooltip, getData]
+    [handlersFor, hoverable, showTooltip, getData, legendHiddenKeys]
   )
 
   const handleLegendClick = useCallback((index: number) => {

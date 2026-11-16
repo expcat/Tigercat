@@ -1,4 +1,12 @@
-import { getCurrentScope, onScopeDispose, ref, toValue, type MaybeRefOrGetter, type Ref } from 'vue'
+import {
+  computed,
+  getCurrentScope,
+  onScopeDispose,
+  ref,
+  toValue,
+  type MaybeRefOrGetter,
+  type Ref
+} from 'vue'
 import {
   chartPointerRemainsInside,
   createChartFrameCoalescer,
@@ -15,6 +23,7 @@ export interface UseCartesianSeriesPointsOptions<T> {
   hoverable: MaybeRefOrGetter<boolean>
   innerRect: MaybeRefOrGetter<{ width: number; height: number }>
   getSeriesPoints: () => Array<{ points: Array<{ x: number; y: number; pointIndex: number }> }>
+  isSeriesHidden: (seriesIndex: number) => boolean
   getDatum: (seriesIndex: number, pointIndex: number) => T | undefined
   getSeriesKeys: () => string[]
   getFlatPoints: () => ChartPointRef[]
@@ -35,7 +44,7 @@ export function useCartesianSeriesPoints<T>(options: UseCartesianSeriesPointsOpt
     onFrame: (sample) => {
       const laidOutSeries = options.getSeriesPoints()
       const nearest = findNearestSeriesPoint(
-        laidOutSeries.map((sd) => sd.points),
+        laidOutSeries.map((sd, index) => (options.isSeriesHidden(index) ? [] : sd.points)),
         sample.x,
         sample.y
       )
@@ -63,6 +72,7 @@ export function useCartesianSeriesPoints<T>(options: UseCartesianSeriesPointsOpt
   const trackHover = () => toValue(options.showTooltip) || toValue(options.hoverable)
 
   const handlePointMouseEnter = (seriesIndex: number, pointIndex: number, event: MouseEvent) => {
+    if (options.isSeriesHidden(seriesIndex)) return
     hoveredPointInfo.value = { seriesIndex, pointIndex }
     tooltipPosition.value = { x: event.clientX, y: event.clientY }
     if (toValue(options.hoverable)) {
@@ -88,7 +98,7 @@ export function useCartesianSeriesPoints<T>(options: UseCartesianSeriesPointsOpt
   }
 
   const showPointTooltipFromElement = (el: SVGElement, seriesIndex: number, pointIndex: number) => {
-    if (!trackHover()) return
+    if (!trackHover() || options.isSeriesHidden(seriesIndex)) return
     const rect = el.getBoundingClientRect()
     hoveredPointInfo.value = { seriesIndex, pointIndex }
     tooltipPosition.value = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 }
@@ -117,6 +127,7 @@ export function useCartesianSeriesPoints<T>(options: UseCartesianSeriesPointsOpt
   }
 
   const handlePointKeydown = (event: KeyboardEvent, seriesIndex: number, pointIndex: number) => {
+    if (options.isSeriesHidden(seriesIndex)) return
     if (isChartNavigationKey(event.key)) {
       event.preventDefault()
       const next = nextChartPointRef(
@@ -143,7 +154,11 @@ export function useCartesianSeriesPoints<T>(options: UseCartesianSeriesPointsOpt
   }
 
   return {
-    hoveredPointInfo,
+    hoveredPointInfo: computed(() =>
+      hoveredPointInfo.value && !options.isSeriesHidden(hoveredPointInfo.value.seriesIndex)
+        ? hoveredPointInfo.value
+        : null
+    ),
     tooltipPosition,
     handlePointMouseEnter,
     handlePointMouseMove,

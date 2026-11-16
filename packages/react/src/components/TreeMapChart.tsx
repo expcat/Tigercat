@@ -263,6 +263,7 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
                 rx={nodeRadius}
                 fill={gradient ? `url(#${gradientPrefix}-${node.index})` : node.color}
                 opacity={opacity}
+                pointerEvents={isNodeHidden(node) ? 'none' : undefined}
                 data-treemap-node=""
                 data-index={node.index}
                 className={classNames(
@@ -270,19 +271,27 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
                   treemapNodeTransitionClasses
                 )}
                 tabIndex={
-                  interactive
+                  interactive && !isNodeHidden(node)
                     ? chartMarkTabIndex(visualIndex, visualActive < 0 ? null : visualActive)
                     : undefined
                 }
                 role={interactive ? 'button' : undefined}
                 aria-hidden={interactive ? undefined : true}
                 aria-label={interactive ? ariaLabel : undefined}
-                onMouseEnter={(e) => handleMouseEnter(node.index, e)}
-                onMouseMove={handleMouseMove}
-                onMouseLeave={handleMouseLeave}
-                onFocus={interactive ? (e) => handleMouseEnter(node.index, e) : undefined}
-                onClick={() => handleClick(node.index)}
-                onKeyDown={(e) => handleNodeKeyDown(e, visualIndex)}
+                onMouseEnter={
+                  isNodeHidden(node) ? undefined : (e) => handleMouseEnter(node.index, e)
+                }
+                onMouseMove={isNodeHidden(node) ? undefined : handleMouseMove}
+                onMouseLeave={isNodeHidden(node) ? undefined : handleMouseLeave}
+                onFocus={
+                  interactive && !isNodeHidden(node)
+                    ? (e) => handleMouseEnter(node.index, e)
+                    : undefined
+                }
+                onClick={isNodeHidden(node) ? undefined : () => handleClick(node.index)}
+                onKeyDown={
+                  isNodeHidden(node) ? undefined : (e) => handleNodeKeyDown(e, visualIndex)
+                }
               />
               {showLabels && node.showLabel && (
                 <text

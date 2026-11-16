@@ -152,4 +152,28 @@ describe('PieChart', () => {
     })
     expect(container.querySelector('[data-donut-center]')).toBeNull()
   })
+  it('ignores hover and click on legend-hidden marks', async () => {
+    const onHover = vi.fn()
+    const onClick = vi.fn()
+    const { container } = renderWithProps(PieChart, {
+      data: [
+        { label: 'Hidden', value: 40 },
+        { label: 'Visible', value: 20 }
+      ],
+      showLegend: true,
+      hoverable: true,
+      selectable: true,
+      onHoveredIndexChange: onHover,
+      onSliceClick: onClick
+    })
+    fireEvent.click(container.querySelector('[data-legend-item]')!)
+    onHover.mockClear()
+    const hidden = container.querySelector('[data-pie-slice][data-index="0"]')!
+    fireEvent.mouseEnter(hidden)
+    fireEvent.click(hidden)
+    expect(onHover).not.toHaveBeenCalled()
+    expect(onClick).not.toHaveBeenCalled()
+    expect(hidden).toHaveAttribute('pointer-events', 'none')
+    expect(hidden).not.toHaveAttribute('tabindex')
+  })
 })

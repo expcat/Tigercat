@@ -238,7 +238,7 @@ export const BarChart: React.FC<BarChartProps> = ({
   const legendItems = useMemo<ChartLegendItem[]>(
     () =>
       buildChartLegendItems({
-        data: data.length > 0 ? [data[0]] : [],
+        data,
         palette,
         activeIndex,
         selectedIndex: resolvedSelectedIndex,
@@ -246,7 +246,7 @@ export const BarChart: React.FC<BarChartProps> = ({
         getColor: (d, i) => d.color ?? palette[i % palette.length],
 
         isHidden: (index) => isLegendIndexHidden(index)
-      }).map((item) => ({ ...item, index: 0, hidden: isLegendIndexHidden(0) })),
+      }),
     [data, legendFormatter, palette, activeIndex, resolvedSelectedIndex, isLegendIndexHidden]
   )
 
@@ -350,7 +350,8 @@ export const BarChart: React.FC<BarChartProps> = ({
             rx={corner.rx}
             ry={corner.ry}
             fill={gradient ? `url(#${gradientPrefix}-${bar.index})` : bar.color}
-            opacity={isLegendIndexHidden(0) ? 0 : bar.opacity}
+            opacity={isLegendIndexHidden(bar.index) ? 0 : bar.opacity}
+            pointerEvents={isLegendIndexHidden(bar.index) ? 'none' : undefined}
             className={classNames(
               animated && BAR_ANIMATED_CLASS,
               interactive && barInteractiveClasses
@@ -364,7 +365,7 @@ export const BarChart: React.FC<BarChartProps> = ({
                 : undefined
             }
             tabIndex={
-              interactive
+              interactive && !isLegendIndexHidden(bar.index)
                 ? chartMarkTabIndex(visualIndex, visualActive < 0 ? null : visualActive)
                 : undefined
             }
@@ -401,7 +402,7 @@ export const BarChart: React.FC<BarChartProps> = ({
               textAnchor="middle"
               dominantBaseline={isInside ? 'central' : bar.negative ? 'hanging' : 'auto'}
               className={isInside ? barValueLabelInsideClasses : barValueLabelClasses}
-              opacity={isLegendIndexHidden(0) ? 0 : bar.opacity}
+              opacity={isLegendIndexHidden(bar.index) ? 0 : bar.opacity}
               data-value-label="">
               {labelText}
             </text>

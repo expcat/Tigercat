@@ -183,11 +183,11 @@ export const cartesianChartAnimationBaseStyles = {
   },
   '.tiger-line-animated': {
     animation:
-      'tiger-line-draw var(--tiger-motion-duration-slow) var(--tiger-motion-ease-emphasized) forwards'
+      'tiger-line-draw var(--tiger-motion-duration-slow) var(--tiger-motion-ease-standard) forwards'
   },
   '.tiger-area-animated': {
     animation:
-      'tiger-area-draw var(--tiger-motion-duration-slow) var(--tiger-motion-ease-emphasized) forwards'
+      'tiger-area-draw var(--tiger-motion-duration-slow) var(--tiger-motion-ease-standard) forwards'
   },
   '.tiger-scatter-entrance': {
     transformBox: 'fill-box',
@@ -197,7 +197,7 @@ export const cartesianChartAnimationBaseStyles = {
   },
   '.tiger-bar-animated': {
     transition:
-      'y var(--tiger-motion-duration-slow) var(--tiger-motion-ease-emphasized), height var(--tiger-motion-duration-slow) var(--tiger-motion-ease-emphasized), opacity var(--tiger-motion-duration-base) var(--tiger-motion-ease-decelerate), filter var(--tiger-motion-duration-base) var(--tiger-motion-ease-decelerate)'
+      'y var(--tiger-motion-duration-slow) var(--tiger-motion-ease-standard), height var(--tiger-motion-duration-slow) var(--tiger-motion-ease-standard), opacity var(--tiger-motion-duration-base) var(--tiger-motion-ease-standard), filter var(--tiger-motion-duration-base) var(--tiger-motion-ease-standard)'
   },
   '@keyframes tiger-donut-entrance': {
     from: { opacity: '0', transform: 'scale(0.9)' },

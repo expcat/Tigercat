@@ -404,7 +404,9 @@ export const LineChart = defineComponent({
       }))
     })
 
-    const flatPoints = computed(() => flattenChartPoints(seriesData.value))
+    const flatPoints = computed(() =>
+      flattenChartPoints(seriesData.value.filter((sd) => !isLegendIndexHidden(sd.seriesIndex)))
+    )
 
     const legendItems = computed<ChartLegendItem[]>(() =>
       buildChartLegendItems({
@@ -423,6 +425,7 @@ export const LineChart = defineComponent({
     )
 
     const handlePointClick = (seriesIndex: number, pointIndex: number) => {
+      if (isLegendIndexHidden(seriesIndex)) return
       const datum = resolvedSeries.value[seriesIndex]?.data[pointIndex]
       emit('point-click', seriesIndex, pointIndex, datum)
     }
@@ -441,6 +444,7 @@ export const LineChart = defineComponent({
       hoverable: () => props.hoverable,
       innerRect,
       getSeriesPoints: () => seriesData.value,
+      isSeriesHidden: isLegendIndexHidden,
       getDatum: (seriesIndex, pointIndex) => resolvedSeries.value[seriesIndex]?.data[pointIndex],
       getSeriesKeys: () => seriesKeys.value,
       getFlatPoints: () => flatPoints.value,
@@ -637,6 +641,7 @@ export const LineChart = defineComponent({
                         name: sd.series.name,
                         type: 'line',
                         opacity: isLegendIndexHidden(sd.seriesIndex) ? 0 : sd.opacity,
+                        'pointer-events': isLegendIndexHidden(sd.seriesIndex) ? 'none' : undefined,
                         'data-series-key': sd.seriesKey,
                         class: classNames(
                           sd.series.className,
@@ -721,14 +726,15 @@ export const LineChart = defineComponent({
                                         y: String(datum?.y ?? '')
                                       }))
                                     : undefined,
-                                  tabindex: pointInteractive
-                                    ? chartPointTabIndex(
-                                        sd.seriesIndex,
-                                        point.pointIndex,
-                                        hoveredPointInfo.value,
-                                        flatPoints.value
-                                      )
-                                    : undefined,
+                                  tabindex:
+                                    !isLegendIndexHidden(sd.seriesIndex) && pointInteractive
+                                      ? chartPointTabIndex(
+                                          sd.seriesIndex,
+                                          point.pointIndex,
+                                          hoveredPointInfo.value,
+                                          flatPoints.value
+                                        )
+                                      : undefined,
                                   'data-point-index': point.pointIndex,
                                   'data-series-key': sd.seriesKey,
                                   onMouseenter: trackPointHover

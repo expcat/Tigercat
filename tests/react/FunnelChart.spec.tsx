@@ -103,4 +103,26 @@ describe('FunnelChart (React)', () => {
       await expectNoA11yViolations(container)
     })
   })
+  it('removes legend-hidden segments from pointer and focus interaction', async () => {
+    const onHover = vi.fn()
+    const onSegmentClick = vi.fn()
+    const { container } = renderWithProps(FunnelChart, {
+      data: sampleData,
+      showLegend: true,
+      hoverable: true,
+      selectable: true,
+      onHoveredIndexChange: onHover,
+      onSegmentClick
+    })
+    fireEvent.click(container.querySelector('[data-legend-item]')!)
+    onHover.mockClear()
+    const hidden = container.querySelector('[data-funnel-segment][data-index="0"]')!
+    fireEvent.mouseEnter(hidden)
+    fireEvent.click(hidden)
+    fireEvent.focus(hidden)
+    expect(onHover).not.toHaveBeenCalled()
+    expect(onSegmentClick).not.toHaveBeenCalled()
+    expect(hidden).not.toHaveAttribute('tabindex')
+    expect(hidden).toHaveAttribute('pointer-events', 'none')
+  })
 })

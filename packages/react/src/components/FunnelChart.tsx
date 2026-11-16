@@ -253,6 +253,7 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
               d={seg.path}
               fill={gradient ? `url(#${gradientPrefix}-${seg.index})` : seg.color}
               opacity={opacity}
+              pointerEvents={isLegendIndexHidden(seg.index) ? 'none' : undefined}
               className={classNames(
                 interactive && 'cursor-pointer',
                 funnelSegmentTransitionClasses
@@ -260,7 +261,7 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
               data-funnel-segment=""
               data-index={seg.index}
               tabIndex={
-                interactive
+                interactive && !isLegendIndexHidden(seg.index)
                   ? chartMarkTabIndex(visualIndex, visualActive < 0 ? null : visualActive)
                   : undefined
               }
@@ -274,12 +275,22 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
                     ).description
                   : undefined
               }
-              onMouseEnter={(e) => handleMouseEnter(seg.index, e)}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-              onFocus={interactive ? (e) => handleMouseEnter(seg.index, e) : undefined}
-              onClick={() => handleClick(seg.index)}
-              onKeyDown={(e) => handleSegmentKeyDown(e, visualIndex)}
+              onMouseEnter={
+                isLegendIndexHidden(seg.index) ? undefined : (e) => handleMouseEnter(seg.index, e)
+              }
+              onMouseMove={isLegendIndexHidden(seg.index) ? undefined : handleMouseMove}
+              onMouseLeave={isLegendIndexHidden(seg.index) ? undefined : handleMouseLeave}
+              onFocus={
+                interactive && !isLegendIndexHidden(seg.index)
+                  ? (e) => handleMouseEnter(seg.index, e)
+                  : undefined
+              }
+              onClick={isLegendIndexHidden(seg.index) ? undefined : () => handleClick(seg.index)}
+              onKeyDown={
+                isLegendIndexHidden(seg.index)
+                  ? undefined
+                  : (e) => handleSegmentKeyDown(e, visualIndex)
+              }
             />
           )
         })}

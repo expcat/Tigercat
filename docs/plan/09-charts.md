@@ -17,30 +17,28 @@ charts 组 21 个组件（C138–C158），视觉与键盘全部 blocked。很�
 
 ## 依赖与顺序
 
-- 先做 ChartTooltip（C145）和 AreaChart 上的共享条目（C138-F01、C138-F02），它们并入了 6 到 10 张图。
+- 先做 ChartTooltip（C145）和 AreaChart 上的共享条目（C138-F02），它们并入了 6 到 10 张图。
 - roving tabindex 一组一起做：C147-F01、C149-F01、C150-F03、C152-F01、C155-F02、C155-F03、C156-F02。共享代码在 `useCartesianSeriesPoints` 和各图的键盘处理里。
 - 默认可访问名称一组一起做：C149-F05、C150-F02、C153-F01、C155-F01、C156-F01、C157-F01，都是无 title 时没读 `*ChartAriaLabel`。
 - OrgChart 的节点全是 `tabindex=0`、方向键无效，TreeMapChart 的 `nextTreeMapNodeIndex` 没有调用方。这两处报告没有编号，见 [13](13-evidence.md) 的未立项观察。
 
 ## 概览
 
-本篇 51 条：P1 0、P2 26、P3 25。
-按波次：W6 26、W9 25。
+本篇 47 条：P1 0、P2 22、P3 25。
+按波次：W6 22、W9 25。
 
-已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C141-F01、C141-F02、C141-F03、C144-F01、C145-F01、C145-F02。
+已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C141-F01、C141-F02、C141-F03、C144-F01、C145-F01、C145-F02、C138-F01、C139-F01、C139-F02、C146-F01。
 
 ## 波及多个组件的条目
 
 这些条目的行在下面各组件的表里。修的时候把右列的组件一起验。
 
-| 条目                                                  | 归属         | 同验                                                                                                                        |
-| ----------------------------------------------------- | ------------ | --------------------------------------------------------------------------------------------------------------------------- |
-| C138-F01 图例隐藏系列只设 opacity 0，命中和最近邻仍在 | AreaChart    | LineChart、PieChart、RadarChart、ScatterChart、SunburstChart、TreeMapChart                                                  |
-| C138-F02 responsive 注释默认 false，实际 true         | AreaChart    | BarChart、FunnelChart、GaugeChart、HeatmapChart、LineChart、PieChart、RadarChart、ScatterChart、SunburstChart、TreeMapChart |
-| C139-F02 tiger-bar-animated 的 CSS 未进插件           | BarChart     | LineChart、PieChart、ScatterChart                                                                                           |
-| C145-F03 content 只有换行时仍挂载空气泡               | ChartTooltip | FunnelChart、GaugeChart、HeatmapChart、LineChart、ScatterChart、SunburstChart、TreeMapChart                                 |
-| C146-F04 padding 注释默认是坐标轴对象，运行时是 24    | FunnelChart  | Gantt、GaugeChart、OrgChart、PieChart、RadarChart                                                                           |
-| C150-F03 关提示时方向键不移动点的 roving tabindex     | LineChart    | SunburstChart、TreeMapChart                                                                                                 |
+| 条目                                               | 归属         | 同验                                                                                                                        |
+| -------------------------------------------------- | ------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| C138-F02 responsive 注释默认 false，实际 true      | AreaChart    | BarChart、FunnelChart、GaugeChart、HeatmapChart、LineChart、PieChart、RadarChart、ScatterChart、SunburstChart、TreeMapChart |
+| C145-F03 content 只有换行时仍挂载空气泡            | ChartTooltip | FunnelChart、GaugeChart、HeatmapChart、LineChart、ScatterChart、SunburstChart、TreeMapChart                                 |
+| C146-F04 padding 注释默认是坐标轴对象，运行时是 24 | FunnelChart  | Gantt、GaugeChart、OrgChart、PieChart、RadarChart                                                                           |
+| C150-F03 关提示时方向键不移动点的 roving tabindex  | LineChart    | SunburstChart、TreeMapChart                                                                                                 |
 
 ## 条目
 
@@ -48,19 +46,13 @@ charts 组 21 个组件（C138–C158），视觉与键盘全部 blocked。很�
 
 报告 `groups/charts/AreaChart.md`，队列状态 needs-evidence。另受 S01、S07 影响。
 
-| 编号     | 级别 | 波次 | 端   | 类别 | 条目                                         | 验收                                                                                |
-| -------- | ---- | ---- | ---- | ---- | -------------------------------------------- | ----------------------------------------------------------------------------------- |
-| C138-F01 | P2   | W6   | 双端 | 行为 | 图例隐藏系列只设 opacity 0，命中和最近邻仍在 | 图例隐藏系列 0 后，对其 g 的 mouseEnter、click 不再触发 series-hover、series-click  |
-| C138-F02 | P3   | W9   | Core | 文档 | responsive 注释默认 false，实际 true         | responsive 的 @default 注释与两端不传该 prop 时的行为（根 class 是否含 w-full）一致 |
+| 编号     | 级别 | 波次 | 端   | 类别 | 条目                                 | 验收                                                                                |
+| -------- | ---- | ---- | ---- | ---- | ------------------------------------ | ----------------------------------------------------------------------------------- |
+| C138-F02 | P3   | W9   | Core | 文档 | responsive 注释默认 false，实际 true | responsive 的 @default 注释与两端不传该 prop 时的行为（根 class 是否含 w-full）一致 |
 
 ### C139 BarChart
 
 报告 `groups/charts/BarChart.md`，队列状态 needs-evidence。另受 S01、S07、C138-F02 影响。
-
-| 编号     | 级别 | 波次 | 端   | 类别 | 条目                                         | 验收                                                                                  |
-| -------- | ---- | ---- | ---- | ---- | -------------------------------------------- | ------------------------------------------------------------------------------------- |
-| C139-F01 | P2   | W6   | 双端 | 行为 | 图例只留第一根柱，隐藏后全部柱透明但命中仍在 | Mon/Tue 两柱开图例时有 2 个图例项；隐藏一根后仅该柱隐藏，且不再触发 hover、onBarClick |
-| C139-F02 | P2   | W6   | Core | 样式 | tiger-bar-animated 的 CSS 未进插件           | animated=true 时 .tiger-bar-animated 的计算样式带 y、height、opacity、filter 过渡     |
 
 ### C140 ChartAxis
 
@@ -94,12 +86,11 @@ charts 组 21 个组件（C138–C158），视觉与键盘全部 blocked。很�
 
 报告 `groups/charts/FunnelChart.md`，队列状态 needs-evidence。另受 S01、S07、C138-F02、C145-F03 影响。
 
-| 编号     | 级别 | 波次 | 端               | 类别 | 条目                                            | 验收                                                                                        |
-| -------- | ---- | ---- | ---------------- | ---- | ----------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| C146-F01 | P2   | W6   | 双端             | 行为 | 图例隐藏的漏斗段仍可悬停、点击和聚焦            | 三段正值、开图例交互并点第一项图例后，该段无 tabindex，mouseenter 和 click 不再带回 index 0 |
-| C146-F02 | P2   | W6   | Core             | 行为 | 夹有 0 或负值时阶段比例拿被丢弃的值当基准       | 100、0、40 时 40 段 versusPrevious 非 null；-10、100 时标签和 aria 不出现 -1000%            |
-| C146-F03 | P3   | W9   | Core+文档·生成器 | 文档 | gradient 注释和生成表写垂直渐变，水平时实际沿 x | gradient 的类型注释和生成表 funnel-chart.md 都写沿漏斗方向渐变，不再写垂直                  |
-| C146-F04 | P3   | W9   | Core             | 文档 | padding 注释默认是坐标轴对象，运行时是 24       | FunnelChartProps.padding 的 JSDoc 显示 @default 24，不再是 bottom/left 52 的对象            |
+| 编号     | 级别 | 波次 | 端               | 类别 | 条目                                            | 验收                                                                             |
+| -------- | ---- | ---- | ---------------- | ---- | ----------------------------------------------- | -------------------------------------------------------------------------------- |
+| C146-F02 | P2   | W6   | Core             | 行为 | 夹有 0 或负值时阶段比例拿被丢弃的值当基准       | 100、0、40 时 40 段 versusPrevious 非 null；-10、100 时标签和 aria 不出现 -1000% |
+| C146-F03 | P3   | W9   | Core+文档·生成器 | 文档 | gradient 注释和生成表写垂直渐变，水平时实际沿 x | gradient 的类型注释和生成表 funnel-chart.md 都写沿漏斗方向渐变，不再写垂直       |
+| C146-F04 | P3   | W9   | Core             | 文档 | padding 注释默认是坐标轴对象，运行时是 24       | FunnelChartProps.padding 的 JSDoc 显示 @default 24，不再是 bottom/left 52 的对象 |
 
 ### C147 Gantt
 
@@ -140,7 +131,7 @@ charts 组 21 个组件（C138–C158），视觉与键盘全部 blocked。很�
 
 ### C150 LineChart
 
-报告 `groups/charts/LineChart.md`，队列状态 needs-evidence。另受 S01、S07、C138-F01、C138-F02、C139-F02、C145-F03 影响。
+报告 `groups/charts/LineChart.md`，队列状态 needs-evidence。另受 S01、S07、C138-F02、C145-F03 影响。
 
 | 编号     | 级别 | 波次 | 端        | 类别   | 条目                                     | 验收                                                                                   |
 | -------- | ---- | ---- | --------- | ------ | ---------------------------------------- | -------------------------------------------------------------------------------------- |
@@ -159,7 +150,7 @@ charts 组 21 个组件（C138–C158），视觉与键盘全部 blocked。很�
 
 ### C152 PieChart
 
-报告 `groups/charts/PieChart.md`，队列状态 needs-evidence。另受 S01、S07、C138-F01、C138-F02、C139-F02、C146-F04 影响。
+报告 `groups/charts/PieChart.md`，队列状态 needs-evidence。另受 S01、S07、C138-F02、C146-F04 影响。
 
 | 编号     | 级别 | 波次 | 端   | 类别 | 条目                                          | 验收                                                                                        |
 | -------- | ---- | ---- | ---- | ---- | --------------------------------------------- | ------------------------------------------------------------------------------------------- |
@@ -167,7 +158,7 @@ charts 组 21 个组件（C138–C158），视觉与键盘全部 blocked。很�
 
 ### C153 RadarChart
 
-报告 `groups/charts/RadarChart.md`，队列状态 needs-evidence。另受 S01、S07、C138-F01、C138-F02、C146-F04 影响。
+报告 `groups/charts/RadarChart.md`，队列状态 needs-evidence。另受 S01、S07、C138-F02、C146-F04 影响。
 
 | 编号     | 级别 | 波次 | 端   | 类别   | 条目                                              | 验收                                                                             |
 | -------- | ---- | ---- | ---- | ------ | ------------------------------------------------- | -------------------------------------------------------------------------------- |
@@ -189,7 +180,7 @@ charts 组 21 个组件（C138–C158），视觉与键盘全部 blocked。很�
 
 ### C155 ScatterChart
 
-报告 `groups/charts/ScatterChart.md`，队列状态 needs-evidence。另受 S01、S07、C138-F01、C138-F02、C139-F02、C145-F03 影响。
+报告 `groups/charts/ScatterChart.md`，队列状态 needs-evidence。另受 S01、S07、C138-F02、C145-F03 影响。
 
 | 编号     | 级别 | 波次 | 端    | 类别   | 条目                                   | 验收                                                                                      |
 | -------- | ---- | ---- | ----- | ------ | -------------------------------------- | ----------------------------------------------------------------------------------------- |
@@ -200,7 +191,7 @@ charts 组 21 个组件（C138–C158），视觉与键盘全部 blocked。很�
 
 ### C156 SunburstChart
 
-报告 `groups/charts/SunburstChart.md`，队列状态 needs-evidence。另受 S01、S07、C138-F01、C138-F02、C145-F03、C150-F03 影响。
+报告 `groups/charts/SunburstChart.md`，队列状态 needs-evidence。另受 S01、S07、C138-F02、C145-F03、C150-F03 影响。
 
 | 编号     | 级别 | 波次 | 端   | 类别   | 条目                                        | 验收                                                                             |
 | -------- | ---- | ---- | ---- | ------ | ------------------------------------------- | -------------------------------------------------------------------------------- |
@@ -209,7 +200,7 @@ charts 组 21 个组件（C138–C158），视觉与键盘全部 blocked。很�
 
 ### C157 TreeMapChart
 
-报告 `groups/charts/TreeMapChart.md`，队列状态 needs-evidence。另受 S01、S02、S07、C138-F01、C138-F02、C145-F03、C150-F03、C156-F02 影响。
+报告 `groups/charts/TreeMapChart.md`，队列状态 needs-evidence。另受 S01、S02、S07、C138-F02、C145-F03、C150-F03、C156-F02 影响。
 
 | 编号     | 级别 | 波次 | 端   | 类别   | 条目                                   | 验收                                                                                            |
 | -------- | ---- | ---- | ---- | ------ | -------------------------------------- | ----------------------------------------------------------------------------------------------- |

@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { FunnelChart } from '@expcat/tigercat-vue/FunnelChart'
 import { renderWithProps, expectNoA11yViolations } from '../utils'
-import { render } from '@testing-library/vue'
+import { fireEvent, render } from '@testing-library/vue'
 
 const defaultSize = { width: 320, height: 300 }
 
@@ -107,5 +107,27 @@ describe('FunnelChart (Vue)', () => {
       })
       await expectNoA11yViolations(container)
     })
+  })
+  it('removes legend-hidden segments from pointer and focus interaction', async () => {
+    const onHover = vi.fn()
+    const onSegmentClick = vi.fn()
+    const { container } = renderWithProps(FunnelChart, {
+      data: sampleData,
+      showLegend: true,
+      hoverable: true,
+      selectable: true,
+      'onUpdate:hoveredIndex': onHover,
+      onSegmentClick
+    })
+    await fireEvent.click(container.querySelector('[data-legend-item]')!)
+    onHover.mockClear()
+    const hidden = container.querySelector('[data-funnel-segment][data-index="0"]')!
+    await fireEvent.mouseEnter(hidden)
+    await fireEvent.click(hidden)
+    await fireEvent.focus(hidden)
+    expect(onHover).not.toHaveBeenCalled()
+    expect(onSegmentClick).not.toHaveBeenCalled()
+    expect(hidden).not.toHaveAttribute('tabindex')
+    expect(hidden).toHaveAttribute('pointer-events', 'none')
   })
 })

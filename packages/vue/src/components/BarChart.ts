@@ -353,7 +353,7 @@ export const BarChart = defineComponent({
 
     const legendItems = computed<ChartLegendItem[]>(() =>
       buildChartLegendItems({
-        data: props.data.length > 0 ? [props.data[0]] : [],
+        data: props.data,
         palette: palette.value,
         activeIndex: activeIndex.value,
         selectedIndex: resolvedSelectedIndex.value,
@@ -362,7 +362,7 @@ export const BarChart = defineComponent({
         getColor: (d, i) => d.color ?? palette.value[i % palette.value.length],
 
         isHidden: (index) => isLegendIndexHidden(index)
-      }).map((item) => ({ ...item, index: 0, hidden: isLegendIndexHidden(0) }))
+      })
     )
 
     const tooltipContent = computed(() =>
@@ -442,7 +442,7 @@ export const BarChart = defineComponent({
                   'text-anchor': 'middle',
                   'dominant-baseline': isInside ? 'central' : bar.negative ? 'hanging' : 'auto',
                   class: isInside ? barValueLabelInsideClasses : barValueLabelClasses,
-                  opacity: isLegendIndexHidden(0) ? 0 : bar.opacity,
+                  opacity: isLegendIndexHidden(bar.index) ? 0 : bar.opacity,
                   'data-value-label': ''
                 },
                 labelText
@@ -517,15 +517,17 @@ export const BarChart = defineComponent({
                         rx: corner.value.rx,
                         ry: corner.value.ry,
                         fill: props.gradient ? `url(#${gradientPrefix}-${bar.index})` : bar.color,
-                        opacity: isLegendIndexHidden(0) ? 0 : bar.opacity,
+                        opacity: isLegendIndexHidden(bar.index) ? 0 : bar.opacity,
+                        'pointer-events': isLegendIndexHidden(bar.index) ? 'none' : undefined,
                         class: classNames(
                           props.animated && BAR_ANIMATED_CLASS,
                           interactive.value && barInteractiveClasses
                         ),
                         style: corner.value.style,
-                        tabindex: interactive.value
-                          ? chartMarkTabIndex(visualIndex, visualActive < 0 ? null : visualActive)
-                          : undefined,
+                        tabindex:
+                          interactive.value && !isLegendIndexHidden(bar.index)
+                            ? chartMarkTabIndex(visualIndex, visualActive < 0 ? null : visualActive)
+                            : undefined,
                         role: interactive.value ? 'button' : undefined,
                         'aria-hidden': interactive.value ? undefined : true,
                         'aria-label': interactive.value

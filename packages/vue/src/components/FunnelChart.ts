@@ -239,6 +239,7 @@ export const FunnelChart = defineComponent({
                   key: `seg-${seg.index}`,
                   d: seg.path,
                   fill: props.gradient ? `url(#${gradientPrefix}-${seg.index})` : seg.color,
+                  'pointer-events': isLegendIndexHidden(seg.index) ? 'none' : undefined,
                   opacity: isLegendIndexHidden(seg.index)
                     ? 0
                     : getChartElementOpacity(seg.index, activeIndex.value, {
@@ -251,9 +252,10 @@ export const FunnelChart = defineComponent({
                   ),
                   'data-funnel-segment': '',
                   'data-index': seg.index,
-                  tabindex: interactive.value
-                    ? chartMarkTabIndex(visualIndex, visualActive < 0 ? null : visualActive)
-                    : undefined,
+                  tabindex:
+                    interactive.value && !isLegendIndexHidden(seg.index)
+                      ? chartMarkTabIndex(visualIndex, visualActive < 0 ? null : visualActive)
+                      : undefined,
                   role: interactive.value ? 'button' : undefined,
                   'aria-hidden': interactive.value ? undefined : true,
                   'aria-label': interactive.value
@@ -262,14 +264,21 @@ export const FunnelChart = defineComponent({
                         seg.index
                       ).description
                     : undefined,
-                  onMouseenter: (e: MouseEvent) => handleMouseEnter(seg.index, e),
-                  onMousemove: handleMouseMove,
-                  onMouseleave: handleMouseLeave,
-                  onFocus: interactive.value
-                    ? (e: FocusEvent) => handleMouseEnter(seg.index, e)
-                    : undefined,
-                  onClick: () => handleClick(seg.index),
-                  onKeydown: (e: KeyboardEvent) => handleSegmentKeyDown(e, visualIndex)
+                  onMouseenter: isLegendIndexHidden(seg.index)
+                    ? undefined
+                    : (e: MouseEvent) => handleMouseEnter(seg.index, e),
+                  onMousemove: isLegendIndexHidden(seg.index) ? undefined : handleMouseMove,
+                  onMouseleave: isLegendIndexHidden(seg.index) ? undefined : handleMouseLeave,
+                  onFocus:
+                    interactive.value && !isLegendIndexHidden(seg.index)
+                      ? (e: FocusEvent) => handleMouseEnter(seg.index, e)
+                      : undefined,
+                  onClick: isLegendIndexHidden(seg.index)
+                    ? undefined
+                    : () => handleClick(seg.index),
+                  onKeydown: isLegendIndexHidden(seg.index)
+                    ? undefined
+                    : (e: KeyboardEvent) => handleSegmentKeyDown(e, visualIndex)
                 })
               )
             ),

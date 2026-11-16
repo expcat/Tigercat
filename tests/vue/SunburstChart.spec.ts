@@ -3,6 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
+import { fireEvent } from '@testing-library/vue'
 import { nextTick } from 'vue'
 import { SunburstChart } from '@expcat/tigercat-vue/SunburstChart'
 import { renderWithProps, expectNoA11yViolations } from '../utils'
@@ -125,5 +126,29 @@ describe('SunburstChart (Vue)', () => {
     const labels = Array.from(container.querySelectorAll('svg text')).map((el) => el.textContent)
     expect(labels).toContain('亚洲')
     expect(labels).toContain('中国')
+  })
+  it('ignores hover and click on legend-hidden marks', async () => {
+    const onHover = vi.fn()
+    const onClick = vi.fn()
+    const { container } = renderWithProps(SunburstChart, {
+      data: [
+        { label: 'Hidden', children: [{ label: 'Child', value: 40 }] },
+        { label: 'Visible', value: 20 }
+      ],
+      showLegend: true,
+      hoverable: true,
+      selectable: true,
+      'onUpdate:hoveredIndex': onHover,
+      onArcClick: onClick
+    })
+    await fireEvent.click(container.querySelector('[data-legend-item]')!)
+    onHover.mockClear()
+    const hidden = container.querySelector('[data-sunburst-arc][data-index="1"]')!
+    await fireEvent.mouseEnter(hidden)
+    await fireEvent.click(hidden)
+    expect(onHover).not.toHaveBeenCalled()
+    expect(onClick).not.toHaveBeenCalled()
+    expect(hidden).toHaveAttribute('pointer-events', 'none')
+    expect(hidden).not.toHaveAttribute('tabindex')
   })
 })

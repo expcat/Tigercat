@@ -15,6 +15,7 @@ export interface UseCartesianSeriesPointsOptions<T> {
   hoverable: boolean
   innerRect: { width: number; height: number }
   getSeriesPoints: () => Array<{ points: Array<{ x: number; y: number; pointIndex: number }> }>
+  isSeriesHidden: (seriesIndex: number) => boolean
   getDatum: (seriesIndex: number, pointIndex: number) => T | undefined
   getSeriesKeys: () => string[]
   getFlatPoints: () => ChartPointRef[]
@@ -28,6 +29,7 @@ export function useCartesianSeriesPoints<T>({
   hoverable,
   innerRect,
   getSeriesPoints,
+  isSeriesHidden,
   getDatum,
   getSeriesKeys,
   getFlatPoints,
@@ -37,15 +39,15 @@ export function useCartesianSeriesPoints<T>({
   const [hoveredPointInfo, setHoveredPointInfo] = useState<ChartPointRef | null>(null)
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 })
   const trackHover = showTooltip || hoverable
-  const scanRef = useRef({ getSeriesPoints, getDatum, hoverable, onPointHover })
-  scanRef.current = { getSeriesPoints, getDatum, hoverable, onPointHover }
+  const scanRef = useRef({ getSeriesPoints, isSeriesHidden, getDatum, hoverable, onPointHover })
+  scanRef.current = { getSeriesPoints, isSeriesHidden, getDatum, hoverable, onPointHover }
   const [plotScan] = useState(() =>
     createChartFrameCoalescer<{ x: number; y: number; clientX: number; clientY: number }>({
       onFrame: (sample) => {
         const current = scanRef.current
         const laidOutSeries = current.getSeriesPoints()
         const nearest = findNearestSeriesPoint(
-          laidOutSeries.map((sd) => sd.points),
+          laidOutSeries.map((sd, index) => (current.isSeriesHidden(index) ? [] : sd.points)),
           sample.x,
           sample.y
         )
@@ -69,13 +71,14 @@ export function useCartesianSeriesPoints<T>({
 
   const handlePointMouseEnter = useCallback(
     (seriesIndex: number, pointIndex: number, event: React.MouseEvent) => {
+      if (isSeriesHidden(seriesIndex)) return
       setHoveredPointInfo({ seriesIndex, pointIndex })
       setTooltipPosition({ x: event.clientX, y: event.clientY })
       if (hoverable) {
         onPointHover?.(seriesIndex, pointIndex, getDatum(seriesIndex, pointIndex) ?? null)
       }
     },
-    [getDatum, hoverable, onPointHover]
+    [getDatum, hoverable, onPointHover, isSeriesHidden]
   )
 
   const handlePointMouseMove = useCallback((event: React.MouseEvent) => {
@@ -96,13 +99,13 @@ export function useCartesianSeriesPoints<T>({
 
   const showPointTooltipFromElement = useCallback(
     (el: SVGElement, seriesIndex: number, pointIndex: number) => {
-      if (!trackHover) return
+      if (!trackHover || isSeriesHidden(seriesIndex)) return
       const rect = el.getBoundingClientRect()
       setHoveredPointInfo({ seriesIndex, pointIndex })
       setTooltipPosition({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 })
       onPointHover?.(seriesIndex, pointIndex, getDatum(seriesIndex, pointIndex) ?? null)
     },
-    [getDatum, onPointHover, trackHover]
+    [getDatum, onPointHover, trackHover, isSeriesHidden]
   )
 
   const handlePlotMouseMove = useCallback(
@@ -132,6 +135,7 @@ export function useCartesianSeriesPoints<T>({
 
   const handlePointKeydown = useCallback(
     (event: React.KeyboardEvent<SVGElement>, seriesIndex: number, pointIndex: number) => {
+      if (isSeriesHidden(seriesIndex)) return
       if (isChartNavigationKey(event.key)) {
         event.preventDefault()
         const next = nextChartPointRef({ seriesIndex, pointIndex }, event.key, getFlatPoints())
@@ -151,11 +155,19 @@ export function useCartesianSeriesPoints<T>({
         handlePointMouseLeave()
       }
     },
-    [getFlatPoints, getSeriesKeys, handlePointMouseLeave, onPointActivate, trackHover]
+    [
+      getFlatPoints,
+      getSeriesKeys,
+      handlePointMouseLeave,
+      onPointActivate,
+      trackHover,
+      isSeriesHidden
+    ]
   )
 
   return {
-    hoveredPointInfo,
+    hoveredPointInfo:
+      hoveredPointInfo && !isSeriesHidden(hoveredPointInfo.seriesIndex) ? hoveredPointInfo : null,
     tooltipPosition,
     handlePointMouseEnter,
     handlePointMouseMove,

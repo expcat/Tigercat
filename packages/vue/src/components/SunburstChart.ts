@@ -262,15 +262,17 @@ export const SunburstChart = defineComponent({
                       }),
                   stroke: 'var(--tiger-surface)',
                   'stroke-width': 1,
+                  'pointer-events': isArcHidden(arc) ? 'none' : undefined,
                   'data-sunburst-arc': '',
                   'data-index': arc.index,
                   class: classNames(
                     interactive.value && 'cursor-pointer',
                     sunburstArcTransitionClasses
                   ),
-                  tabindex: interactive.value
-                    ? chartMarkTabIndex(visualIndex, visualActive < 0 ? null : visualActive)
-                    : undefined,
+                  tabindex:
+                    interactive.value && !isArcHidden(arc)
+                      ? chartMarkTabIndex(visualIndex, visualActive < 0 ? null : visualActive)
+                      : undefined,
                   role: interactive.value ? 'button' : undefined,
                   'aria-hidden': interactive.value ? undefined : true,
                   'aria-label': interactive.value
@@ -280,14 +282,19 @@ export const SunburstChart = defineComponent({
                         percent: arc.percent.toFixed(1)
                       })
                     : undefined,
-                  onMouseenter: (e: MouseEvent) => handleMouseEnter(arc.index, e),
-                  onMousemove: handleMouseMove,
-                  onMouseleave: handleMouseLeave,
-                  onFocus: interactive.value
-                    ? (e: FocusEvent) => handleMouseEnter(arc.index, e)
-                    : undefined,
-                  onClick: () => handleClick(arc.index),
-                  onKeydown: (e: KeyboardEvent) => handleArcKeyDown(e, arc.index)
+                  onMouseenter: isArcHidden(arc)
+                    ? undefined
+                    : (e: MouseEvent) => handleMouseEnter(arc.index, e),
+                  onMousemove: isArcHidden(arc) ? undefined : handleMouseMove,
+                  onMouseleave: isArcHidden(arc) ? undefined : handleMouseLeave,
+                  onFocus:
+                    interactive.value && !isArcHidden(arc)
+                      ? (e: FocusEvent) => handleMouseEnter(arc.index, e)
+                      : undefined,
+                  onClick: isArcHidden(arc) ? undefined : () => handleClick(arc.index),
+                  onKeydown: isArcHidden(arc)
+                    ? undefined
+                    : (e: KeyboardEvent) => handleArcKeyDown(e, arc.index)
                 })
               ),
               ...(props.showLabels

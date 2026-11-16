@@ -372,4 +372,40 @@ describe('BarChart', () => {
       expect(tallest).toBeLessThan(200)
     })
   })
+  it('toggles each bar independently and ignores a hidden bar', async () => {
+    const onHover = vi.fn()
+    const onBarClick = vi.fn()
+    const { container } = renderWithProps(BarChart, {
+      data: [
+        { x: 'Mon', y: 10 },
+        { x: 'Tue', y: 20 }
+      ],
+      showLegend: true,
+      showValueLabels: true,
+      hoverable: true,
+      selectable: true,
+      onHoveredIndexChange: onHover,
+      onBarClick
+    })
+    const legend = container.querySelectorAll('[data-legend-item]')
+    expect(legend).toHaveLength(2)
+    expect(legend[0]).toHaveTextContent('Mon')
+    expect(legend[1]).toHaveTextContent('Tue')
+    fireEvent.click(legend[0])
+    const bars = container.querySelectorAll('[data-bar-index]')
+    expect(bars[0]).toHaveAttribute('opacity', '0')
+    expect(bars[1]).not.toHaveAttribute('opacity', '0')
+    const labels = container.querySelectorAll('[data-value-label]')
+    expect(labels[0]).toHaveAttribute('opacity', '0')
+    expect(labels[1]).not.toHaveAttribute('opacity', '0')
+    onHover.mockClear()
+    fireEvent.mouseEnter(bars[0])
+    fireEvent.click(bars[0])
+    expect(onHover).not.toHaveBeenCalled()
+    expect(onBarClick).not.toHaveBeenCalled()
+    expect(bars[0]).toHaveAttribute('pointer-events', 'none')
+    expect(bars[0]).not.toHaveAttribute('tabindex')
+    fireEvent.click(bars[1])
+    expect(onBarClick).toHaveBeenCalledWith(1, expect.objectContaining({ x: 'Tue' }))
+  })
 })

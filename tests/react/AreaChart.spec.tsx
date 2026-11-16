@@ -232,4 +232,54 @@ describe('AreaChart', () => {
     expect(dashed).toBeTruthy()
     expect(dashed).not.toHaveAttribute('pathLength')
   })
+  it('excludes legend-hidden series from events, focus, and nearest-point tooltips', async () => {
+    const onSeriesHover = vi.fn()
+    const onSeriesClick = vi.fn()
+    const onPointHover = vi.fn()
+    const onPointClick = vi.fn()
+    const { container } = renderWithProps(AreaChart, {
+      series: [
+        { name: 'Hidden', data: [{ x: 'Mon', y: 10 }] },
+        { name: 'Visible', data: [{ x: 'Mon', y: 3 }] }
+      ],
+      width: 300,
+      height: 200,
+      padding: 0,
+      responsive: false,
+      showLegend: true,
+      showPoints: true,
+      hoverable: true,
+      selectable: true,
+      onSeriesHover,
+      onSeriesClick,
+      onPointHover,
+      onPointClick
+    })
+    fireEvent.click(container.querySelector('[data-legend-item]')!)
+    onSeriesHover.mockClear()
+    const hidden = container.querySelector('[data-area-series="0"]')!.parentElement!
+    const key = hidden.getAttribute('data-series-key')!
+    const point = container.querySelector(`circle[data-series-key="${key}"]`)!
+    fireEvent.mouseEnter(hidden)
+    fireEvent.click(hidden)
+    fireEvent.mouseEnter(point)
+    fireEvent.click(point)
+    expect(onSeriesHover).not.toHaveBeenCalled()
+    expect(onSeriesClick).not.toHaveBeenCalled()
+    expect(onPointHover).not.toHaveBeenCalled()
+    expect(onPointClick).not.toHaveBeenCalled()
+    expect(hidden).toHaveAttribute('pointer-events', 'none')
+    expect(point).not.toHaveAttribute('tabindex')
+    const hit = container.querySelector('[data-plot-hit]')!
+    vi.spyOn(hit, 'getBoundingClientRect').mockReturnValue(new DOMRect(0, 0, 300, 200))
+    fireEvent.mouseMove(hit, {
+      clientX: Number(point.getAttribute('cx')),
+      clientY: Number(point.getAttribute('cy'))
+    })
+    await act(async () => {
+      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+    })
+    expect(onPointHover).toHaveBeenLastCalledWith(1, 0, expect.objectContaining({ y: 3 }))
+    expect(document.body.querySelector('[data-chart-tooltip]')).toHaveTextContent('Visible')
+  })
 })

@@ -305,14 +305,18 @@ export const LineChart: React.FC<LineChartProps> = ({
 
   const handlePointClick = useCallback(
     (seriesIndex: number, pointIndex: number) => {
+      if (isLegendIndexHidden(seriesIndex)) return
       onPointClick?.(seriesIndex, pointIndex, resolvedSeries[seriesIndex]?.data[pointIndex])
     },
-    [onPointClick, resolvedSeries]
+    [onPointClick, resolvedSeries, isLegendIndexHidden]
   )
 
   const pointClickable = Boolean(onPointClick)
   const trackPointHover = showTooltip || hoverable
-  const flatPoints = useMemo(() => flattenChartPoints(seriesData), [seriesData])
+  const flatPoints = useMemo(
+    () => flattenChartPoints(seriesData.filter((sd) => !isLegendIndexHidden(sd.seriesIndex))),
+    [seriesData, isLegendIndexHidden]
+  )
   const {
     hoveredPointInfo,
     tooltipPosition,
@@ -327,6 +331,7 @@ export const LineChart: React.FC<LineChartProps> = ({
     hoverable,
     innerRect,
     getSeriesPoints: () => seriesData,
+    isSeriesHidden: isLegendIndexHidden,
     getDatum: (seriesIndex, pointIndex) => resolvedSeries[seriesIndex]?.data[pointIndex],
     getSeriesKeys: () => seriesKeys,
     getFlatPoints: () => flatPoints,
@@ -461,6 +466,7 @@ export const LineChart: React.FC<LineChartProps> = ({
               name={sd.series.name}
               type="line"
               opacity={isLegendIndexHidden(sd.seriesIndex) ? 0 : sd.opacity}
+              pointerEvents={isLegendIndexHidden(sd.seriesIndex) ? 'none' : undefined}
               data-series-key={sd.seriesKey}
               className={classNames(
                 sd.series.className,
@@ -507,7 +513,9 @@ export const LineChart: React.FC<LineChartProps> = ({
                     hoveredPointInfo?.pointIndex === point.pointIndex
                   const hoverSize = sd.pointSize + 2
                   const datum = point.datum
-                  const pointInteractive = hoverable || selectable || pointClickable
+                  const pointInteractive =
+                    !isLegendIndexHidden(sd.seriesIndex) &&
+                    (hoverable || selectable || pointClickable)
                   return (
                     <circle
                       key={`point-${sd.seriesKey}-${point.pointIndex}`}

@@ -249,23 +249,26 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
               opacity={opacity}
               stroke="var(--tiger-surface)"
               strokeWidth={1}
+              pointerEvents={isArcHidden(arc) ? 'none' : undefined}
               data-sunburst-arc=""
               data-index={arc.index}
               className={classNames(interactive && 'cursor-pointer', sunburstArcTransitionClasses)}
               tabIndex={
-                interactive
+                interactive && !isArcHidden(arc)
                   ? chartMarkTabIndex(visualIndex, visualActive < 0 ? null : visualActive)
                   : undefined
               }
               role={interactive ? 'button' : undefined}
               aria-hidden={interactive ? undefined : true}
               aria-label={interactive ? ariaLabel : undefined}
-              onMouseEnter={(e) => handleMouseEnter(arc.index, e)}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-              onFocus={interactive ? (e) => handleMouseEnter(arc.index, e) : undefined}
-              onClick={() => handleClick(arc.index)}
-              onKeyDown={(e) => handleArcKeyDown(e, arc.index)}
+              onMouseEnter={isArcHidden(arc) ? undefined : (e) => handleMouseEnter(arc.index, e)}
+              onMouseMove={isArcHidden(arc) ? undefined : handleMouseMove}
+              onMouseLeave={isArcHidden(arc) ? undefined : handleMouseLeave}
+              onFocus={
+                interactive && !isArcHidden(arc) ? (e) => handleMouseEnter(arc.index, e) : undefined
+              }
+              onClick={isArcHidden(arc) ? undefined : () => handleClick(arc.index)}
+              onKeyDown={isArcHidden(arc) ? undefined : (e) => handleArcKeyDown(e, arc.index)}
             />
           )
         })}
