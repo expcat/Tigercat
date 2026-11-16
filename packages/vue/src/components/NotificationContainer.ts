@@ -114,7 +114,7 @@ export const NotificationContainer = /* @__PURE__ */ defineComponent({
         )
       }
 
-      if (notification.onClick || notification.actions?.length) {
+      if (notification.onClick || notification.actions?.length || notification.actionNode != null) {
         const actionButtons = []
         if (notification.onClick) {
           actionButtons.push(
@@ -157,11 +157,10 @@ export const NotificationContainer = /* @__PURE__ */ defineComponent({
             )
           )
         })
+        if (notification.actionNode != null) {
+          actionButtons.push(notification.actionNode as never)
+        }
         contentChildren.push(h('div', { class: notificationActionsClasses }, actionButtons))
-      } else if (notification.actionNode != null) {
-        contentChildren.push(
-          h('div', { class: notificationActionsClasses }, notification.actionNode as never)
-        )
       }
 
       const children: HArrayChildren = [

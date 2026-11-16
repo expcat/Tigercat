@@ -18,8 +18,8 @@ feedback 组 14 个组件（C117–C130）。这一组没有截图，视觉与�
 
 ## 概览
 
-本篇 14 条：P1 0、P2 5、P3 9。
-按波次：W4 5、W9 9。
+本篇 13 条：P1 0、P2 4、P3 9。
+按波次：W4 4、W9 9。
 
 已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C118-F04（S13）、C121-F01、C124-F03（S13）、C127-F01（S13）、C129-F01（S13）。
 
@@ -55,14 +55,6 @@ feedback 组 14 个组件（C117–C130）。这一组没有截图，视觉与�
 ### C124 Modal
 
 报告 `groups/feedback/Modal.md`，队列状态 needs-evidence。另受 S01、S04、C118-F05 影响。
-
-### C125 NotificationContainer
-
-报告 `groups/feedback/NotificationContainer.md`，队列状态 needs-evidence。另受 S01、S02、S04、S08 影响。
-
-| 编号     | 级别 | 波次 | 端  | 类别 | 条目                                                         | 验收                                                                              |
-| -------- | ---- | ---- | --- | ---- | ------------------------------------------------------------ | --------------------------------------------------------------------------------- |
-| C125-F01 | P2   | W4   | Vue | 行为 | Vue 有主按钮或 actions 时不渲染 actionNode，React 会同时渲染 | 同一条通知同时带 actions 与 actionNode 时，Vue 与 React 都在按钮后渲染 actionNode |
 
 ### C126 Popconfirm
 

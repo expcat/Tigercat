@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **NotificationContainer 操作节点（Vue，C125-F01）**：主按钮或 `actions` 与 `actionNode` 同时存在时，自定义节点渲染在同一操作区的按钮之后，与 React 一致。
+
 - **Modal 确认等待与层级（React / Vue，C124-F01、C124-F02）**：React 命令式确认等待 `onOk` 的 Promise，兑现后才关闭；返回 false 或拒绝时保持打开。Vue 自定义 `zIndex` 在打开期间更新，并在离场过渡中保留。
 
 - **MessageContainer outlet 实例（Vue，C122-F01）**：容器使用稳定的实例 id，切换 position 时更新原条目；同位实例卸载一个时保留另一个。

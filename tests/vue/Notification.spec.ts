@@ -118,6 +118,23 @@ describe('notification (Vue)', () => {
     expect(onClick).toHaveBeenCalledTimes(1)
   })
 
+  it('renders actionNode after action buttons in the same action area', async () => {
+    notification.info({
+      title: 'Actions',
+      duration: 0,
+      closable: false,
+      actions: [{ label: 'Undo' }],
+      actionNode: h('a', { href: '/details' }, 'Details')
+    })
+    await flushHost()
+    const toast = getToasts()[0]
+    const button = toast.querySelector('button')
+    const actionNode = toast.querySelector('a')
+    expect(button?.textContent).toBe('Undo')
+    expect(actionNode?.textContent).toBe('Details')
+    expect(button?.nextElementSibling).toBe(actionNode)
+  })
+
   it('uses official locale close names and accepts a custom closeAriaLabel', async () => {
     mountProvider(zhCN)
     notification.info({ title: 'CN', duration: 0, closable: true })
