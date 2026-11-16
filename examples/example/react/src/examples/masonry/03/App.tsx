@@ -34,7 +34,7 @@ export default function App() {
           移除卡片
         </Button>
       </div>
-      <Masonry columns={2} gap={12} aria-label="动态卡片瀑布流">
+      <Masonry columns={2} gap={12} layout="shortest" aria-label="动态卡片瀑布流">
         {cards.map((card) => (
           <div
             key={card.id}

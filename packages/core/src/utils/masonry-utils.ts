@@ -68,14 +68,22 @@ export function resolveMasonryGap(gap: MasonryResponsiveValue | undefined, width
 /**
  * Pack measured item heights into the currently shortest column.
  *
- * Ties go to the leftmost column. Items with height `<= 0` are skipped from
- * the shortest-column contest and fall back to modulo so they do not pull
- * later items into column 0.
+ * The contest uses the occupied height of each column: measured item heights
+ * plus the gap between items already placed there. Ties go to the leftmost
+ * column. Items with height `<= 0` are skipped from the shortest-column
+ * contest and fall back to modulo so they do not pull later items into
+ * column 0.
  */
-export function distributeMasonryItems(heights: number[], columnCount: number): number[][] {
+export function distributeMasonryItems(
+  heights: number[],
+  columnCount: number,
+  gap = 0
+): number[][] {
   const count = clampMasonryColumnCount(columnCount)
+  const spacing = clampMasonryGap(gap)
   const columns: number[][] = Array.from({ length: count }, () => [])
   const totals = new Array<number>(count).fill(0)
+  const placed = new Array<number>(count).fill(0)
 
   heights.forEach((rawHeight, index) => {
     const height = Number.isFinite(rawHeight) && rawHeight > 0 ? rawHeight : 0
@@ -87,8 +95,10 @@ export function distributeMasonryItems(heights: number[], columnCount: number): 
     for (let column = 1; column < count; column++) {
       if (totals[column] < totals[target]) target = column
     }
-    columns[target].push(index)
+    if (placed[target] > 0) totals[target] += spacing
+    placed[target] += 1
     totals[target] += height
+    columns[target].push(index)
   })
 
   return columns
@@ -120,7 +130,7 @@ export function computeMasonryPositions(
   const width =
     containerWidth > 0 ? Math.max((containerWidth - spacing * (count - 1)) / count, 0) : 0
   const columns = hasMeasuredMasonryHeights(heights)
-    ? distributeMasonryItems(heights, count)
+    ? distributeMasonryItems(heights, count, spacing)
     : moduloDistributeMasonryItems(heights.length, count)
   const tops = new Array<number>(count).fill(0)
   const positions: MasonryItemPosition[] = new Array(heights.length)
@@ -170,7 +180,7 @@ export function masonryLayoutColumnHeights(
 ): number[] {
   const columns =
     layout === 'shortest'
-      ? distributeMasonryItems(heights, columnCount)
+      ? distributeMasonryItems(heights, columnCount, gap)
       : distributeMasonrySourceItems(heights.length, columnCount)
   return computeMasonryColumnHeights(heights, columns, gap)
 }

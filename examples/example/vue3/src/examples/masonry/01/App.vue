@@ -11,7 +11,7 @@ const cards = heights.map((height, index) => ({
 
 <template>
   <div class="w-full max-w-md">
-    <Masonry aria-label="卡片瀑布流">
+    <Masonry layout="shortest" aria-label="卡片瀑布流">
       <div
         v-for="card in cards"
         :key="card.id"

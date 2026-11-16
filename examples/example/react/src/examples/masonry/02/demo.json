@@ -1,7 +1,7 @@
 {
   "id": "masonry-02",
   "title": "响应式列数与间距",
-  "description": "columns 与 gap 均支持断点映射:xs 单列、sm 双列、lg 四列,间距随断点放大。",
+  "description": "columns 与 gap 均支持断点映射:xs 单列 8px、sm 双列 16px、md 起四列 24px。",
   "entry": "App.tsx",
   "order": 2,
   "viewport": {

@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Masonry 间距分配与示例（Core / Demo，C044-F01、C044-F02、C044-F03）**：最短列按含列内间距的占用高度选列。heights=[100,1,1,1]、columns=2、gap=100 时第 4 项进入第 1 列，列高为 [201,102]。两端 masonry/01、03 显式传入 shortest。masonry/02 去掉 672px 上限，改用预览里可达的 md：宽屏 4 列、24px，sm 为 16px，窄屏仍是 1 列、8px。
+
 - **List 悬停与页大小（Demo，C043-F04、C043-F05）**：两端 list/01 显式传入 hoverable，行带悬停底色。两端 list/03 保存并回传 pageSize，选择新页大小后列表条数与选择器保持该值。
 
 - **Layout 横排属性（文档 / MCP，C042-F01）**：生成笔记与优先字段改为公开的 `mode`。Layout 文档与 MCP 写 `mode=horizontal`，不再出现 `direction=horizontal`。

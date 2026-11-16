@@ -10,7 +10,7 @@ const cards = heights.map((height, index) => ({
 export default function App() {
   return (
     <div className="w-full max-w-md">
-      <Masonry aria-label="卡片瀑布流">
+      <Masonry layout="shortest" aria-label="卡片瀑布流">
         {cards.map((card) => (
           <div
             key={card.id}

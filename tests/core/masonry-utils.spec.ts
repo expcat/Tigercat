@@ -7,11 +7,13 @@ import {
   clampMasonryColumnCount,
   clampMasonryGap,
   computeMasonryColumnHeights,
+  computeMasonryPositions,
   distributeMasonryItems,
   getMasonryColumnStyle,
   getMasonryGapStyle,
   getMasonryItemClasses,
   getMasonryRootClasses,
+  masonryLayoutColumnHeights,
   moduloDistributeMasonryItems,
   readMasonryItemHeight,
   resolveMasonryColumnCount,
@@ -121,6 +123,21 @@ describe('masonry-utils', () => {
     it('clamps the column count', () => {
       expect(distributeMasonryItems([10, 20], 0)).toEqual([[0, 1]])
       expect(distributeMasonryItems([10, 20], -2)).toEqual([[0, 1]])
+    })
+
+    it('counts the gap when choosing the shortest column', () => {
+      // heights=[100,1,1,1], columns=2, gap=100.
+      // Before item 3 the occupied heights are [100,102], so it belongs in column 0.
+      const heights = [100, 1, 1, 1]
+      expect(distributeMasonryItems(heights, 2, 100)).toEqual([
+        [0, 3],
+        [1, 2]
+      ])
+      expect(masonryLayoutColumnHeights(heights, 2, 100, 'shortest')).toEqual([201, 102])
+      expect(computeMasonryPositions(heights, 2, 100, 400)[3]).toMatchObject({
+        column: 0,
+        top: 200
+      })
     })
   })
 

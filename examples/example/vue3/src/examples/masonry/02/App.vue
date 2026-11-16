@@ -10,10 +10,10 @@ const cards = heights.map((height, index) => ({
 </script>
 
 <template>
-  <div class="w-full max-w-2xl">
+  <div class="w-full">
     <Masonry
-      :columns="{ xs: 1, sm: 2, lg: 4 }"
-      :gap="{ xs: 8, md: 16, lg: 24 }"
+      :columns="{ xs: 1, sm: 2, md: 4 }"
+      :gap="{ xs: 8, sm: 16, md: 24 }"
       aria-label="响应式瀑布流">
       <div
         v-for="card in cards"
