@@ -15,7 +15,7 @@ description: Compact Tigercat Charts Vue and React usage routes
 
 Runnable modules: `examples/example/vue3/src/examples/use-chart-interaction/02/`, `examples/example/react/src/examples/use-chart-interaction/02/`.
 
-Note: `responsive` 观察画布自己的宿主，不是 legend 壳。默认 padding 盖住 ChartAxis 标签。有 `title` / `aria-label` 时 svg 是 `role="img"`。render props / 作用域槽给出 `innerRect`。
+Note: `responsive` 观察画布自己的宿主，不是 legend 壳。默认 padding 盖住 ChartAxis 标签。svg 始终是 `role="group"`。render props / 作用域槽给出 `innerRect`。
 
 Vue: `<ChartCanvas title="Sales" :width="320" :height="200"><slot /></ChartCanvas>`
 

@@ -24,8 +24,10 @@ charts 组 21 个组件（C138–C158），视觉与键盘全部 blocked。很�
 
 ## 概览
 
-本篇 57 条：P1 0、P2 32、P3 25。
-按波次：W6 32、W9 25。
+本篇 51 条：P1 0、P2 26、P3 25。
+按波次：W6 26、W9 25。
+
+已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C141-F01、C141-F02、C141-F03、C144-F01、C145-F01、C145-F02。
 
 ## 波及多个组件的条目
 
@@ -36,7 +38,6 @@ charts 组 21 个组件（C138–C158），视觉与键盘全部 blocked。很�
 | C138-F01 图例隐藏系列只设 opacity 0，命中和最近邻仍在 | AreaChart    | LineChart、PieChart、RadarChart、ScatterChart、SunburstChart、TreeMapChart                                                  |
 | C138-F02 responsive 注释默认 false，实际 true         | AreaChart    | BarChart、FunnelChart、GaugeChart、HeatmapChart、LineChart、PieChart、RadarChart、ScatterChart、SunburstChart、TreeMapChart |
 | C139-F02 tiger-bar-animated 的 CSS 未进插件           | BarChart     | LineChart、PieChart、ScatterChart                                                                                           |
-| C145-F01 Vue 无监听仍吞 Escape，React 不会            | ChartTooltip | FunnelChart、GaugeChart、HeatmapChart、LineChart、PieChart、RadarChart、ScatterChart、SunburstChart、TreeMapChart           |
 | C145-F03 content 只有换行时仍挂载空气泡               | ChartTooltip | FunnelChart、GaugeChart、HeatmapChart、LineChart、ScatterChart、SunburstChart、TreeMapChart                                 |
 | C146-F04 padding 注释默认是坐标轴对象，运行时是 24    | FunnelChart  | Gantt、GaugeChart、OrgChart、PieChart、RadarChart                                                                           |
 | C150-F03 关提示时方向键不移动点的 roving tabindex     | LineChart    | SunburstChart、TreeMapChart                                                                                                 |
@@ -73,34 +74,25 @@ charts 组 21 个组件（C138–C158），视觉与键盘全部 blocked。很�
 
 报告 `groups/charts/ChartCanvas.md`，队列状态 needs-evidence。另受 S01、S02 影响。
 
-| 编号     | 级别 | 波次 | 端          | 类别   | 条目                                     | 验收                                                                                 |
-| -------- | ---- | ---- | ----------- | ------ | ---------------------------------------- | ------------------------------------------------------------------------------------ |
-| C141-F01 | P2   | W6   | Vue         | 行为   | Vue 字符串 style 打崩 ChartCanvas        | Vue 传字符串 style「margin-top: 13px」时正常挂载，svg 带该样式，与对象形式一致       |
-| C141-F02 | P2   | W6   | 双端        | 无障碍 | 调用方 aria 引用被丢，aria-label 不生效  | 无 title/desc 时调用方 aria 引用保留；title=Sales、aria-label=Custom 时名称为 Custom |
-| C141-F03 | P2   | W6   | 文档·生成器 | 文档   | 生成说明写 role=img，实现固定 role=group | 重跑 docs:api 后 chart-canvas 的 props 与 examples 页说明写 role=group，与运行时一致 |
-| C141-F04 | P3   | W9   | Vue         | 行为   | Vue 不发初始 resolved-size-change        | Vue 传 width=0、height=0 挂载后 emit 一次 resolved-size-change（320×200）            |
+| 编号     | 级别 | 波次 | 端  | 类别 | 条目                              | 验收                                                                      |
+| -------- | ---- | ---- | --- | ---- | --------------------------------- | ------------------------------------------------------------------------- |
+| C141-F04 | P3   | W9   | Vue | 行为 | Vue 不发初始 resolved-size-change | Vue 传 width=0、height=0 挂载后 emit 一次 resolved-size-change（320×200） |
 
 ### C144 ChartSeries
 
 报告 `groups/charts/ChartSeries.md`，队列状态 needs-evidence。另受 S01、S02 影响。
 
-| 编号     | 级别 | 波次 | 端   | 类别 | 条目                                    | 验收                                                                              |
-| -------- | ---- | ---- | ---- | ---- | --------------------------------------- | --------------------------------------------------------------------------------- |
-| C144-F01 | P2   | W6   | 双端 | 行为 | paint 为空时清掉调用方的 fill 和 stroke | 传 fill=red、stroke=green 且 type=custom（或只传 color）时，两端 g 保留这两个属性 |
-
 ### C145 ChartTooltip
 
 报告 `groups/charts/ChartTooltip.md`，队列状态 needs-evidence。另受 S01、S02、S07 影响。
 
-| 编号     | 级别 | 波次 | 端   | 类别 | 条目                                    | 验收                                                                                         |
-| -------- | ---- | ---- | ---- | ---- | --------------------------------------- | -------------------------------------------------------------------------------------------- |
-| C145-F01 | P2   | W6   | Vue  | 键盘 | Vue 无监听仍吞 Escape，React 不会       | Vue open 且未绑 dismiss 时按 Escape，defaultPrevented 为 false；绑定后回调走一次             |
-| C145-F02 | P2   | W6   | 双端 | SSR  | 首次 transform 两端不一致（Vue 已偏移） | x=y=100 且 open 时，两端服务端渲染的首次 transform 相同（同为 112,92 或 100,100）            |
-| C145-F03 | P3   | W9   | 双端 | 行为 | content 只有换行时仍挂载空气泡          | open 且 content 为单个换行时两端都不挂 role=tooltip 节点，与空字符串一致；a 换行 b 仍渲染 ul |
+| 编号     | 级别 | 波次 | 端   | 类别 | 条目                           | 验收                                                                                         |
+| -------- | ---- | ---- | ---- | ---- | ------------------------------ | -------------------------------------------------------------------------------------------- |
+| C145-F03 | P3   | W9   | 双端 | 行为 | content 只有换行时仍挂载空气泡 | open 且 content 为单个换行时两端都不挂 role=tooltip 节点，与空字符串一致；a 换行 b 仍渲染 ul |
 
 ### C146 FunnelChart
 
-报告 `groups/charts/FunnelChart.md`，队列状态 needs-evidence。另受 S01、S07、C138-F02、C145-F01、C145-F02、C145-F03 影响。
+报告 `groups/charts/FunnelChart.md`，队列状态 needs-evidence。另受 S01、S07、C138-F02、C145-F03 影响。
 
 | 编号     | 级别 | 波次 | 端               | 类别 | 条目                                            | 验收                                                                                        |
 | -------- | ---- | ---- | ---------------- | ---- | ----------------------------------------------- | ------------------------------------------------------------------------------------------- |
@@ -123,7 +115,7 @@ charts 组 21 个组件（C138–C158），视觉与键盘全部 blocked。很�
 
 ### C148 GaugeChart
 
-报告 `groups/charts/GaugeChart.md`，队列状态 needs-evidence。另受 S01、S07、C138-F02、C145-F01、C145-F03、C146-F04 影响。
+报告 `groups/charts/GaugeChart.md`，队列状态 needs-evidence。另受 S01、S07、C138-F02、C145-F03、C146-F04 影响。
 
 | 编号     | 级别 | 波次 | 端        | 类别   | 条目                                         | 验收                                                                                       |
 | -------- | ---- | ---- | --------- | ------ | -------------------------------------------- | ------------------------------------------------------------------------------------------ |
@@ -135,7 +127,7 @@ charts 组 21 个组件（C138–C158），视觉与键盘全部 blocked。很�
 
 ### C149 HeatmapChart
 
-报告 `groups/charts/HeatmapChart.md`，队列状态 needs-evidence。另受 S01、S07、C138-F02、C145-F01、C145-F03 影响。
+报告 `groups/charts/HeatmapChart.md`，队列状态 needs-evidence。另受 S01、S07、C138-F02、C145-F03 影响。
 
 | 编号     | 级别 | 波次 | 端    | 类别   | 条目                                          | 验收                                                                                      |
 | -------- | ---- | ---- | ----- | ------ | --------------------------------------------- | ----------------------------------------------------------------------------------------- |
@@ -148,7 +140,7 @@ charts 组 21 个组件（C138–C158），视觉与键盘全部 blocked。很�
 
 ### C150 LineChart
 
-报告 `groups/charts/LineChart.md`，队列状态 needs-evidence。另受 S01、S07、C138-F01、C138-F02、C139-F02、C145-F01、C145-F03 影响。
+报告 `groups/charts/LineChart.md`，队列状态 needs-evidence。另受 S01、S07、C138-F01、C138-F02、C139-F02、C145-F03 影响。
 
 | 编号     | 级别 | 波次 | 端        | 类别   | 条目                                     | 验收                                                                                   |
 | -------- | ---- | ---- | --------- | ------ | ---------------------------------------- | -------------------------------------------------------------------------------------- |
@@ -167,7 +159,7 @@ charts 组 21 个组件（C138–C158），视觉与键盘全部 blocked。很�
 
 ### C152 PieChart
 
-报告 `groups/charts/PieChart.md`，队列状态 needs-evidence。另受 S01、S07、C138-F01、C138-F02、C139-F02、C145-F01、C146-F04 影响。
+报告 `groups/charts/PieChart.md`，队列状态 needs-evidence。另受 S01、S07、C138-F01、C138-F02、C139-F02、C146-F04 影响。
 
 | 编号     | 级别 | 波次 | 端   | 类别 | 条目                                          | 验收                                                                                        |
 | -------- | ---- | ---- | ---- | ---- | --------------------------------------------- | ------------------------------------------------------------------------------------------- |
@@ -175,7 +167,7 @@ charts 组 21 个组件（C138–C158），视觉与键盘全部 blocked。很�
 
 ### C153 RadarChart
 
-报告 `groups/charts/RadarChart.md`，队列状态 needs-evidence。另受 S01、S07、C138-F01、C138-F02、C145-F01、C146-F04 影响。
+报告 `groups/charts/RadarChart.md`，队列状态 needs-evidence。另受 S01、S07、C138-F01、C138-F02、C146-F04 影响。
 
 | 编号     | 级别 | 波次 | 端   | 类别   | 条目                                              | 验收                                                                             |
 | -------- | ---- | ---- | ---- | ------ | ------------------------------------------------- | -------------------------------------------------------------------------------- |
@@ -197,7 +189,7 @@ charts 组 21 个组件（C138–C158），视觉与键盘全部 blocked。很�
 
 ### C155 ScatterChart
 
-报告 `groups/charts/ScatterChart.md`，队列状态 needs-evidence。另受 S01、S07、C138-F01、C138-F02、C139-F02、C145-F01、C145-F03 影响。
+报告 `groups/charts/ScatterChart.md`，队列状态 needs-evidence。另受 S01、S07、C138-F01、C138-F02、C139-F02、C145-F03 影响。
 
 | 编号     | 级别 | 波次 | 端    | 类别   | 条目                                   | 验收                                                                                      |
 | -------- | ---- | ---- | ----- | ------ | -------------------------------------- | ----------------------------------------------------------------------------------------- |
@@ -208,7 +200,7 @@ charts 组 21 个组件（C138–C158），视觉与键盘全部 blocked。很�
 
 ### C156 SunburstChart
 
-报告 `groups/charts/SunburstChart.md`，队列状态 needs-evidence。另受 S01、S07、C138-F01、C138-F02、C145-F01、C145-F03、C150-F03 影响。
+报告 `groups/charts/SunburstChart.md`，队列状态 needs-evidence。另受 S01、S07、C138-F01、C138-F02、C145-F03、C150-F03 影响。
 
 | 编号     | 级别 | 波次 | 端   | 类别   | 条目                                        | 验收                                                                             |
 | -------- | ---- | ---- | ---- | ------ | ------------------------------------------- | -------------------------------------------------------------------------------- |
@@ -217,7 +209,7 @@ charts 组 21 个组件（C138–C158），视觉与键盘全部 blocked。很�
 
 ### C157 TreeMapChart
 
-报告 `groups/charts/TreeMapChart.md`，队列状态 needs-evidence。另受 S01、S02、S07、C138-F01、C138-F02、C145-F01、C145-F03、C150-F03、C156-F02 影响。
+报告 `groups/charts/TreeMapChart.md`，队列状态 needs-evidence。另受 S01、S02、S07、C138-F01、C138-F02、C145-F03、C150-F03、C156-F02 影响。
 
 | 编号     | 级别 | 波次 | 端   | 类别   | 条目                                   | 验收                                                                                            |
 | -------- | ---- | ---- | ---- | ------ | -------------------------------------- | ----------------------------------------------------------------------------------------------- |

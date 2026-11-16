@@ -5,7 +5,8 @@
  */
 
 import { describe, it, expect, vi, afterEach } from 'vitest'
-import { nextTick } from 'vue'
+import { createSSRApp, h, nextTick } from 'vue'
+import { renderToString } from '@vue/server-renderer'
 import { waitFor } from '@testing-library/vue'
 import { ChartAxis } from '@expcat/tigercat-vue/ChartAxis'
 import { ChartCanvas } from '@expcat/tigercat-vue/ChartCanvas'
@@ -69,6 +70,28 @@ describe('ChartCanvas', () => {
     expect(svg).toHaveAttribute('width', '300')
     expect(svg).toHaveAttribute('height', '160')
     expect(group).toHaveAttribute('transform', 'translate(12, 8)')
+  })
+
+  it.each(['margin-top: 13px', { marginTop: '13px' }])(
+    'applies caller style %j to the svg',
+    (style) => {
+      const { container } = renderWithProps(ChartCanvas, {}, { attrs: { style } })
+      expect(container.querySelector('svg')).toHaveStyle({ marginTop: '13px' })
+    }
+  )
+
+  it('preserves caller aria references without a title or description', () => {
+    const { container } = renderWithProps(ChartCanvas, {
+      'aria-labelledby': 'sales-label',
+      'aria-describedby': 'sales-description'
+    })
+    expect(container.querySelector('svg')).toHaveAttribute('aria-labelledby', 'sales-label')
+    expect(container.querySelector('svg')).toHaveAttribute('aria-describedby', 'sales-description')
+  })
+
+  it('uses an explicit aria-label before the title', () => {
+    const { container } = renderWithProps(ChartCanvas, { title: 'Sales', 'aria-label': 'Custom' })
+    expect(container.querySelector('svg')).toHaveAccessibleName('Custom')
   })
 
   it('resizes responsively with ResizeObserver and rAF batching', async () => {
@@ -223,6 +246,18 @@ describe('ChartLegend', () => {
 // ===========================================================================
 
 describe('ChartSeries', () => {
+  it.each(['custom', undefined] as const)('preserves caller paint with type %s', (type) => {
+    const { container } = renderWithProps(ChartSeries, {
+      data: [{ x: 0, y: 10 }],
+      type,
+      color: '#2563eb',
+      fill: 'red',
+      stroke: 'green'
+    })
+    expect(container.querySelector('g')).toHaveAttribute('fill', 'red')
+    expect(container.querySelector('g')).toHaveAttribute('stroke', 'green')
+  })
+
   it('does not fill a line series group', () => {
     const { container } = renderWithProps(ChartSeries, {
       data: [{ x: 0, y: 10 }],
@@ -242,6 +277,35 @@ describe('ChartSeries', () => {
 describe('ChartTooltip', () => {
   afterEach(() => {
     document.body.innerHTML = ''
+  })
+
+  it('leaves Escape untouched without a dismiss listener and emits once with one', async () => {
+    const withoutListener = renderWithProps(ChartTooltip, { content: 'Tooltip text', open: true })
+    await nextTick()
+    const unhandled = new KeyboardEvent('keydown', {
+      key: 'Escape',
+      bubbles: true,
+      cancelable: true
+    })
+    document.dispatchEvent(unhandled)
+    expect(unhandled.defaultPrevented).toBe(false)
+    withoutListener.unmount()
+
+    const onDismiss = vi.fn()
+    renderWithProps(ChartTooltip, { content: 'Tooltip text', open: true, onDismiss })
+    await nextTick()
+    const handled = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true })
+    document.dispatchEvent(handled)
+    expect(handled.defaultPrevented).toBe(true)
+    expect(onDismiss).toHaveBeenCalledTimes(1)
+    expect(document.querySelector('[data-chart-tooltip]')).toBeInTheDocument()
+  })
+
+  it('keeps the anchor coordinates in the first server render', async () => {
+    const html = await renderToString(
+      createSSRApp(() => h(ChartTooltip, { content: 'Tooltip text', open: true, x: 100, y: 100 }))
+    )
+    expect(html).toContain('translate3d(100px, 100px, 0)')
   })
 
   it('renders content when open', async () => {
@@ -277,7 +341,7 @@ describe('ChartTooltip', () => {
     await new Promise((resolve) => setTimeout(resolve, 0))
 
     const tooltip = document.querySelector('[data-chart-tooltip]') as HTMLElement
-    expect(tooltip.style.transform).toMatch(/translate3d\(/)
+    expect(tooltip.style.transform).toBe('translate3d(112px, 92px, 0)')
     expect(tooltip.style.left).toBe('')
     expect(tooltip.style.top).toBe('')
   })

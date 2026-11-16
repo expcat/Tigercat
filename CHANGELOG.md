@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **图表基础层（React / Vue / 文档 / MCP，C141-F01、C141-F02、C141-F03、C144-F01、C145-F01、C145-F02）**：Vue ChartCanvas 接受字符串 style，两端保留调用方 ARIA 引用，显式 aria-label 优先于 title；生成说明对齐固定 role=group。ChartSeries 不再用空 paint 清掉调用方 fill/stroke。Vue ChartTooltip 仅在有 dismiss 监听时拦截 Escape，两端 SSR 首次坐标均保留 x/y，挂载后再定位。
+
 - **Timeline pending 播报（React / Vue，C137-F01）**：元素 pendingContent 不再被 String() 成 [object Object]。Vue 使用 pending 槽时，live region 不再播报被槽替换的 Loading...。
 
 - **Table 排序面板与 grid 焦点（React / Vue，C136-F01、C136-F02）**：传入 sorts（含空数组）不再把 W9 面板挂进文档，多列排序改由表头完成。开启 grid 后 ArrowRight 把焦点移到下一格；到边界时不拦截按键。

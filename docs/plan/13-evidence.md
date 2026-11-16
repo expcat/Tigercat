@@ -208,41 +208,41 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 
 ### data
 
-| 任务 | 组件          | 队列           | 现状                                                                                                                                                                                                                                                                                          |
-| ---- | ------------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| C131 | Calendar      | needs-evidence | C131-F01 已修复。Vue 示例改为 v-model。视觉 0/32、键盘 0/32 均 blocked，截图 0；vitest 4 files 49 passed（happy-dom，axe 未扫）；docs:api:check 与 mcp:build 通过；无读屏、无真实 RTL                                                                                                         |
-| C132 | Collapse      | needs-evidence | 视觉 0/24、键盘 0/24 均 blocked，截图 0；vitest 3 files 75 passed（happy-dom，axe 未扫）；未跑 docs:api:check、exports:check；无 ref 探针                                                                                                                                                     |
-| C133 | CollapsePanel | needs-evidence | C133-F01 已修复。Vue 收起时标题按钮不写 aria-controls，展开后等于 region id。主责视觉格 0；相关 24 格（owner C132）视觉、键盘 0/24 blocked，截图 0；vitest 2 files 67 passed（happy-dom，TIGER_A11Y=1，无自有测试）；无读屏                                                                   |
-| C134 | Countdown     | needs-evidence | C134-F01 已修复。无 title、interval=0 时 timer 可访问名为 00:00:05，根 aria-label 仍是付款倒计时。视觉 0/16、键盘 0/16 均 blocked，截图 0；vitest 3 files 77 passed（happy-dom，TIGER_A11Y=1）；未跑 docs:api:check；无读屏                                                                   |
-| C135 | DataExport    | needs-evidence | C135-F01、C135-F02 已修复。默认笔记与 Demo 为 xlsx/csv/markdown；隐藏 secret 时 customExport 无 secret 与 render-only 列，name 为 X:Ada。视觉 0/8、键盘 0/8 均 blocked，截图 0；vitest 3 files 40 passed（happy-dom，axe 未扫）；临时 happy-dom 探针（非浏览器、非 SSR）；未跑 docs:api:check |
-| C136 | Table         | needs-evidence | C136-F01、C136-F02 已修复。sorts={[]} 不再挂出 header menu，多列排序走表头；grid 的 ArrowRight 落到下一格。视觉 0/64、键盘 0/64 均 blocked，截图 0；vitest Table.spec、table-utils、w9-bind 通过（happy-dom，TIGER_A11Y=1）；IAB 不可用，未做浏览器键盘；menu/05 属 C098                      |
-| C137 | Timeline      | needs-evidence | C137-F01 已修复。元素 pendingContent 的 role=status 不再含 [object Object]；Vue pending 槽不再把 role=status 播成 Loading...。视觉 0/24、键盘 0/24 均 blocked，截图 0；vitest 3 files 47 passed（happy-dom，TIGER_A11Y=1）；happy-dom 探针通过（已删，非视觉）；未跑 SSR；无读屏；alternate、right、horizontal 无画面                                                                                                                                  |
+| 任务 | 组件          | 队列           | 现状                                                                                                                                                                                                                                                                                                                  |
+| ---- | ------------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| C131 | Calendar      | needs-evidence | C131-F01 已修复。Vue 示例改为 v-model。视觉 0/32、键盘 0/32 均 blocked，截图 0；vitest 4 files 49 passed（happy-dom，axe 未扫）；docs:api:check 与 mcp:build 通过；无读屏、无真实 RTL                                                                                                                                 |
+| C132 | Collapse      | needs-evidence | 视觉 0/24、键盘 0/24 均 blocked，截图 0；vitest 3 files 75 passed（happy-dom，axe 未扫）；未跑 docs:api:check、exports:check；无 ref 探针                                                                                                                                                                             |
+| C133 | CollapsePanel | needs-evidence | C133-F01 已修复。Vue 收起时标题按钮不写 aria-controls，展开后等于 region id。主责视觉格 0；相关 24 格（owner C132）视觉、键盘 0/24 blocked，截图 0；vitest 2 files 67 passed（happy-dom，TIGER_A11Y=1，无自有测试）；无读屏                                                                                           |
+| C134 | Countdown     | needs-evidence | C134-F01 已修复。无 title、interval=0 时 timer 可访问名为 00:00:05，根 aria-label 仍是付款倒计时。视觉 0/16、键盘 0/16 均 blocked，截图 0；vitest 3 files 77 passed（happy-dom，TIGER_A11Y=1）；未跑 docs:api:check；无读屏                                                                                           |
+| C135 | DataExport    | needs-evidence | C135-F01、C135-F02 已修复。默认笔记与 Demo 为 xlsx/csv/markdown；隐藏 secret 时 customExport 无 secret 与 render-only 列，name 为 X:Ada。视觉 0/8、键盘 0/8 均 blocked，截图 0；vitest 3 files 40 passed（happy-dom，axe 未扫）；临时 happy-dom 探针（非浏览器、非 SSR）；未跑 docs:api:check                         |
+| C136 | Table         | needs-evidence | C136-F01、C136-F02 已修复。sorts={[]} 不再挂出 header menu，多列排序走表头；grid 的 ArrowRight 落到下一格。视觉 0/64、键盘 0/64 均 blocked，截图 0；vitest Table.spec、table-utils、w9-bind 通过（happy-dom，TIGER_A11Y=1）；IAB 不可用，未做浏览器键盘；menu/05 属 C098                                              |
+| C137 | Timeline      | needs-evidence | C137-F01 已修复。元素 pendingContent 的 role=status 不再含 [object Object]；Vue pending 槽不再把 role=status 播成 Loading...。视觉 0/24、键盘 0/24 均 blocked，截图 0；vitest 3 files 47 passed（happy-dom，TIGER_A11Y=1）；happy-dom 探针通过（已删，非视觉）；未跑 SSR；无读屏；alternate、right、horizontal 无画面 |
 
 ### charts
 
-| 任务 | 组件           | 队列           | 现状                                                                                                                                                                                      |
-| ---- | -------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| C138 | AreaChart      | needs-evidence | 视觉 0/24 blocked，截图 0；键盘 0/24 blocked；视觉子代理未创建，未启动 Demo；定向 vitest 22 通过、happy-dom 探针 2 通过；未跑 SSR，无计算样式                                             |
-| C139 | BarChart       | needs-evidence | 视觉 0/24 blocked，截图 0；键盘 0/24 blocked；视觉子代理未创建，未启动 Demo；定向 vitest 43 通过、happy-dom 探针 8 通过；未跑 SSR，animated 无计算样式                                    |
-| C140 | ChartAxis      | needs-evidence | 主责 Demo 0，视觉矩阵 0 格未执行，截图 0；键盘未执行；定向 vitest 17 通过 135 跳过（X06 spec）、探针 4 通过；无读屏；top/right 轴与标签裁切无浏览器证据                                   |
-| C141 | ChartCanvas    | needs-evidence | 主责 Demo 0，视觉矩阵 0 格未执行，截图 0；键盘未执行；定向 vitest 13 通过 25 跳过（X06 spec）、探针 7 通过；无读屏；焦点环、主题对比无浏览器证据                                          |
-| C142 | ChartGrid      | needs-evidence | 主责 Demo 0，视觉矩阵 0 格未执行，截图 0；键盘未执行；定向 vitest 7 通过 145 跳过（X06 spec）、探针 4 通过；未跑 SSR；无读屏与主题对比证据                                                |
-| C143 | ChartLegend    | needs-evidence | 主责 Demo 0，视觉矩阵 0 格，截图 0；键盘未执行；定向 vitest 9 通过 26 跳过（X06 spec，未断言 hidden）、探针 6 通过（happy-dom 加 server renderer，非独立 SSR）                            |
-| C144 | ChartSeries    | needs-evidence | 主责 Demo 0，视觉矩阵 0 格，截图 0；键盘未执行；定向 vitest 3 通过 149 跳过（X06 spec）、探针 10 通过（happy-dom 加 server renderer）；非浏览器像素命中                                   |
-| C145 | ChartTooltip   | needs-evidence | 主责 Demo 0，视觉矩阵 0 格，截图 0；浏览器键盘未执行；定向 vitest 17 通过 51 跳过（X06 spec）、探针 10 通过；无 document 的 Node SSR 与浏览器绘制帧未测                                   |
-| C146 | FunnelChart    | needs-evidence | 视觉 0/24、键盘 0/24 全 blocked，截图 0；现有测试 3 文件 35 项通过；happy-dom 探针 2 文件 10 项通过；无 document 的 Node SSR、浏览器绘制帧、真实像素命中未测                              |
-| C147 | Gantt          | needs-evidence | 视觉 0/16、键盘 0/16 全 blocked，截图 0；现有测试 3 文件 53 项通过；happy-dom 探针 3 文件 13 项通过；无 document 的 SSR、浏览器绘制、真实拖拽未测；RTL 未触发                             |
-| C148 | GaugeChart     | needs-evidence | 视觉 0/24、键盘 0/24 全 blocked，截图 0；现有测试 3 文件 42 项通过；探针 4 文件 17 项通过（含 SSR 字符串）；浏览器绘制、真实键盘焦点、读屏未测                                            |
-| C149 | HeatmapChart   | needs-evidence | 视觉 0/24、键盘 0/24 全 blocked，截图 0；现有测试 3 文件 43 项通过；探针 4 文件 18 项通过（含 SSR 字符串）；浏览器绘制、真实键盘焦点、暗色空格、读屏、RTL 页面未测                        |
-| C150 | LineChart      | needs-evidence | 视觉 0/24、键盘 0/24 全 blocked，截图 0；现有测试 2 文件 26 项通过；探针 3 文件 15 项通过（含 SSR 字符串）；浏览器绘制、真实键盘焦点、面积像素、读屏未测                                  |
-| C151 | OrgChart       | needs-evidence | 视觉 0/16、键盘 0/16 全 blocked，截图 0；现有测试 3 文件 42 项通过；探针 2 文件 14 项通过；浏览器绘制、真实键盘焦点、头像像素、读屏未测；rtl 布局未从组件打到；X05 页面 Demo 未打开       |
-| C152 | PieChart       | needs-evidence | 视觉 0/48、键盘 0/48 全 blocked，截图 0；现有测试 2 文件 25 项通过；探针 3 文件 19 项通过（含 SSR 1 项）；浏览器绘制、真实键盘焦点、入场动画计算样式、读屏未测；X05 页面 Demo 未打开      |
-| C153 | RadarChart     | needs-evidence | 视觉 0/24、键盘 0/24 均 blocked，截图 0；未建视觉子代理、未启动浏览器；happy-dom 探针 23 项（含 SSR 1）与现有测试 26 项通过；读屏未测                                                     |
-| C154 | SankeyChart    | needs-evidence | 视觉 0/8、键盘 0/8 均 blocked，截图 0；未建视觉子代理、未用浏览器；happy-dom 探针 7 项（含 SSR）通过；现有测试 3 通过 13 跳过；未观察 ResizeObserver 改写后的尺寸                         |
-| C155 | ScatterChart   | needs-evidence | 视觉 0/24、键盘 0/24 均 blocked，截图 0；未建视觉子代理、未启动浏览器；happy-dom 探针 17 项（含 SSR 1）与现有测试 45 项通过；未设 TIGER_A11Y，axe 未实际扫描；读屏、动画计算样式未测      |
-| C156 | SunburstChart  | needs-evidence | 视觉 0/16、键盘 0/16 均 blocked，截图 0；未建视觉子代理、未启动浏览器；happy-dom 探针 21 项（含 SSR 1）通过；现有测试 31 项通过但本轮未重跑；axe 未实际扫描；读屏、过渡计算样式未测       |
-| C157 | TreeMapChart   | needs-evidence | 视觉 0/16、键盘 0/16 均 blocked，截图 0；未建视觉子代理、未启动浏览器；happy-dom 探针 27 项（含 SSR 1）通过；现有测试 26 项通过但补写报告时未重跑；axe 未实际扫描；读屏、过渡计算样式未测 |
-| C158 | WaterfallChart | needs-evidence | 视觉 0/8、键盘 0/8 均 blocked，截图 0；未建视觉子代理、未用浏览器；happy-dom 探针 7 项（含 SSR）通过；现有测试 3 通过 13 跳过，无 WaterfallChart.spec                                     |
+| 任务 | 组件           | 队列           | 现状                                                                                                                                                                                                       |
+| ---- | -------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| C138 | AreaChart      | needs-evidence | 视觉 0/24 blocked，截图 0；键盘 0/24 blocked；视觉子代理未创建，未启动 Demo；定向 vitest 22 通过、happy-dom 探针 2 通过；未跑 SSR，无计算样式                                                              |
+| C139 | BarChart       | needs-evidence | 视觉 0/24 blocked，截图 0；键盘 0/24 blocked；视觉子代理未创建，未启动 Demo；定向 vitest 43 通过、happy-dom 探针 8 通过；未跑 SSR，animated 无计算样式                                                     |
+| C140 | ChartAxis      | needs-evidence | 主责 Demo 0，视觉矩阵 0 格未执行，截图 0；键盘未执行；定向 vitest 17 通过 135 跳过（X06 spec）、探针 4 通过；无读屏；top/right 轴与标签裁切无浏览器证据                                                    |
+| C141 | ChartCanvas    | needs-evidence | F01–F03 已修复：字符串 style、ARIA 与 role 文档对齐；双端定向 48 条（含 a11y）、docs:api:check、types:check 通过。IAB 不可用；主责 Demo 0，视觉 0 格、截图 0，浏览器键盘、读屏、焦点环与主题对比仍 blocked |
+| C142 | ChartGrid      | needs-evidence | 主责 Demo 0，视觉矩阵 0 格未执行，截图 0；键盘未执行；定向 vitest 7 通过 145 跳过（X06 spec）、探针 4 通过；未跑 SSR；无读屏与主题对比证据                                                                 |
+| C143 | ChartLegend    | needs-evidence | 主责 Demo 0，视觉矩阵 0 格，截图 0；键盘未执行；定向 vitest 9 通过 26 跳过（X06 spec，未断言 hidden）、探针 6 通过（happy-dom 加 server renderer，非独立 SSR）                                             |
+| C144 | ChartSeries    | needs-evidence | F01 已修复：custom / 省略 type 保留 fill/stroke，双端定向 48 条（含 a11y）通过。IAB 不可用；主责 Demo 0，视觉 0 格、截图 0；浏览器键盘与像素命中仍 blocked                                                 |
+| C145 | ChartTooltip   | needs-evidence | F01–F02 已修复：Vue 无监听不拦 Escape，双端 SSR 首次 100,100；双端定向 48 条（含 a11y）通过。IAB 不可用；主责 Demo 0，视觉 0 格、截图 0；浏览器键盘、绘制帧与无 document SSR 未测                          |
+| C146 | FunnelChart    | needs-evidence | 视觉 0/24、键盘 0/24 全 blocked，截图 0；现有测试 3 文件 35 项通过；happy-dom 探针 2 文件 10 项通过；无 document 的 Node SSR、浏览器绘制帧、真实像素命中未测                                               |
+| C147 | Gantt          | needs-evidence | 视觉 0/16、键盘 0/16 全 blocked，截图 0；现有测试 3 文件 53 项通过；happy-dom 探针 3 文件 13 项通过；无 document 的 SSR、浏览器绘制、真实拖拽未测；RTL 未触发                                              |
+| C148 | GaugeChart     | needs-evidence | 视觉 0/24、键盘 0/24 全 blocked，截图 0；现有测试 3 文件 42 项通过；探针 4 文件 17 项通过（含 SSR 字符串）；浏览器绘制、真实键盘焦点、读屏未测                                                             |
+| C149 | HeatmapChart   | needs-evidence | 视觉 0/24、键盘 0/24 全 blocked，截图 0；现有测试 3 文件 43 项通过；探针 4 文件 18 项通过（含 SSR 字符串）；浏览器绘制、真实键盘焦点、暗色空格、读屏、RTL 页面未测                                         |
+| C150 | LineChart      | needs-evidence | 视觉 0/24、键盘 0/24 全 blocked，截图 0；现有测试 2 文件 26 项通过；探针 3 文件 15 项通过（含 SSR 字符串）；浏览器绘制、真实键盘焦点、面积像素、读屏未测                                                   |
+| C151 | OrgChart       | needs-evidence | 视觉 0/16、键盘 0/16 全 blocked，截图 0；现有测试 3 文件 42 项通过；探针 2 文件 14 项通过；浏览器绘制、真实键盘焦点、头像像素、读屏未测；rtl 布局未从组件打到；X05 页面 Demo 未打开                        |
+| C152 | PieChart       | needs-evidence | 视觉 0/48、键盘 0/48 全 blocked，截图 0；现有测试 2 文件 25 项通过；探针 3 文件 19 项通过（含 SSR 1 项）；浏览器绘制、真实键盘焦点、入场动画计算样式、读屏未测；X05 页面 Demo 未打开                       |
+| C153 | RadarChart     | needs-evidence | 视觉 0/24、键盘 0/24 均 blocked，截图 0；未建视觉子代理、未启动浏览器；happy-dom 探针 23 项（含 SSR 1）与现有测试 26 项通过；读屏未测                                                                      |
+| C154 | SankeyChart    | needs-evidence | 视觉 0/8、键盘 0/8 均 blocked，截图 0；未建视觉子代理、未用浏览器；happy-dom 探针 7 项（含 SSR）通过；现有测试 3 通过 13 跳过；未观察 ResizeObserver 改写后的尺寸                                          |
+| C155 | ScatterChart   | needs-evidence | 视觉 0/24、键盘 0/24 均 blocked，截图 0；未建视觉子代理、未启动浏览器；happy-dom 探针 17 项（含 SSR 1）与现有测试 45 项通过；未设 TIGER_A11Y，axe 未实际扫描；读屏、动画计算样式未测                       |
+| C156 | SunburstChart  | needs-evidence | 视觉 0/16、键盘 0/16 均 blocked，截图 0；未建视觉子代理、未启动浏览器；happy-dom 探针 21 项（含 SSR 1）通过；现有测试 31 项通过但本轮未重跑；axe 未实际扫描；读屏、过渡计算样式未测                        |
+| C157 | TreeMapChart   | needs-evidence | 视觉 0/16、键盘 0/16 均 blocked，截图 0；未建视觉子代理、未启动浏览器；happy-dom 探针 27 项（含 SSR 1）通过；现有测试 26 项通过但补写报告时未重跑；axe 未实际扫描；读屏、过渡计算样式未测                  |
+| C158 | WaterfallChart | needs-evidence | 视觉 0/8、键盘 0/8 均 blocked，截图 0；未建视觉子代理、未用浏览器；happy-dom 探针 7 项（含 SSR）通过；现有测试 3 通过 13 跳过，无 WaterfallChart.spec                                                      |
 
 ### advanced
 

@@ -43,8 +43,7 @@ export const ChartSeries = <T extends ChartSeriesPoint = ChartSeriesPoint>({
       className={classNames(className)}
       data-series-name={name}
       data-series-type={type}
-      fill={paint.fill}
-      stroke={paint.stroke}
+      {...paint}
       opacity={opacity}>
       {content}
     </g>

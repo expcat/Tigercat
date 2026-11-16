@@ -48,8 +48,7 @@ export const ChartSeries = defineComponent({
           class: classNames(coerceClassValue(attrs.class), props.className),
           'data-series-name': props.name,
           'data-series-type': props.type,
-          fill: paint.fill,
-          stroke: paint.stroke,
+          ...paint,
           opacity: props.opacity
         },
         slots.default?.({

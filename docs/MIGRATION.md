@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+双端 ChartCanvas 在没有 title/desc 时保留调用方 ARIA 引用，显式 aria-label 优先于 title；Vue 字符串 style 正常传入 SVG。ChartSeries 的 custom 或省略 type 时保留调用方 fill/stroke。Vue ChartTooltip 没有 dismiss 监听时不再拦截 Escape；双端 SSR 首次使用传入的 x/y，挂载后再解析偏移。调用方式不用改，依赖旧名称、属性或 SSR 坐标的断言需调整。
+
 双端 Descriptions 的 children/default slot 现在保留根属性与样式，空 items 仍显示 title；Vue title slot 关联 table/dl 的可访问名称。DescriptionsItem 的容器由 div 改为 dl，dt/dd 保留；调用方式不用改，依赖旧容器标签的选择器或断言需调整。
 
 Vue Carousel 首挂 `currentIndex=1` 后撤掉该 prop 现在仍停在第二页，窗口顺序与位移保持一致。父 render 函数替换 default slot 内容时，页数和圆点同步更新。调用方式不用改，依赖旧回跳或缓存内容的断言需调整；圆点仍是以 `aria-current` 标记当前页的导航按钮。

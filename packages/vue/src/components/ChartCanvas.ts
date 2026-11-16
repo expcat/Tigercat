@@ -18,6 +18,7 @@ import {
   DEFAULT_CHART_PADDING,
   DEFAULT_CHART_SIZE,
   getChartInnerRect,
+  mergeStyleValues,
   resolveResponsiveChartSize,
   type ChartCanvasProps,
   type ChartCanvasSize,
@@ -83,9 +84,7 @@ export const ChartCanvas = defineComponent({
       classNames(chartCanvasBaseClasses, coerceClassValue(attrs.class), props.className)
     )
 
-    const svgStyle = computed(() => ({
-      ...(attrs.style as Record<string, unknown> | undefined)
-    }))
+    const svgStyle = computed(() => mergeStyleValues(attrs.style))
 
     const syncResponsiveObserver = () => {
       if (!props.responsive) {
@@ -144,8 +143,9 @@ export const ChartCanvas = defineComponent({
               role: 'group',
               'data-chart-canvas': '',
               'aria-label': accessibleName,
-              'aria-labelledby': titleId,
-              'aria-describedby': descId,
+              'aria-labelledby':
+                titleId && !attrs['aria-label'] ? titleId : attrs['aria-labelledby'],
+              'aria-describedby': descId ?? attrs['aria-describedby'],
               'data-chart-plot': plotReady ? 'ready' : 'empty'
             },
             [

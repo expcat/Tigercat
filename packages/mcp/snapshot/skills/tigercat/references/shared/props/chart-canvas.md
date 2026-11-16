@@ -13,7 +13,7 @@ description: Compact generated Tigercat Charts props reference
 
 `packages/core/src/types/chart-core.ts` · `ChartCanvasProps` · 4/8 compact props · [Complete props](#remaining-props-complete-public-api)
 
-Note: `responsive` 观察画布自己的宿主，不是 legend 壳。默认 padding 盖住 ChartAxis 标签。有 `title` / `aria-label` 时 svg 是 `role="img"`。render props / 作用域槽给出 `innerRect`。
+Note: `responsive` 观察画布自己的宿主，不是 legend 壳。默认 padding 盖住 ChartAxis 标签。svg 始终是 `role="group"`。render props / 作用域槽给出 `innerRect`。
 
 | Prop          | Type           | Default                                        | Notes                                                                                      |
 | ------------- | -------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------ |

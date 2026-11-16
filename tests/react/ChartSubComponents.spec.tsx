@@ -6,6 +6,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import React from 'react'
+import { renderToStaticMarkup } from 'react-dom/server'
 import { act, waitFor, cleanup, fireEvent, render } from '@testing-library/react'
 import { ChartAxis } from '@expcat/tigercat-react/ChartAxis'
 import { ChartCanvas } from '@expcat/tigercat-react/ChartCanvas'
@@ -92,6 +93,20 @@ describe('ChartCanvas', () => {
     expect(svg).toHaveAttribute('width', '300')
     expect(svg).toHaveAttribute('height', '160')
     expect(group).toHaveAttribute('transform', 'translate(12, 8)')
+  })
+
+  it('preserves caller aria references without a title or description', () => {
+    const { container } = renderWithProps(ChartCanvas, {
+      'aria-labelledby': 'sales-label',
+      'aria-describedby': 'sales-description'
+    })
+    expect(container.querySelector('svg')).toHaveAttribute('aria-labelledby', 'sales-label')
+    expect(container.querySelector('svg')).toHaveAttribute('aria-describedby', 'sales-description')
+  })
+
+  it('uses an explicit aria-label before the title', () => {
+    const { container } = renderWithProps(ChartCanvas, { title: 'Sales', 'aria-label': 'Custom' })
+    expect(container.querySelector('svg')).toHaveAccessibleName('Custom')
   })
 
   it('resizes responsively with ResizeObserver and rAF batching', async () => {
@@ -279,6 +294,18 @@ describe('ChartLegend', () => {
 // ===========================================================================
 
 describe('ChartSeries', () => {
+  it.each(['custom', undefined] as const)('preserves caller paint with type %s', (type) => {
+    const { container } = renderWithProps(ChartSeriesWrapper, {
+      data: [{ x: 0, y: 10 }],
+      type,
+      color: '#2563eb',
+      fill: 'red',
+      stroke: 'green'
+    })
+    expect(container.querySelector('g')).toHaveAttribute('fill', 'red')
+    expect(container.querySelector('g')).toHaveAttribute('stroke', 'green')
+  })
+
   it('does not fill a line series group', () => {
     const { container } = renderWithProps(ChartSeriesWrapper, {
       data: [{ x: 0, y: 10 }],
@@ -304,6 +331,11 @@ describe('ChartTooltip', () => {
   afterEach(() => {
     cleanup()
     document.querySelectorAll('[data-chart-tooltip]').forEach((t) => t.remove())
+  })
+
+  it('keeps the anchor coordinates in the first server render', () => {
+    const html = renderToStaticMarkup(<ChartTooltip content="Tooltip text" open x={100} y={100} />)
+    expect(html).toContain('translate3d(100px, 100px, 0)')
   })
 
   it('renders content when open', () => {
@@ -335,7 +367,7 @@ describe('ChartTooltip', () => {
     renderWithProps(ChartTooltip, { content: 'Tooltip text', open: true, x: 100, y: 100 })
 
     const tooltip = document.querySelector('[data-chart-tooltip]') as HTMLElement
-    expect(tooltip.style.transform).toMatch(/translate3d\(/)
+    expect(tooltip.style.transform).toBe('translate3d(112px, 92px, 0)')
     expect(tooltip.style.left).toBe('')
     expect(tooltip.style.top).toBe('')
   })

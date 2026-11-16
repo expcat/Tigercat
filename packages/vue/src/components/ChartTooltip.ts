@@ -1,4 +1,13 @@
-import { defineComponent, h, computed, ref, watch, onMounted, onBeforeUnmount } from 'vue'
+import {
+  defineComponent,
+  h,
+  computed,
+  getCurrentInstance,
+  ref,
+  watch,
+  onMounted,
+  onBeforeUnmount
+} from 'vue'
 import {
   classNames,
   mergeStyleValues,
@@ -14,6 +23,7 @@ import {
   resolveChartTooltipPosition
 } from '@expcat/tigercat-core'
 import { renderVueOverlayTeleport, useVueOverlayPortalTarget } from '../utils/overlay'
+import { hasEmitHandler } from '../utils/emit-with-return'
 
 export interface VueChartTooltipProps {
   content?: string
@@ -52,6 +62,7 @@ export const ChartTooltip = defineComponent({
   },
   emits: ['dismiss'],
   setup(props, { slots, attrs, emit }) {
+    const instance = getCurrentInstance()
     const tooltipRef = ref<HTMLDivElement | null>(null)
     const { anchorRef, target } = useVueOverlayPortalTarget()
     const adjustedPosition = ref({ x: props.x, y: props.y })
@@ -85,7 +96,7 @@ export const ChartTooltip = defineComponent({
     watch(
       () => [props.x, props.y, props.open, props.content, mounted.value, target.value] as const,
       (_value, _oldValue, onCleanup) => {
-        if (!props.open || !isBrowser()) return
+        if (!props.open || !mounted.value || !isBrowser()) return
 
         writePosition(placeTooltip())
 
@@ -121,7 +132,7 @@ export const ChartTooltip = defineComponent({
       (open) => {
         releaseEscape?.()
         releaseEscape = undefined
-        if (!open || !isBrowser()) return
+        if (!open || !isBrowser() || !hasEmitHandler(instance, 'dismiss')) return
         releaseEscape = registerEscapeDismiss(
           document,
           () => emit('dismiss'),
