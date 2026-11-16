@@ -53,6 +53,15 @@ describe('CropUpload', () => {
       expect(screen.queryByLabelText('Select image to crop and upload')).not.toBeInTheDocument()
     })
 
+    it('preserves an explicit aria-label for an icon-only trigger', () => {
+      render(
+        <CropUpload aria-label="Upload company logo">
+          <svg aria-hidden="true" />
+        </CropUpload>
+      )
+      expect(screen.getByRole('button')).toHaveAccessibleName('Upload company logo')
+    })
+
     it('applies accept filter to file input', () => {
       const { container } = render(<CropUpload accept="image/png" />)
       expect(container.querySelector('input[type="file"]')).toHaveAttribute('accept', 'image/png')

@@ -43,6 +43,25 @@ describe('CropUpload', () => {
       expect(container.querySelector('[aria-label="Select image to crop and upload"]')).toBeNull()
     })
 
+    it('preserves an explicit aria-label for an icon-only trigger', () => {
+      const { getByRole } = render(CropUpload, {
+        attrs: { 'aria-label': 'Upload company logo' },
+        slots: { default: '<svg aria-hidden="true" />' }
+      })
+      expect(getByRole('button')).toHaveAccessibleName('Upload company logo')
+    })
+
+    it('uses the explicit id for the trigger and file input', () => {
+      const { container, getByRole } = render(CropUpload, {
+        attrs: { id: 'avatar-picker' }
+      })
+      expect(getByRole('button')).toHaveAttribute('id', 'avatar-picker')
+      expect(container.querySelector('input[type="file"]')).toHaveAttribute(
+        'id',
+        'avatar-picker-input'
+      )
+    })
+
     it('has a visually hidden file input with default accept', () => {
       const { container } = render(CropUpload)
       const input = container.querySelector('input[type="file"]') as HTMLInputElement

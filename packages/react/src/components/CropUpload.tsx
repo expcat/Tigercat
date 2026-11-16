@@ -200,6 +200,7 @@ export const CropUpload = forwardRef<CropUploadRef, CropUploadProps>(function Cr
       <input
         ref={inputRef}
         id={inputId}
+        aria-labelledby={triggerId}
         type="file"
         accept={accept}
         disabled={effectiveDisabled}
@@ -220,7 +221,10 @@ export const CropUpload = forwardRef<CropUploadRef, CropUploadProps>(function Cr
         style={style}
         aria-disabled={effectiveDisabled || undefined}
         aria-describedby={describedBy}
-        aria-label={children ? undefined : labels.selectImageAriaLabel}
+        aria-label={
+          (rest as React.AriaAttributes)['aria-label'] ??
+          (children ? undefined : labels.selectImageAriaLabel)
+        }
         onDragOver={(event) => {
           const result = handleUploadDragOver(event, effectiveDisabled)
           if (result.handled) setIsDragging(result.isDragging)

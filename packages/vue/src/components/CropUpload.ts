@@ -68,7 +68,12 @@ export const CropUpload = defineComponent({
       () => props.disabled || (formItemControl?.disabled.value ?? false)
     )
     const autoId = useId()
-    const triggerId = computed(() => formItemControl?.id.value ?? `tiger-crop-upload-${autoId}`)
+    const triggerId = computed(
+      () =>
+        (attrs.id as string | undefined) ??
+        formItemControl?.id.value ??
+        `tiger-crop-upload-${autoId}`
+    )
     const inputId = computed(() => `${triggerId.value}-input`)
     const fileInputRef = ref<HTMLInputElement | null>(null)
     const triggerRef = ref<HTMLElement | null>(null)
@@ -183,7 +188,9 @@ export const CropUpload = defineComponent({
               : undefined,
             formItemControl?.describedBy.value
           ),
-          'aria-label': slots.default ? undefined : labels.value.selectImageAriaLabel,
+          'aria-label':
+            forwarded['aria-label'] ??
+            (slots.default ? undefined : labels.value.selectImageAriaLabel),
           onDragover: (event: DragEvent) => {
             const result = handleUploadDragOver(event, effectiveDisabled.value)
             if (result.handled) isDragging.value = result.isDragging
@@ -215,6 +222,7 @@ export const CropUpload = defineComponent({
         h('input', {
           ref: fileInputRef,
           id: inputId.value,
+          'aria-labelledby': triggerId.value,
           type: 'file',
           accept: props.accept,
           disabled: effectiveDisabled.value,

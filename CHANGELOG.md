@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **CropUpload 名称与 id（React / Vue，C011-F001、C011-F002、C011-F003）**：两端文件输入引用触发按钮的名称，保留调用方显式 `aria-label`；Vue 优先使用显式 `id`，文件输入沿用 `-input` 后缀。
+
 - **CopyButton 按钮属性与异步焦点（React / Vue，C010-F001、C010-F002）**：Vue 的原生按钮属性传给真实 button，class/style 继续用于外层布局；两端复制完成后保留用户已移走的焦点。
 
 - **Badge 无障碍与 locale（React / Vue，C007-F01、C007-F02、C007-F03）**：两端保留字符串 `aria-hidden="false"`，overlay 计数按组件合并后的 locale 格式化；React 的 dot 在 locale 名称为空时仍按共享内容决议渲染并保留显式名称。
