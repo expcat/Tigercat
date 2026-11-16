@@ -363,6 +363,22 @@ describe('FileManager (Vue)', () => {
     expect(container.firstElementChild).toHaveStyle({ height: '200px' })
   })
 
+  it('uses a min-height floor so a parent or class height can replace 20rem', () => {
+    const empty = render(FileManager, { props: {} })
+    const emptyRoot = empty.container.firstElementChild as HTMLElement
+    expect(emptyRoot.style.height).not.toBe('20rem')
+    expect(emptyRoot.style.minHeight).toBe('20rem')
+
+    const sized = render(FileManager, {
+      props: { files },
+      attrs: { class: 'h-96' }
+    })
+    const sizedRoot = sized.container.firstElementChild as HTMLElement
+    expect(sizedRoot.className).toContain('h-96')
+    expect(sizedRoot.style.height).not.toBe('20rem')
+    expect(sizedRoot.style.minHeight).toBe('')
+  })
+
   it('reorders the current folder on drop and keeps sibling folders', async () => {
     const tree: FileItem[] = [
       {

@@ -426,7 +426,7 @@ export const FileManager: React.FC<FileManagerProps> = ({
   const explicitHeight =
     style?.height != null || (className ? /\b(?:h|min-h|max-h)-/.test(className) : false)
   const rootStyle = {
-    ...(explicitHeight ? {} : { height: FILE_MANAGER_DEFAULT_HEIGHT }),
+    ...(explicitHeight ? {} : { minHeight: FILE_MANAGER_DEFAULT_HEIGHT }),
     ...style
   }
   const visibleItems = fileWindow.virtual
@@ -446,7 +446,12 @@ export const FileManager: React.FC<FileManagerProps> = ({
             data-tiger-file-open=""
             disabled={!canEmitFileOpen(bind.permission)}
             onClick={() => {
-              if (canEmitFileOpen(bind.permission)) onOpen?.(files?.[0] as FileItem)
+              if (!canEmitFileOpen(bind.permission)) return
+              const target = sanitizeFileDisplayName(bind.name ?? '')
+              const match = (files ?? []).find(
+                (item) => sanitizeFileDisplayName(item.name) === target
+              )
+              ;(onOpen as ((payload: FileItem | string) => void) | undefined)?.(match ?? target)
             }}>
             {labels.previewText}
           </button>

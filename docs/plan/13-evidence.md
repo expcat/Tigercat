@@ -250,8 +250,8 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | ---- | --------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | C159 | CodeEditor      | needs-evidence | F01 已修复：同名 highlighter 返回当前 token；定向测试、axe、types:check 通过。IAB 不可用；原视觉 0/24、键盘 0/24 blocked，截图 0；未启动 Example，读屏待补。                   |
 | C160 | Drag            | needs-evidence | F01–F03 已修复：键盘重排、zh-CN 悬停项号、React 根属性回归通过；323 项（含 axe）、types:check 通过。IAB 不可用；原视觉 0/8、键盘 0/8 blocked，截图 0；真实键盘与读屏待补。     |
-| C161 | FileManager     | needs-evidence | 视觉 0/16 blocked；键盘 0/16 blocked；截图 0；未启动 Example；定向 spec 120 项通过（happy-dom）；临时探针 4 项通过并留快照；未跑 SSR                                           |
-| C162 | ImageAnnotation | needs-evidence | 视觉 0/16 blocked；键盘 0/16 blocked；截图 0；未启动 Example；定向 spec 72 项通过（happy-dom，React 有 act 警告）；临时探针 6 项通过并留快照；未跑 SSR                         |
+| C161 | FileManager     | needs-evidence | F01、F02 已修复：回退高度改为 min-height，Vue 高度类不再被内联 height 盖住；bind 打开按名称交回 FileItem。双端 spec 与 w9-bind 通过（happy-dom / axe），IAB 不可用。原视觉 0/16、键盘 0/16 blocked，截图 0；未启动 Example，未跑 SSR。 |
+| C162 | ImageAnnotation | needs-evidence | F01、F02 已修复：listbox 方向键先聚焦当前项或第一项，形状方向键不再冒泡；bind 移出公开 props，私有推动按钮删除。双端 spec 与 w9-bind 通过（happy-dom / axe），IAB 不可用。原视觉 0/16、键盘 0/16 blocked，截图 0；未启动 Example，未跑 SSR。 |
 | C163 | InfiniteScroll  | needs-evidence | 视觉 0/16 blocked；键盘 0/16 blocked；截图 0；未启动 Example、未在页面滚到哨兵；定向 spec 79 项通过；custom-text 7 项通过（不含错误文案）；探针含 SSR 字符串快照，汇总行未落盘 |
 | C164 | MarkdownEditor  | needs-evidence | 视觉 0/16 blocked；键盘 0/16 blocked；截图 0；未启动 Example；定向 spec 84 项通过（happy-dom）；探针两端各 1 项通过；w9-bind 未重跑；真实 IME、390×844 未测                    |
 | C165 | PrintLayout     | needs-evidence | 视觉 0/8 blocked；键盘 0/8 blocked；截图 0；未启动 Example；TIGER_A11Y=1 定向 spec 44 通过（a11y 用例无页眉）；探针 Vue 3、React 4 通过；未开打印对话框；未做 SSR              |

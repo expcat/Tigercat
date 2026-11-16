@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **文件列表高度与标注键盘（React / Vue，C161-F01、C161-F02、C162-F01、C162-F02）**：FileManager 回退高度改为 min-height，空根不再写内联 height: 20rem，Vue 的高度类可以换掉这层下限；bind 打开按名称交回 FileItem。ImageAnnotation 从 listbox 按方向键先聚焦当前项或第一项，形状上的方向键不再冒泡。bind 移出公开 props，私有推动按钮删除。
+
 - **编辑器缓存与列表拖拽（Core / React / Vue，C159-F01、C160-F01、C160-F02、C160-F03）**：高亮缓存区分同名高亮器的函数引用；Drag 默认项支持聚焦与键盘拿起、移动、放下，同列表和跨列表悬停播报保留正确项号；React 根保留原生属性、样式和点击。
 
 - **图表标签、画布参数与头像示例（React / Vue / Demo，C151-F01、C154-F01、C154-F02、C158-F01、C158-F02）**：桑基节点和瀑布柱使用布局 label 作为可访问名称；两图透传 padding/desc，保留默认 16/24；OrgChart 02 示例改用 HTTPS 头像。

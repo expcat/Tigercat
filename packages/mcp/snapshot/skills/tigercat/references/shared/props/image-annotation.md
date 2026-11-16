@@ -11,7 +11,7 @@ description: Compact generated Tigercat Advanced props reference
 
 ## ImageAnnotation
 
-`packages/core/src/types/image-annotation.ts` · `ImageAnnotationProps` · 4/19 compact props · [Complete props](#remaining-props-complete-public-api)
+`packages/core/src/types/image-annotation.ts` · `ImageAnnotationProps` · 4/18 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop          | Type                  | Default | Notes                                                                         |
 | ------------- | --------------------- | ------- | ----------------------------------------------------------------------------- |
@@ -35,7 +35,6 @@ description: Compact generated Tigercat Advanced props reference
 - `showLabels?`: `boolean`; default `-`. -
 - `className?`: `string`; default `-`. -
 - `style?`: `React.CSSProperties`; default `-`. -
-- `bind?`: `boolean`; default `-`. -
 - `modelValue?`: `CoreImageAnnotation[]`; default `-`. -
 
 Events/callback props: `onChange?`, `onSelect?`, `onToolChange?`, `onReady?`, `onError?`, `onUpdate:modelValue?`, `onUpdate:selectedId?`, `onUpdate:tool?`.

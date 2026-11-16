@@ -2,14 +2,9 @@ import { computed, defineComponent, h, onBeforeUnmount, onMounted, PropType, ref
 import {
   callUnknownEventHandler,
   classNames,
-  movePolygonVertex,
-  nudgeAnnotationBox,
-  pushAnnotationHistory,
-  undoAnnotation,
   isActivationKey,
   coerceClassValue,
   addImageAnnotationPolygonPoint,
-  clampImageAnnotationShapeIndex,
   stepImageAnnotationShapeIndex,
   createAnnotationFrameCoalescer,
   getImageAnnotationStageStyle,
@@ -113,7 +108,6 @@ export const ImageAnnotation = defineComponent({
       default: () => defaultImageAnnotationTools
     },
     disabled: { type: Boolean, default: false },
-    bind: { type: Boolean, default: false },
     readonly: { type: Boolean, default: false },
     minSize: { type: Number, default: 0.01 },
     strokeWidth: { type: Number, default: 2 },
@@ -135,16 +129,6 @@ export const ImageAnnotation = defineComponent({
     'update:tool'
   ],
   setup(props, { attrs, emit }) {
-    const annotationBox = ref({ x: 0.2, y: 0.2, width: 0.3, height: 0.2 })
-    const polygon = ref([
-      { x: 0.1, y: 0.1 },
-      { x: 0.4, y: 0.1 },
-      { x: 0.2, y: 0.4 }
-    ])
-    const annotationHistory = ref<
-      { annotations: { x: number; y: number; width: number; height: number }[] }[]
-    >([])
-    const annotationBlob = ref('')
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getImageEditorLabels(mergedLocale.value))
@@ -437,17 +421,13 @@ export const ImageAnnotation = defineComponent({
         isCanvasTarget(event.target) &&
         annotations.value.length > 0
       ) {
+        const target = event.target
+        if (target instanceof Element && target.closest('[role="option"]')) return
         event.preventDefault()
-        const delta =
-          event.key === 'ArrowRight' || event.key === 'ArrowDown'
-            ? isRtl.value
-              ? -1
-              : 1
-            : isRtl.value
-              ? 1
-              : -1
-        const focused = clampImageAnnotationShapeIndex(focusedShape.value, annotations.value.length)
-        const next = stepImageAnnotationShapeIndex(focused, annotations.value.length, delta)
+        const selected = annotations.value.findIndex(
+          (annotation) => annotation.id === activeSelectedId.value
+        )
+        const next = selected >= 0 ? selected : 0
         focusedShape.value = next
         shapeEls[next]?.focus()
         return
@@ -563,6 +543,7 @@ export const ImageAnnotation = defineComponent({
                   event.key === 'ArrowUp'
                 ) {
                   event.preventDefault()
+                  event.stopPropagation()
                   const delta =
                     event.key === 'ArrowRight' || event.key === 'ArrowDown'
                       ? isRtl.value
@@ -821,82 +802,6 @@ export const ImageAnnotation = defineComponent({
           }
         },
         [
-          props.bind
-            ? h('div', { 'data-tiger-annotation-bind': '' }, [
-                h(
-                  'button',
-                  {
-                    type: 'button',
-                    'data-tiger-nudge': '',
-                    onClick: () => {
-                      annotationHistory.value = pushAnnotationHistory(annotationHistory.value, [
-                        annotationBox.value
-                      ])
-                      annotationBox.value = nudgeAnnotationBox(annotationBox.value, 'ArrowRight')
-                    }
-                  },
-                  'nudge'
-                ),
-                h(
-                  'button',
-                  {
-                    type: 'button',
-                    'data-tiger-vertex': '',
-                    onClick: () => {
-                      polygon.value = movePolygonVertex(polygon.value, 0, { x: 0.5, y: 0.2 })
-                    }
-                  },
-                  'vertex'
-                ),
-                h(
-                  'button',
-                  {
-                    type: 'button',
-                    'data-tiger-undo': '',
-                    onClick: () => {
-                      const undone = undoAnnotation(annotationHistory.value)
-                      if (!undone) return
-                      annotationHistory.value = undone.past
-                      const restored = undone.annotations[0]
-                      if (restored) annotationBox.value = restored
-                    }
-                  },
-                  'undo'
-                ),
-                h(
-                  'button',
-                  {
-                    type: 'button',
-                    'data-tiger-annotation-export': '',
-                    onClick: () => {
-                      const canvas = document.createElement('canvas')
-                      canvas.width = 32
-                      canvas.height = 32
-                      const context = canvas.getContext('2d')
-                      if (context) {
-                        context.fillRect(
-                          annotationBox.value.x * 32,
-                          annotationBox.value.y * 32,
-                          annotationBox.value.width * 32,
-                          annotationBox.value.height * 32
-                        )
-                      }
-                      canvas.toBlob((blob) => {
-                        annotationBlob.value = blob ? String(blob.size) : ''
-                      })
-                    }
-                  },
-                  'export'
-                ),
-                h(
-                  'span',
-                  { 'data-annotation-box': '' },
-                  `${annotationBox.value.x},${annotationBox.value.y}`
-                ),
-                h('span', { 'data-annotation-vertex': '' }, String(polygon.value[0]?.x ?? '')),
-                h('span', { 'data-annotation-blob': '' }, annotationBlob.value)
-              ])
-            : null,
           toolbar,
           h(
             'div',

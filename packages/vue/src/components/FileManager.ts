@@ -276,10 +276,10 @@ export const FileManager = defineComponent({
     )
     const containerStyle = computed(() => {
       const incoming = attrs.style as { height?: unknown } | undefined
-      const className = String(props.className ?? '')
+      const className = classNames(String(props.className ?? ''), coerceClassValue(attrs.class))
       const explicit = incoming?.height != null || /\b(?:h|min-h|max-h)-/.test(className)
       return mergeStyleValues(
-        explicit ? undefined : { height: FILE_MANAGER_DEFAULT_HEIGHT },
+        explicit ? undefined : { minHeight: FILE_MANAGER_DEFAULT_HEIGHT },
         attrs.style
       )
     })
@@ -678,7 +678,12 @@ export const FileManager = defineComponent({
                     'data-tiger-file-open': '',
                     disabled: !canEmitFileOpen(props.bind.permission),
                     onClick: () => {
-                      if (canEmitFileOpen(props.bind?.permission)) emit('open', props.bind?.name)
+                      if (!canEmitFileOpen(props.bind?.permission)) return
+                      const target = sanitizeFileDisplayName(props.bind?.name ?? '')
+                      const match = (props.files ?? []).find(
+                        (item) => sanitizeFileDisplayName(item.name) === target
+                      )
+                      emit('open', match ?? target)
                     }
                   },
                   labels.value.previewText

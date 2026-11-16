@@ -628,23 +628,24 @@ describe('W9 view bindings', () => {
     expect(files.container.querySelector('[data-file-preview]')?.textContent).toBe('photo.png')
     const renamed = render(FileManager, {
       props: {
-        files: [{ key: 'a', name: 'Alpha', type: 'file' }],
+        files: [
+          { key: 'z', name: 'Zed', type: 'file' },
+          { key: 'a', name: 'Alpha', type: 'file' }
+        ],
         bind: { name: 'Alpha\n', permission: { readable: true, writable: true } }
       }
     })
     await fireEvent.click(renamed.container.querySelector('[data-tiger-file-rename]')!)
     expect(renamed.container.querySelector('[data-file-action]')?.textContent).toBe('Alpha')
     await fireEvent.click(renamed.container.querySelector('[data-tiger-file-open]')!)
-    expect(renamed.emitted().open?.[0]?.[0]).toBe('Alpha\n')
+    expect(renamed.emitted().open?.[0]?.[0]).toMatchObject({
+      key: 'a',
+      name: 'Alpha',
+      type: 'file'
+    })
 
-    const note = render(ImageAnnotation, { props: { src: '', bind: true } })
-    await fireEvent.click(note.container.querySelector('[data-tiger-nudge]')!)
-    expect(
-      Number(note.container.querySelector('[data-annotation-box]')?.textContent?.split(',')[0])
-    ).toBeGreaterThan(0.2)
-    await fireEvent.click(note.container.querySelector('[data-tiger-vertex]')!)
-    expect(note.container.querySelector('[data-annotation-vertex]')?.textContent).toBe('0.5')
-    await fireEvent.click(note.container.querySelector('[data-tiger-undo]')!)
+    const note = render(ImageAnnotation, { props: { src: '' } })
+    expect(note.container.querySelector('[data-tiger-nudge]')).toBeNull()
 
     const drag = render(Drag, { props: { items: [{ id: 'a' }, { id: 'b' }] } })
     const dragItems = drag.container.querySelectorAll('li')

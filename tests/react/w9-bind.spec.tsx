@@ -594,7 +594,10 @@ describe('W9 view bindings', () => {
     const onOpen = vi.fn()
     const renamed = render(
       <FileManager
-        files={[{ key: 'a', name: 'Alpha', type: 'file' }]}
+        files={[
+          { key: 'z', name: 'Zed', type: 'file' },
+          { key: 'a', name: 'Alpha', type: 'file' }
+        ]}
         onOpen={onOpen}
         bind={{ name: 'Alpha\n', permission: { readable: true, writable: true } }}
       />
@@ -602,15 +605,12 @@ describe('W9 view bindings', () => {
     fireEvent.click(renamed.container.querySelector('[data-tiger-file-rename]')!)
     expect(renamed.container.querySelector('[data-file-action]')?.textContent).toBe('Alpha')
     fireEvent.click(renamed.container.querySelector('[data-tiger-file-open]')!)
-    expect(onOpen).toHaveBeenCalled()
+    expect(onOpen).toHaveBeenCalledWith(
+      expect.objectContaining({ key: 'a', name: 'Alpha', type: 'file' })
+    )
 
-    const note = render(<ImageAnnotation src="" bind />)
-    fireEvent.click(note.container.querySelector('[data-tiger-nudge]')!)
-    expect(
-      Number(note.container.querySelector('[data-annotation-box]')?.textContent?.split(',')[0])
-    ).toBeGreaterThan(0.2)
-    fireEvent.click(note.container.querySelector('[data-tiger-vertex]')!)
-    expect(note.container.querySelector('[data-annotation-vertex]')?.textContent).toBe('0.5')
+    const note = render(<ImageAnnotation src="" />)
+    expect(note.container.querySelector('[data-tiger-nudge]')).toBeNull()
 
     const drag = render(<Drag items={[{ id: 'a' }, { id: 'b' }]} />)
     const dragItems = drag.container.querySelectorAll('li')

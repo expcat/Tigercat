@@ -146,6 +146,33 @@ describe('ImageAnnotation', () => {
     ])
   })
 
+  it('moves listbox focus one annotation at a time from the first item', async () => {
+    const annotations: CoreImageAnnotation[] = [
+      {
+        id: 'entrance',
+        type: 'rectangle',
+        x: 0.1,
+        y: 0.1,
+        width: 0.2,
+        height: 0.2,
+        label: 'Entrance'
+      },
+      { id: 'work', type: 'ellipse', x: 0.4, y: 0.2, width: 0.2, height: 0.2, label: 'Work' },
+      { id: 'door', type: 'rectangle', x: 0.7, y: 0.3, width: 0.1, height: 0.1, label: 'Door' }
+    ]
+    const { getByRole } = await renderLoadedAnnotation({
+      props: { src: '/scene.jpg', modelValue: annotations }
+    })
+    const listbox = getByRole('listbox')
+    listbox.focus()
+    await fireEvent.keyDown(listbox, { key: 'ArrowRight' })
+    expect(document.activeElement).toHaveAccessibleName('Entrance, Rectangle annotation')
+    await fireEvent.keyDown(document.activeElement!, { key: 'ArrowRight' })
+    expect(document.activeElement).toHaveAccessibleName('Work, Ellipse annotation')
+    await fireEvent.keyDown(document.activeElement!, { key: 'ArrowRight' })
+    expect(document.activeElement).toHaveAccessibleName('Door, Rectangle annotation')
+  })
+
   it('selects an annotation with Enter/Space on its shape (C20-3)', async () => {
     const annotations: CoreImageAnnotation[] = [
       { id: 'face', type: 'rectangle', x: 0.1, y: 0.1, width: 0.2, height: 0.2, label: 'Face' }
