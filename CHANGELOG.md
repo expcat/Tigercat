@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Link 禁用示例说明（Demo，C023-F01）**：两端 link/01 改为写明 disabled 时移除 href 并不可聚焦，不再写禁用仍保留 href。
+
 - **Kbd 组合名称与空末键（React / Vue / 文档，C022-F01、C022-F02）**：两端组合键留在原生 kbd 的可见文本里，不再设置根 aria-label，内层键名也不再 aria-hidden。keys 为 Ctrl 与 K 时，启用 aria-prohibited-attr 后无违规；Ctrl 后再接末键 S 时露出的文本含 S。空数组、空 Fragment 和只含注释的 slot 不再留下尾随分隔符。
 
 - **Inplace 根属性、编辑热键与焦点（React / Vue / Demo，C021-F01、C021-F02、C021-F03、C021-K01）**：React 把 id、className、style、title、data-* 和 aria-* 留在外层 span。两端忽略输入法组合中，以及子节点已经取消的 Enter 和 Escape。进入编辑后聚焦编辑区内第一个可聚焦元素，没有则聚焦编辑容器；提交或 Escape 后焦点回到展示按钮。两端示例说明改为 Escape 退出编辑并保留当前输入。
