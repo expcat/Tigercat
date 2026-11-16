@@ -89,6 +89,22 @@ describe('Menu', () => {
       expect(getItem('Users')).toBeInTheDocument()
     })
 
+    it('prefers items over default content, including an empty array', () => {
+      const content = <MenuItem itemKey="slot">Slot item</MenuItem>
+      const { rerender } = render(
+        <Menu items={[{ key: 'data', label: 'Data item' }]}>{content}</Menu>
+      )
+
+      expect(getItem('Data item')).toBeInTheDocument()
+      expect(screen.queryByText('Slot item')).not.toBeInTheDocument()
+
+      rerender(<Menu items={[]}>{content}</Menu>)
+      expect(screen.queryByRole('menuitem')).not.toBeInTheDocument()
+
+      rerender(<Menu>{content}</Menu>)
+      expect(getItem('Slot item')).toBeInTheDocument()
+    })
+
     it('expands ancestors when searching a nested label without defaultOpenKeys', async () => {
       const user = userEvent.setup()
       render(<Menu items={dataItems} searchable />)

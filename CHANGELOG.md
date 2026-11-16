@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Menu 内容优先级（Vue / Core / MCP，C098-F03）**：双端统一为 `items` 非 `null` / `undefined` 时优先（包括空数组），不渲染默认 slot / children。Vue 对齐既有 React 行为，Props 与 MCP 同步写明混用规则。
+
 - **FullscreenButton 目标同步与说明（Vue / React / MCP，C097-F01、C097-F02、C097-F03）**：双端全屏期间切换 target 后重新同步 pressed 状态与标签，下一次点击进入新目标。Demo 说明 SSR 首屏不禁用、挂载后检查浏览器支持；生成 Props 与 MCP 按 Core `FullscreenProps` 解析并公开 `onChange` / `onError`。
 
 - **FloatButtonGroup 关闭焦点与鼠标事件（Vue / React，C096-F02、C096-F03）**：双端从面板内按 Escape 或默认动作关闭后回焦触发器，`closeOnAction=false` 保留动作焦点。Vue 根节点在 click / hover 模式下保留调用方 mouseenter / mouseleave，并继续执行内部 hover 开合。

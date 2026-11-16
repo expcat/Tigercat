@@ -199,7 +199,7 @@ export interface MenuRouteRecord {
  */
 export interface MenuProps {
   /**
-   * Data-driven menu items. Slot/children based usage is still supported.
+   * When not null/undefined (even []), items override default slot/children.
    */
   items?: MenuItem[]
 

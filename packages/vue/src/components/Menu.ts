@@ -369,7 +369,7 @@ export const Menu = defineComponent({
 
     const tabStopKey = computed(() => {
       const root =
-        props.items && props.items.length > 0
+        props.items != null
           ? collectMenuRootTabStops(filteredItems.value)
           : { itemKeys: collectVueMenuKeys(slots.default?.()), disabledKeys: undefined }
       return resolveMenuTabStopKey({
@@ -445,13 +445,9 @@ export const Menu = defineComponent({
         )
       }
 
-      const dataChildren = filteredItems.value.map(renderDataItem)
-      const slotChildren = slots.default?.() ?? []
-      const empty =
-        props.items &&
-        props.items.length > 0 &&
-        dataChildren.length === 0 &&
-        slotChildren.length === 0
+      const children =
+        props.items != null ? filteredItems.value.map(renderDataItem) : (slots.default?.() ?? [])
+      const empty = props.items && props.items.length > 0 && children.length === 0
 
       return h(
         'nav',
@@ -497,7 +493,7 @@ export const Menu = defineComponent({
               'data-tiger-menu-list': '',
               'data-tiger-menu-mode': resolvedMode.value
             },
-            [...dataChildren, ...slotChildren]
+            children
           )
         ]
       )

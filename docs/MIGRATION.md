@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+Vue Menu 现在与 React 一致：`items` 非 `null` / `undefined` 时只渲染数据项，包括 `items=[]`；默认 slot / children 不再追加。需要渲染默认内容时，移除 `items` 或传 `undefined`；需要追加菜单项时，将它们放入同一个 `items` 数组。
+
 双端 FullscreenButton 与 `useFullscreen` 的 target 变化现在会重新同步全屏状态：A 全屏期间改为 B 后，按钮显示进入全屏，下一次点击对 B 发出进入请求，`onChange` / `change` 同步为 false。调用方式不用改。SSR 首屏仍不禁用，挂载后检查浏览器支持，Demo 说明已对齐。
 
 双端 FloatButtonGroup 在焦点位于动作面板内时，按 Escape 或默认动作关闭后会把焦点移回触发器；`closeOnAction=false` 时焦点继续留在动作按钮。Vue 根节点的调用方 `mouseenter` / `mouseleave` 现在在 click 和 hover 模式下都会执行，hover 模式同时保留内部开合。调用方式不用改。

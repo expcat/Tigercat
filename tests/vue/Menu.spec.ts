@@ -82,6 +82,22 @@ describe('Menu', () => {
       expect(getItem('Users')).toBeInTheDocument()
     })
 
+    it('prefers items over default content, including an empty array', async () => {
+      const { rerender } = render(Menu, {
+        props: { items: [{ key: 'data', label: 'Data item' }] },
+        slots: { default: () => h(MenuItem, { itemKey: 'slot' }, () => 'Slot item') }
+      })
+
+      expect(getItem('Data item')).toBeInTheDocument()
+      expect(screen.queryByText('Slot item')).not.toBeInTheDocument()
+
+      await rerender({ items: [] })
+      expect(screen.queryByRole('menuitem')).not.toBeInTheDocument()
+
+      await rerender({ items: undefined })
+      expect(getItem('Slot item')).toBeInTheDocument()
+    })
+
     it('expands ancestors when searching a nested label without defaultOpenKeys', async () => {
       render(Menu, { props: { items: dataItems, searchable: true } })
       await fireEvent.update(screen.getByRole('searchbox'), 'Roles')
@@ -286,10 +302,16 @@ describe('Menu', () => {
         }
       })
 
-      expect(screen.getByRole('menuitem', { name: 'Alpha' })).toHaveAttribute('aria-expanded', 'true')
+      expect(screen.getByRole('menuitem', { name: 'Alpha' })).toHaveAttribute(
+        'aria-expanded',
+        'true'
+      )
 
       await fireEvent.click(screen.getByRole('menuitem', { name: 'Beta' }))
-      expect(screen.getByRole('menuitem', { name: 'Beta' })).toHaveAttribute('aria-expanded', 'true')
+      expect(screen.getByRole('menuitem', { name: 'Beta' })).toHaveAttribute(
+        'aria-expanded',
+        'true'
+      )
       expect(screen.getByRole('menuitem', { name: 'Alpha' })).toHaveAttribute(
         'aria-expanded',
         'false'

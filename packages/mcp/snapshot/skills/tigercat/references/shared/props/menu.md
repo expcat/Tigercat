@@ -17,7 +17,7 @@ Note: 项上的 `href` 和 schema 的 `path` / `href` / `iframeSrc` 走 `link-ut
 
 | Prop            | Type         | Default | Notes                                                                                      |
 | --------------- | ------------ | ------- | ------------------------------------------------------------------------------------------ |
-| `items?`        | `MenuItem[]` | `-`     | Data-driven menu items. Slot/children based usage is still supported.                      |
+| `items?`        | `MenuItem[]` | `-`     | When not null/undefined (even []), items override default slot/children.                   |
 | `selectedKeys?` | `MenuKey[]`  | `-`     | Currently selected menu item keys. Selection is always single-key: the array is empty o... |
 | `openKeys?`     | `MenuKey[]`  | `-`     | Currently opened submenu keys (inline, vertical, and popup).                               |
 | `collapsed?`    | `boolean`    | `false` | Collapse vertical/inline menus to icons (or first letter) and popup submenus. Horizonta... |
