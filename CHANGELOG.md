@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **CollapsePanel 收起态 aria-controls（Vue，C133-F01）**：默认收起的标题按钮不再写 aria-controls；展开后等于 region 的 id。关闭仍即卸载。
+
 - **Calendar 生成示例（文档 / MCP，C131-F01）**：Vue 示例改为 `<Calendar v-model="date" />`。组件只声明 modelValue，照示例挂载可以选中日期。
 
 - **Splitter 比例延续与折叠恢复（Core / React / Vue，C051-F01、C051-F02）**：容器 804、gutter 4、sizes=[200,600] 经 ArrowRight 后移除 sizes 仍为 210/590。sizes=['30%','70%'] 不回写时，ArrowRight 后容器增至 1604 约为 500/1100。sizes=['30%'] 且 collapsible 时，第二 pane 折叠再展开恢复为 560px。

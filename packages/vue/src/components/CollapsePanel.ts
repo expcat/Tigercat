@@ -208,7 +208,7 @@ export const CollapsePanel = defineComponent({
           'data-tiger-collapse-header': '',
           class: headerClasses.value,
           'aria-expanded': isActive.value,
-          'aria-controls': contentId,
+          'aria-controls': isActive.value ? contentId : undefined,
           'aria-disabled': props.disabled || undefined,
           onClick: handleClick,
           onKeydown: handleKeydown

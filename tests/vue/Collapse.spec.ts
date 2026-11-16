@@ -604,6 +604,22 @@ describe('Collapse', () => {
       expect(header).toHaveAttribute('aria-controls', region.id)
     })
 
+    it('omits aria-controls while collapsed and points it at the region when expanded', async () => {
+      render(Collapse, {
+        slots: {
+          default: () => [h(CollapsePanel, { panelKey: '1', header: 'Panel 1' }, () => 'Content 1')]
+        }
+      })
+
+      const header = screen.getByRole('button', { name: 'Panel 1' })
+      expect(header).not.toHaveAttribute('aria-controls')
+      expect(screen.queryByRole('region', { name: 'Panel 1' })).not.toBeInTheDocument()
+
+      await fireEvent.click(header)
+      const region = screen.getByRole('region', { name: 'Panel 1' })
+      expect(header).toHaveAttribute('aria-controls', region.id)
+    })
+
     it('treats numeric and string panel keys as the same panel', () => {
       render(Collapse, {
         props: { activeKey: '1' },
