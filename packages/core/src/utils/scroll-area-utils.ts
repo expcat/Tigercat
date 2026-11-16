@@ -25,6 +25,15 @@ export const SCROLL_AREA_MIN_THUMB_SIZE = 20
 
 const SCROLL_AREA_EPSILON = 1
 
+/**
+ * Browser scrollLeft convention for dir=rtl, detected once and then passed in.
+ * negative: 0 at inline-start, decreasing. reverse: 0 at inline-start, increasing.
+ * default: 0 at the physical left.
+ */
+export type RtlScrollLeftModel = 'negative' | 'reverse' | 'default'
+
+let cachedRtlScrollLeftModel: RtlScrollLeftModel | undefined
+
 export const SCROLL_AREA_THICKNESS_PX: Record<ScrollAreaScrollbarSize, number> = {
   sm: 6,
   md: 10,
@@ -115,19 +124,20 @@ export function computeScrollAreaAxisState(
 /**
  * Map a viewport's `scrollLeft` onto logical inline progress (0 = inline-start).
  *
- * Covers: LTR 0→max, RTL negative-start, RTL 0=physical-left.
+ * Pass model so an RTL zero stays in one convention. Without it, the sign is still inferred.
  */
 export function logicalInlineScrollPosition(
   scrollLeft: number,
   scrollWidth: number,
   clientWidth: number,
-  direction: 'ltr' | 'rtl'
+  direction: 'ltr' | 'rtl',
+  model?: RtlScrollLeftModel
 ): number {
   const max = Math.max(scrollWidth - clientWidth, 0)
   if (max <= 0) return 0
   if (direction !== 'rtl') return clamp(scrollLeft, 0, max)
-  if (scrollLeft < 0) return clamp(-scrollLeft, 0, max)
-  return clamp(max - scrollLeft, 0, max)
+  const resolved = model ?? (scrollLeft < 0 ? 'negative' : 'default')
+  return logicalInlineFromModel(scrollLeft, max, resolved)
 }
 
 export function physicalInlineScrollFromLogical(
@@ -135,19 +145,64 @@ export function physicalInlineScrollFromLogical(
   scrollWidth: number,
   clientWidth: number,
   direction: 'ltr' | 'rtl',
-  sampleScrollLeft: number
+  sampleScrollLeft: number,
+  model?: RtlScrollLeftModel
 ): number {
   const max = Math.max(scrollWidth - clientWidth, 0)
   const position = clamp(logical, 0, max)
   if (direction !== 'rtl') return position
-  if (sampleScrollLeft < 0) return -position
+  const resolved = model ?? (sampleScrollLeft < 0 ? 'negative' : 'default')
+  if (resolved === 'negative') return position === 0 ? 0 : -position
+  if (resolved === 'reverse') return position
   return max - position
+}
+
+function logicalInlineFromModel(
+  scrollLeft: number,
+  max: number,
+  model: RtlScrollLeftModel
+): number {
+  if (model === 'negative') return clamp(scrollLeft === 0 ? 0 : -scrollLeft, 0, max)
+  if (model === 'reverse') return clamp(scrollLeft, 0, max)
+  return clamp(max - scrollLeft, 0, max)
+}
+
+/** Probe a detached RTL scroller. Does not read the caller's current scrollLeft. */
+export function detectRtlScrollLeftModel(
+  doc: Document | null | undefined = typeof document === 'undefined' ? undefined : document
+): RtlScrollLeftModel | undefined {
+  if (cachedRtlScrollLeftModel) return cachedRtlScrollLeftModel
+  const body = doc?.body
+  if (!doc || !body) return undefined
+  const probe = doc.createElement('div')
+  probe.dir = 'rtl'
+  probe.style.fontSize = '14px'
+  probe.style.width = '4px'
+  probe.style.height = '1px'
+  probe.style.position = 'absolute'
+  probe.style.top = '-1000px'
+  probe.style.overflow = 'scroll'
+  probe.appendChild(doc.createTextNode('ABCD'))
+  body.appendChild(probe)
+  try {
+    let model: RtlScrollLeftModel = 'reverse'
+    if (probe.scrollLeft > 0) model = 'default'
+    else {
+      probe.scrollLeft = 2
+      if (probe.scrollLeft < 2) model = 'negative'
+    }
+    cachedRtlScrollLeftModel = model
+    return model
+  } finally {
+    probe.remove()
+  }
 }
 
 export function computeScrollAreaState(
   metrics: ScrollAreaViewportMetrics,
   minThumbSize: number = SCROLL_AREA_MIN_THUMB_SIZE,
-  inlineDirection: 'ltr' | 'rtl' = 'ltr'
+  inlineDirection: 'ltr' | 'rtl' = 'ltr',
+  inlineModel?: RtlScrollLeftModel
 ): ScrollAreaState {
   return {
     x: computeScrollAreaAxisState(
@@ -155,7 +210,8 @@ export function computeScrollAreaState(
         metrics.scrollLeft,
         metrics.scrollWidth,
         metrics.clientWidth,
-        inlineDirection
+        inlineDirection,
+        inlineModel
       ),
       metrics.scrollWidth,
       metrics.clientWidth,

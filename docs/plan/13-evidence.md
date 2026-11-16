@@ -106,7 +106,7 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | C044 | Masonry      | needs-evidence | F01/F02/F03 已修复。最短列计入间距，探针第 4 项进第 1 列，列高 [201,102]。两端 01/03 用 shortest；02 宽屏 4 列与 16/24px。视觉/键盘 0/24 blocked；hydration、读屏、E2E 未执行 |
 | C045 | Resizable    | needs-evidence | F01–F04 已修复。文档与 MCP 写未禁用角手柄进入 Tab。未设最大值时 aria-valuemax 等于当前值。style 320×180 时 right/bottom 为 320/180。根 aria-labelledby 保留手柄名。视觉/键盘 0/16 blocked；hydration、读屏、E2E 未执行 |
 | C046 | Row          | needs-evidence | 视觉 0/24 blocked；键盘 0/24 blocked；截图 0；未执行新的 SSR/hydration、Example 构建、浏览器 E2E、读屏；Vue 属性更新探针为合成 DOM；Terra 两阶段只读复核完成但无图可审        |
-| C047 | ScrollArea   | needs-evidence | 视觉 0/24 blocked；键盘 0/24 blocked；截图 0；E2E 未运行（既有 E2E 仅查两端 Demo01）；SSR、读屏、全构建未执行；探针为 happy-dom 注入尺寸与合成事件；补拍 0/2                  |
+| C047 | ScrollArea   | needs-evidence | F01–F06 已修复。hidden 或 nativeBars 且溢出时 viewport 有 tabindex、region 与名称，gutter 只跟自定义条；aria-describedby 与 aria-busy 进 viewport；Vue 字符串 tabindex=-1 保留；RTL 负值模型零点连续；已测量溢出时隐藏原生条；Demo02 写 axis。视觉/键盘 0/24 blocked、截图 0；E2E、读屏、hydration 未执行 |
 | C048 | Sidebar      | needs-evidence | 视觉 0/16 blocked；键盘 0/16 blocked；截图 0；SSR/happy-dom/TS 探针已跑；E2E、全量构建、读屏未执行；docs:links 退出 1（均来自 .local/review）；Terra 未审图                   |
 | C049 | Skeleton     | needs-evidence | 视觉 0/16 blocked；键盘 0/16 blocked；截图 0；双端 SSR 与 happy-dom 探针已跑；E2E、完整构建、读屏未执行；docs:links 退出 1（均在 .local/review）；Terra 未审图                |
 | C050 | Space        | needs-evidence | 视觉 0/24 blocked；键盘 0/24 blocked；截图 0；28 个双端 SSR 输出与 TS 诊断已跑；hydration、E2E、全量构建、读屏未执行；C012 旧截图未重审，不计入 C050 pass                     |

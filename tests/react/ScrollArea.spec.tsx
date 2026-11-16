@@ -256,6 +256,39 @@ describe('ScrollArea', () => {
       const { container } = renderOverflowing({ ariaLabel: 'Log output', shadow: true })
       await expectNoA11yViolationsIsolated(container)
     })
+
+    it('names a focusable region when the custom bar is hidden or native', () => {
+      for (const props of [{ scrollbar: 'hidden' as const }, { nativeBars: true }]) {
+        const { container } = renderOverflowing(props)
+        const viewport = getViewport(container)
+        expect(viewport.getAttribute('tabindex')).toBe('0')
+        expect(viewport.getAttribute('role')).toBe('region')
+        expect(viewport.getAttribute('aria-label')).toBe('Scrollable region')
+        expect(viewport.style.paddingInlineEnd).toBe('')
+      }
+    })
+
+    it('forwards aria descriptions and busy state onto the viewport', () => {
+      const { container } = renderOverflowing({
+        'aria-describedby': 'explanation',
+        'aria-busy': true,
+        'aria-label': 'Notes'
+      })
+      const viewport = getViewport(container)
+      const root = container.querySelector('[data-scroll-area]') as HTMLElement
+      expect(viewport.getAttribute('aria-describedby')).toBe('explanation')
+      expect(viewport.getAttribute('aria-busy')).toBe('true')
+      expect(viewport.getAttribute('aria-label')).toBe('Notes')
+      expect(root.getAttribute('aria-describedby')).toBeNull()
+      expect(root.getAttribute('aria-busy')).toBeNull()
+    })
+
+    it('hides native scrollbars after an overflowing viewport is measured', () => {
+      const shown = renderOverflowing()
+      expect(shown.viewport.className).toContain('[scrollbar-width:none]')
+      const native = renderOverflowing({ nativeBars: true })
+      expect(native.viewport.className).not.toContain('[scrollbar-width:none]')
+    })
   })
 
   describe('Edge cases', () => {

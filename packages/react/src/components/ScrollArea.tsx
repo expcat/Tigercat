@@ -16,6 +16,7 @@ import {
   computeScrollFromTrackPoint,
   createDocumentDragSession,
   createEmptyScrollAreaState,
+  detectRtlScrollLeftModel,
   getScrollAreaBoxStyle,
   getScrollAreaContentClasses,
   getScrollAreaGutterStyle,
@@ -28,6 +29,7 @@ import {
   getScrollAreaThumbClasses,
   getScrollAreaThumbStyle,
   getScrollAreaViewportClasses,
+  isScrollAreaAxisEnabled,
   mergeTigerLocale,
   observeScrollAreaSize,
   physicalInlineScrollFromLogical,
@@ -36,6 +38,7 @@ import {
   isScrollAreaViewportKeyTarget,
   resolveScrollAreaViewportTabIndex,
   scrollAreaRootClasses,
+  scrollAreaViewportMeasuredClasses,
   prefersReducedMotion,
   scrollAreaMotionBehavior,
   shouldRenderScrollAreaScrollbar,
@@ -46,6 +49,7 @@ import {
   type ScrollAreaProps as CoreScrollAreaProps,
   type ScrollAreaScrollDetail,
   type ScrollAreaScrollToOptions,
+  type RtlScrollLeftModel,
   type ScrollAreaState
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './tiger-config'
@@ -59,6 +63,11 @@ export interface ScrollAreaProps
 }
 
 export type { ScrollAreaInstance }
+
+function readInlineScrollModel(viewport: HTMLElement): RtlScrollLeftModel | undefined {
+  if (readInlineDirection(viewport) !== 'rtl') return undefined
+  return detectRtlScrollLeftModel(viewport.ownerDocument)
+}
 
 function peelA11y(rest: Record<string, unknown>): {
   a11y: Record<string, unknown>
@@ -101,6 +110,7 @@ export const ScrollArea = forwardRef<ScrollAreaInstance, ScrollAreaProps>(functi
   const dragSessionRef = useRef<DocumentDragSession | null>(null)
   const stateRef = useRef<ScrollAreaState>(createEmptyScrollAreaState())
   const [state, setState] = useState<ScrollAreaState>(stateRef.current)
+  const [measured, setMeasured] = useState(false)
   const [draggingAxis, setDraggingAxis] = useState<ScrollAreaAxis | null>(null)
   const [scrolling, setScrolling] = useState(false)
   const scrollTimer = useRef<number>(0)
@@ -116,10 +126,12 @@ export const ScrollArea = forwardRef<ScrollAreaInstance, ScrollAreaProps>(functi
     const next = computeScrollAreaState(
       readScrollAreaMetrics(viewport),
       minThumbSize,
-      readInlineDirection(viewport)
+      readInlineDirection(viewport),
+      readInlineScrollModel(viewport)
     )
     stateRef.current = next
     setState(next)
+    setMeasured(true)
   }, [minThumbSize])
 
   const handleScroll = useCallback(() => {
@@ -147,7 +159,8 @@ export const ScrollArea = forwardRef<ScrollAreaInstance, ScrollAreaProps>(functi
           viewport.scrollWidth,
           viewport.clientWidth,
           readInlineDirection(viewport),
-          viewport.scrollLeft
+          viewport.scrollLeft,
+          readInlineScrollModel(viewport)
         )
       }
       handleScroll()
@@ -303,8 +316,10 @@ export const ScrollArea = forwardRef<ScrollAreaInstance, ScrollAreaProps>(functi
   const visibleX = nativeBars
     ? false
     : shouldRenderScrollAreaScrollbar(scrollbar, axis, 'x', state.x)
-  const overflow = (visibleY && state.y.scrollable) || (visibleX && state.x.scrollable)
-  const userTabIndex = a11y.tabIndex as number | undefined
+  const overflow =
+    (isScrollAreaAxisEnabled(axis, 'y') && state.y.scrollable) ||
+    (isScrollAreaAxisEnabled(axis, 'x') && state.x.scrollable)
+  const userTabIndex = typeof a11y.tabIndex === 'number' ? a11y.tabIndex : undefined
   const tabIndex = resolveScrollAreaViewportTabIndex({
     overflow,
     userTabIndex
@@ -314,6 +329,11 @@ export const ScrollArea = forwardRef<ScrollAreaInstance, ScrollAreaProps>(functi
     (typeof a11y['aria-label'] === 'string' && (a11y['aria-label'] as string)) ||
     (typeof a11y['aria-labelledby'] === 'string' && (a11y['aria-labelledby'] as string))
   const viewportName = named || (tabIndex === 0 ? labels.ariaLabel : undefined)
+  const viewportAria: Record<string, unknown> = {}
+  for (const [key, value] of Object.entries(a11y)) {
+    if (key === 'tabIndex' || key === 'aria-label' || key === 'aria-labelledby') continue
+    viewportAria[key] = value
+  }
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     const viewport = viewportRef.current
@@ -340,7 +360,8 @@ export const ScrollArea = forwardRef<ScrollAreaInstance, ScrollAreaProps>(functi
         computeScrollAreaState(
           readScrollAreaMetrics(viewport),
           minThumbSize,
-          readInlineDirection(viewport)
+          readInlineDirection(viewport),
+          readInlineScrollModel(viewport)
         ).x.progress *
           Math.max(viewport.scrollWidth - viewport.clientWidth, 0) +
         delta.delta
@@ -393,12 +414,16 @@ export const ScrollArea = forwardRef<ScrollAreaInstance, ScrollAreaProps>(functi
         ref={viewportRef}
         className={classNames(
           getScrollAreaViewportClasses(axis, viewportClassName),
-          nativeBars ? 'overflow-auto' : undefined
+          nativeBars ? 'overflow-auto' : undefined,
+          !nativeBars && scrollbar !== 'hidden' && measured && overflow
+            ? scrollAreaViewportMeasuredClasses
+            : undefined
         )}
         style={{
           ...getScrollAreaBoxStyle({ height, maxHeight, width, maxWidth }),
           ...getScrollAreaGutterStyle(scrollbarSize, visibleX, visibleY)
         }}
+        {...(viewportAria as React.HTMLAttributes<HTMLDivElement>)}
         tabIndex={tabIndex}
         role={viewportName ? 'region' : undefined}
         aria-label={

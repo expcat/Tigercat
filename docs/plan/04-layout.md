@@ -18,10 +18,10 @@ layout 组 19 个组件（C033–C051）。只有 AspectRatio、Card、Carousel 
 
 ## 概览
 
-本篇 16 条：P1 0、P2 15、P3 1。
-按波次：W5 15、W9 1。
+本篇 10 条：P1 0、P2 9、P3 1。
+按波次：W5 9、W9 1。
 
-已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C034-F04（S13）、C037-F01（S11）、C039-F03（S08）、C040-F01（S01）、C044-F01、C044-F02、C044-F03、C045-F01、C045-F02、C045-F03、C045-F04、C048-F02（S13）、C050-F02（S13）、C051-F03（S13）。
+已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C034-F04（S13）、C037-F01（S11）、C039-F03（S08）、C040-F01（S01）、C044-F01、C044-F02、C044-F03、C045-F01、C045-F02、C045-F03、C045-F04、C047-F01、C047-F02、C047-F03、C047-F04、C047-F05、C047-F06、C048-F02（S13）、C050-F02（S13）、C051-F03（S13）。
 
 ## 条目
 
@@ -32,19 +32,6 @@ layout 组 19 个组件（C033–C051）。只有 AspectRatio、Card、Carousel 
 | 编号     | 级别 | 波次 | 端   | 类别 | 条目                                    | 验收                                                                          |
 | -------- | ---- | ---- | ---- | ---- | --------------------------------------- | ----------------------------------------------------------------------------- |
 | C034-F07 | P3   | W9   | 双端 | 类型 | 键盘路径给 onClick 的事件与公开类型不同 | Enter/Space 激活 Card 时 onClick 收到的事件符合声明的点击类型，不再是 keydown |
-
-### C047 ScrollArea
-
-报告 `groups/layout/ScrollArea.md`，队列状态 needs-evidence。另受 S01 影响。
-
-| 编号     | 级别 | 波次 | 端   | 类别   | 条目                                             | 验收                                                                                 |
-| -------- | ---- | ---- | ---- | ------ | ------------------------------------------------ | ------------------------------------------------------------------------------------ |
-| C047-F01 | P2   | W5   | 双端 | 无障碍 | 自定义条的可见性错误地控制默认焦点和名称         | 溢出且 scrollbar=hidden 或 nativeBars 时两端 viewport 有 tabindex=0、region 与名称   |
-| C047-F02 | P2   | W5   | 双端 | 无障碍 | 除名称外的 aria-\* 属性被两端吞掉                | 传 aria-describedby=explanation、aria-busy=true 时，两端 viewport 输出这两个属性     |
-| C047-F03 | P2   | W5   | Vue  | 键盘   | Vue 忽略普通静态字符串 tabindex                  | Vue 模板写静态字符串 tabindex -1 且溢出时 viewport 输出 -1，与数字绑定和 React 一致  |
-| C047-F04 | P2   | W5   | Core | i18n   | RTL 以瞬时 scrollLeft 的符号猜模型，零点产生跳变 | RTL 负值模型、scrollWidth=400、clientWidth=200 下 scrollLeft 从 -1 到 0 进度不跳到 1 |
-| C047-F05 | P2   | W5   | Core | 样式   | 隐藏原生滚动条的类定义后从未接到 viewport        | 默认 auto、已测量且溢出时两端 viewport 带隐藏原生条的类，nativeBars 时不带           |
-| C047-F06 | P2   | W5   | Demo | 示例   | 两端 Demo02 描述使用不存在的 direction 属性      | 两端 scroll-area/02/demo.json 的描述写 axis 为 both，不再出现 direction              |
 
 ### C048 Sidebar
 

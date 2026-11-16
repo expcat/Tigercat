@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **ScrollArea 焦点、ARIA、RTL 与原生条（Core / React / Vue / Demo，C047-F01–F06）**：溢出且 scrollbar 为 hidden 或 nativeBars 时，两端 viewport 保留 tabindex、region 与名称，gutter 只在自定义条出现时留白。aria-describedby 与 aria-busy 转到 viewport，显式名称仍可覆盖。Vue 静态字符串 tabindex=-1 在溢出时保持 -1。RTL 负值模型在 scrollLeft 从 -1 到 0 时进度停在起点，正反换算使用同一模型。默认 auto 且已测量并溢出时隐藏原生条，nativeBars 不隐藏。两端 Demo02 改为 axis 为 both。
+
 - **Resizable 手柄焦点、上限与名称（Core / React / Vue / 文档 / MCP，C045-F01、C045-F02、C045-F03、C045-F04）**：生成笔记与 MCP 写明未禁用的边手柄和角手柄都进入 Tab。未传最大值时 `aria-valuemax` 取当前值，不再落到隐式 100。仅 style 为 320×180 时，right 为 320、bottom 为 180。根节点 `aria-labelledby` 不再清空手柄的 locale 名称。
 
 - **Masonry 间距分配与示例（Core / Demo，C044-F01、C044-F02、C044-F03）**：最短列按含列内间距的占用高度选列。heights=[100,1,1,1]、columns=2、gap=100 时第 4 项进入第 1 列，列高为 [201,102]。两端 masonry/01、03 显式传入 shortest。masonry/02 去掉 672px 上限，改用预览里可达的 md：宽屏 4 列、24px，sm 为 16px，窄屏仍是 1 列、8px。

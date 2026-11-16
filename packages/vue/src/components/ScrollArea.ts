@@ -15,8 +15,10 @@ import {
   classNames,
   coerceClassValue,
   computeScrollAreaKeyboardDelta,
+  isScrollAreaAxisEnabled,
   isScrollAreaViewportKeyTarget,
   computeScrollAreaState,
+  detectRtlScrollLeftModel,
   computeScrollFromThumbOffset,
   computeScrollFromTrackPoint,
   createDocumentDragSession,
@@ -42,6 +44,7 @@ import {
   readScrollAreaMetrics,
   resolveScrollAreaViewportTabIndex,
   scrollAreaRootClasses,
+  scrollAreaViewportMeasuredClasses,
   shouldRenderScrollAreaScrollbar,
   SCROLL_AREA_MIN_THUMB_SIZE,
   type DocumentDragSession,
@@ -52,6 +55,7 @@ import {
   type ScrollAreaScrollbarSize,
   type ScrollAreaScrollbarVisibility,
   type ScrollAreaScrollToOptions,
+  type RtlScrollLeftModel,
   type ScrollAreaState,
   type TigerLocale
 } from '@expcat/tigercat-core'
@@ -62,6 +66,15 @@ export interface VueScrollAreaProps extends CoreScrollAreaProps {}
 export type ScrollAreaProps = VueScrollAreaProps
 
 export type { ScrollAreaInstance }
+
+function readScrollAreaTabIndex(value: unknown): number | undefined {
+  if (typeof value === 'number') return Number.isFinite(value) ? value : undefined
+  if (typeof value === 'string' && value.trim() !== '') {
+    const parsed = Number(value)
+    if (Number.isFinite(parsed)) return parsed
+  }
+  return undefined
+}
 
 export const ScrollArea = defineComponent({
   name: 'TigerScrollArea',
@@ -99,6 +112,7 @@ export const ScrollArea = defineComponent({
     const viewportRef = ref<HTMLElement | null>(null)
     const contentRef = ref<HTMLElement | null>(null)
     const scrollState = shallowRef<ScrollAreaState>(createEmptyScrollAreaState())
+    const measured = ref(false)
     const draggingAxis = ref<ScrollAreaAxis | null>(null)
     const scrolling = ref(false)
     let dragSession: DocumentDragSession | null = null
@@ -109,14 +123,21 @@ export const ScrollArea = defineComponent({
       getScrollAreaLabels(mergeTigerLocale(config.value.locale, props.locale))
     )
 
+    function readInlineScrollModel(viewport: HTMLElement): RtlScrollLeftModel | undefined {
+      if (readInlineDirection(viewport) !== 'rtl') return undefined
+      return detectRtlScrollLeftModel(viewport.ownerDocument)
+    }
+
     function syncState(): void {
       const viewport = viewportRef.value
       if (!viewport) return
       scrollState.value = computeScrollAreaState(
         readScrollAreaMetrics(viewport),
         props.minThumbSize,
-        readInlineDirection(viewport)
+        readInlineDirection(viewport),
+        readInlineScrollModel(viewport)
       )
+      measured.value = true
     }
 
     function handleScroll(): void {
@@ -145,7 +166,8 @@ export const ScrollArea = defineComponent({
           viewport.scrollWidth,
           viewport.clientWidth,
           readInlineDirection(viewport),
-          viewport.scrollLeft
+          viewport.scrollLeft,
+          readInlineScrollModel(viewport)
         )
       }
       handleScroll()
@@ -319,26 +341,16 @@ export const ScrollArea = defineComponent({
     }
 
     return () => {
-      const visibleY = shouldRenderScrollAreaScrollbar(
-        props.scrollbar,
-        props.axis,
-        'y',
-        scrollState.value.y
-      )
-      const visibleX = shouldRenderScrollAreaScrollbar(
-        props.scrollbar,
-        props.axis,
-        'x',
-        scrollState.value.x
-      )
+      const visibleY =
+        !props.nativeBars &&
+        shouldRenderScrollAreaScrollbar(props.scrollbar, props.axis, 'y', scrollState.value.y)
+      const visibleX =
+        !props.nativeBars &&
+        shouldRenderScrollAreaScrollbar(props.scrollbar, props.axis, 'x', scrollState.value.x)
       const overflow =
-        (visibleY && scrollState.value.y.scrollable) || (visibleX && scrollState.value.x.scrollable)
-      const userTabIndex =
-        typeof attrs.tabindex === 'number'
-          ? attrs.tabindex
-          : typeof attrs.tabIndex === 'number'
-            ? (attrs.tabIndex as number)
-            : undefined
+        (isScrollAreaAxisEnabled(props.axis, 'y') && scrollState.value.y.scrollable) ||
+        (isScrollAreaAxisEnabled(props.axis, 'x') && scrollState.value.x.scrollable)
+      const userTabIndex = readScrollAreaTabIndex(attrs.tabindex ?? attrs.tabIndex)
       const tabIndex = resolveScrollAreaViewportTabIndex({
         overflow,
         userTabIndex
@@ -386,12 +398,16 @@ export const ScrollArea = defineComponent({
               ref: viewportRef,
               class: classNames(
                 getScrollAreaViewportClasses(props.axis, props.viewportClassName),
-                props.nativeBars ? 'overflow-auto' : undefined
+                props.nativeBars ? 'overflow-auto' : undefined,
+                !props.nativeBars && props.scrollbar !== 'hidden' && measured.value && overflow
+                  ? scrollAreaViewportMeasuredClasses
+                  : undefined
               ),
               style: {
                 ...getScrollAreaBoxStyle(props),
                 ...getScrollAreaGutterStyle(props.scrollbarSize, visibleX, visibleY)
               },
+              ...restA11y,
               tabindex: tabIndex,
               role: viewportName ? 'region' : undefined,
               'aria-label': attrLabel || (tabIndex === 0 ? labels.value.ariaLabel : undefined),

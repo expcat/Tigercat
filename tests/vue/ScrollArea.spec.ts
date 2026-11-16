@@ -234,6 +234,65 @@ describe('ScrollArea', () => {
       const { container } = await renderOverflowing({ ariaLabel: 'Log output', shadow: true })
       await expectNoA11yViolationsIsolated(container)
     })
+
+    it('names a focusable region when the custom bar is hidden or native', async () => {
+      for (const props of [{ scrollbar: 'hidden' }, { nativeBars: true }]) {
+        const { container } = await renderOverflowing(props)
+        const viewport = getViewport(container)
+        expect(viewport.getAttribute('tabindex')).toBe('0')
+        expect(viewport.getAttribute('role')).toBe('region')
+        expect(viewport.getAttribute('aria-label')).toBe('Scrollable region')
+        expect(viewport.style.paddingInlineEnd).toBe('')
+      }
+    })
+
+    it('forwards aria descriptions and busy state onto the viewport', async () => {
+      const utils = render(ScrollArea, {
+        attrs: {
+          'aria-describedby': 'explanation',
+          'aria-busy': true,
+          'aria-label': 'Notes'
+        },
+        slots: { default: () => h('p', 'tall content') }
+      })
+      const viewport = getViewport(utils.container)
+      stubViewport(viewport, {
+        scrollHeight: 400,
+        clientHeight: 200,
+        scrollWidth: 200,
+        clientWidth: 200
+      })
+      await fireEvent.scroll(viewport)
+      const root = utils.container.querySelector('[data-scroll-area]') as HTMLElement
+      expect(viewport.getAttribute('aria-describedby')).toBe('explanation')
+      expect(viewport.getAttribute('aria-busy')).toBe('true')
+      expect(viewport.getAttribute('aria-label')).toBe('Notes')
+      expect(root.getAttribute('aria-describedby')).toBeNull()
+      expect(root.getAttribute('aria-busy')).toBeNull()
+    })
+
+    it('keeps a static string tabindex of -1 when the area overflows', async () => {
+      const utils = render(ScrollArea, {
+        attrs: { tabindex: '-1' },
+        slots: { default: () => h('p', 'tall content') }
+      })
+      const viewport = getViewport(utils.container)
+      stubViewport(viewport, {
+        scrollHeight: 400,
+        clientHeight: 200,
+        scrollWidth: 200,
+        clientWidth: 200
+      })
+      await fireEvent.scroll(viewport)
+      expect(viewport.getAttribute('tabindex')).toBe('-1')
+    })
+
+    it('hides native scrollbars after an overflowing viewport is measured', async () => {
+      const shown = await renderOverflowing()
+      expect(shown.viewport.className).toContain('[scrollbar-width:none]')
+      const native = await renderOverflowing({ nativeBars: true })
+      expect(native.viewport.className).not.toContain('[scrollbar-width:none]')
+    })
   })
 
   describe('Edge cases', () => {

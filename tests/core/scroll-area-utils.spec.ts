@@ -19,7 +19,9 @@ import {
   getScrollAreaThumbStyle,
   getScrollAreaViewportClasses,
   isScrollAreaAxisEnabled,
+  logicalInlineScrollPosition,
   observeScrollAreaSize,
+  physicalInlineScrollFromLogical,
   readScrollAreaMetrics,
   resolveScrollAreaLength,
   shouldRenderScrollAreaScrollbar,
@@ -109,6 +111,36 @@ describe('scroll-area-utils', () => {
       expect(rtlNegative.x.progress).toBeCloseTo(1)
       expect(rtlPhysical.x.progress).toBeCloseTo(1)
       expect(ltr.x.progress).toBeCloseTo(1)
+    })
+
+    it('keeps a negative RTL model continuous across zero and round-trips inside one model', () => {
+      const width = { scrollWidth: 400, clientWidth: 200 }
+      const near = computeScrollAreaState(
+        { ...metrics, ...width, scrollLeft: -1 },
+        undefined,
+        'rtl',
+        'negative'
+      )
+      const zero = computeScrollAreaState(
+        { ...metrics, ...width, scrollLeft: 0 },
+        undefined,
+        'rtl',
+        'negative'
+      )
+      expect(near.x.progress).toBeCloseTo(0.005)
+      expect(zero.x.progress).toBeCloseTo(0)
+      expect(zero.x.atStart).toBe(true)
+      expect(zero.x.atEnd).toBe(false)
+      expect(near.x.atStart).toBe(true)
+      expect(near.x.atEnd).toBe(false)
+      expect(logicalInlineScrollPosition(-1, 400, 200, 'rtl', 'negative')).toBe(1)
+      expect(logicalInlineScrollPosition(0, 400, 200, 'rtl', 'negative')).toBe(0)
+      expect(physicalInlineScrollFromLogical(40, 400, 200, 'rtl', 0, 'negative')).toBe(-40)
+      expect(logicalInlineScrollPosition(-40, 400, 200, 'rtl', 'negative')).toBe(40)
+      expect(logicalInlineScrollPosition(0, 400, 200, 'rtl', 'default')).toBe(200)
+      expect(logicalInlineScrollPosition(1, 400, 200, 'rtl', 'default')).toBe(199)
+      expect(physicalInlineScrollFromLogical(40, 400, 200, 'rtl', 0, 'default')).toBe(160)
+      expect(logicalInlineScrollPosition(160, 400, 200, 'rtl', 'default')).toBe(40)
     })
 
     it('starts empty before the viewport is measured', () => {
