@@ -20,6 +20,7 @@ import {
   printLayoutHeaderClasses,
   printLayoutPageBreakClasses,
   printLayoutPageBreakLabelClasses,
+  PRINT_LAYOUT_MARGIN,
   printPrintLayoutRoot,
   resolvePrintPageBox,
   type PrintLayoutInstance,
@@ -119,11 +120,11 @@ export const PrintLayout = forwardRef<PrintLayoutInstance, PrintLayoutProps>(fun
         data-tiger-print-instance={instanceId.current}
         data-tiger-print-size={box.pageSize}>
         {bind ? (
-          <div data-tiger-print-preview="">
+          <div className="print:hidden" data-tiger-print-preview="">
             {paginatePrintPreview({
               contentHeightMm: bind.contentHeightMm ?? 0,
-              pageHeightMm: bind.pageHeightMm ?? 297,
-              marginMm: bind.marginMm,
+              pageHeightMm: bind.pageHeightMm ?? Number.parseFloat(box.height),
+              marginMm: bind.marginMm ?? Number.parseFloat(PRINT_LAYOUT_MARGIN),
               manualBreaks: bind.manualBreaks
             }).map((page) => (
               <span key={page.index} data-page-number={page.numberLabel}>

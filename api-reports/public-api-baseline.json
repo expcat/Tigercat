@@ -9110,6 +9110,7 @@
         "loading",
         "onSelectionChange",
         "overscan",
+        "pagination",
         "rowClassName",
         "rowKey",
         "rowSelection",

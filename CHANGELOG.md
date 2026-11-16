@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **打印纸面墨色与虚拟表窗口（Core / React / Vue / 文档 / MCP，C165-F01、C165-F02、C169-F02、C169-F03、C169-F04）**：页眉、页脚和分页符标签改用纸面墨色 #111827，暗色主题不再把它们改成次级浅色。横向纸张的 bind 预览按纸高和 20mm 边距计页，landscape 且 contentHeightMm 为 250 时至少两页，预览节点带 print:hidden。VirtualTable 的 overscan 传入纵向窗口。virtualItemHeight 的运行时、类型注释和生成 Props 默认对齐为 40。React 与 Vue 一样，未传 pagination 时关闭，传入 pageSize 5 时两端都渲染 5 行并显示分页导航。
+
 - **无限滚动文案与 Markdown 窗格（Core / React / Vue / Demo，C163-F01、C163-F02、C163-F03、C164-F01、C164-F02、C164-F03）**：错误和重试走 infiniteScroll locale，传入文案优先。container 滚动根可被 Tab 聚焦并带焦点样式，默认视口根不加 tabindex。两端 Demo 01 写明第一页 12 条、容器根、内容不满时不自动连拉。Vue 窄屏 split 可在编辑和预览之间切换，目录按钮聚焦编辑器自身，组合输入期间不执行格式热键。
 
 - **文件列表高度与标注键盘（React / Vue，C161-F01、C161-F02、C162-F01、C162-F02）**：FileManager 回退高度改为 min-height，空根不再写内联 height: 20rem，Vue 的高度类可以换掉这层下限；bind 打开按名称交回 FileItem。ImageAnnotation 从 listbox 按方向键先聚焦当前项或第一项，形状上的方向键不再冒泡。bind 移出公开 props，私有推动按钮删除。

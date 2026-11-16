@@ -275,4 +275,47 @@ describe('VirtualTable (React)', () => {
     fireEvent.click(screen.getByRole('button', { name: 'bump' }))
     expect(container.querySelector('table')).toBe(first)
   })
+
+  it('renders fewer rows at overscan 0 than at overscan 20', () => {
+    const narrow = render(
+      <VirtualTable
+        dataSource={makeData(200)}
+        columns={columns}
+        virtualItemHeight={40}
+        virtualHeight={160}
+        overscan={0}
+      />
+    )
+    const wide = render(
+      <VirtualTable
+        dataSource={makeData(200)}
+        columns={columns}
+        virtualItemHeight={40}
+        virtualHeight={160}
+        overscan={20}
+      />
+    )
+    expect(dataRowsOf(narrow.container).length).not.toBe(dataRowsOf(wide.container).length)
+  })
+
+  it('uses 40px rows when virtualItemHeight is omitted', () => {
+    const { container } = render(
+      <VirtualTable dataSource={makeData(30)} columns={columns} virtualHeight={200} />
+    )
+    expect(dataRowsOf(container)[0]?.style.height).toBe('40px')
+  })
+
+  it('pages five rows and shows a pager when pagination pageSize is 5', () => {
+    const { container } = render(
+      <VirtualTable
+        dataSource={makeData(30)}
+        columns={columns}
+        pagination={{ pageSize: 5 }}
+        virtualHeight={400}
+        virtualItemHeight={40}
+      />
+    )
+    expect(dataRowsOf(container)).toHaveLength(5)
+    expect(container.querySelector('nav')).toBeTruthy()
+  })
 })

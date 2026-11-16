@@ -127,6 +127,32 @@ describe('PrintLayout', () => {
     expect(contentDiv).toBeInTheDocument()
     expect(contentDiv!.textContent).toBe('inner')
   })
+
+  it('keeps header, footer, and page-break label on paper ink', () => {
+    const { container } = render(PrintLayout, {
+      props: { showHeader: true, showFooter: true, headerText: 'Head', footerText: 'Foot' },
+      slots: { default: () => h(PrintPageBreak) }
+    })
+    const nodes = [
+      container.querySelector('th'),
+      container.querySelector('tfoot td'),
+      container.querySelector('span')
+    ]
+    for (const node of nodes) {
+      expect(node?.className ?? '').toContain('text-[#111827]')
+      expect(node?.className ?? '').not.toContain('tiger-text-secondary')
+    }
+  })
+
+  it('previews at least two landscape pages and hides that preview from print', () => {
+    const { container } = render(PrintLayout, {
+      props: { orientation: 'landscape', bind: { contentHeightMm: 250 } },
+      slots: { default: 'content' }
+    })
+    const preview = container.querySelector('[data-tiger-print-preview]')
+    expect(preview?.className ?? '').toContain('print:hidden')
+    expect(preview?.querySelectorAll('[data-page-number]').length ?? 0).toBeGreaterThanOrEqual(2)
+  })
 })
 
 describe('PrintPageBreak', () => {

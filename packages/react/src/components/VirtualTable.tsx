@@ -44,7 +44,7 @@ function VirtualTableInner<T extends Record<string, unknown>>(
     virtual: true,
     virtualizeColumns: columnGuard.active,
     overscan: props.overscan ?? 2,
-    pagination: false as const,
+    pagination: props.pagination === undefined ? false : props.pagination,
     rowSelection,
     scrollToIndex: scrollIndex
   }

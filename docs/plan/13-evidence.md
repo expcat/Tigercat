@@ -254,11 +254,11 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | C162 | ImageAnnotation | needs-evidence | F01、F02 已修复：listbox 方向键先聚焦当前项或第一项，形状方向键不再冒泡；bind 移出公开 props，私有推动按钮删除。双端 spec 与 w9-bind 通过（happy-dom / axe），IAB 不可用。原视觉 0/16、键盘 0/16 blocked，截图 0；未启动 Example，未跑 SSR。 |
 | C163 | InfiniteScroll  | needs-evidence | F01–F03 已修复：zh-CN 错误与重试走 infiniteScroll locale，传入 errorText 优先；container 滚动根 tabindex 为 0 并有焦点样式，默认视口根不加；两端 Demo 01 改为 12 条、容器根、内容不满不自动连拉。双端 spec 通过（happy-dom / axe），IAB 不可用。原视觉 0/16、键盘 0/16 blocked，截图 0；未启动 Example、未在页面滚到哨兵 |
 | C164 | MarkdownEditor  | needs-evidence | F01–F03 已修复：窄屏 split 且关闭模式开关与工具栏时，Vue 可切换编辑和预览；目录按钮聚焦编辑器自身，不改页面上其他 textarea 的选区；组合输入期间不执行格式热键。双端 spec 通过（happy-dom / axe），IAB 不可用。原视觉 0/16、键盘 0/16 blocked，截图 0；未启动 Example；真实 IME、390×844 未测                    |
-| C165 | PrintLayout     | needs-evidence | 视觉 0/8 blocked；键盘 0/8 blocked；截图 0；未启动 Example；TIGER_A11Y=1 定向 spec 44 通过（a11y 用例无页眉）；探针 Vue 3、React 4 通过；未开打印对话框；未做 SSR              |
+| C165 | PrintLayout     | needs-evidence | F01、F02 已修复：页眉、页脚、分页符标签使用纸面墨色 #111827，不跟随 --tiger-text-secondary；landscape 且 bind.contentHeightMm=250 时预览至少 2 页，预览节点带 print:hidden。双端 spec 通过（happy-dom / axe），IAB 不可用。原视觉 0/8、键盘 0/8 blocked，截图 0；未启动 Example；未开打印对话框；未做 SSR |
 | C166 | PrintPageBreak  | needs-evidence | 无独立 Demo；组合 Demo 视觉 0/8、键盘 0/8 blocked（owner 为 C165）；截图 0；定向 spec 44 通过（a11y 用例无分页符）；探针摘要未留盘；未开打印对话框；未做 SSR                   |
 | C167 | RichTextEditor  | needs-evidence | 视觉 0/16 blocked；键盘 0/16 blocked；截图 0；未启动 Example；定向 spec 155 通过（无 axe 用例）；探针 2 通过；SSR renderToString 两端有 textbox、不抛错                        |
 | C168 | VirtualList     | needs-evidence | 视觉 0/16 blocked；键盘 0/16 blocked；截图 0；未启动 Example；TIGER_A11Y=1 定向 spec 63 通过（两条 axe 实跑）；探针 2 通过（happy-dom）                                        |
-| C169 | VirtualTable    | needs-evidence | 视觉 0/16 blocked；键盘 0/16 blocked；截图 0；未启动 Example；TIGER_A11Y=1 定向 spec 46 通过（两条 axe 实跑）；探针 2 通过（happy-dom）                                        |
+| C169 | VirtualTable    | needs-evidence | F02–F04 已修复：overscan 传入纵向窗口，200 行、行高 40、容器高 160 时 overscan 0 与 20 的行数不同；virtualItemHeight 运行时、类型注释与生成 Props 默认同为 40；两端未传 pagination 时关闭，传入 pageSize 5 时都是 5 行并有分页导航。双端 spec 通过（happy-dom / axe），IAB 不可用。原视觉 0/16、键盘 0/16 blocked，截图 0；未启动 Example |
 
 ### composite
 

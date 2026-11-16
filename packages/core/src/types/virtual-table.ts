@@ -3,7 +3,7 @@
  */
 
 import type { ExclusiveVirtualRange } from './virtual-list'
-import type { RowSelectionConfig, TableColumn } from './table'
+import type { PaginationConfig, RowSelectionConfig, TableColumn } from './table'
 
 export interface VirtualTableHandle {
   scrollToIndex: (index: number) => void
@@ -19,7 +19,7 @@ export interface VirtualTableProps<T = Record<string, unknown>> {
   columns?: TableColumn<T>[]
   /**
    * Fixed row height in px used by the window. Content is not clipped.
-   * @default 48
+   * @default 40
    */
   virtualItemHeight?: number
   /**
@@ -34,6 +34,11 @@ export interface VirtualTableProps<T = Record<string, unknown>> {
   width?: number | 'auto'
   /** Number of extra rows rendered above/below viewport */
   overscan?: number
+  /**
+   * Page the rows like Table. Omit to leave the window unpaged.
+   * @default false
+   */
+  pagination?: PaginationConfig | false
   /** Enable fixed (sticky) header */
   stickyHeader?: boolean
   /**

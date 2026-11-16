@@ -2,6 +2,8 @@
  * @vitest-environment happy-dom
  */
 
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { describe, it, expect } from 'vitest'
 import { render, fireEvent, screen } from '@testing-library/vue'
 import { defineComponent, h, nextTick, ref } from 'vue'
@@ -235,5 +237,61 @@ describe('VirtualTable (Vue)', () => {
       props: { dataSource: [], columns, virtualHeight: 240 }
     })
     await expectNoA11yViolations(empty.container)
+  })
+
+  it('renders fewer rows at overscan 0 than at overscan 20', () => {
+    const narrow = render(VirtualTable, {
+      props: {
+        dataSource: makeData(200),
+        columns,
+        virtualItemHeight: 40,
+        virtualHeight: 160,
+        overscan: 0
+      }
+    })
+    const wide = render(VirtualTable, {
+      props: {
+        dataSource: makeData(200),
+        columns,
+        virtualItemHeight: 40,
+        virtualHeight: 160,
+        overscan: 20
+      }
+    })
+    expect(dataRowsOf(narrow.container).length).not.toBe(dataRowsOf(wide.container).length)
+  })
+
+  it('uses 40px rows when virtualItemHeight is omitted, matching the type and props page', () => {
+    const { container } = render(VirtualTable, {
+      props: { dataSource: makeData(30), columns, virtualHeight: 200 }
+    })
+    expect(dataRowsOf(container)[0]?.style.height).toBe('40px')
+    const typeSrc = readFileSync(
+      resolve(process.cwd(), 'packages/core/src/types/virtual-table.ts'),
+      'utf8'
+    )
+    const marker = typeSrc.indexOf('virtualItemHeight?:')
+    expect(typeSrc.slice(Math.max(0, marker - 180), marker)).toContain('@default 40')
+    const propsDoc = readFileSync(
+      resolve(process.cwd(), 'skills/tigercat/references/shared/props/virtual-table.md'),
+      'utf8'
+    )
+    const row = propsDoc.split('\n').find((line) => line.includes('virtualItemHeight?'))
+    expect(row).toContain('`40`')
+    expect(row).not.toContain('`48`')
+  })
+
+  it('pages five rows and shows a pager when pagination pageSize is 5', () => {
+    const { container } = render(VirtualTable, {
+      props: {
+        dataSource: makeData(30),
+        columns,
+        pagination: { pageSize: 5 },
+        virtualHeight: 400,
+        virtualItemHeight: 40
+      }
+    })
+    expect(dataRowsOf(container)).toHaveLength(5)
+    expect(container.querySelector('nav')).toBeTruthy()
   })
 })

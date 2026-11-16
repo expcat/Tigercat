@@ -28,6 +28,7 @@ import {
   printLayoutHeaderClasses,
   printLayoutPageBreakClasses,
   printLayoutPageBreakLabelClasses,
+  PRINT_LAYOUT_MARGIN,
   printPrintLayoutRoot,
   resolvePrintPageBox,
   type PrintLayoutInstance,
@@ -135,11 +136,11 @@ export const PrintLayout = defineComponent({
           props.bind
             ? h(
                 'div',
-                { 'data-tiger-print-preview': '' },
+                { class: 'print:hidden', 'data-tiger-print-preview': '' },
                 paginatePrintPreview({
                   contentHeightMm: props.bind.contentHeightMm ?? 0,
-                  pageHeightMm: props.bind.pageHeightMm ?? 297,
-                  marginMm: props.bind.marginMm,
+                  pageHeightMm: props.bind.pageHeightMm ?? Number.parseFloat(box.value.height),
+                  marginMm: props.bind.marginMm ?? Number.parseFloat(PRINT_LAYOUT_MARGIN),
                   manualBreaks: props.bind.manualBreaks
                 }).map((page) =>
                   h(

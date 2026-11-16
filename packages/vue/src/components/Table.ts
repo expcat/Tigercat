@@ -438,7 +438,8 @@ export const Table = defineComponent({
             ctx.virtualScrollTop.value,
             virtualViewport,
             declaredRowHeight,
-            ctx.paginatedData.value.length
+            ctx.paginatedData.value.length,
+            resolvedProps.overscan
           )
         : undefined
       const focusVirtualRow = (index: number, edge: 'down' | 'up') => {

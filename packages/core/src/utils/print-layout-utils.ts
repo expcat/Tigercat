@@ -20,16 +20,16 @@ export const printLayoutBaseClasses =
   'tiger-print-layout relative bg-white text-[#111827] shadow-[var(--tiger-shadow-sm)] border border-[var(--tiger-border)] mx-auto box-border'
 
 export const printLayoutHeaderClasses =
-  'text-center text-sm text-[var(--tiger-text-secondary)] border-b border-[var(--tiger-border)] py-2 font-medium'
+  'text-center text-sm text-[#111827] border-b border-[var(--tiger-border)] py-2 font-medium'
 
 export const printLayoutFooterClasses =
-  'text-center text-xs text-[var(--tiger-text-secondary)] border-t border-[var(--tiger-border)] py-2'
+  'text-center text-xs text-[#111827] border-t border-[var(--tiger-border)] py-2'
 
 export const printLayoutPageBreakClasses =
   'relative my-4 border-t-2 border-dashed border-[var(--tiger-border)] print:my-0 print:border-0 print:h-0'
 
 export const printLayoutPageBreakLabelClasses =
-  'absolute top-0 start-0 end-0 mx-auto w-fit -translate-y-1/2 bg-white px-2 text-xs text-[var(--tiger-text-secondary)] print:hidden'
+  'absolute top-0 start-0 end-0 mx-auto w-fit -translate-y-1/2 bg-white px-2 text-xs text-[#111827] print:hidden'
 
 export const printLayoutPaddingClasses = ''
 

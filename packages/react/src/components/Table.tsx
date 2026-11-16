@@ -438,7 +438,8 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
             virtualScrollTop,
             virtualViewport,
             declaredRowHeight,
-            ctx.paginatedData.length
+            ctx.paginatedData.length,
+            overscan
           )
         : undefined,
     [
@@ -446,7 +447,8 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
       virtualScrollTop,
       virtualViewport,
       declaredRowHeight,
-      ctx.paginatedData.length
+      ctx.paginatedData.length,
+      overscan
     ]
   )
   const [pendingVirtualFocusIndex, setPendingVirtualFocusIndex] = useState<number | null>(null)
