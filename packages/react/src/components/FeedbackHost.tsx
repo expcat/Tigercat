@@ -123,6 +123,7 @@ function ImperativeModal({ modal, scope }: { modal: ImperativeModalRecord; scope
           }
         }
         modal.okResult = modal.onOk?.(dismissEvent)
+        return modal.okResult as void | Promise<void>
       }}
       onCancel={() => {
         modal.cancelled = true

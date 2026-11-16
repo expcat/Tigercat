@@ -443,16 +443,16 @@ export const Modal = defineComponent({
     }
 
     watch(
-      () => props.open,
-      (open) => {
+      () => [props.open, props.zIndex] as const,
+      ([open, zIndex]) => {
         releaseOverlayZ?.()
         releaseOverlayZ = undefined
         if (!open) {
           stackedZ.value = undefined
           return
         }
-        if (props.zIndex !== undefined) {
-          stackedZ.value = props.zIndex
+        if (zIndex !== undefined) {
+          stackedZ.value = zIndex
           return
         }
         // SSR renders never release the process-level overlay z serial
@@ -739,7 +739,7 @@ export const Modal = defineComponent({
         {
           class: modalWrapperClasses,
           ref: rootRef,
-          style: { zIndex: stackedZ.value ?? OVERLAY_Z_INDEX.modal },
+          style: { zIndex: props.zIndex ?? stackedZ.value ?? OVERLAY_Z_INDEX.modal },
           hidden: isOverlayVisuallyHidden(props.open, leaving.value),
           'aria-hidden': !props.open ? 'true' : undefined,
           'data-tiger-overlay-layer': '',

@@ -224,6 +224,27 @@ describe('Modal', () => {
       })
     })
 
+    it('updates custom zIndex while open and preserves it through the leave transition', async () => {
+      const { rerender } = renderWithProps(Modal, {
+        open: true,
+        title: 'Test Modal',
+        zIndex: 2000,
+        style: { transitionDuration: '200ms' }
+      })
+      const dialog = await screen.findByRole('dialog', { name: 'Test Modal' })
+      const wrapper = dialog.closest('[data-tiger-modal-root]')
+      expect(wrapper).toHaveStyle({ zIndex: '2000' })
+
+      await rerender({ zIndex: 3000 })
+      expect(wrapper).toHaveStyle({ zIndex: '3000' })
+
+      await rerender({ open: false })
+      expect(wrapper).not.toHaveAttribute('hidden')
+      expect(wrapper).toHaveStyle({ zIndex: '3000' })
+      await fireEvent.transitionEnd(dialog)
+      expect(wrapper).toHaveAttribute('hidden')
+    })
+
     it('renders a scrollable body when mobileSheet is true', async () => {
       render(Modal, {
         props: { open: true, title: 'Mobile Sheet', mobileSheet: true },

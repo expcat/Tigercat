@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+React `confirmModal` 现在等待 `onOk` 返回的 Promise 兑现后才关闭，外层 Promise 继续采纳该返回值；返回 false 或拒绝时，对话框保持打开，外层 Promise 继续待决，仍可重试或取消。Vue Modal 的自定义 `zIndex` 现在随打开期间的 prop 更新，并在离场过渡中保留。调用方式不用改。
+
 React Tabs 省略 `lazy` 时现在挂载未访问面板，与 Core 和 Vue 的默认 `false` 一致。需要继续推迟挂载时请显式传入 `lazy`。Vue 标签 id 与关闭后的焦点选择器按 key 类型区分数字 `1` 和字符串 `"1"`，生成 id 形如 `n:1` / `s:1`。调用方式不用改。
 
 Vue inline Menu 的嵌套 MenuItemGroup 现在继续继承父分组层级，标题和叶项保留已有缩进，与 React 一致。调用方式不用改。
