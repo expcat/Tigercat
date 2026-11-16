@@ -111,16 +111,31 @@ describe('ImagePreview', () => {
     expect(emitted()['update:open']?.length).toBeGreaterThan(2)
   })
 
-  it('navigates with buttons and loops at the ends', async () => {
+  it('requests the next index without leaving a controlled currentIndex', async () => {
     const { emitted } = render(ImagePreview, {
       props: { open: true, images, currentIndex: 1 }
     })
     const img = document.querySelector('[role="dialog"] img') as HTMLImageElement
+    expect(img).toHaveAttribute('src', '/img2.jpg')
     await fireEvent.click(screen.getByRole('button', { name: labels.nextImageAriaLabel }))
     expect(emitted()['update:currentIndex']?.[0]).toEqual([2])
-    expect(img).toHaveAttribute('src', '/img3.jpg')
+    expect(img).toHaveAttribute('src', '/img2.jpg')
     expect(screen.getByRole('button', { name: labels.nextImageAriaLabel })).toBeEnabled()
     await fireEvent.click(screen.getByRole('button', { name: labels.nextImageAriaLabel }))
+    expect(emitted()['update:currentIndex']?.[1]).toEqual([2])
+    expect(img).toHaveAttribute('src', '/img2.jpg')
+  })
+
+  it('navigates uncontrolled images with buttons and loops at the ends', async () => {
+    const { emitted } = render(ImagePreview, { props: { open: true, images } })
+    const img = document.querySelector('[role="dialog"] img') as HTMLImageElement
+    await fireEvent.click(screen.getByRole('button', { name: labels.nextImageAriaLabel }))
+    expect(emitted()['update:currentIndex']?.[0]).toEqual([1])
+    expect(img).toHaveAttribute('src', '/img2.jpg')
+    await fireEvent.click(screen.getByRole('button', { name: labels.nextImageAriaLabel }))
+    expect(img).toHaveAttribute('src', '/img3.jpg')
+    await fireEvent.click(screen.getByRole('button', { name: labels.nextImageAriaLabel }))
+    expect(emitted()['update:currentIndex']?.at(-1)).toEqual([0])
     expect(img).toHaveAttribute('src', '/img1.jpg')
   })
 

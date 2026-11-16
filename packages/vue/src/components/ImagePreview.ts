@@ -96,7 +96,7 @@ export const ImagePreview = defineComponent({
   props: {
     open: { type: Boolean, default: undefined },
     images: { type: Array as PropType<ImageLightboxItem[]>, required: true },
-    currentIndex: { type: Number, default: 0 },
+    currentIndex: { type: Number, default: undefined },
     zIndex: { type: Number, default: undefined },
     maskClosable: { type: Boolean, default: true },
     scaleStep: { type: Number, default: LIGHTBOX_SCALE_STEP },
@@ -171,8 +171,10 @@ export const ImagePreview = defineComponent({
     })
 
     const applyIndex = (next: number) => {
-      index.value = next
-      resetTransform()
+      if (props.currentIndex === undefined) {
+        index.value = next
+        resetTransform()
+      }
       emit('update:currentIndex', next)
     }
 

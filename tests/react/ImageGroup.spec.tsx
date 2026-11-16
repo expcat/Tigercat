@@ -7,7 +7,10 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import React, { useState } from 'react'
 import { Image } from '@expcat/tigercat-react/Image'
 import { ImageGroup } from '@expcat/tigercat-react/ImageGroup'
+import { getImageViewerLabels } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
+
+const labels = getImageViewerLabels()
 
 describe('ImageGroup', () => {
   it('renders children in a named group container', () => {
@@ -71,6 +74,21 @@ describe('ImageGroup', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     fireEvent.click(screen.getByAltText('Disabled preview'))
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
+  it('keeps the lightbox on a fixed currentIndex while requesting the next image', () => {
+    const onCurrentIndexChange = vi.fn()
+    render(
+      <ImageGroup open currentIndex={0} onCurrentIndexChange={onCurrentIndexChange}>
+        <Image src="/img1.jpg" alt="One" />
+        <Image src="/img2.jpg" alt="Two" />
+      </ImageGroup>
+    )
+    const img = document.querySelector('[role="dialog"] img') as HTMLImageElement
+    expect(img).toHaveAttribute('src', '/img1.jpg')
+    fireEvent.click(screen.getByRole('button', { name: labels.nextImageAriaLabel }))
+    expect(onCurrentIndexChange).toHaveBeenCalledWith(1)
+    expect(img).toHaveAttribute('src', '/img1.jpg')
   })
 
   it('keeps both copies when two images share a src and one unmounts', async () => {

@@ -120,7 +120,7 @@ describe('ImagePreview', () => {
     expect(onOpenChange).not.toHaveBeenCalled()
   })
 
-  it('navigates with buttons and arrow keys and loops at the ends', () => {
+  it('requests the next index without leaving a controlled currentIndex', () => {
     const onCurrentIndexChange = vi.fn()
     render(
       <ImagePreview
@@ -131,10 +131,25 @@ describe('ImagePreview', () => {
       />
     )
     const img = document.querySelector('[role="dialog"] img') as HTMLImageElement
+    expect(img).toHaveAttribute('src', '/img2.jpg')
     fireEvent.click(screen.getByRole('button', { name: labels.nextImageAriaLabel }))
     expect(onCurrentIndexChange).toHaveBeenCalledWith(2)
-    expect(img).toHaveAttribute('src', '/img3.jpg')
+    expect(img).toHaveAttribute('src', '/img2.jpg')
     expect(screen.getByRole('button', { name: labels.nextImageAriaLabel })).toBeEnabled()
+    fireEvent.click(screen.getByRole('button', { name: labels.nextImageAriaLabel }))
+    expect(onCurrentIndexChange).toHaveBeenLastCalledWith(2)
+    expect(img).toHaveAttribute('src', '/img2.jpg')
+  })
+
+  it('navigates uncontrolled images with buttons and loops at the ends', () => {
+    const onCurrentIndexChange = vi.fn()
+    render(<ImagePreview open images={images} onCurrentIndexChange={onCurrentIndexChange} />)
+    const img = document.querySelector('[role="dialog"] img') as HTMLImageElement
+    fireEvent.click(screen.getByRole('button', { name: labels.nextImageAriaLabel }))
+    expect(onCurrentIndexChange).toHaveBeenCalledWith(1)
+    expect(img).toHaveAttribute('src', '/img2.jpg')
+    fireEvent.click(screen.getByRole('button', { name: labels.nextImageAriaLabel }))
+    expect(img).toHaveAttribute('src', '/img3.jpg')
     fireEvent.click(screen.getByRole('button', { name: labels.nextImageAriaLabel }))
     expect(onCurrentIndexChange).toHaveBeenLastCalledWith(0)
     expect(img).toHaveAttribute('src', '/img1.jpg')

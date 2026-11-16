@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **ImageGroup 受控索引（React / Vue，C019-F01）**：传入 currentIndex 时，切图只发出下一张索引请求，灯箱停在父层那一张。ImageGroup 固定 currentIndex=0 时画面仍是第 1 张。未传 currentIndex 的预览仍自行切图，并在首尾循环。
+
 - **ImageCropper 比例、放大与导出（Core / React / Vue / Demo，C018-F01、C018-F02、C018-F03、C018-F04、C018-K01、C018-V01）**：React 在 `aspectPreset` 变化时同步选中按钮和几何比例。容器放大时先记下新的显示尺寸，再约束选区。锁定比例后，图片仍能放下的最小边会被重新满足；角手柄只收到水平键时按宽度等比缩放。旋转或翻转导出按图片自然尺寸画进预览框，内容对齐变换后的显示选区。两端 04 改为按显示选区裁剪，不再写旋转交换宽高。
 
 - **ImageCompare 拖动中禁用（React / Vue，C017-F01）**：手柄拖动中切到 `disabled` 时结束当前会话。之后的 pointermove 不改变位置，也不发出 change 或 update:position。

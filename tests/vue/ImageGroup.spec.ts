@@ -7,7 +7,10 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/vue'
 import { defineComponent, h, ref } from 'vue'
 import { Image } from '@expcat/tigercat-vue/Image'
 import { ImageGroup } from '@expcat/tigercat-vue/ImageGroup'
+import { getImageViewerLabels } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils'
+
+const labels = getImageViewerLabels()
 
 describe('ImageGroup', () => {
   it('renders children in a named group container', () => {
@@ -87,6 +90,36 @@ describe('ImageGroup', () => {
     expect(screen.queryByRole('button')).not.toBeInTheDocument()
     await fireEvent.click(screen.getByAltText('Disabled preview'))
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
+  it('keeps the lightbox on a fixed currentIndex while requesting the next image', async () => {
+    const onCurrentIndexChange = vi.fn()
+    const Wrapper = defineComponent({
+      setup() {
+        return () =>
+          h(
+            ImageGroup,
+            {
+              open: true,
+              currentIndex: 0,
+              'onUpdate:currentIndex': onCurrentIndexChange
+            },
+            () => [
+              h(Image, { src: '/img1.jpg', alt: 'One' }),
+              h(Image, { src: '/img2.jpg', alt: 'Two' })
+            ]
+          )
+      }
+    })
+
+    render(Wrapper)
+    await waitFor(() => {
+      expect(document.querySelector('[role="dialog"] img')).toHaveAttribute('src', '/img1.jpg')
+    })
+    const img = document.querySelector('[role="dialog"] img') as HTMLImageElement
+    await fireEvent.click(screen.getByRole('button', { name: labels.nextImageAriaLabel }))
+    expect(onCurrentIndexChange).toHaveBeenCalledWith(1)
+    expect(img).toHaveAttribute('src', '/img1.jpg')
   })
 
   it('follows a child src change in the preview list', async () => {

@@ -75,7 +75,7 @@ const SvgIcon: React.FC<{ d: string; cls?: string }> = ({ d, cls = 'w-5 h-5' }) 
 export const ImagePreview: React.FC<ImagePreviewProps> = ({
   open,
   images,
-  currentIndex = 0,
+  currentIndex,
   zIndex,
   maskClosable = true,
   scaleStep = LIGHTBOX_SCALE_STEP,
@@ -113,7 +113,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
 
   const [transform, setTransform] = useState<GestureTransform>(createDefaultTransform)
   const [index, setIndex] = useState(() =>
-    resolved.length ? Math.min(Math.max(0, currentIndex), resolved.length - 1) : 0
+    resolved.length ? Math.min(Math.max(0, currentIndex ?? 0), resolved.length - 1) : 0
   )
   const [dragging, setDragging] = useState(false)
 
@@ -144,10 +144,11 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
 
   useEffect(() => {
     if (!isOpen) return
+    const sourceIndex = currentIndex ?? 0
     const nextIndex =
       resolved.length === 0
         ? 0
-        : Math.min(Math.max(0, Math.floor(currentIndex)), resolved.length - 1)
+        : Math.min(Math.max(0, Math.floor(sourceIndex)), resolved.length - 1)
     setIndex(nextIndex)
     resetTransform()
   }, [isOpen, currentIndex, resolved.length, resetTransform])
@@ -163,11 +164,13 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
 
   const applyIndex = useCallback(
     (next: number) => {
-      setIndex(next)
-      resetTransform()
+      if (currentIndex === undefined) {
+        setIndex(next)
+        resetTransform()
+      }
       onCurrentIndexChangeRef.current?.(next)
     },
-    [resetTransform]
+    [currentIndex, resetTransform]
   )
 
   const handlePrev = useCallback(() => {
