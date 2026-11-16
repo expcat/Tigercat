@@ -1,7 +1,7 @@
 {
   "id": "loading-bar-03",
   "title": "颜色、高度与清除",
-  "description": "自定义 color 后，不传选项的 start() 不再粘色。set(40) 是确定进度。clear() 立即拆除宿主。",
+  "description": "自定义 color 后，省略选项的 start() 沿用上次 color，直到 hide 或 clear。set(40) 是确定进度。clear() 立即拆除宿主。",
   "entry": "App.tsx",
   "order": 3,
   "viewport": {

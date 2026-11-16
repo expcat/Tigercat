@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **LoadingBar 粘色说明（Demo / MCP，C121-F01）**：两端示例 03 与 command-apis 写明，省略选项的 `start()` 沿用上次 color，直到 hide 或 clear。
+
 - **Loading dots 与 bars 动画（Core，C119-F01）**：主题插件纳入 `loadingAnimationBaseStyles`。`variant` 为 dots 或 bars 时，产物 CSS 含 `tiger-bounce-dot` 与 `tiger-scale-bar` 的 keyframes，对应节点按这两个类名播放。
 
 - **Drawer 全屏关闭轴与 Vue after-enter（Core / Vue / React，C118-F01、C118-F02）**：窄于 md 的全屏抽屉，跟手距离、位移和松手阈值改走 `getDrawerSwipeCloseDirection`。LTR 向右、RTL 向左，left / top / bottom 沿这个方向拖过阈值会关闭。Vue 在 `destroyOnClose` 下首次打开和销毁后重开时，等面板进入文档且这一层过渡结束后才发出 `after-enter`。

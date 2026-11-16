@@ -32,7 +32,7 @@ LoadingBar.finish()
 - `notification` 的主动作是一颗按钮（`actionLabel`，默认 locale 的查看文案），整张卡片不是点击目标。`actions` 是另外的按钮，不会触发主动作。用 `closeOnClick` 或回调里的 `close()` 关掉这一条。
 - 声明式容器：Vue 发 `close`（`@close`），不要只绑 `:on-close`。
 - 关闭名走 locale：`common.closeMessageAriaLabel` / `closeNotificationAriaLabel`。LoadingBar 默认名是 `common.loadingText`。
-- `Message.loading({ duration })` 尊重传入 duration。`LoadingBar.finish` 后下一次 `start()` 不粘上一次 color。`error` 和 `finish` 共用 `start` 计数；还有未结束的 `start` 时保持加载。
+- `Message.loading({ duration })` 尊重传入 duration。`LoadingBar` 省略选项的 `start()` 沿用上次 color，直到 hide 或 clear。`error` 和 `finish` 共用 `start` 计数；还有未结束的 `start` 时保持加载。
 
 条目/容器 props 见 [feedback.md](shared/props/feedback.md) 的 `## Message`、`## LoadingBar`、`## NotificationContainer`。绑定差异见 [common.md](shared/patterns/common.md)。文案见 [i18n.md](i18n.md)。
 
