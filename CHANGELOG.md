@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **DropdownItem radio 点击（Vue，C093-F02）**：点击与 Space 使用相同的类型分支；已选 radio 继续发出 `check(true)` 并保持 `aria-checked=true`，checkbox 仍取反。
+
 - **Dropdown schema 与 focus 打开（Vue / React，C092-F01、C092-F02、C092-F03、C092-F04）**：Vue schema 叶项遵守父级 `closeOnClick`，子菜单继承禁用与关闭策略，向根菜单转发选择 / 勾选通知；普通项默认整体关闭，checkbox / radio 保持打开。双端 hover 触发器获焦即打开，关闭后回焦不会重新打开。
 
 - **ContextMenu 打开焦点与 schema 菜单（Core / Vue / React，C088-F02、C088-F03、C088-F04、C088-F06）**：双端外部受控 `open` 打开后聚焦首个可用菜单项。React ContextMenu / Dropdown 的 `items` 遵守 `closeOnClick=false`，菜单 id 与触发器 `aria-controls` 对应；共享方向键导航按 DOM 顺序包含 checkbox / radio，保留层级、隐藏和禁用筛选。

@@ -514,6 +514,41 @@ describe('Dropdown', () => {
   })
 
   describe('Edge Cases', () => {
+    it.each(['radio', 'checkbox'] as const)(
+      'keeps declarative %s click and Space check semantics consistent',
+      async (itemType) => {
+        const checked = ref(true)
+        const onCheck = vi.fn((value: boolean) => {
+          checked.value = value
+        })
+        render(Dropdown, {
+          props: { defaultOpen: true, portal: false },
+          slots: {
+            default: () => [
+              'Trigger',
+              h(DropdownMenu, null, () =>
+                h(DropdownItem, { itemType, checked: checked.value, onCheck }, () => 'Choice')
+              )
+            ]
+          }
+        })
+
+        const item = screen.getByRole(itemType === 'radio' ? 'menuitemradio' : 'menuitemcheckbox', {
+          name: 'Choice'
+        })
+        expect(item).toHaveAttribute('aria-checked', 'true')
+
+        await fireEvent.click(item)
+        const checkedAfterClick = itemType === 'radio'
+        expect(onCheck.mock.calls).toEqual([[checkedAfterClick]])
+        expect(item).toHaveAttribute('aria-checked', String(checkedAfterClick))
+
+        await fireEvent.keyDown(item, { key: ' ' })
+        expect(onCheck.mock.calls).toEqual([[checkedAfterClick], [true]])
+        expect(item).toHaveAttribute('aria-checked', 'true')
+      }
+    )
+
     it('honors closeOnClick false for schema actions without closing checkbox or radio items', async () => {
       const { emitted } = render(Dropdown, {
         props: {

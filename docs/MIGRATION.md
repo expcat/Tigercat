@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+Vue 声明式 DropdownItem 的已选 radio 现在点击后发出 `check(true)`，与 Space 一致；把事件值写回 `checked` 后仍保持选中。checkbox 的点击和 Space 继续取反。调用方式不用改。
+
 双端 ContextMenu 从外部把 `open` 由 false 改为 true 时，现在与 Shift+F10 打开一样聚焦首个可用菜单项。React ContextMenu 与 Dropdown 的 `items` 配 `closeOnClick=false` 时，普通项点击后保留菜单且不请求关闭，`aria-controls` 指向实际菜单。共享菜单方向键现在依次经过 checkbox / radio 项，ContextMenu 与 Dropdown 均适用。调用方式不用改，依赖旧焦点顺序的键盘脚本需相应调整。
 
 双端 Breadcrumb 的折叠菜单打开后现在聚焦首项，上下键及 Home / End 在菜单项间移动，Escape 关闭并回焦省略号，Tab 离开时关闭菜单。Enter / Space 激活原项并关闭菜单；在省略号上按上下键分别打开并聚焦首项或末项。调用方式不用改，依赖旧焦点停留行为的键盘脚本需相应调整。

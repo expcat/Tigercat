@@ -21,8 +21,8 @@ navigation 组 35 个组件（C082–C116）。审查时这一组同样没有浏
 
 ## 概览
 
-本篇 55 条：P2 39、P3 16。
-按波次：W4 39、W9 16。
+本篇 54 条：P2 38、P3 16。
+按波次：W4 38、W9 16。
 
 已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C086-F03（S13）、C088-F05（S13）、C095-F02（S13）、C109-F06（S13）、C112-F01（S13）、C113-F01（S13）、C114-F04（S13）、C116-F05（S13）。
 
@@ -56,10 +56,9 @@ navigation 组 35 个组件（C082–C116）。审查时这一组同样没有浏
 
 报告 `groups/navigation/DropdownItem.md`，队列状态 needs-evidence。另受 S01、S02 影响。
 
-| 编号     | 级别 | 波次 | 端    | 类别 | 条目                                                                 | 验收                                                                              |
-| -------- | ---- | ---- | ----- | ---- | -------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| C093-F01 | P3   | W9   | React | 行为 | React itemKey 未消费，泄漏为小写 DOM 属性并触发警告                  | React DropdownItem 传 itemKey=「identity-7」后 DOM 无 itemkey 属性且无 React 警告 |
-| C093-F02 | P2   | W4   | Vue   | 行为 | Vue 已选 radio 的 click 发出 check(false)，与 Space 和 Core 语义相反 | Vue 已选 radio 项点击发 check(true)、aria-checked 保持 true；checkbox 仍取反      |
+| 编号     | 级别 | 波次 | 端    | 类别 | 条目                                                | 验收                                                                              |
+| -------- | ---- | ---- | ----- | ---- | --------------------------------------------------- | --------------------------------------------------------------------------------- |
+| C093-F01 | P3   | W9   | React | 行为 | React itemKey 未消费，泄漏为小写 DOM 属性并触发警告 | React DropdownItem 传 itemKey=「identity-7」后 DOM 无 itemkey 属性且无 React 警告 |
 
 ### C095 FloatButton
 

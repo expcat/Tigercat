@@ -177,7 +177,7 @@ export const DropdownItem = defineComponent({
 
       emit('click', event)
       if (props.itemType === 'checkbox' || props.itemType === 'radio') {
-        emit('check', !props.checked)
+        emit('check', props.itemType === 'checkbox' ? !props.checked : true)
         return
       }
 
