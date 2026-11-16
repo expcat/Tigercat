@@ -15,9 +15,11 @@ description: Compact Tigercat Composite Vue and React usage routes
 
 Runnable modules: `examples/example/vue3/src/examples/assignee-picker/01/`, `examples/example/react/src/examples/assignee-picker/01/`.
 
-Vue: `<AssigneePicker />`
+Note: 目录由调用方传入。Vue 用 `v-model:selected-ids` 回写已选 id；React 用 `onChange`。只传 `selectedIds` 而不回写时，选中不会保持。
 
-React: `<AssigneePicker />`
+Vue: `<AssigneePicker :options="options" v-model:selected-ids="selectedIds" />`
+
+React: `<AssigneePicker options={options} selectedIds={selectedIds} onChange={setSelectedIds} />`
 
 Imports: use PascalCase subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`. Hooks and `notification` use the same subpath rule. Shared types and helpers come from `@expcat/tigercat-core`.
 

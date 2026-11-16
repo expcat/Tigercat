@@ -529,6 +529,10 @@ const COMPONENT_USAGE_NOTES = {
     notes:
       '`hoverable` 只抬起。`onClick`/`href` 才是控件；有 actions 时根不再当按钮。有封面时 padding 在内容列。`coverAlt` 默认空（装饰）。`title` 是可见 heading，`titleLevel` 控制标题级别；`#header` / `header` 优先。`htmlTitle` 是原生 HTML tooltip。'
   },
+  AssigneePicker: {
+    notes:
+      '目录由调用方传入。Vue 用 `v-model:selected-ids` 回写已选 id；React 用 `onChange`。只传 `selectedIds` 而不回写时，选中不会保持。'
+  },
   ChatWindow: {
     uses: ['Avatar', 'Textarea/Input', 'Button', 'VirtualList', 'Empty'],
     notes:
@@ -714,6 +718,7 @@ const COMPONENT_SNIPPETS = {
     Badge: '<Badge :content="5" />',
     Tag: '<Tag closable>标签</Tag>',
     ChatWindow: '<ChatWindow :messages="messages" @send="onSend" />',
+    AssigneePicker: '<AssigneePicker :options="options" v-model:selected-ids="selectedIds" />',
     ActivityFeed: '<ActivityFeed :items="items" />',
     CommentThread: '<CommentThread :nodes="nodes" @reply="onReply" />',
     NotificationCenter: '<NotificationCenter :items="items" />',
@@ -776,6 +781,8 @@ const COMPONENT_SNIPPETS = {
     Badge: '<Badge content={5} />',
     Tag: '<Tag closable>标签</Tag>',
     ChatWindow: '<ChatWindow messages={messages} onSend={onSend} />',
+    AssigneePicker:
+      '<AssigneePicker options={options} selectedIds={selectedIds} onChange={setSelectedIds} />',
     ActivityFeed: '<ActivityFeed items={items} />',
     CommentThread: '<CommentThread nodes={nodes} onReply={onReply} />',
     NotificationCenter: '<NotificationCenter items={items} />',

@@ -13,10 +13,12 @@ description: Compact generated Tigercat Composite props reference
 
 `packages/core/src/types/assignee-picker.ts` · `AssigneePickerProps`
 
-| Prop           | Type                     | Default | Notes                                                         |
-| -------------- | ------------------------ | ------- | ------------------------------------------------------------- |
-| `options?`     | `AssigneePickerOption[]` | `-`     | Directory supplied by the caller. Empty shows an explanation. |
-| `locale?`      | `Partial<TigerLocale>`   | `-`     | Locale object for empty and search copy.                      |
-| `selectedIds?` | `string[]`               | `-`     | Selected ids.                                                 |
+Note: 目录由调用方传入。Vue 用 `v-model:selected-ids` 回写已选 id；React 用 `onChange`。只传 `selectedIds` 而不回写时，选中不会保持。
+
+| Prop           | Type                     | Default | Notes                                                                         |
+| -------------- | ------------------------ | ------- | ----------------------------------------------------------------------------- |
+| `options?`     | `AssigneePickerOption[]` | `-`     | Directory supplied by the caller. Empty shows an explanation.                 |
+| `locale?`      | `Partial<TigerLocale>`   | `-`     | Locale object for empty and search copy.                                      |
+| `selectedIds?` | `string[]`               | `-`     | Selected ids. Vue writes them with v-model:selected-ids; React uses onChange. |
 
 Events/callback props: `onChange?`.

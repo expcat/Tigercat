@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **受理人选择器键盘、过滤与文档回写（Core / React / Vue / 文档 / MCP，C172-F01、C172-F02、C172-F03、C172-F04、C172-F05、C172-F06）**：搜索框方向键把活动项从 Ada 移到 Bea，名称不再与列表相同。点击 Cy 后 Enter 作用在 Cy，不会把 Bea 加进已选。三人名单搜索 zzz 显示 No results found，zh-CN 为「暂无结果」；options 为空仍是 The directory is empty /「目录为空」。选中 Cy 和 Bea 后搜索 Design 仍显示 2 selected。30 人按 End 时列表含 overflow-auto 和最大高度，最后一人滚进容器。生成 Props 与示例写明 Vue v-model:selected-ids 和 React onChange。
+
 - **动态流开窗与应用壳页签（Core / React / Vue / 文档 / MCP，C170-F02、C170-F03、C170-F04、C171-F01、C171-F02）**：开窗后自定义分组头仍显示 CUSTOM-HEADER。groupByDate 按调用方时区归组，UTC 下 2024-05-02T20:00:00.000Z 归到 2024-05-02，section 含 Evening。loadError 显示本地化说明和重试，zh-CN 为「无法加载更多动态。」和「重试」，点一次再请求 1 次。AppShell 正文只在选中的 tabpanel 内。breadcrumbExtra 与 tabsExtra 和数组一起渲染，空数组只留自定义节点。
 
 - **富文本链接、纯文本与图片（Core / React / Vue，C167-F02、C167-F03、C167-F04、C167-F05、C167-F06、C167-F07）**：zh-CN 链接表单占位为「输入链接地址」，打开后聚焦输入框。plain 模式受控回写 Hello world 后编辑区不再残留 strong。只有图片时 isContentEmpty 为 false 且不显示占位，空段落仍算空。粘贴被拒图片的 live 公告走 locale，zh-CN 为「图片未粘贴。」。Vue 先调用调用方的 keydown 与 blur，再跑内部热键，paste 与 click 仍到达。HTML 转 markdown 时，alt 写在 src 前或后都留在方括号里。
