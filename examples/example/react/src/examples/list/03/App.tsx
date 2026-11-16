@@ -8,13 +8,7 @@ const items = Array.from({ length: 12 }, (_, index) => ({
 }))
 
 export default function App() {
-  const [page, setPage] = useState(1)
+  const [pagination, setPagination] = useState({ current: 1, pageSize: 4 })
 
-  return (
-    <List
-      dataSource={items}
-      pagination={{ current: page, pageSize: 4 }}
-      onPageChange={({ current }) => setPage(current)}
-    />
-  )
+  return <List dataSource={items} pagination={pagination} onPageChange={setPagination} />
 }

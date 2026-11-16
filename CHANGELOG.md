@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **List 悬停与页大小（Demo，C043-F04、C043-F05）**：两端 list/01 显式传入 hoverable，行带悬停底色。两端 list/03 保存并回传 pageSize，选择新页大小后列表条数与选择器保持该值。
+
 - **Layout 横排属性（文档 / MCP，C042-F01）**：生成笔记与优先字段改为公开的 `mode`。Layout 文档与 MCP 写 `mode=horizontal`，不再出现 `direction=horizontal`。
 
 - **Header 示例说明（Demo，C041-F01）**：两端 layout/01 改为写 blur 半透明顶栏，不再写未启用的 sticky 盖住滚动内容。

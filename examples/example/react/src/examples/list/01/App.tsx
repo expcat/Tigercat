@@ -7,5 +7,5 @@ const items = [
 ]
 
 export default function App() {
-  return <List dataSource={items} size="md" split />
+  return <List dataSource={items} size="md" split hoverable />
 }

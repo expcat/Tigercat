@@ -102,7 +102,7 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | C040 | Footer       | needs-evidence | 视觉 0/16 blocked、外壳键盘 0/16 blocked、截图 0（owner 均为 C042）；未启动服务；未跑 hydration、浏览器 E2E、读屏、docs:links；无 Footer 专属 E2E                             |
 | C041 | Header       | needs-evidence | F01 已修复。两端 layout/01 改为 blur 半透明顶栏，不再称未启用的 sticky。视觉/键盘 0/24 blocked、截图 0（owner 均为 C042）；hydration、浏览器 E2E、读屏未测                    |
 | C042 | Layout       | needs-evidence | F01 已修复。生成笔记与 MCP 写 mode=horizontal，不再出现 direction=horizontal。视觉/键盘 0/32 blocked、截图 0；skip link、hydration、浏览器 E2E、读屏未测                      |
-| C043 | List         | needs-evidence | 视觉 0/40 blocked；键盘 0/40 blocked；截图 0；双端 SSR 探针已跑，hydration、读屏、浏览器 E2E、全仓构建未执行；Terra 二次审核不可核验                                          |
+| C043 | List         | needs-evidence | F04/F05 已修复（F01–F03 此前已修）。两端 list/01 传入 hoverable；list/03 保存并回传 pageSize。视觉/键盘 0/40 blocked、截图 0；SSR 已跑，hydration、读屏、E2E 未执行           |
 | C044 | Masonry      | needs-evidence | 视觉 0/24 blocked；键盘 0/24 blocked；截图 0；双端 SSR 与纯函数探针已跑，hydration、读屏、浏览器 E2E、全仓构建未执行；Terra 二次审核不可核验                                  |
 | C045 | Resizable    | needs-evidence | 视觉 0/16 blocked；键盘 0/16 blocked；截图 0；双端 SSR 探针三场景已跑，真实布局、输入、hydration、读屏、浏览器 E2E、全仓构建未执行；Terra 审核不可核验                        |
 | C046 | Row          | needs-evidence | 视觉 0/24 blocked；键盘 0/24 blocked；截图 0；未执行新的 SSR/hydration、Example 构建、浏览器 E2E、读屏；Vue 属性更新探针为合成 DOM；Terra 两阶段只读复核完成但无图可审        |

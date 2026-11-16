@@ -7,16 +7,13 @@ const items = Array.from({ length: 12 }, (_, index) => ({
   title: `列表项 ${index + 1}`,
   description: '分页数据'
 }))
-const page = ref(1)
+const pagination = ref({ current: 1, pageSize: 4 })
 
-function onPageChange(next: { current: number }): void {
-  page.value = next.current
+function onPageChange(next: { current: number; pageSize: number }): void {
+  pagination.value = next
 }
 </script>
 
 <template>
-  <List
-    :data-source="items"
-    :pagination="{ current: page, pageSize: 4 }"
-    @page-change="onPageChange" />
+  <List :data-source="items" :pagination="pagination" @page-change="onPageChange" />
 </template>
