@@ -206,8 +206,8 @@ export const Card = defineComponent({
         if (event.target !== event.currentTarget) return
         if (activation.rootRole !== 'button') return
         handleCardActivation(event, () => {
-          const click = attrsRecord.onClick
-          if (typeof click === 'function') (click as (event: Event) => void)(event)
+          const card = event.currentTarget as HTMLElement
+          card.click()
         })
       }
 

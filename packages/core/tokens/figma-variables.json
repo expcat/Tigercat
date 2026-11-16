@@ -1088,25 +1088,25 @@
         {
           "name": "primitive/font/lineHeight/tight",
           "type": "STRING",
-          "cssVariable": "--tiger-primitive-font-lineHeight-tight",
+          "cssVariable": "--tiger-primitive-font-lh-tight",
           "value": "1.25"
         },
         {
           "name": "primitive/font/lineHeight/normal",
           "type": "STRING",
-          "cssVariable": "--tiger-primitive-font-lineHeight-normal",
+          "cssVariable": "--tiger-primitive-font-lh-normal",
           "value": "1.5"
         },
         {
           "name": "primitive/font/lineHeight/relaxed",
           "type": "STRING",
-          "cssVariable": "--tiger-primitive-font-lineHeight-relaxed",
+          "cssVariable": "--tiger-primitive-font-lh-relaxed",
           "value": "1.625"
         },
         {
           "name": "primitive/font/lineHeight/loose",
           "type": "STRING",
-          "cssVariable": "--tiger-primitive-font-lineHeight-loose",
+          "cssVariable": "--tiger-primitive-font-lh-loose",
           "value": "2"
         },
         {

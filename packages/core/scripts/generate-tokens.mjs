@@ -670,6 +670,9 @@ function referenceName(value) {
 
 function cssVariableFor(layer, path) {
   if (layer === 'primitive') {
+    if (path[0] === 'font' && path[1] === 'lineHeight') {
+      return canonicalCssVarName('primitive', 'font-lh', ...path.slice(2))
+    }
     return canonicalCssVarName('primitive', path[0], ...path.slice(1))
   }
   if (layer === 'semantic') {

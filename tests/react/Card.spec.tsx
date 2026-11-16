@@ -105,7 +105,13 @@ describe('Card', () => {
     expect(onClick).not.toHaveBeenCalled()
     card.focus()
     await user.keyboard('{Enter}')
-    expect(onClick).toHaveBeenCalledTimes(1)
+    await user.keyboard(' ')
+    expect(onClick).toHaveBeenCalledTimes(2)
+    for (const [event] of onClick.mock.calls) {
+      expect(event.type).toBe('click')
+      expect(event.nativeEvent).toBeInstanceOf(MouseEvent)
+      expect(event.target).toBe(card)
+    }
   })
 
   it('keeps the title heading inside a separate link beside controls', async () => {

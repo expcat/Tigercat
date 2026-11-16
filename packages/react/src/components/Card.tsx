@@ -194,7 +194,7 @@ export const Card = forwardRef<HTMLElement, CardProps>(function Card(
     if (event.target !== event.currentTarget) return
     if (activation.rootRole !== 'button') return
     handleCardActivation(event, () => {
-      onClick?.(event as unknown as React.MouseEvent<HTMLElement>)
+      event.currentTarget.click()
     })
   }
 

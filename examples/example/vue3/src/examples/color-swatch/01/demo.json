@@ -1,7 +1,7 @@
 {
   "id": "color-swatch-01",
   "title": "分组色板",
-  "description": "FormItem 可见组名。两组不等长（4+6），columns=6 与组宽不一致；初选浅黄以便看见勾。",
+  "description": "FormItem 可见组名。两组不等长（4+6），columns=6 与组宽不一致；初选警告色以便看见勾。",
   "entry": "App.vue",
   "order": 1,
   "viewport": {

@@ -16,7 +16,7 @@ export interface AutoCompleteOption {
   /** Display text */
   label: string
   /**
-   * Option value. `''` is a legal value (not “unselected”).
+   * Option value. `''` is not committed, matching `AutoCompleteProps.value`.
    */
   value: AutoCompleteValue
   /** Whether the option is disabled */

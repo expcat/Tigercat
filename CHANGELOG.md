@@ -4,6 +4,11 @@
 
 ## v3.0.1（未发布）
 
+- **Figma 行高变量（Core，X02-F005）**：生成器将四个行高变量名映射为 `--tiger-primitive-font-lh-*`，167 个 Figma 变量均对应 tokens.css 的声明。
+- **Card 键盘点击事件（React / Vue，C034-F07）**：根节点 Enter / Space 激活走原生 click，onClick 收到符合点击契约的事件，不再收到 keydown。
+- **AutoComplete 空值注释（Core，C052-F04）**：AutoCompleteOption.value 注释与 Props 统一，空串表示未提交。
+- **ColorSwatch 初选说明（Demo，C057-F07）**：两端 01 示例说明改为初选警告色，与 `#f59e0b` 初值一致。
+
 - **组件文档索引（文档·生成器，X04-F01）**：生成索引和 Vue/React 框架索引改为打开 `shared/props/{kebab}.md` 与 `examples/{kebab}.md`。Form、Layout 仍指向内嵌标题的分类页。command-apis 改为指向 message、loading-bar、notification-container 三份拆页。
 - **预发布 latest 修复（工具链，X06-F01）**：publish-on-tag 不再写死 `STABLE=2.9.4`，改用五个包 version 里最后一个不含预发布号的版本。当前是 3.0.0。
 - **发布前核对标签（工具链，X06-F02）**：changeset publish 之前读取五个包的 version，与标签去掉 `v` 之后不一致就失败退出。
