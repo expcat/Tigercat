@@ -21,6 +21,9 @@ import {
   normalizePaginationTotal,
   normalizePaginationPageSize,
   resolvePageSizeOptions,
+  createPaginationIdleValidationScheduler,
+  getValidatedPaginationJumperValue,
+  getLocaleDirection,
   getQuickJumperPrefixClasses,
   getPaginationContainerClasses,
   getPaginationButtonBaseClasses,
@@ -82,7 +85,7 @@ export const Pagination: React.FC<PaginationProps> = ({
   showLessItems = false,
   ellipsisJump = false,
   itemRender,
-  quickJumperValidation: _quickJumperValidation,
+  quickJumperValidation,
   className,
   style,
   onChange,
@@ -133,11 +136,15 @@ export const Pagination: React.FC<PaginationProps> = ({
     [mergedLocale, labelsOverride]
   )
   const localeCode = mergedLocale?.locale
+  const direction = getLocaleDirection(mergedLocale)
 
   // Internal state for uncontrolled mode
   const [internalCurrent, setInternalCurrent] = useState<number>(defaultCurrent)
   const [internalPageSize, setInternalPageSize] = useState<number>(defaultPageSize)
   const [quickJumperValue, setQuickJumperValue] = useState<string>('')
+  const quickJumperSchedulerRef = useRef<ReturnType<
+    typeof createPaginationIdleValidationScheduler
+  > | null>(null)
   const focusIntent = useRef<'prev' | 'next' | 'page' | null>(null)
   const prevRef = useRef<HTMLButtonElement>(null)
   const nextRef = useRef<HTMLButtonElement>(null)
@@ -173,6 +180,21 @@ export const Pagination: React.FC<PaginationProps> = ({
     const next = validateCurrentPage(controlledCurrent, totalPages)
     if (next !== controlledCurrent) onChange?.(next, currentPageSize)
   }, [controlledCurrent, currentPageSize, onChange, totalPages])
+
+  useEffect(() => {
+    if (!quickJumperValidation) {
+      quickJumperSchedulerRef.current?.cancel()
+      quickJumperSchedulerRef.current = null
+      return
+    }
+
+    const scheduler = createPaginationIdleValidationScheduler(quickJumperValidation)
+    quickJumperSchedulerRef.current = scheduler
+    return () => {
+      scheduler.cancel()
+      if (quickJumperSchedulerRef.current === scheduler) quickJumperSchedulerRef.current = null
+    }
+  }, [quickJumperValidation])
 
   useLayoutEffect(() => {
     const intent = focusIntent.current
@@ -222,6 +244,7 @@ export const Pagination: React.FC<PaginationProps> = ({
 
   // Handle quick jumper submit
   const handleQuickJumperSubmit = useCallback(() => {
+    quickJumperSchedulerRef.current?.cancel()
     const page = getPaginationJumperPage(quickJumperValue, totalPages)
     if (page !== null) {
       handlePageChange(page)
@@ -229,9 +252,15 @@ export const Pagination: React.FC<PaginationProps> = ({
     setQuickJumperValue('')
   }, [quickJumperValue, totalPages, handlePageChange])
 
-  const handleQuickJumperChange = useCallback((value: string) => {
-    setQuickJumperValue(value)
-  }, [])
+  const handleQuickJumperChange = useCallback(
+    (value: string) => {
+      setQuickJumperValue(value)
+      quickJumperSchedulerRef.current?.schedule(() => {
+        setQuickJumperValue(getValidatedPaginationJumperValue(value, totalPages))
+      })
+    },
+    [totalPages]
+  )
 
   // Handle quick jumper keypress
   const handleQuickJumperKeyPress = useCallback(
@@ -318,12 +347,14 @@ export const Pagination: React.FC<PaginationProps> = ({
               <button
                 type="button"
                 className={getPaginationEllipsisClasses(size)}
-                aria-label={labels.jumpToPageAriaLabel}>
+                aria-label={labels.jumpToPageAriaLabel}
+                disabled={disabled}>
                 ...
               </button>
               <input
                 aria-label={labels.jumpToPageAriaLabel}
                 className="w-12"
+                disabled={disabled}
                 onKeyDown={(event) => {
                   if (event.key !== 'Enter') return
                   const next = clampPaginationJump(event.currentTarget.value, totalPages)
@@ -437,6 +468,7 @@ export const Pagination: React.FC<PaginationProps> = ({
     <nav
       className={containerClasses}
       {...navProps}
+      dir={direction}
       aria-label={ariaLabelProp ?? (ariaLabelledbyProp ? undefined : labels.paginationAriaLabel)}
       aria-labelledby={ariaLabelledbyProp}
       style={style}>

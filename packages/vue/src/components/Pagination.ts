@@ -364,6 +364,19 @@ export const Pagination = defineComponent({
       getPageRange(validatedCurrentPage.value, currentPageSize.value, itemTotal.value)
     )
 
+    watch(
+      () => [props.current, totalPages.value, currentPageSize.value] as const,
+      () => {
+        const current = props.current
+        if (current === undefined || !Number.isFinite(current)) return
+        const next = validateCurrentPage(current, totalPages.value)
+        if (next === current) return
+        emit('update:current', next)
+        emit('change', next, currentPageSize.value)
+      },
+      { immediate: true }
+    )
+
     // Check if should hide on single page
     const shouldHide = computed(() => {
       return props.hideOnSinglePage && totalPages.value <= 1
@@ -543,6 +556,7 @@ export const Pagination = defineComponent({
                         type: 'button',
                         class: getPaginationEllipsisClasses(size),
                         'aria-label': labels.value.jumpToPageAriaLabel,
+                        disabled: props.disabled,
                         onClick: (event: MouseEvent) => {
                           const input = (
                             event.currentTarget as HTMLElement
@@ -556,6 +570,7 @@ export const Pagination = defineComponent({
                       type: 'number',
                       class: 'w-12',
                       'aria-label': labels.value.jumpToPageAriaLabel,
+                      disabled: props.disabled,
                       onKeydown: (event: KeyboardEvent) => {
                         if (event.key !== 'Enter') return
                         const next = clampPaginationJump(

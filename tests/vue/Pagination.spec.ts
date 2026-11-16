@@ -72,6 +72,26 @@ describe('Pagination', () => {
     expect(onUpdateCurrent).toHaveBeenCalledWith(2)
   })
 
+  it('notifies the parent once when a controlled page is out of range', async () => {
+    const onChange = vi.fn()
+    const onUpdateCurrent = vi.fn()
+    const { rerender } = render(Pagination, {
+      props: { total: 50, pageSize: 10, current: 999 },
+      attrs: { onChange, 'onUpdate:current': onUpdateCurrent }
+    })
+
+    expect(screen.getByRole('button', { name: 'Page 5' })).toHaveAttribute('aria-current', 'page')
+    expect(onUpdateCurrent).toHaveBeenCalledTimes(1)
+    expect(onUpdateCurrent).toHaveBeenCalledWith(5)
+    expect(onChange).toHaveBeenCalledTimes(1)
+    expect(onChange).toHaveBeenCalledWith(5, 10)
+
+    await rerender({ total: 50, pageSize: 10, current: 5 })
+    await rerender({ total: 50, pageSize: 10, current: 5, className: 'again' })
+    expect(onUpdateCurrent).toHaveBeenCalledTimes(1)
+    expect(onChange).toHaveBeenCalledTimes(1)
+  })
+
   it('uses locale page indicator text in simple mode', () => {
     render({
       render: () =>
@@ -103,6 +123,15 @@ describe('Pagination', () => {
   it('disables all page buttons when disabled', () => {
     render(Pagination, { props: { total: 100, pageSize: 10, disabled: true } })
     screen.getAllByRole('button').forEach((btn) => expect(btn).toBeDisabled())
+  })
+
+  it('disables ellipsis jump controls when disabled', () => {
+    render(Pagination, {
+      props: { total: 200, pageSize: 10, current: 10, ellipsisJump: true, disabled: true }
+    })
+    const jumpControls = screen.getAllByLabelText('Go to page')
+    expect(jumpControls.length).toBeGreaterThan(0)
+    jumpControls.forEach((control) => expect(control).toBeDisabled())
   })
 
   it('hides on single page when hideOnSinglePage is true', () => {

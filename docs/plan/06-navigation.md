@@ -20,8 +20,8 @@ navigation 组 35 个组件（C082–C116）。审查时这一组同样没有浏
 
 ## 概览
 
-本篇 31 条：P2 15、P3 16。
-按波次：W4 15、W9 16。
+本篇 27 条：P2 11、P3 16。
+按波次：W4 11、W9 16。
 
 已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C086-F03（S13）、C088-F05（S13）、C095-F02（S13）、C109-F06（S13）、C112-F01（S13）、C113-F01（S13）、C114-F04（S13）、C116-F05（S13）。
 
@@ -71,14 +71,10 @@ navigation 组 35 个组件（C082–C116）。审查时这一组同样没有浏
 
 报告 `groups/navigation/Pagination.md`，队列状态 needs-evidence。另受 S01 影响。
 
-| 编号     | 级别 | 波次 | 端        | 类别 | 条目                                            | 验收                                                                                                |
-| -------- | ---- | ---- | --------- | ---- | ----------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| C109-F01 | P2   | W4   | Vue       | 行为 | Vue 受控越界页只改显示，不通知父级              | current=999、total=50、pageSize=10 时 Vue 发出一次 update:current(5) 与 change(5,10)，与 React 一致 |
-| C109-F02 | P2   | W4   | React     | 行为 | React 的 quickJumperValidation 被忽略           | React delay=50、total=100、pageSize=10，输入 99 前进 500ms 后变为 10；不传时仍为 99                 |
-| C109-F03 | P2   | W4   | 双端      | 行为 | disabled 没有禁用两端省略号跳页控件             | 同时开 ellipsisJump 与 disabled 时，双端省略号按钮和跳页输入的 disabled 均为 true                   |
-| C109-F04 | P2   | W4   | React     | i18n | React 组件级 RTL locale 不写 dir                | React 直接传 locale=arSA 且外层无 ConfigProvider 时，nav 的 dir 为 rtl                              |
-| C109-F05 | P3   | W9   | React     | 行为 | React 非受控点击当前页仍触发 onChange           | React 不传 current 时点击当前第 1 页，onChange 调用 0 次，与 Vue 一致                               |
-| C109-F07 | P3   | W9   | Core+Demo | 文档 | size 的注释和 Demo 说明写成 medium，运行值是 md | Core size 注释为 @default md，两端 pagination/03 demo.json 写 sm/md/lg                              |
+| 编号     | 级别 | 波次 | 端        | 类别 | 条目                                            | 验收                                                                   |
+| -------- | ---- | ---- | --------- | ---- | ----------------------------------------------- | ---------------------------------------------------------------------- |
+| C109-F05 | P3   | W9   | React     | 行为 | React 非受控点击当前页仍触发 onChange           | React 不传 current 时点击当前第 1 页，onChange 调用 0 次，与 Vue 一致  |
+| C109-F07 | P3   | W9   | Core+Demo | 文档 | size 的注释和 Demo 说明写成 medium，运行值是 md | Core size 注释为 @default md，两端 pagination/03 demo.json 写 sm/md/lg |
 
 ### C110 ScrollSpy
 

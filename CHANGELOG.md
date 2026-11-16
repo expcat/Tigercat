@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Pagination 受控夹取、快速跳页、禁用与方向（Vue / React，C109-F01、C109-F02、C109-F03、C109-F04）**：Vue 在受控 current 为有限数字且与夹取值不同时发出一次 `update:current` 与 `change`，父级接受夹取值后不再重发。React 传入 `quickJumperValidation` 时复用空闲校验调度，不传时仍在提交时才夹取。双端 `disabled` 同时禁用省略号跳页按钮和输入。React 按合并后的 locale 在 `nav` 上写 `dir`。
+
 - **NavigationMenuTrigger 顶栏 typeahead（React，C107-F01）**：Trigger 聚焦后键入字母前缀时，复用已有 menubar typeahead，焦点跳到匹配顶栏项并写上 tab stop，与 Vue 一致。
 
 - **NavigationMenuList current 指示器（Vue / React，C106-F01、C106-F02）**：React current 指示器补上与 Vue 相同的绝对定位、h-0.5 高度和主色。双端在视口或列表几何变化后重测 current 项，指示器起点和宽度继续对齐。

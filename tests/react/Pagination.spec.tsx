@@ -11,6 +11,7 @@ import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { enUS } from '@expcat/tigercat-core/locales/en-US'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
+import { arSA } from '@expcat/tigercat-core/locales/ar-SA'
 import { expectNoA11yViolations } from '../utils/react'
 
 describe('Pagination', () => {
@@ -70,6 +71,11 @@ describe('Pagination', () => {
     expect(screen.getByRole('navigation', { name: '分頁' })).toBeInTheDocument()
   })
 
+  it('writes dir from a component-level RTL locale without ConfigProvider', () => {
+    const { container } = render(<Pagination total={50} locale={arSA} />)
+    expect(container.querySelector('nav')).toHaveAttribute('dir', 'rtl')
+  })
+
   it('disables prev/next on boundaries', () => {
     const { unmount } = render(<Pagination total={100} pageSize={10} current={1} />)
     expect(screen.getByLabelText('Previous page')).toBeDisabled()
@@ -82,6 +88,13 @@ describe('Pagination', () => {
   it('disables all page buttons when disabled', () => {
     render(<Pagination total={100} pageSize={10} disabled />)
     screen.getAllByRole('button').forEach((btn) => expect(btn).toBeDisabled())
+  })
+
+  it('disables ellipsis jump controls when disabled', () => {
+    render(<Pagination total={200} pageSize={10} current={10} ellipsisJump disabled />)
+    const jumpControls = screen.getAllByLabelText('Go to page')
+    expect(jumpControls.length).toBeGreaterThan(0)
+    jumpControls.forEach((control) => expect(control).toBeDisabled())
   })
 
   it('hides on single page when hideOnSinglePage is true', () => {
@@ -115,6 +128,29 @@ describe('Pagination', () => {
     await user.keyboard('{Enter}')
     expect(onChange).toHaveBeenCalledWith(10, 10)
     expect(input.value).toBe('')
+  })
+
+  it('clamps quick jumper input after the validation delay, and only when configured', () => {
+    vi.useFakeTimers()
+    const { unmount } = render(
+      <Pagination total={100} pageSize={10} showQuickJumper quickJumperValidation={{ delay: 50 }} />
+    )
+    const input = screen.getByLabelText('Go to') as HTMLInputElement
+    fireEvent.change(input, { target: { value: '99' } })
+    expect(input.value).toBe('99')
+    act(() => {
+      vi.advanceTimersByTime(500)
+    })
+    expect(input.value).toBe('10')
+
+    unmount()
+    render(<Pagination total={100} pageSize={10} showQuickJumper />)
+    const plain = screen.getByLabelText('Go to') as HTMLInputElement
+    fireEvent.change(plain, { target: { value: '99' } })
+    act(() => {
+      vi.advanceTimersByTime(500)
+    })
+    expect(plain.value).toBe('99')
   })
 
   it('loads pagination locale lazily', async () => {
