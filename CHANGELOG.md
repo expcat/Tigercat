@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Space 分隔符与 verticalSize 说明（Core / React / Vue / 文档 / MCP，C050-F01、C050-F03）**：split 先展开 Fragment 并去掉注释。Vue v-for 三项出 2 个分隔符，v-if=false 只剩 B 时无前导分隔符；React 三项 Fragment、Fragment(A,B)+C 同样各出 2 个分隔符，空 Fragment 后的 B 没有前导分隔符，数字 0 仍保留。verticalSize 注释改为数值 size 输出 gap:40px 简写，该属性只覆盖行间距。
+
 - **Skeleton 预设、行数与加载后宿主（Core / React / Vue / 文档 / MCP，C049-F01、C049-F02、C049-F03）**：只传 preset=avatar 时两端输出 rounded-full w-10 h-10，显式 variant 优先，preset 不再进入 DOM。rows 使用 resolveSkeletonRows，rows=8 渲染 6 条，rows=2.5 且 paragraph 渲染 2 条且末行 60%，Infinity 回退为 1 条。loading 从 true 改为 false 后根保留 id、class、padding、aria-describedby、data 与点击，并撤下骨架的 aria-hidden 与 status。
 
 - **Sidebar 零宽隔离与展开 tabindex（React / Vue，C048-F01、C048-F03）**：React 零宽折叠时最后写入 inert、aria-hidden=true、tabindex=-1，调用方冲突值不能覆盖；展开态继续透传。Vue 只在 fullyHidden 时强制 tabindex=-1，展开且传入 0 时 SSR 保留 tabindex=0。

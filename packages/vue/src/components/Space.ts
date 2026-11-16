@@ -1,4 +1,13 @@
-import { defineComponent, computed, h, PropType } from 'vue'
+import {
+  Comment,
+  Fragment,
+  defineComponent,
+  computed,
+  h,
+  isVNode,
+  PropType,
+  type VNodeChild
+} from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -9,6 +18,25 @@ import {
   type SpaceProps,
   type SpaceSize
 } from '@expcat/tigercat-core'
+
+function flattenSpaceChildren(nodes: readonly unknown[]): VNodeChild[] {
+  const out: VNodeChild[] = []
+  for (const node of nodes) {
+    if (Array.isArray(node)) {
+      out.push(...flattenSpaceChildren(node))
+      continue
+    }
+    if (node == null || node === true || node === false) continue
+    if (isVNode(node) && (node.type === Comment || node.type === Fragment)) {
+      if (node.type === Fragment && Array.isArray(node.children)) {
+        out.push(...flattenSpaceChildren(node.children))
+      }
+      continue
+    }
+    out.push(node as VNodeChild)
+  }
+  return out
+}
 
 export interface VueSpaceProps extends SpaceProps {
   split?: boolean
@@ -67,7 +95,7 @@ export const Space = defineComponent({
     return () => {
       const attrsRecord = attrs as Record<string, unknown>
       const kids = slots.default?.() ?? []
-      const flat = kids.flatMap((node) => (Array.isArray(node) ? node : [node]))
+      const flat = flattenSpaceChildren(kids)
       const content =
         props.split && flat.length > 1
           ? flat.flatMap((node, index) =>

@@ -126,4 +126,48 @@ describe('Space (React)', () => {
     await user.click(el)
     expect(onClick).toHaveBeenCalledTimes(1)
   })
+
+  it('splits fragments and does not lead with an empty fragment', () => {
+    const grouped = render(
+      <Space split="/">
+        <>
+          <span>A</span>
+          <span>B</span>
+          <span>C</span>
+        </>
+      </Space>
+    )
+    expect(grouped.container.querySelectorAll('[data-tiger-space-split]')).toHaveLength(2)
+    expect(grouped.container.textContent).toBe('A/B/C')
+
+    const mixed = render(
+      <Space split="/">
+        <>
+          <span>A</span>
+          <span>B</span>
+        </>
+        <span>C</span>
+      </Space>
+    )
+    expect(mixed.container.querySelectorAll('[data-tiger-space-split]')).toHaveLength(2)
+    expect(mixed.container.textContent).toBe('A/B/C')
+
+    const empty = render(
+      <Space split="/">
+        <></>
+        <span>B</span>
+      </Space>
+    )
+    expect(empty.container.querySelectorAll('[data-tiger-space-split]')).toHaveLength(0)
+    expect(empty.container.textContent).toBe('B')
+
+    const zero = render(
+      <Space split="/">
+        {0}
+        <span>B</span>
+      </Space>
+    )
+    expect(zero.container.querySelectorAll('[data-tiger-space-split]')).toHaveLength(1)
+    expect(zero.container.textContent).toBe('0/B')
+  })
 })

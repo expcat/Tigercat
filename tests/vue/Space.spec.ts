@@ -128,4 +128,27 @@ describe('Space (Vue)', () => {
     expect(el).toHaveAttribute('id', 'my-space')
     expect(el).toHaveAttribute('aria-label', 'space')
   })
+
+  it('splits a v-for fragment and skips a hidden leading item', () => {
+    const listed = render({
+      template: '<Space split><span v-for="n in 3" :key="n">{{ n }}</span></Space>',
+      components: { Space }
+    })
+    expect(listed.container.querySelectorAll('[data-tiger-space-split]')).toHaveLength(2)
+    expect(listed.container.textContent).toBe('1|2|3')
+
+    const hidden = render({
+      template: '<Space split><span v-if="false">A</span><span>B</span></Space>',
+      components: { Space }
+    })
+    expect(hidden.container.querySelectorAll('[data-tiger-space-split]')).toHaveLength(0)
+    expect(hidden.container.textContent).toBe('B')
+
+    const zero = render(Space, {
+      props: { split: true },
+      slots: { default: () => [0, h('span', 'B')] }
+    })
+    expect(zero.container.querySelectorAll('[data-tiger-space-split]')).toHaveLength(1)
+    expect(zero.container.textContent).toBe('0|B')
+  })
 })

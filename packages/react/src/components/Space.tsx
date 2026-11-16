@@ -6,6 +6,18 @@ import {
   type SpaceProps as CoreSpaceProps
 } from '@expcat/tigercat-core'
 
+function flattenSpaceFragments(children: React.ReactNode): React.ReactNode {
+  const out: React.ReactNode[] = []
+  React.Children.forEach(children, (child) => {
+    if (React.isValidElement(child) && child.type === React.Fragment) {
+      out.push(flattenSpaceFragments((child.props as { children?: React.ReactNode }).children))
+      return
+    }
+    out.push(child)
+  })
+  return out
+}
+
 export type SpaceProps = CoreSpaceProps &
   Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'className' | 'style'> & {
     children?: React.ReactNode
@@ -35,7 +47,7 @@ export const Space = forwardRef<HTMLDivElement, SpaceProps>(function Space(
         // written inline. Coercing the name to 0 would wipe the class gap.
         getSpaceGapStyle(size, verticalSize)
       : getSpaceStyle(size)
-  const nodes = React.Children.toArray(children)
+  const nodes = React.Children.toArray(flattenSpaceFragments(children))
   const content =
     split != null && nodes.length > 1
       ? nodes.flatMap((node, index) =>

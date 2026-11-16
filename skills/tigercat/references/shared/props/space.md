@@ -24,7 +24,7 @@ Note: `wrap` 只在窄容器里折行。Vue 声明 `className`，不会盖掉基
 ### Remaining props (complete public API)
 
 - `orientation?`: `BaseLayoutProps['orientation']`; default `'horizontal'`. Space orientation
-- `verticalSize?`: `number`; default `-`. Vertical gap in pixels. Omit to use `size` on both axes when `size` is a preset. A nume...
+- `verticalSize?`: `number`; default `-`. Vertical gap in pixels. When omitted, preset and numeric `size` both apply on the two a...
 - `split?`: `boolean`; default `-`. -
 - `className?`: `string`; default `-`. -
 - `style?`: `Record<string, string | number>`; default `-`. -

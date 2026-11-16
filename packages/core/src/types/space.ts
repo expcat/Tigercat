@@ -39,8 +39,9 @@ export interface SpaceProps extends Pick<BaseLayoutProps, 'orientation' | 'align
   wrap?: BaseLayoutProps['wrap']
 
   /**
-   * Vertical gap in pixels. Omit to use `size` on both axes when `size` is a preset.
-   * A numeric `size` stays horizontal-only until this is set.
+   * Vertical gap in pixels. When omitted, preset and numeric `size` both apply
+   * on the two axes. A numeric `size` is the CSS `gap` shorthand:
+   * `getSpaceStyle(40)` outputs `gap:40px`. This prop overrides only the row gap.
    */
   verticalSize?: number
 }

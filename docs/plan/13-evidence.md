@@ -109,7 +109,7 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | C047 | ScrollArea   | needs-evidence | F01–F06 已修复。hidden 或 nativeBars 且溢出时 viewport 有 tabindex、region 与名称，gutter 只跟自定义条；aria-describedby 与 aria-busy 进 viewport；Vue 字符串 tabindex=-1 保留；RTL 负值模型零点连续；已测量溢出时隐藏原生条；Demo02 写 axis。视觉/键盘 0/24 blocked、截图 0；E2E、读屏、hydration 未执行 |
 | C048 | Sidebar      | needs-evidence | F01/F03 已修复。零宽折叠且调用方传入冲突属性时，根仍输出 inert、aria-hidden=true、tabindex=-1；Vue 展开态保留 tabindex=0，fullyHidden 仍为 -1。视觉/键盘 0/16 blocked、截图 0；E2E、读屏、hydration 未执行 |
 | C049 | Skeleton     | needs-evidence | F01/F02/F03 已修复。preset=avatar 映射为 rounded-full w-10 h-10，显式 variant 优先。rows=8 为 6 条，rows=2.5 且 paragraph 为 2 条、末行 60%，Infinity 回退 1 条。loading 变 false 后保留 id、class、padding、aria-describedby 与点击。视觉/键盘 0/16 blocked、截图 0；E2E、读屏、hydration 未执行 |
-| C050 | Space        | needs-evidence | 视觉 0/24 blocked；键盘 0/24 blocked；截图 0；28 个双端 SSR 输出与 TS 诊断已跑；hydration、E2E、全量构建、读屏未执行；C012 旧截图未重审，不计入 C050 pass                     |
+| C050 | Space        | needs-evidence | F01/F03 已修复。split 展开 Fragment 并去掉空注释：Vue v-for 三项 2 个分隔符，v-if=false 只剩 B 无前导分隔符；React 三项 Fragment 与 Fragment(A,B)+C 各 2 个分隔符，空 Fragment 后的 B 无前导分隔符，数字 0 保留。verticalSize 注释改为数值 size 的 gap:40px 简写，只覆盖行间距。Space spec 23 项（happy-dom）与 types:check 通过；IAB 不可用。视觉/键盘 0/24 blocked、截图 0；hydration、E2E、读屏未执行 |
 | C051 | Splitter     | needs-evidence | 视觉 0/24 blocked；键盘 0/24 blocked；截图 0；双端 SSR 成功，hydration 未验证；E2E 未运行且无直接 Splitter 用例；docs:links 退出 1（均在 .local/review）                      |
 
 ### form
