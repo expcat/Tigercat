@@ -63,7 +63,13 @@ export const AvatarGroup: React.FC<AvatarGroupProps> = ({
     [size, shape]
   )
 
-  const childArray = React.Children.toArray(children)
+  const childArray = React.Children.toArray(children).flatMap(
+    function flattenFragment(child): React.ReactNode[] {
+      return isValidElement<{ children?: React.ReactNode }>(child) && child.type === React.Fragment
+        ? React.Children.toArray(child.props.children).flatMap(flattenFragment)
+        : [child]
+    }
+  )
   let avatarSeen = 0
   const cap =
     typeof max === 'number' && Number.isFinite(max) ? Math.max(0, Math.floor(max)) : undefined
@@ -102,8 +108,8 @@ export const AvatarGroup: React.FC<AvatarGroupProps> = ({
       <div
         className={getAvatarGroupClasses(className)}
         role="group"
-        aria-label={labels.ariaLabel}
-        {...props}>
+        {...props}
+        aria-label={props['aria-label'] ?? labels.ariaLabel}>
         {rendered}
         {overflowCount > 0 && (
           <Popover

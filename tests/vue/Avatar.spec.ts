@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { defineComponent, h } from 'vue'
+import { defineComponent, Fragment, h } from 'vue'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import { Avatar } from '@expcat/tigercat-vue/Avatar'
 import { AvatarGroup } from '@expcat/tigercat-vue/AvatarGroup'
@@ -163,6 +163,31 @@ describe('AvatarGroup', () => {
     render(Host)
     expect(screen.getByText('keep-me')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '1 more' })).toBeInTheDocument()
+  })
+
+  it('counts avatars inside transparent fragments toward max', () => {
+    render({
+      setup: () => () =>
+        h(AvatarGroup, { max: 1 }, () => [
+          h(Fragment, [
+            h(Avatar, { text: 'A' }),
+            h('span', 'keep-me'),
+            h(Fragment, [h(Avatar, { text: 'B' })])
+          ])
+        ])
+    })
+    expect(screen.getByRole('img', { name: 'A' }).closest('.sr-only')).toBeNull()
+    expect(screen.getByRole('img', { name: 'B' }).closest('.sr-only')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '1 more' })).toHaveTextContent('+1')
+    expect(screen.getByText('keep-me')).toBeInTheDocument()
+  })
+
+  it.each([undefined, 'Team'])('resolves the native group label (%s)', (label) => {
+    render(AvatarGroup, {
+      attrs: { 'aria-label': label },
+      slots: { default: () => h(Avatar, { text: 'A' }) }
+    })
+    expect(screen.getByRole('group', { name: label ?? 'Avatar group' })).toBeInTheDocument()
   })
 
   it('applies group shape to overflow', () => {

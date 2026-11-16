@@ -147,6 +147,33 @@ describe('AvatarGroup', () => {
     expect(screen.getByText('not-avatar')).toBeInTheDocument()
   })
 
+  it('counts avatars inside transparent fragments toward max', () => {
+    render(
+      <AvatarGroup max={1}>
+        <>
+          <Avatar text="A" />
+          <span>keep-me</span>
+          <>
+            <Avatar text="B" />
+          </>
+        </>
+      </AvatarGroup>
+    )
+    expect(screen.getByRole('img', { name: 'A' }).closest('.sr-only')).toBeNull()
+    expect(screen.getByRole('img', { name: 'B' }).closest('.sr-only')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '1 more' })).toHaveTextContent('+1')
+    expect(screen.getByText('keep-me')).toBeInTheDocument()
+  })
+
+  it.each([undefined, 'Team'])('resolves the native group label (%s)', (label) => {
+    render(
+      <AvatarGroup aria-label={label}>
+        <Avatar text="A" />
+      </AvatarGroup>
+    )
+    expect(screen.getByRole('group', { name: label ?? 'Avatar group' })).toBeInTheDocument()
+  })
+
   it('applies group shape to overflow', () => {
     render(
       <AvatarGroup max={0} shape="square">

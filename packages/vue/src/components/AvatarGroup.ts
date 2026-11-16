@@ -133,8 +133,8 @@ export const AvatarGroup = defineComponent({
         'div',
         {
           role: 'group',
-          'aria-label': labels.value.ariaLabel,
           ...attrs,
+          'aria-label': attrs['aria-label'] ?? labels.value.ariaLabel,
           class: getAvatarGroupClasses(props.className, coerceClassValue(attrsClass))
         },
         [

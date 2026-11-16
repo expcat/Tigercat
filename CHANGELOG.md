@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **AvatarGroup 折叠与组名（React / Vue，C006-F001、C006-F003）**：React 计数前展开 Fragment，max=1 时保留 A 并折叠 B 为 +1；两端原生 aria-label 为 undefined 时保留 locale 默认组名，显式名称仍可覆盖。
+
 - **Avatar 名称、示例配色与组叠放（Core / React / Vue / Demo，C005-F001、C005-F002、C005-F003）**：外部标签接到实际图片，图片与回退保持显式名称优先；TC 示例使用主题前景色适配明暗主题；溢出按钮重叠缩至 4px，避免遮住「陈晨」字形。
 
 - **Button 默认加载描边（Core / Vue，C004-F002）**：共享 SVG descriptor 在 Vue 渲染前转换现有描边属性，默认 loading 圆环输出 stroke-width="4"，与 React 一致。
