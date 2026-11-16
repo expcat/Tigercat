@@ -172,7 +172,7 @@ export const NavigationMenuLink = React.forwardRef<HTMLElement, NavigationMenuLi
     const item = useContext(NavigationMenuItemContext)
     const content = useContext(NavigationMenuContentContext)
     const inPanel = Boolean(content)
-    const isDisabled = disabled || Boolean(item?.disabled) || Boolean(!inPanel && root?.disabled)
+    const isDisabled = disabled || Boolean(item?.disabled) || Boolean(root?.disabled)
     // Mega panels are disclosures: links keep native anchor/button semantics.
     const tabIndex = inPanel
       ? content?.mega

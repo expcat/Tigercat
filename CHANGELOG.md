@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **NavigationMenuLink 根禁用（Vue / React，C105-F01）**：面板已经打开后再把根设为 `disabled` 时，双端面板内 Link 去掉 href、带 `aria-disabled`，点击不再执行调用方回调。
+
 - **NavigationMenuItem 根禁用与生成示例（Vue / React / 文档生成器，C104-F01、C104-F02）**：双端根 `disabled` 且 `defaultValue` 或受控 `value` 命中某 Item 时，Content 保持关闭。Item 生成示例补上 Content 与 Link，重跑 `pnpm docs:api` 后 Examples 与 MCP 片段构成有效组合。
 
 - **NavigationMenu menubar 子角色（React，C102-F03）**：启用 portal 时，关闭的面板继续挂载在 portal 中，不再把 mega 面板的原生链接带回 menubar；现有打开面板的 axe 用例通过。

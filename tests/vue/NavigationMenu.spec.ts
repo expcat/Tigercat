@@ -392,6 +392,41 @@ describe('NavigationMenu', () => {
     )
   })
 
+  it('disables an already open panel link when the root becomes disabled', async () => {
+    const onClick = vi.fn()
+    const { rerender } = render(NavigationMenu, {
+      props: { delayDuration: 0, skipDelayDuration: 0, defaultValue: 'products' },
+      slots: {
+        default: () => [
+          h(NavigationMenuList, null, () => [
+            h(NavigationMenuItem, { value: 'products' }, () => [
+              h(NavigationMenuTrigger, null, () => 'Products'),
+              h(NavigationMenuContent, null, () => [
+                h(NavigationMenuLink, { href: '/overview', onClick }, () => 'Overview')
+              ])
+            ])
+          ])
+        ]
+      }
+    })
+
+    const overview = screen.getByRole('menuitem', { name: 'Overview' })
+    expect(overview).toHaveAttribute('href', '/overview')
+    expect(overview).not.toHaveAttribute('aria-disabled')
+
+    await rerender({
+      delayDuration: 0,
+      skipDelayDuration: 0,
+      defaultValue: 'products',
+      disabled: true
+    })
+    const disabledOverview = screen.getByRole('menuitem', { name: 'Overview', hidden: true })
+    expect(disabledOverview).not.toHaveAttribute('href')
+    expect(disabledOverview).toHaveAttribute('aria-disabled', 'true')
+    await fireEvent.click(disabledOverview)
+    expect(onClick).not.toHaveBeenCalled()
+  })
+
   it('keeps aria-controls while closed', async () => {
     renderNav({ defaultValue: 'products' })
     const products = screen.getByRole('menuitem', { name: 'Products' })

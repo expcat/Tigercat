@@ -262,7 +262,7 @@ export const NavigationMenuLink = defineComponent({
 
     const inPanel = Boolean(content)
     const disabled = computed(
-      () => props.disabled || Boolean(item?.disabled) || Boolean(!inPanel && root?.disabled)
+      () => props.disabled || Boolean(item?.disabled) || Boolean(root?.disabled)
     )
 
     const handleClick = (event: MouseEvent) => {
