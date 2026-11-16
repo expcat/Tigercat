@@ -1,5 +1,18 @@
-import { defineComponent, h, ref, computed, type PropType } from 'vue'
+import { computed, defineComponent, h, nextTick, ref, type PropType } from 'vue'
 import { resolveButtonClasses, toggleInplace } from '@expcat/tigercat-core'
+
+const INPLACE_FOCUSABLE =
+  'input:not([disabled]):not([type="hidden"]), textarea:not([disabled]), select:not([disabled]), button:not([disabled]), a[href], [contenteditable="true"], [tabindex]:not([tabindex="-1"])'
+
+function focusInplaceEditor(container: HTMLElement | null): void {
+  if (!container) return
+  const target = container.querySelector<HTMLElement>(INPLACE_FOCUSABLE)
+  if (target) {
+    target.focus()
+    return
+  }
+  container.focus()
+}
 
 export type VueInplaceProps = InstanceType<typeof Inplace>['$props']
 
@@ -16,6 +29,9 @@ export const Inplace = defineComponent({
     const unmanaged = ref(props.defaultEditing)
     const isControlled = computed(() => props.editing !== undefined)
     const editing = computed(() => (isControlled.value ? Boolean(props.editing) : unmanaged.value))
+    const inputRef = ref<HTMLElement | null>(null)
+    const buttonRef = ref<HTMLButtonElement | null>(null)
+    let focusIntent: 'edit' | 'display' | null = null
 
     function publish(next: boolean, action: 'edit' | 'commit' | 'cancel'): void {
       const state = toggleInplace({ editing: editing.value }, action)
@@ -23,6 +39,17 @@ export const Inplace = defineComponent({
       if (!isControlled.value) unmanaged.value = value
       emit('editing-change', value)
       emit('update:editing', value)
+      focusIntent = value ? 'edit' : 'display'
+      void settleFocus()
+    }
+
+    async function settleFocus(): Promise<void> {
+      const intent = focusIntent
+      await nextTick()
+      if (!intent || focusIntent !== intent) return
+      focusIntent = null
+      if (intent === 'edit') focusInplaceEditor(inputRef.value)
+      else buttonRef.value?.focus()
     }
 
     function startEdit(): void {
@@ -31,6 +58,7 @@ export const Inplace = defineComponent({
     }
 
     function onKeydown(event: KeyboardEvent): void {
+      if (event.isComposing || event.defaultPrevented) return
       if (event.key === 'Enter') {
         event.preventDefault()
         publish(false, 'commit')
@@ -45,10 +73,11 @@ export const Inplace = defineComponent({
         'span',
         { ...attrs, 'data-tiger-inplace': '', 'data-editing': editing.value ? 'true' : 'false' },
         editing.value
-          ? h('span', { onKeydown }, slots.input?.())
+          ? h('span', { ref: inputRef, tabindex: -1, onKeydown }, slots.input?.())
           : h(
               'button',
               {
+                ref: buttonRef,
                 type: 'button',
                 class: resolveButtonClasses({
                   variant: 'ghost',

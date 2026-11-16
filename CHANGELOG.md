@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Inplace 根属性、编辑热键与焦点（React / Vue / Demo，C021-F01、C021-F02、C021-F03、C021-K01）**：React 把 id、className、style、title、data-* 和 aria-* 留在外层 span。两端忽略输入法组合中，以及子节点已经取消的 Enter 和 Escape。进入编辑后聚焦编辑区内第一个可聚焦元素，没有则聚焦编辑容器；提交或 Escape 后焦点回到展示按钮。两端示例说明改为 Escape 退出编辑并保留当前输入。
+
 - **ImagePreview 循环说明、手势与缩放范围（文档 / Vue / React，C020-F01、C020-F02、C020-F03）**：生成笔记改为多图首尾循环，Props、Examples 与 MCP 不再写到头禁用。Vue 打开期间按图片数量、缩放范围和滑动开关重建手势会话，1 张变 2 张后可以滑动换图，关掉 touchSwipeable 后不再滑动换图。两端打开、切图和 Reset 把比例夹进 minScale 与 maxScale，范围不含 1 时不再发出 scale 1。
 
 - **ImageGroup 受控索引（React / Vue，C019-F01）**：传入 currentIndex 时，切图只发出下一张索引请求，灯箱停在父层那一张。ImageGroup 固定 currentIndex=0 时画面仍是第 1 张。未传 currentIndex 的预览仍自行切图，并在首尾循环。
