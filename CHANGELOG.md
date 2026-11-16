@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Tooltip 焦点说明（文档 / MCP，C129-F02）**：生成笔记与迁移文档写明，`trigger="hover"` 的焦点进入立即打开，默认 100ms 的显示延迟只作用于指针。
+
 - **Progress 百分比语言（React，C128-F01）**：默认百分比文字遵循 ConfigProvider 的 locale；fr-FR 的 50% 显示为 `50\u00A0%`，与 Vue 一致。
 
 - **Popconfirm 键盘确认（React / Vue，C126-F01）**：打开并完成定位后聚焦确定按钮，Enter 确认；Shift+Tab 与 Tab 可在取消、确定之间移动，不再因焦点留在触发器而提前关闭。

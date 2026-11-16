@@ -262,7 +262,7 @@ reducer 拒绝不属于当前操作者的动作，并拒绝空的必填意见。
 
 ## Tooltip / Popover / Popconfirm
 
-悬停只跟指针。焦点还在触发器上时，指针离开不关。`Popover` 把焦点留在触发器上，Tab 离开即关。`Popconfirm` 打开后聚焦确定按钮，Enter 确认；Shift+Tab 与 Tab 可在取消、确定之间移动。确认的 Promise 在进行中关不掉。
+`Tooltip` 的 `trigger="hover"` 同时监听指针和焦点，焦点进入立即打开；显示延迟只作用于指针，默认 100ms。焦点还在触发器上时，指针离开不关。`Popover` 把焦点留在触发器上，Tab 离开即关。`Popconfirm` 打开后聚焦确定按钮，Enter 确认；Shift+Tab 与 Tab 可在取消、确定之间移动。确认的 Promise 在进行中关不掉。
 
 Tooltip 气泡用 `--tiger-text` 作底、`--tiger-surface` 作字，圆角 `--tiger-radius-sm`，阴影 `--tiger-shadow-lg`。箭头跟气泡同色，不再借用 Popconfirm 的白底描边。不再读未定义的 `--tiger-component-tooltip-*`。
 

@@ -378,7 +378,7 @@ const COMPONENT_USAGE_NOTES = {
   },
   Tooltip: {
     notes:
-      '悬停只跟指针。点击、Enter、Space 不会把悬停层关掉。焦点还在触发器上时，指针离开也保持打开。`disabled` 立刻关闭。内容只接受纯文本，可聚焦后代在开发期报错；要交互用 Popover。显示延迟默认 100ms。'
+      '`trigger="hover"` 同时监听指针和焦点，焦点进入立即打开。点击、Enter、Space 不会把悬停层关掉。焦点还在触发器上时，指针离开也保持打开。`disabled` 立刻关闭。内容只接受纯文本，可聚焦后代在开发期报错；要交互用 Popover。显示延迟只作用于指针，默认 100ms。'
   },
   Popover: {
     notes:
