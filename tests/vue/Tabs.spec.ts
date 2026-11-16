@@ -930,4 +930,33 @@ describe('Tabs', () => {
       expect(screen.getByText('Content 2')).toBeTruthy()
     })
   })
+
+  it('keeps numeric 1 and string "1" distinct and focuses the next tab', async () => {
+    render(Tabs, {
+      props: {
+        type: 'editable-card',
+        closable: true,
+        defaultActiveKey: 1
+      },
+      slots: {
+        default: () => [
+          h(TabPane, { tabKey: 1, label: 'Number' }, () => 'Number body'),
+          h(TabPane, { tabKey: '1', label: 'String' }, () => 'String body')
+        ]
+      }
+    })
+
+    const numberTab = screen.getByRole('tab', { name: 'Number' })
+    const stringTab = screen.getByRole('tab', { name: 'String' })
+    expect(numberTab.id).not.toBe(stringTab.id)
+    expect(numberTab.getAttribute('aria-controls')).not.toBe(
+      stringTab.getAttribute('aria-controls')
+    )
+
+    numberTab.focus()
+    await fireEvent.keyDown(numberTab, { key: 'Delete' })
+    await waitFor(() => {
+      expect(stringTab).toHaveFocus()
+    })
+  })
 })

@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Tabs 懒渲染默认值与类型化 key（Vue / React，C114-F01、C114-F02）**：React 省略 `lazy` 时与 Core、Vue 一样挂载未访问面板，只有显式 `lazy` 才推迟挂载。数字 `1` 与字符串 `"1"` 的 DOM id、React 列表 key 和溢出文案不再相撞，关闭当前项后焦点落到对应的下一项。
+
 - **Spotlight 热键、搜索框关闭与图标（Core / Vue / React / Demo，C111-F01、C111-F02、C111-F03、C111-F04）**：Vue 在 `hotkey` 变化时认领或释放全局热键，挂载后再打开可以响应 Meta/Ctrl+K，关掉后不再响应。已打开面板的搜索框上，带命令修饰键的切换热键可以关闭面板；其他可编辑目标和裸字母仍留给输入。示例 01 传入 `hotkey`，02 用 `defaultOpen` 演示 ⌘ ,。已注册图标名渲染为 svg，未注册字符串仍显示为文本。
 
 - **ScrollSpy 受控禁用键（React，C110-F01）**：传入 `activeKey` 时显示该键，禁用或不存在也不再静默改成第一项，且不触发 `onActiveKeyChange`。未传 `activeKey` 时仍按 `defaultActiveKey` 或第一项可用项初始化。

@@ -302,7 +302,7 @@ export const Tabs: React.FC<TabsProps> = ({
   closable = false,
   centered = false,
   destroyInactiveTabPane = false,
-  lazy = true,
+  lazy = false,
   swipeable = false,
   activation = 'automatic',
   className,
@@ -365,7 +365,7 @@ export const Tabs: React.FC<TabsProps> = ({
       const panelId = `${idBase}-panel-${formatTabKey(key)}`
       items.push(
         React.cloneElement(child, {
-          key: `tab-${String(key)}`,
+          key: `tab-${formatTabKey(key)}`,
           renderMode: 'tab',
           tabId,
           panelId
@@ -373,7 +373,7 @@ export const Tabs: React.FC<TabsProps> = ({
       )
       panes.push(
         React.cloneElement(child, {
-          key: `pane-${String(key)}`,
+          key: `pane-${formatTabKey(key)}`,
           renderMode: 'pane',
           tabId,
           panelId
@@ -387,7 +387,7 @@ export const Tabs: React.FC<TabsProps> = ({
       const key = readTabPaneKey(child.props as unknown as Record<string, unknown>)
       if (key === undefined) return
       const label = child.props.label
-      labelByKey.set(String(key), typeof label === 'string' ? label : String(key))
+      labelByKey.set(formatTabKey(key), typeof label === 'string' ? label : String(key))
     })
 
     return { tabItems: items, tabPanes: panes, tabRecords: records, labelByKey }
@@ -630,7 +630,7 @@ export const Tabs: React.FC<TabsProps> = ({
         <Dropdown
           items={overflowKeys.map((key) => ({
             key,
-            label: labelByKey.get(String(key)) ?? String(key)
+            label: labelByKey.get(formatTabKey(key)) ?? String(key)
           }))}
           onItemSelect={(item) => handleTabClick(item.key)}>
           <button type="button" data-tiger-tabs-more="">

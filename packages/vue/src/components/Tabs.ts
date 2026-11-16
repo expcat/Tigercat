@@ -463,7 +463,7 @@ export const Tabs = defineComponent({
         return
       }
       pendingFocusKey.value = null
-      const tabId = `${idBase}-tab-${String(pending)}`
+      const tabId = `${idBase}-tab-${formatTabKey(pending)}`
       tabListEl.value?.querySelector<HTMLElement>(`#${CSS.escape(tabId)}`)?.focus()
     }
 
@@ -657,8 +657,8 @@ export const Tabs = defineComponent({
       const tabPanes: VNode[] = []
 
       for (const child of validChildren) {
-        const tabId = `${idBase}-tab-${String(child.key)}`
-        const panelId = `${idBase}-panel-${String(child.key)}`
+        const tabId = `${idBase}-tab-${formatTabKey(child.key)}`
+        const panelId = `${idBase}-panel-${formatTabKey(child.key)}`
         tabItems.push(
           h(child.type, {
             ...child.props,

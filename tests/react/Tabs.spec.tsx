@@ -508,7 +508,10 @@ describe('Tabs', () => {
       await fireEvent.keyDown(tab1, { key: 'ArrowRight' })
       expect(tab2).toHaveFocus()
       expect(tab1).toHaveAttribute('aria-selected', 'true')
-      expect(screen.queryByText('Content 2')).not.toBeInTheDocument()
+      expect(screen.getByText('Content 2').closest('[role="tabpanel"]')).toHaveAttribute(
+        'aria-hidden',
+        'true'
+      )
 
       await fireEvent.keyDown(tab2, { key: 'Enter' })
       expect(tab2).toHaveAttribute('aria-selected', 'true')
@@ -753,9 +756,8 @@ describe('Tabs', () => {
       const tabs = screen.getAllByRole('tab')
       expect(tabs).toHaveLength(2)
 
-      const tabpanels = screen.getAllByRole('tabpanel')
-      expect(tabpanels).toHaveLength(1)
-      expect(screen.queryByText('Content 2')).not.toBeInTheDocument()
+      const tabpanels = screen.getAllByRole('tabpanel', { hidden: true })
+      expect(tabpanels).toHaveLength(2)
     })
 
     it('puts one named close button inside a closable tab', () => {
@@ -793,7 +795,7 @@ describe('Tabs', () => {
 
     it('does not mount an unvisited tab panel', () => {
       render(
-        <Tabs activeKey="1">
+        <Tabs activeKey="1" lazy>
           <TabPane tabKey="1" label="Tab 1">
             Content 1
           </TabPane>
@@ -807,6 +809,23 @@ describe('Tabs', () => {
       expect(panels).toHaveLength(1)
       expect(panels[0]).not.toHaveAttribute('aria-hidden', 'true')
       expect(screen.queryByText('Content 2')).not.toBeInTheDocument()
+    })
+
+    it('mounts unvisited panels when lazy is omitted', () => {
+      render(
+        <Tabs activeKey="1">
+          <TabPane tabKey="1" label="Tab 1">
+            Content 1
+          </TabPane>
+          <TabPane tabKey="2" label="Tab 2">
+            Content 2
+          </TabPane>
+        </Tabs>
+      )
+
+      const panels = screen.getAllByRole('tabpanel', { hidden: true })
+      expect(panels).toHaveLength(2)
+      expect(screen.getByText('Content 2', { hidden: true })).toBeInTheDocument()
     })
 
     it('should have proper aria-disabled attributes', () => {
@@ -1016,5 +1035,38 @@ describe('Tabs', () => {
       // Tab 2 content still mounted
       expect(screen.getByText('Content 2')).toBeTruthy()
     })
+  })
+
+  it('keeps numeric 1 and string "1" distinct and focuses the next tab', async () => {
+    const errors: string[] = []
+    const spy = vi.spyOn(console, 'error').mockImplementation((...args: unknown[]) => {
+      errors.push(args.map((arg) => String(arg)).join(' '))
+    })
+    try {
+      render(
+        <Tabs type="editable-card" closable defaultActiveKey={1}>
+          <TabPane tabKey={1} label="Number">
+            Number body
+          </TabPane>
+          <TabPane tabKey="1" label="String">
+            String body
+          </TabPane>
+        </Tabs>
+      )
+
+      expect(errors).toEqual([])
+      const numberTab = screen.getByRole('tab', { name: 'Number' })
+      const stringTab = screen.getByRole('tab', { name: 'String' })
+      expect(numberTab.id).not.toBe(stringTab.id)
+      expect(numberTab.getAttribute('aria-controls')).not.toBe(
+        stringTab.getAttribute('aria-controls')
+      )
+
+      numberTab.focus()
+      await fireEvent.keyDown(numberTab, { key: 'Delete' })
+      expect(stringTab).toHaveFocus()
+    } finally {
+      spy.mockRestore()
+    }
   })
 })
