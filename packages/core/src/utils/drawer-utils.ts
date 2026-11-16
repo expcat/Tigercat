@@ -268,26 +268,47 @@ export function drawerResizeAxis(
   return placement === 'top' || placement === 'bottom' ? 'height' : 'width'
 }
 
-/** Positive distance moves the panel toward its close edge. */
+function drawerFollowCloseAxis(
+  placement: Exclude<DrawerPlacement, 'start' | 'end'>,
+  options?: Pick<DrawerSwipeCloseOptions, 'direction' | 'fullscreen'>
+): SwipeDirection {
+  if (options?.fullscreen) {
+    return getDrawerSwipeCloseDirection({
+      placement,
+      direction: options.direction,
+      fullscreen: true
+    })
+  }
+  if (placement === 'left') return 'left'
+  if (placement === 'right') return 'right'
+  if (placement === 'bottom') return 'down'
+  return 'up'
+}
+
+/** Positive distance moves the panel toward its close edge. Fullscreen uses the documented swipe axis. */
 export function drawerFollowDistance(
   placement: Exclude<DrawerPlacement, 'start' | 'end'>,
   deltaX: number,
-  deltaY: number
+  deltaY: number,
+  options?: Pick<DrawerSwipeCloseOptions, 'direction' | 'fullscreen'>
 ): number {
-  if (placement === 'right') return clampSheetDragDistance(deltaX)
-  if (placement === 'left') return clampSheetDragDistance(-deltaX)
-  if (placement === 'bottom') return clampSheetDragDistance(deltaY)
+  const axis = drawerFollowCloseAxis(placement, options)
+  if (axis === 'right') return clampSheetDragDistance(deltaX)
+  if (axis === 'left') return clampSheetDragDistance(-deltaX)
+  if (axis === 'down') return clampSheetDragDistance(deltaY)
   return clampSheetDragDistance(-deltaY)
 }
 
 export function drawerFollowTransform(
   placement: Exclude<DrawerPlacement, 'start' | 'end'>,
-  distance: number
+  distance: number,
+  options?: Pick<DrawerSwipeCloseOptions, 'direction' | 'fullscreen'>
 ): string {
   const traveled = clampSheetDragDistance(distance)
-  if (placement === 'right') return `translate3d(${traveled}px, 0, 0)`
-  if (placement === 'left') return `translate3d(${-traveled}px, 0, 0)`
-  if (placement === 'bottom') return `translate3d(0, ${traveled}px, 0)`
+  const axis = drawerFollowCloseAxis(placement, options)
+  if (axis === 'right') return `translate3d(${traveled}px, 0, 0)`
+  if (axis === 'left') return `translate3d(${-traveled}px, 0, 0)`
+  if (axis === 'down') return `translate3d(0, ${traveled}px, 0)`
   return `translate3d(0, ${-traveled}px, 0)`
 }
 

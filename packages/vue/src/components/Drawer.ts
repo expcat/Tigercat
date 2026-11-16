@@ -355,6 +355,13 @@ export const Drawer = defineComponent({
     const sheetOffset = ref(0)
     const resizedLength = ref<number | null>(null)
     const resizing = ref(false)
+    const swipeFollowOptions = () => ({
+      direction: writingDirection.value,
+      fullscreen: isDrawerMobileFullscreen({
+        fullscreenOnMobile: props.fullscreenOnMobile,
+        viewportWidth: window.innerWidth
+      })
+    })
     const resetTouchGesture = () => {
       touchStartPoint = null
       touchCurrentPoint = null
@@ -392,7 +399,8 @@ export const Drawer = defineComponent({
         sheetOffset.value = drawerFollowDistance(
           resolvedPlacement.value,
           point.x - touchStartPoint.x,
-          point.y - touchStartPoint.y
+          point.y - touchStartPoint.y,
+          swipeFollowOptions()
         )
       } else if (point) {
         touchCurrentPoint = point
@@ -408,15 +416,21 @@ export const Drawer = defineComponent({
       )
 
       const allowed = swipeAllowed
+      const follow = swipeFollowOptions()
       const distance =
         sheetOffset.value ||
         (gesture
-          ? drawerFollowDistance(resolvedPlacement.value, gesture.deltaX, gesture.deltaY)
+          ? drawerFollowDistance(resolvedPlacement.value, gesture.deltaX, gesture.deltaY, follow)
           : 0)
+      const closeDirection = getDrawerSwipeCloseDirection({
+        placement: resolvedPlacement.value,
+        direction: follow.direction,
+        fullscreen: follow.fullscreen
+      })
       const size =
-        resolvedPlacement.value === 'left' || resolvedPlacement.value === 'right'
-          ? (dialogRef.value?.offsetWidth ?? 0)
-          : (dialogRef.value?.offsetHeight ?? 0)
+        closeDirection === 'up' || closeDirection === 'down'
+          ? (dialogRef.value?.offsetHeight ?? 0)
+          : (dialogRef.value?.offsetWidth ?? 0)
       resetTouchGesture()
 
       if (!allowed) return
@@ -471,7 +485,6 @@ export const Drawer = defineComponent({
         if (nextVisible) {
           hasOpened.value = true
           leaving.value = false
-          onCleanup(whenOverlayTransitionEnds(dialogRef.value, () => emit('after-enter')))
           return
         }
         if (prevVisible !== true) return
@@ -484,6 +497,15 @@ export const Drawer = defineComponent({
         )
       },
       { immediate: true }
+    )
+
+    watch(
+      [() => props.open, dialogRef],
+      ([open, element], _previous, onCleanup) => {
+        if (!open || !element) return
+        onCleanup(whenOverlayTransitionEnds(element, () => emit('after-enter')))
+      },
+      { flush: 'post' }
     )
 
     return () => {
@@ -538,7 +560,7 @@ export const Drawer = defineComponent({
           : drawerPushOffset(layerId.value, resolvedPlacement.value)
       const follow =
         sheetOffset.value > 0
-          ? drawerFollowTransform(resolvedPlacement.value, sheetOffset.value)
+          ? drawerFollowTransform(resolvedPlacement.value, sheetOffset.value, swipeFollowOptions())
           : ''
       const transform = [push.x || push.y ? `translate(${push.x}px, ${push.y}px)` : '', follow]
         .filter(Boolean)

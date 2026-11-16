@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  drawerFollowDistance,
   getDrawerMaskClasses,
   getDrawerPanelClasses,
   isDrawerSwipeCloseGesture,
@@ -49,6 +50,10 @@ describe('drawer-utils', () => {
     expect(
       isDrawerSwipeCloseGesture({ placement: 'start', direction: 'rtl' }, swipe('right'))
     ).toBe(true)
+    expect(drawerFollowDistance('left', 80, 0)).toBe(0)
+    expect(drawerFollowDistance('left', 80, 0, { fullscreen: true, direction: 'ltr' })).toBe(80)
+    expect(drawerFollowDistance('top', 64, -20, { fullscreen: true, direction: 'ltr' })).toBe(64)
+    expect(drawerFollowDistance('bottom', -70, 30, { fullscreen: true, direction: 'rtl' })).toBe(70)
   })
 
   it('resolveDrawerPlacement maps start/end with direction', () => {

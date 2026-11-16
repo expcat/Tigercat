@@ -221,6 +221,16 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
 
   const writingDirection = mergedLocale?.direction === 'rtl' ? 'rtl' : 'ltr'
   const resolvedPlacement = resolveDrawerPlacement(placement, writingDirection)
+  const swipeFollowOptions = useCallback(
+    () => ({
+      direction: writingDirection,
+      fullscreen: isDrawerMobileFullscreen({
+        fullscreenOnMobile,
+        viewportWidth: window.innerWidth
+      })
+    }),
+    [fullscreenOnMobile, writingDirection]
+  )
 
   useEffect(() => {
     if (!open) {
@@ -305,14 +315,15 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
           drawerFollowDistance(
             resolvedPlacement,
             point.x - touchStartRef.current.x,
-            point.y - touchStartRef.current.y
+            point.y - touchStartRef.current.y,
+            swipeFollowOptions()
           )
         )
       } else if (point) {
         touchCurrentRef.current = point
       }
     },
-    [dialogDivProps, resolvedPlacement]
+    [dialogDivProps, resolvedPlacement, swipeFollowOptions]
   )
 
   const handleTouchEnd = useCallback(
@@ -325,20 +336,35 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
       )
 
       const allowed = swipeAllowedRef.current
+      const follow = swipeFollowOptions()
       const distance =
         sheetOffset ||
-        (gesture ? drawerFollowDistance(resolvedPlacement, gesture.deltaX, gesture.deltaY) : 0)
+        (gesture
+          ? drawerFollowDistance(resolvedPlacement, gesture.deltaX, gesture.deltaY, follow)
+          : 0)
+      const closeDirection = getDrawerSwipeCloseDirection({
+        placement: resolvedPlacement,
+        direction: follow.direction,
+        fullscreen: follow.fullscreen
+      })
       const size =
-        resolvedPlacement === 'left' || resolvedPlacement === 'right'
-          ? (dialogRef.current?.offsetWidth ?? 0)
-          : (dialogRef.current?.offsetHeight ?? 0)
+        closeDirection === 'up' || closeDirection === 'down'
+          ? (dialogRef.current?.offsetHeight ?? 0)
+          : (dialogRef.current?.offsetWidth ?? 0)
       resetTouchGesture()
       if (!allowed) return
       const release = resolveSheetRelease(distance, size)
       const motion = resolveSheetReducedMotion(release, prefersReducedMotion())
       if (motion === 'close') handleClose()
     },
-    [dialogDivProps, handleClose, resetTouchGesture, resolvedPlacement, sheetOffset]
+    [
+      dialogDivProps,
+      handleClose,
+      resetTouchGesture,
+      resolvedPlacement,
+      sheetOffset,
+      swipeFollowOptions
+    ]
   )
 
   const handleTouchCancel = useCallback(
@@ -412,7 +438,9 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
               layerId != null
                 ? `translate(${drawerPushOffset(layerId, resolvedPlacement).x}px, ${drawerPushOffset(layerId, resolvedPlacement).y}px)`
                 : '',
-              sheetOffset > 0 ? drawerFollowTransform(resolvedPlacement, sheetOffset) : ''
+              sheetOffset > 0
+                ? drawerFollowTransform(resolvedPlacement, sheetOffset, swipeFollowOptions())
+                : ''
             ]
               .filter((part) => part && part !== 'translate(0px, 0px)')
               .join(' ') || undefined,

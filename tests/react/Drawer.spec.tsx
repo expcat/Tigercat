@@ -208,6 +208,26 @@ describe('Drawer', () => {
     expect(onOpenChange).toHaveBeenCalledWith(false)
   })
 
+  it('closes a narrow fullscreen left drawer when swiped in the documented direction', () => {
+    const previousWidth = window.innerWidth
+    Object.defineProperty(window, 'innerWidth', { configurable: true, value: 390 })
+    try {
+      const onOpenChange = vi.fn()
+      render(
+        <Drawer open={true} title="Swipe Drawer" placement="left" onOpenChange={onOpenChange} />
+      )
+
+      const dialog = screen.getByRole('dialog')
+      fireEvent.touchStart(dialog, { touches: [{ clientX: 40, clientY: 120 }] })
+      fireEvent.touchMove(dialog, { touches: [{ clientX: 120, clientY: 124 }] })
+      fireEvent.touchEnd(dialog, { changedTouches: [{ clientX: 120, clientY: 124 }] })
+
+      expect(onOpenChange).toHaveBeenCalledWith(false)
+    } finally {
+      Object.defineProperty(window, 'innerWidth', { configurable: true, value: previousWidth })
+    }
+  })
+
   it('does not close a bottom drawer when the body can still scroll', async () => {
     const onOpenChange = vi.fn()
     render(

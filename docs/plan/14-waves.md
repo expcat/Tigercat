@@ -11,7 +11,7 @@
 | W1   | 安全                   |    0 |   0 |   0 |   0 | 12                                         |
 | W2   | 共享 Core、主题与 i18n |    0 |   0 |   0 |   0 | 02                                         |
 | W3   | 表单                   |    0 |   0 |   0 |   0 | 05                                         |
-| W4   | 导航与反馈             |   12 |   0 |  12 |   0 | 06、07                                     |
+| W4   | 导航与反馈             |   10 |   0 |  10 |   0 | 06、07                                     |
 | W5   | 基础与布局             |  118 |   0 | 118 |   0 | 03、04                                     |
 | W6   | 数据、图表与高级       |   65 |   0 |  65 |   0 | 08、09、10                                 |
 | W7   | 组合组件               |   39 |   0 |  39 |   0 | 11                                         |
@@ -19,7 +19,7 @@
 | W9   | P3 收尾                |   99 |   0 |   0 |  99 | 02、03、04、05、06、07、08、09、10、11、12 |
 | W10  | 证据补采与复验         |   11 |   — |   — |   — | 13                                         |
 
-W1–W9 合计 340 条 Review 发现（P2 241、P3 99）。W10 的 11 条是 E01–E11。已完成条目见 [CHANGELOG.md](../../CHANGELOG.md)。
+W1–W9 合计 338 条 Review 发现（P2 239、P3 99）。W10 的 11 条是 E01–E11。已完成条目见 [CHANGELOG.md](../../CHANGELOG.md)。
 
 ## 各波在收什么
 
@@ -55,7 +55,6 @@ W1–W9 合计 340 条 Review 发现（P2 241、P3 99）。W10 的 11 条是 E01
 | C049-F01  | Skeleton              | [04](04-layout.md)     | 先确定 preset 与 variant 的公开关系，再接入一处共享解析，或在获准的 API 调整中撤销该未实现字段  |
 | C111-F05  | Spotlight             | [06](06-navigation.md) | 有查询时仍让命中的 recentIds 排在其余命中前，或把注释改为只约束空查询；未命中的 recent 不硬插回 |
 | C117-F04  | Alert                 | [07](07-feedback.md)   | defaultPrevented 时停止关闭，或不再把事件标成 cancelable                                        |
-| C118-F01  | Drawer                | [07](07-feedback.md)   | 松手判定使用与 getDrawerSwipeCloseDirection 相同的轴；或改文档与 helper，只保留物理边           |
 | C118-F06  | Drawer                | [07](07-feedback.md)   | 让分隔条可聚焦并响应方向键；做到之前不要把它标成可操作的 separator                              |
 | C125-F01  | NotificationContainer | [07](07-feedback.md)   | Vue 不用 else，把 actionNode 放进同一个 actions 容器；若本意互斥则改 React 并在类型里写明       |
 | C147-F05  | Gantt                 | [09](09-charts.md)     | React 02 加上 draggable，或去掉无效的 onDataChange，并让 demo.json 与源码一致                   |

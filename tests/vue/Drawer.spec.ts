@@ -9,7 +9,7 @@ import { Drawer } from '@expcat/tigercat-vue/Drawer'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
-import { h } from 'vue'
+import { h, nextTick } from 'vue'
 import {
   renderWithProps,
   renderWithSlots,
@@ -291,6 +291,31 @@ describe('Drawer', () => {
     expect(onUpdateOpen).toHaveBeenCalledWith(false)
   })
 
+  it('closes a narrow fullscreen left drawer when swiped in the documented direction', async () => {
+    const previousWidth = window.innerWidth
+    Object.defineProperty(window, 'innerWidth', { configurable: true, value: 390 })
+    const onUpdateOpen = vi.fn()
+    try {
+      render(Drawer, {
+        props: {
+          open: true,
+          title: 'Swipe Drawer',
+          placement: 'left',
+          'onUpdate:open': onUpdateOpen
+        }
+      })
+
+      const dialog = screen.getByRole('dialog')
+      await fireEvent.touchStart(dialog, { touches: [{ clientX: 40, clientY: 120 }] })
+      await fireEvent.touchMove(dialog, { touches: [{ clientX: 120, clientY: 124 }] })
+      await fireEvent.touchEnd(dialog, { changedTouches: [{ clientX: 120, clientY: 124 }] })
+
+      expect(onUpdateOpen).toHaveBeenCalledWith(false)
+    } finally {
+      Object.defineProperty(window, 'innerWidth', { configurable: true, value: previousWidth })
+    }
+  })
+
   it('does not close a bottom drawer when the body can still scroll', async () => {
     const onUpdateOpen = vi.fn()
     render(Drawer, {
@@ -495,6 +520,7 @@ describe('Drawer', () => {
         }
       })
 
+      await nextTick()
       expect(onAfterEnter).toHaveBeenCalled()
 
       await rerender({
@@ -505,6 +531,51 @@ describe('Drawer', () => {
       })
       expect(onAfterClose).toHaveBeenCalled()
     } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('emits after-enter after destroyOnClose mounts the panel and the transition ends', async () => {
+    vi.useFakeTimers()
+    const view = document.defaultView!
+    const readStyle = view.getComputedStyle.bind(view)
+    const styleSpy = vi.spyOn(view, 'getComputedStyle').mockImplementation((element: Element) => {
+      const style = readStyle(element)
+      return new Proxy(style, {
+        get(target, prop, receiver) {
+          if (prop === 'transitionDuration') return '200ms'
+          if (prop === 'transitionDelay') return '0s'
+          const value = Reflect.get(target, prop, receiver)
+          return typeof value === 'function' ? value.bind(target) : value
+        }
+      }) as CSSStyleDeclaration
+    })
+    try {
+      const onAfterEnter = vi.fn(() => {
+        expect(document.body.contains(document.querySelector('[role="dialog"]'))).toBe(true)
+      })
+      const { rerender } = render(Drawer, {
+        props: { open: true, destroyOnClose: true, onAfterEnter },
+        slots: { default: () => h('div', 'Content') }
+      })
+
+      expect(screen.getByRole('dialog')).toBeInTheDocument()
+      expect(onAfterEnter).not.toHaveBeenCalled()
+      await vi.advanceTimersByTimeAsync(200)
+      expect(onAfterEnter).toHaveBeenCalledTimes(1)
+
+      onAfterEnter.mockClear()
+      await rerender({ open: false, destroyOnClose: true, onAfterEnter })
+      await vi.advanceTimersByTimeAsync(200)
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+
+      await rerender({ open: true, destroyOnClose: true, onAfterEnter })
+      expect(screen.getByRole('dialog')).toBeInTheDocument()
+      expect(onAfterEnter).not.toHaveBeenCalled()
+      await vi.advanceTimersByTimeAsync(200)
+      expect(onAfterEnter).toHaveBeenCalledTimes(1)
+    } finally {
+      styleSpy.mockRestore()
       vi.useRealTimers()
     }
   })

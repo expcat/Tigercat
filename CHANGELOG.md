@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Drawer 全屏关闭轴与 Vue after-enter（Core / Vue / React，C118-F01、C118-F02）**：窄于 md 的全屏抽屉，跟手距离、位移和松手阈值改走 `getDrawerSwipeCloseDirection`。LTR 向右、RTL 向左，left / top / bottom 沿这个方向拖过阈值会关闭。Vue 在 `destroyOnClose` 下首次打开和销毁后重开时，等面板进入文档且这一层过渡结束后才发出 `after-enter`。
+
 - **Alert 实时区域、倒计时暂停与 action 顺序（Core / Vue / React，C117-F01、C117-F02、C117-F03）**：非 error 的实时区域改看当前 document 是否已经首次绘制，不再用模块级微任务，进程内也不再常驻。首屏和每次服务端请求里的静态 info / success / warning 不带 `role="status"` 与 `aria-live`；绘制之后新插入的才带。`duration` 期间指针或焦点进入 Alert 会暂停，离开后按剩余时间继续，到点仍关闭，`closable` 仍独立。两端顺序统一为 title、description、action、默认内容，action 容器使用同一套 description class。
 
 - **Tree 键盘、名称与选择（Core / Vue / React，C116-F01、C116-F02、C116-F03）**：React 一次字母只推进一次 typeahead，先停在首个匹配项，连续前缀再命中对应节点。未传 `ariaLabel` 时，`role=tree` 使用原生 `aria-label`。未写 `selectionMode` 时，`selectable={false}` 不可选，`multiple` 为多选；显式 `selectionMode` 仍优先。
