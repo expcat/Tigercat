@@ -27,7 +27,7 @@ export default function App() {
       </Tabs>
       <Tabs defaultActiveKey="a" size="sm" centered type="pills">
         <TabPane tabKey="a" label="全部">
-          <div className="p-2 text-sm text-gray-600">size=small · centered</div>
+          <div className="p-2 text-sm text-gray-600">size=sm · centered</div>
         </TabPane>
         <TabPane tabKey="b" label="进行中">
           <div className="p-2 text-sm text-gray-600">进行中</div>

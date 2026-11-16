@@ -25,7 +25,6 @@ export default function App() {
 
     const key = String(info.targetKey)
     setTabs((current) => current.filter((tab) => tab.key !== key))
-    if (activeKey === key) setActiveKey(tabs.find((tab) => tab.key !== key)?.key ?? '')
   }
 
   return (

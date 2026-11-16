@@ -156,6 +156,8 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 
 ### navigation
 
+2026-11-17 W9-G5：8 条均已实现；新增定向断言先红后绿，Vue Demo 02 在原同步回写顺序下已通过。相关套件 329 passed、1 个既有 React Tabs axe `nested-interactive` 失败（用基线 Tabs 源码复跑仍失败）；types:check、改动源码 lint / Prettier、docs:api:check、mcp:build 与 MCP 32 项测试、841 个示例来源及编译检查通过。补充 docs:links 的 5360 处问题均在未修改的 .local；api:validate 命中基线 Tag.ts 的 openChange 事件名，未扩展修复。IAB 返回 unavailable，按授权用 happy-dom / Node SSR 验证，等待人工浏览器验收；历史矩阵不重计。
+
 | 任务 | 组件                  | 队列           | 现状                                                                                                                                                                      |
 | ---- | --------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | C082 | Affix                 | needs-evidence | 视觉/键盘各 0/16 blocked，截图 0；F01/F02 已修复，happy-dom 回归通过；Affix/Core/Anchor（含 AnchorLink）5 文件 95 pass、现有 axe 与类型通过；浏览器、读屏、hydration 待补 |
@@ -186,13 +188,13 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | C107 | NavigationMenuTrigger | needs-evidence | 视觉 0/16 blocked；原生键盘 0/16 blocked；截图 0；E2E 未执行；SSR/hydration、w9-t07 未跑；React NavigationMenu 组合的 TIGER_A11Y=1 单文件 33 项通过；无浏览器清单         |
 | C108 | PageHeader            | needs-evidence | F01 已修复：双端无标题时保留调用方 labelledby，先红后绿、IAB 通过。本组 314 pass（axe）、类型通过；原视觉/键盘各 32 格 blocked，完整矩阵、读屏与 hydration 待补。         |
 | C109 | Pagination            | needs-evidence | F05/F07 已修复：非受控当前页 IAB 回调 0 次、翻页 1 次，size 文档对齐 md / sm·md·lg。本组 314 pass（axe）、类型通过；原视觉/键盘各 40 格 blocked，完整矩阵待补。           |
-| C110 | ScrollSpy             | needs-evidence | F02 已修复：双端嵌套 active / behavior 先红后绿，IAB 为 #child / smooth；Vue 使用共享模型。本组 314 pass（axe）、类型通过；原视觉/键盘各 16 格 blocked，完整矩阵待补。    |
-| C111 | Spotlight             | needs-evidence | 视觉 0/16（16 blocked）；原生键盘 0/16（16 blocked）；截图全空；无 Spotlight E2E；SSR 仅 node 探针渲染未抛错，未跑 hydrate；happy-dom 50 passed                           |
+| C110 | ScrollSpy             | needs-evidence | F02 已修；F03 React Demo 02 说明改为 onActiveKeyChange，diff 通过。旧 314 pass（axe）；本轮 IAB 不可用，原视觉/键盘各 16 格 blocked。                                     |
+| C111 | Spotlight             | needs-evidence | F05 注释仅约束空查询；F06 SSR 首项与 aria-activedescendant 先红后绿，两端 spec 通过。IAB 不可用，视觉/键盘各 16 格 blocked；hydration 未测。                              |
 | C112 | Steps                 | needs-evidence | 视觉 0/24 blocked；原生键盘 0/24 blocked；无 Steps E2E；SSR 仅 node 探针 renderToString 未抛错，未跑 hydrate 与独立 SSR 套件；happy-dom 52 passed                         |
 | C113 | StepsItem             | needs-evidence | 视觉 0/24 blocked；原生键盘 0/24 blocked；无 StepsItem E2E；无专属测试路径，父组件 spec 42 passed（happy-dom）；SSR 仅 node 探针未抛错，未跑 hydrate                      |
-| C114 | Tabs                  | needs-evidence | 视觉 0/32 blocked；原生键盘 0/32 blocked；无 E2E；未跑 hydration；无 happy-dom 探针；Tabs 与 tabs-utils spec 101 passed 仅 happy-dom                                      |
+| C114 | Tabs                  | needs-evidence | F03/F05/F06 已实现：按滑动轴判断滚动、React dir、Demo 关闭后一项与 size=sm；定向断言通过。既有 axe 失败见本节说明；视觉/键盘各 32 格 blocked。                            |
 | C115 | TabPane               | needs-evidence | 视觉 0/32 blocked；原生键盘 0/32 blocked；无 E2E；无独立 spec，Tabs 相关 101 passed（happy-dom）；未跑 hydration；无 happy-dom / SSR 探针                                 |
-| C116 | Tree                  | needs-evidence | 视觉 0/24 blocked；原生键盘 0/24 blocked；无 Tree E2E；未跑 hydration；本轮未调用 MCP；无 happy-dom 探针；Tree 相关 spec 159 passed 仅 happy-dom                          |
+| C116 | Tree                  | needs-evidence | F04 注释与生成文档明确不同 key；F06 双端本地化搜索名称先红后绿，组件 spec 通过。IAB 不可用，视觉/键盘各 24 格 blocked；hydration 未测。                                   |
 
 ### feedback
 
@@ -335,7 +337,7 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | C103 | NavigationMenuContent | 无独立主责文件与 Demo；4 个 Demo 均未开 viewport，恢复浏览器后仍需另行覆盖；React useFloating 在 floating ref 缺失时逐帧重试，无性能实测、未立项                                                                                                                                       |
 | C108 | PageHeader            | 22 个主责文件与 8/8 Demo 已读；labels.backAriaLabel 传空串会覆盖 locale 并落到英文 Back（边角，未立项）；AppShell 内 header 在 main 中不是 banner，不记缺陷；Vue subTitle 同为 Boolean 判断但未探针                                                                                    |
 | C110 | ScrollSpy             | 14 个主责文件与 4/4 Demo 已读；与 Anchor 共享 createAnchorObserver；其注释称无 IntersectionObserver 时返回空函数，实际仍挂 scroll/resize（未立项）；DOM 直写 aria-label 会被 locale 默认值盖住                                                                                         |
-| C111 | Spotlight             | 现有测试未覆盖 hotkey false→true、搜索框上的切换热键、已注册图标名、带查询的 recent 顺序、SSR 首帧 aria-activedescendant；有可见标题时调用方 aria-label 被 aria-labelledby 取代（与现有 locale 测试一致，未立项）                                                                      |
+| C111 | Spotlight             | SSR 首帧 aria-activedescendant 已补 Node 断言；recentIds 注释明确只在空查询置顶。有可见标题时调用方 aria-label 被 aria-labelledby 取代（与现有 locale 测试一致，未立项）；此前 hotkey 与图标的历史观察保留在审查报告中。                                                               |
 | C112 | Steps                 | 未立项：Vue 注释 size 写 @default 'default'（实为 md）、clickable 注释误贴 progressDot；error 图标支缺 motion-reduce:transition-none；button 无 focus-visible 类，无计算样式未判缺陷                                                                                                   |
 | C113 | StepsItem             | C113 主责文件 0 个，无独立源文件与 Demo，./StepsItem 与 ./Steps 同模块；按钮类无 focus-visible，无计算样式未立项；React StepsItem displayName 为 null，isStepsItemType 只靠引用匹配（现状非缺陷）                                                                                      |
 | C115 | TabPane               | C115 主责文件 0 个；Vue 标签 aria-label 固定为 props.label；Vue 具名关闭按钮在 tablist 外（sr-only），React 关闭 button 嵌在 role=tab 内并被测试锁定，均未立项；C114 写的 Vue icon 行 289 实为 292                                                                                     |

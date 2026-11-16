@@ -24,9 +24,7 @@ const handleEdit = (info: { targetKey?: string | number; action: 'add' | 'remove
   }
 
   const key = String(info.targetKey)
-  const remainingTabs = tabs.value.filter((tab) => tab.key !== key)
-  tabs.value = remainingTabs
-  if (activeKey.value === key) activeKey.value = remainingTabs[0]?.key ?? ''
+  tabs.value = tabs.value.filter((tab) => tab.key !== key)
 }
 </script>
 

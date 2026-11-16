@@ -13,7 +13,7 @@ description: Compact generated Tigercat Navigation props reference
 
 `packages/core/src/types/tree.ts` · `TreeProps` · 4/35 compact props · [Complete props](#remaining-props-complete-public-api)
 
-Note: `checkStrictly` 默认 false（父子级联）。勾选只在 `treeitem` 上用 `aria-checked`，勾选标记不另做一颗复选框。`posinset` / `setsize` 按同一父节点下的兄弟。搜索零命中是空列表。每棵树有自己的拖拽容器。`height` 是页面窗口，不是 overlay `listHeight`。
+Note: 数字 `1` 与字符串 `"1"` 标识不同节点。`checkStrictly` 默认 false（父子级联）。勾选只在 `treeitem` 上用 `aria-checked`，勾选标记不另做一颗复选框。`posinset` / `setsize` 按同一父节点下的兄弟。搜索零命中是空列表。每棵树有自己的拖拽容器。`height` 是页面窗口，不是 overlay `listHeight`。
 
 | Prop            | Type            | Default | Notes                                                                                      |
 | --------------- | --------------- | ------- | ------------------------------------------------------------------------------------------ |

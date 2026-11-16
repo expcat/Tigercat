@@ -10,8 +10,18 @@ import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { zhCN } from '../../packages/core/src/utils/i18n/locales/zh-CN'
 import { zhTW } from '../../packages/core/src/utils/i18n/locales/zh-TW'
 import { expectNoA11yViolations } from '../utils'
+import EditableTabsDemo from '../../examples/example/vue3/src/examples/tabs/02/App.vue'
 
 describe('Tabs', () => {
+  it('keeps the next tab selected when the editable demo closes the middle tab', async () => {
+    render(EditableTabsDemo)
+    await fireEvent.click(screen.getByRole('button', { name: 'Add tab' }))
+    await fireEvent.click(screen.getByRole('tab', { name: '标签 2' }))
+    await fireEvent.click(screen.getByRole('button', { name: 'Close 标签 2' }))
+    expect(screen.queryByRole('tab', { name: '标签 2' })).not.toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: '标签 3' })).toHaveAttribute('aria-selected', 'true')
+  })
+
   it('localizes overflow copy through provider, component locale, and labels', async () => {
     const width = vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(100)
     const rect = vi

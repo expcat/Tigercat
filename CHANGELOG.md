@@ -4,6 +4,15 @@
 
 ## v3.0.1（未发布）
 
+- **滚动章节示例回调（Demo，C110-F03）**：React scroll-spy/02 的说明改为实际公开回调 onActiveKeyChange。
+- **命令面板最近项说明（Core / 文档，C111-F05）**：recentIds 仅在空查询时排前；非空查询继续按相关度排序，未命中项不回插。
+- **命令面板服务端选中（React，C111-F06）**：渲染期选中首个启用结果，SSR 首帧即输出 aria-selected 与输入框 aria-activedescendant；effect 只做选中项滚动定位。
+- **纵向页签嵌套滚动（Core / React / Vue，C114-F03）**：按滑动轴检查 overflow 与滚动尺寸，纵向面板内的滚动容器阻止标签切换。
+- **页签本地化方向（React，C114-F05）**：tablist 写入合并 locale 的方向，仅传组件 rtl locale 也与 Vue 一致。
+- **页签关闭与尺寸示例（Demo，C114-F06）**：两端 Demo 02 移除关闭时的 activeKey 改写，保留组件选出的后一项；Demo 04 文案改为 size=sm。
+- **树节点 key 说明（Core / 文档 / MCP，C116-F04）**：类型注释及生成文档明确数字 1 与字符串「1」标识不同节点。
+- **树搜索框名称（React / Vue，C116-F06）**：内置搜索 input 增加本地化 aria-label，zh-CN 下为「搜索」。
+
 - **返回顶部帧取消（Core，C085-F01）**：立即 update 前取消待执行帧，schedule → update → cancel 后不再残留回调。
 - **上下文菜单项身份属性（React，C089-F02）**：在 Item 边界消费 itemKey，SSR 与原生元素不再输出未知属性或触发 React 告警。
 - **下拉菜单项身份属性（React，C093-F01）**：DropdownItem 显式消费 itemKey，避免向原生 button / a 透传 itemkey。

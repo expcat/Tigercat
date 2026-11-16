@@ -40,7 +40,7 @@ Note: 打开后等待输入节点挂载并自动聚焦。焦点约束、关闭�
 - `filterItem?`: `SpotlightItemFilter`; default `-`. -
 - `limit?`: `number`; default `-`. -
 - `locale?`: `Partial<TigerLocale>`; default `-`. -
-- `recentIds?`: `SpotlightItemKey[]`; default `-`. Ids shown ahead of the other filter results. The caller owns the list.
+- `recentIds?`: `SpotlightItemKey[]`; default `-`. Ids shown ahead of other results only when the query is empty. Non-empty queries use re...
 - `icon?`: `(item: SpotlightItem) => React.ReactNode`; default `-`. -
 
 Events/callback props: `onOpenChange?`, `onQueryChange?`, `onSelect?`.

@@ -3,7 +3,7 @@
  */
 
 /**
- * Unique key for a tree node. `1` and `'1'` identify the same node.
+ * Unique key for a tree node. `1` and `'1'` identify different nodes.
  */
 export type TreeNodeKey = string | number
 

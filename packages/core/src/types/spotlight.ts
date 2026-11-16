@@ -59,7 +59,8 @@ export interface SpotlightProps {
    */
   hotkey?: boolean | string
   /**
-   * Ids shown ahead of the other filter results. The caller owns the list.
+   * Ids shown ahead of other results only when the query is empty.
+   * Non-empty queries use relevance order. The caller owns the list.
    */
   recentIds?: SpotlightItemKey[]
 }

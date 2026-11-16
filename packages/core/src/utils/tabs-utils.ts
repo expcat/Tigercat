@@ -276,17 +276,18 @@ export function getTabSwipeDelta(
 
 export function isSwipeBlockedByNestedScroll(
   target: EventTarget | null,
-  root: EventTarget | null
+  root: EventTarget | null,
+  axis: 'x' | 'y' = 'x'
 ): boolean {
   if (!isBrowser() || !(target instanceof Element)) return false
   let node: Element | null = target
   while (node && node !== root) {
     if (node instanceof HTMLElement) {
-      const overflowX = getComputedStyle(node).overflowX
-      if (
-        (overflowX === 'auto' || overflowX === 'scroll') &&
-        node.scrollWidth > node.clientWidth + 1
-      ) {
+      const style = getComputedStyle(node)
+      const overflow = axis === 'y' ? style.overflowY : style.overflowX
+      const scrollSize = axis === 'y' ? node.scrollHeight : node.scrollWidth
+      const clientSize = axis === 'y' ? node.clientHeight : node.clientWidth
+      if ((overflow === 'auto' || overflow === 'scroll') && scrollSize > clientSize + 1) {
         return true
       }
     }

@@ -75,6 +75,7 @@ export const Tree = forwardRef<HTMLDivElement, TreeProps>(function Tree(props, r
       type="search"
       className={treeSearchInputClasses}
       placeholder={ctx.searchPlaceholder}
+      aria-label={ctx.searchPlaceholder}
       value={ctx.searchQuery}
       onChange={(event) => ctx.setSearchQuery(event.target.value)}
     />

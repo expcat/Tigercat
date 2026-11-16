@@ -10,8 +10,29 @@ import { TabPane, Tabs } from '@expcat/tigercat-react/Tabs'
 import { zhCN } from '../../packages/core/src/utils/i18n/locales/zh-CN'
 import { zhTW } from '../../packages/core/src/utils/i18n/locales/zh-TW'
 import { expectNoA11yViolations } from '../utils/react'
+import EditableTabsDemo from '../../examples/example/react/src/examples/tabs/02/App'
 
 describe('Tabs', () => {
+  it('sets the tablist direction from the component locale', () => {
+    render(
+      <Tabs locale={{ direction: 'rtl' }}>
+        <TabPane tabKey="a" label="Overview">
+          A
+        </TabPane>
+      </Tabs>
+    )
+    expect(screen.getByRole('tablist')).toHaveAttribute('dir', 'rtl')
+  })
+
+  it('keeps the next tab selected when the editable demo closes the middle tab', () => {
+    render(<EditableTabsDemo />)
+    fireEvent.click(screen.getByRole('button', { name: 'Add tab' }))
+    fireEvent.click(screen.getByRole('tab', { name: '标签 2' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Close 标签 2' }))
+    expect(screen.queryByRole('tab', { name: '标签 2' })).not.toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: '标签 3' })).toHaveAttribute('aria-selected', 'true')
+  })
+
   it('localizes overflow copy through provider, component locale, and labels', async () => {
     const width = vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(100)
     const rect = vi

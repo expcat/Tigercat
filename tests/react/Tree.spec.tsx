@@ -723,9 +723,12 @@ describe('Tree', () => {
 
   // v0.6.0 — searchable
   describe('Searchable (v0.6.0)', () => {
-    it('renders search input when searchable is true', () => {
-      render(<Tree treeData={sampleTreeData} searchable />)
-      expect(screen.getByRole('searchbox')).toBeInTheDocument()
+    it.each([
+      { locale: undefined, label: 'Search' },
+      { locale: zhCN, label: '搜索' }
+    ])('names the search input as $label', ({ locale, label }) => {
+      render(<Tree treeData={sampleTreeData} searchable locale={locale} />)
+      expect(screen.getByRole('searchbox', { name: label })).toHaveAttribute('aria-label', label)
     })
     it('filters when typing in search input', async () => {
       const user = userEvent.setup()

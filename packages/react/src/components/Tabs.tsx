@@ -41,6 +41,7 @@ import {
   readTabPaneKey,
   mergeTigerLocale,
   getTabsLabels,
+  getLocaleDirection,
   type TabActivation,
   type TabRecord,
   type TigerLocale,
@@ -328,7 +329,7 @@ export const Tabs: React.FC<TabsProps> = ({
     () => getTabsLabels(mergedLocale, labelsOverride),
     [mergedLocale, labelsOverride]
   )
-  const dir: 'ltr' | 'rtl' = config.direction === 'rtl' ? 'rtl' : 'ltr'
+  const dir = getLocaleDirection(mergedLocale)
 
   const [internalActiveKey, setInternalActiveKey] = useState<string | number | undefined>(
     defaultActiveKey
@@ -546,7 +547,8 @@ export const Tabs: React.FC<TabsProps> = ({
   const handleContentTouchEnd = useCallback(
     (event: React.TouchEvent<HTMLDivElement>) => {
       if (!swipeable || !swipeStartRef.current || event.changedTouches.length !== 1) return
-      if (isSwipeBlockedByNestedScroll(event.target, event.currentTarget)) {
+      const axis = tabPosition === 'left' || tabPosition === 'right' ? 'y' : 'x'
+      if (isSwipeBlockedByNestedScroll(event.target, event.currentTarget, axis)) {
         swipeStartRef.current = null
         return
       }
@@ -610,6 +612,7 @@ export const Tabs: React.FC<TabsProps> = ({
         ref={tabListRef}
         className={tabNavListClasses}
         role="tablist"
+        dir={dir}
         id={id}
         aria-label={ariaLabel ?? (ariaLabelledby ? undefined : labels.tablistAriaLabel)}
         aria-labelledby={ariaLabelledby}

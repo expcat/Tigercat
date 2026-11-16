@@ -129,8 +129,6 @@ export const Spotlight = forwardRef<SpotlightHandle, SpotlightProps>(function Sp
     defaultValue: defaultQuery ?? '',
     onChange: onQueryChange
   })
-  const [activeIndex, setActiveIndex] = useState(-1)
-
   const reactId = useId()
   const dialogId = `tiger-spotlight-${reactId}`
   const titleId = `${dialogId}-title`
@@ -149,6 +147,33 @@ export const Spotlight = forwardRef<SpotlightHandle, SpotlightProps>(function Sp
       }),
     [items, recentIds, resolvedQuery, filterItem, limit]
   )
+  const [activeIndex, setActiveIndex] = useState(() =>
+    getInitialPickerActiveIndex(
+      searchState.flatResults,
+      resolvedOpen && defaultActiveFirstItem,
+      (result) => result.item.disabled === true
+    )
+  )
+  const [activeInputs, setActiveInputs] = useState({
+    open: resolvedOpen,
+    searchState,
+    defaultActiveFirstItem
+  })
+  if (
+    activeInputs.open !== resolvedOpen ||
+    activeInputs.searchState !== searchState ||
+    activeInputs.defaultActiveFirstItem !== defaultActiveFirstItem
+  ) {
+    setActiveInputs({ open: resolvedOpen, searchState, defaultActiveFirstItem })
+    setActiveIndex(
+      getInitialPickerActiveIndex(
+        searchState.flatResults,
+        resolvedOpen && defaultActiveFirstItem,
+        (result) => result.item.disabled === true
+      )
+    )
+  }
+
   const closeSpotlight = useCallback(() => {
     setOpenValue(false)
   }, [setOpenValue])
@@ -196,20 +221,6 @@ export const Spotlight = forwardRef<SpotlightHandle, SpotlightProps>(function Sp
       releaseSpotlightHotkey(owner)
     }
   }, [hotkey, toggleSpotlight])
-
-  useEffect(() => {
-    if (!resolvedOpen) {
-      setActiveIndex(-1)
-      return
-    }
-    setActiveIndex(
-      getInitialPickerActiveIndex(
-        searchState.flatResults,
-        defaultActiveFirstItem,
-        (result) => result.item.disabled === true
-      )
-    )
-  }, [resolvedOpen, resolvedQuery, items, searchState.flatResults, defaultActiveFirstItem])
 
   useEffect(() => {
     if (!resolvedOpen || activeIndex < 0) return

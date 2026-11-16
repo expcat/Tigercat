@@ -951,6 +951,10 @@ export const Tree = defineComponent({
             type: 'search',
             class: treeSearchInputClasses,
             placeholder: resolveLocaleText('Search', mergedLocale.value?.common?.searchPlaceholder),
+            'aria-label': resolveLocaleText(
+              'Search',
+              mergedLocale.value?.common?.searchPlaceholder
+            ),
             value: searchQuery.value,
             onInput: (event: Event) => setSearchQuery((event.target as HTMLInputElement).value)
           })

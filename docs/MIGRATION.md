@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+React Spotlight 打开态的 SSR 首帧即选中首个启用结果，并输出 aria-activedescendant。双端纵向 Tabs 的面板内若存在纵向滚动容器，其上的滑动不再切换页签；React Tabs 将合并 locale 的方向写入 tablist，仅传组件 rtl locale 也生效。Tree 内置搜索框的 aria-label 采用本地化搜索文案。调用方式不用改。
+
 React Pagination 非受控点击当前页不再触发 onChange；依赖重复回调的逻辑应改为监听实际页码变化。双端 PageHeader 无标题时保留调用方 aria-labelledby；ScrollSpy 的 section active 属性覆盖嵌套项，Vue 同步输出 active 与 behavior 属性。React ContextMenuItem / DropdownItem 的 itemKey 不再透传到原生元素，调用方式不用改。
 
 React ImagePreview（含 Gallery）打开时立即采用受控 currentIndex。Vue ImageCompare 在归一化位置不变时不再发 update:position / change；依赖重复 Home / End 回调的逻辑应改为监听实际位置变化。

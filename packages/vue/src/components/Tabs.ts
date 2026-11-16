@@ -557,7 +557,8 @@ export const Tabs = defineComponent({
 
     const handleContentTouchEnd = (event: TouchEvent) => {
       if (!props.swipeable || !swipeStart.value || event.changedTouches.length !== 1) return
-      if (isSwipeBlockedByNestedScroll(event.target, event.currentTarget)) {
+      const axis = props.tabPosition === 'left' || props.tabPosition === 'right' ? 'y' : 'x'
+      if (isSwipeBlockedByNestedScroll(event.target, event.currentTarget, axis)) {
         swipeStart.value = null
         return
       }
