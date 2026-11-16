@@ -364,7 +364,9 @@ export const LineChart = defineComponent({
         innerHeight: innerRect.value.height,
         xScale: props.xScale,
         yScale: props.yScale,
-        includeZero: Boolean(props.includeZero || props.showArea)
+        includeZero: Boolean(
+          props.includeZero || resolvedSeries.value.some((s) => s.showArea ?? props.showArea)
+        )
       })
     )
     const resolvedXScale = computed(() => resolvedScales.value.xScale)

@@ -95,6 +95,36 @@ describe('getBarValueLabelY', () => {
 })
 
 describe('layoutLineSeries', () => {
+  it.each([false, true])('lets series area options override chart showArea=%s', (showArea) => {
+    const series = layoutLineSeries(
+      [true, false, undefined].map((showArea) => ({
+        showArea,
+        areaOpacity: showArea ? 0.9 : undefined,
+        data: [
+          { x: 'A', y: 30 },
+          { x: 'B', y: 40 }
+        ]
+      })),
+      createPointScale(['A', 'B'], [0, 100], { padding: 0 }),
+      createLinearScale([0, 40], [80, 0]),
+      {
+        curve: 'linear',
+        palette: ['#111'],
+        activeIndex: null,
+        showArea,
+        areaOpacity: 0.2,
+        strokeWidth: 2,
+        showPoints: true,
+        pointSize: 4,
+        pointHollow: false
+      }
+    )
+    expect(series.map((item) => item.showArea)).toEqual([true, false, showArea])
+    expect(series.map((item) => item.areaOpacity)).toEqual([0.9, 0, showArea ? 0.2 : 0])
+    expect(series[0].areaPath).not.toBe('')
+    expect(series[1].areaPath).toBe('')
+  })
+
   it('uses yScale.map(0) as the area baseline, not the plot bottom', () => {
     const xScale = createPointScale(['A', 'B'], [0, 100], { padding: 0 })
     const yScale = createLinearScale([30, 40], [80, 0])

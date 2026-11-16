@@ -424,10 +424,6 @@ export const RadarChart: React.FC<RadarChartProps> = ({
       if (node instanceof SVGElement) node.focus()
       return
     }
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault()
-      handleSelectIndex(seriesIndex)
-    }
   }
 
   const chart = (
@@ -580,7 +576,6 @@ export const RadarChart: React.FC<RadarChartProps> = ({
                 onMouseEnter={(e) => handleHoverEnter(item.seriesIndex, e)}
                 onMouseMove={(e) => handleAreaMove(item.seriesIndex, e)}
                 onMouseLeave={handlePointLeave}
-                onClick={() => handleSelectIndex(item.seriesIndex)}
               />
             ) : null}
             {showSeriesPoints
@@ -637,7 +632,6 @@ export const RadarChart: React.FC<RadarChartProps> = ({
                           ? (e) => handlePointEnter(item.seriesIndex, point.index, e)
                           : undefined
                       }
-                      onClick={() => handleSelectIndex(item.seriesIndex)}
                       onKeyDown={(e) => handlePointKeyDown(e, item.seriesIndex, point.index)}
                     />
                   )

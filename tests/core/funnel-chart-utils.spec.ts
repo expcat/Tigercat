@@ -5,6 +5,15 @@ import {
   funnelLayerRatios
 } from '@expcat/tigercat-core'
 
+it('uses only visible positive stages as funnel conversion baselines', () => {
+  expect(funnelLayerRatios([-10, 100, 0, 40])).toEqual([
+    { index: 0, value: -10, versusFirst: null, versusPrevious: null },
+    { index: 1, value: 100, versusFirst: 1, versusPrevious: null },
+    { index: 2, value: 0, versusFirst: null, versusPrevious: null },
+    { index: 3, value: 40, versusFirst: 0.4, versusPrevious: 0.4 }
+  ])
+})
+
 it('formats named funnel conversions from stages instead of a sum of stages', () => {
   const ratios = funnelLayerRatios([1000, 620, 340])
   const labels = {

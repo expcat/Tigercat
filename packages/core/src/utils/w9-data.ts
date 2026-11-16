@@ -640,17 +640,17 @@ export interface FunnelRatio {
 }
 
 export function funnelLayerRatios(values: readonly number[]): FunnelRatio[] {
-  const first = values.find((value) => Number.isFinite(value) && value !== 0) ?? null
+  const first = values.find((value) => Number.isFinite(value) && value > 0) ?? null
   let previous: number | null = null
   return values.map((value, index) => {
+    const visible = Number.isFinite(value) && value > 0
     const ratio: FunnelRatio = {
       index,
       value,
-      versusPrevious:
-        previous === null || previous === 0 || !Number.isFinite(value) ? null : value / previous,
-      versusFirst: first === null || !Number.isFinite(value) ? null : value / first
+      versusPrevious: !visible || previous === null ? null : value / previous,
+      versusFirst: !visible || first === null ? null : value / first
     }
-    if (Number.isFinite(value)) previous = value
+    if (visible) previous = value
     return ratio
   })
 }

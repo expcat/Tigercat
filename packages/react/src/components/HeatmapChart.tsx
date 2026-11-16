@@ -442,6 +442,30 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
           {formatHeatmapSummary(labels.heatmapSummary, layout.rows, layout.cols)}
         </p>
       ) : null}
+      <table className="sr-only" data-heatmap-table="">
+        <thead>
+          <tr>
+            <td />
+            {xLabels.map((label) => (
+              <th key={`hx-${label}`} scope="col">
+                {label}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {yLabels.map((yLabel, row) => (
+            <tr key={`hy-${yLabel}`}>
+              <th scope="row">{yLabel}</th>
+              {xLabels.map((xLabel, col) => (
+                <td key={`hv-${xLabel}-${yLabel}`}>
+                  {formatValue(cells[row * layout.cols + col]?.value ?? null)}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
       {tooltip}
       {bind ? (
         <div data-tiger-calendar-axis={bind.calendar ? '' : undefined}>

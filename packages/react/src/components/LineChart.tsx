@@ -217,7 +217,7 @@ export const LineChart: React.FC<LineChartProps> = ({
         innerHeight: innerRect.height,
         xScale: xScaleProp,
         yScale: yScaleProp,
-        includeZero: Boolean(includeZero || showArea)
+        includeZero: Boolean(includeZero || resolvedSeries.some((s) => s.showArea ?? showArea))
       }),
     [
       xValues,
@@ -227,7 +227,8 @@ export const LineChart: React.FC<LineChartProps> = ({
       xScaleProp,
       yScaleProp,
       includeZero,
-      showArea
+      showArea,
+      resolvedSeries
     ]
   )
 

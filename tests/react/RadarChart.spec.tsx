@@ -27,6 +27,26 @@ const multiSeriesData = [
 ]
 
 describe('RadarChart', () => {
+  it.each([true, false])(
+    'selects once per area click and point activation with showPoints=%s',
+    (showPoints) => {
+      const onSeriesClick = vi.fn()
+      const { container } = renderWithProps(RadarChart, {
+        series: multiSeriesData,
+        showPoints,
+        onSeriesClick
+      })
+      fireEvent.click(container.querySelector('[data-radar-area]')!)
+      expect(onSeriesClick).toHaveBeenCalledTimes(1)
+      const point = container.querySelector('[data-radar-point]')!
+      fireEvent.keyDown(point, { key: 'Enter' })
+      expect(onSeriesClick).toHaveBeenCalledTimes(2)
+      fireEvent.click(point)
+      expect(onSeriesClick).toHaveBeenCalledTimes(3)
+      expect(onSeriesClick).toHaveBeenLastCalledWith(0, multiSeriesData[0])
+    }
+  )
+
   it('renders radar area and points', () => {
     const { container } = renderWithProps(RadarChart, { data: singleSeriesData })
 

@@ -19,6 +19,45 @@ const basicData = [
 const defaultSize = { width: 300, height: 200 }
 
 describe('LineChart', () => {
+  it('applies series area overrides and includes zero only for effective areas', async () => {
+    const props = {
+      ...defaultSize,
+      padding: 20,
+      includeZero: false,
+      series: [
+        { name: 'Filled', data: basicData, showArea: true, areaOpacity: 0.9 },
+        { name: 'Unfilled', data: basicData, showArea: false }
+      ]
+    }
+    const { container, rerender } = renderWithProps(LineChart, props)
+    expect(container.querySelector('[data-area-series="0"]')).toBeTruthy()
+    expect(container.querySelector('[data-area-series="1"]')).toBeNull()
+    expect(container.querySelector('linearGradient stop')).toHaveAttribute('stop-opacity', '0.9')
+    expect(
+      Number(container.querySelector('circle[data-point-index="0"]')!.getAttribute('cy'))
+    ).toBeLessThan(160)
+
+    await rerender({
+      ...props,
+      showArea: true,
+      areaOpacity: 0.15,
+      series: [...props.series, { data: basicData }]
+    })
+    expect(container.querySelector('[data-area-series="1"]')).toBeNull()
+    expect(container.querySelector('[data-area-series="2"]')).toBeTruthy()
+    expect(
+      Array.from(container.querySelectorAll('linearGradient stop:first-child'), (stop) =>
+        stop.getAttribute('stop-opacity')
+      )
+    ).toEqual(['0.9', '0.15'])
+
+    await rerender({ ...props, showArea: true, series: [props.series[1]] })
+    expect(container.querySelector('[data-area-series]')).toBeNull()
+    expect(
+      Number(container.querySelector('circle[data-point-index="0"]')!.getAttribute('cy'))
+    ).toBe(160)
+  })
+
   it('moves the point tab stop without tooltip tracking', async () => {
     const { container } = renderWithProps(LineChart, {
       ...defaultSize,

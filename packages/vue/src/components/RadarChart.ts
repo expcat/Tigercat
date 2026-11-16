@@ -382,10 +382,6 @@ export const RadarChart = defineComponent({
           if (node instanceof SVGElement) node.focus()
           return
         }
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault()
-          handleSelectIndex(seriesIndex)
-        }
       }
 
       const defs =
@@ -576,7 +572,6 @@ export const RadarChart = defineComponent({
                       onFocus: focusableMarks
                         ? (e: FocusEvent) => handlePointEnter(item.seriesIndex, point.index, e)
                         : undefined,
-                      onClick: () => handleSelectIndex(item.seriesIndex),
                       onKeydown: (e: KeyboardEvent) =>
                         handlePointKeyDown(e, item.seriesIndex, point.index)
                     })
@@ -654,8 +649,7 @@ export const RadarChart = defineComponent({
                         'data-series-index': item.seriesIndex,
                         onMouseenter: (e: MouseEvent) => handleHoverEnter(item.seriesIndex, e),
                         onMousemove: (e: MouseEvent) => handleAreaMove(item.seriesIndex, e),
-                        onMouseleave: handlePointLeave,
-                        onClick: () => handleSelectIndex(item.seriesIndex)
+                        onMouseleave: handlePointLeave
                       })
                     : null,
                   ...points

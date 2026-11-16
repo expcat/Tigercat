@@ -3,6 +3,7 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { renderToString } from 'react-dom/server'
 import { HeatmapChart } from '@expcat/tigercat-react/HeatmapChart'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
@@ -46,6 +47,24 @@ function createCanvasContextMock() {
 }
 
 describe('HeatmapChart', () => {
+  it.each(['auto', 'canvas'] as const)(
+    'exposes every formatted cell value in a readable table in %s DOM and SSR',
+    (renderMode) => {
+      const props = { ...defaultProps, renderMode, valueFormatter: (value: number) => `${value}%` }
+      const { container } = renderWithProps(HeatmapChart, props)
+      const ssr = document.createElement('div')
+      ssr.innerHTML = renderToString(<HeatmapChart {...props} />)
+
+      for (const root of [container, ssr]) {
+        const table = root.querySelector('[data-heatmap-table]')
+        expect(table).toHaveClass('sr-only')
+        expect(Array.from(table!.querySelectorAll('tbody td'), (cell) => cell.textContent)).toEqual(
+          ['1%', '2%', '3%', '4%']
+        )
+      }
+    }
+  )
+
   it.each(['svg', 'canvas'] as const)(
     'moves the %s cell tab stop without tooltip tracking',
     (renderMode) => {

@@ -13,6 +13,20 @@ const sampleData = [
 ]
 
 describe('FunnelChart (React)', () => {
+  it.each([
+    { values: [100, 0, 40], label: '40 (40%)', rates: 'Of first: 40%; Of previous: 40%' },
+    { values: [-10, 100], label: '100 (100%)', rates: 'Of first: 100%' }
+  ])('labels only visible positive stages for $values', ({ values, label, rates }) => {
+    const { container } = renderWithProps(FunnelChart, {
+      data: values.map((value) => ({ label: 'Stage', value })),
+      hoverable: true,
+      ...defaultSize
+    })
+    const last = container.querySelector(`[data-funnel-segment][data-index="${values.length - 1}"]`)
+    expect(container.textContent).toContain(`Stage ${label}`)
+    expect(last).toHaveAttribute('aria-label', `Stage: ${values.at(-1)} (${rates})`)
+  })
+
   it('renders SVG with segments', () => {
     const { container } = renderWithProps(FunnelChart, {
       data: sampleData,

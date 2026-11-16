@@ -472,7 +472,8 @@ export const HeatmapChart = defineComponent({
                   currentLayout.cols
                 )
               )
-            : hiddenTable,
+            : null,
+          hiddenTable,
           tooltip,
           props.bind
             ? h('div', { 'data-tiger-calendar-axis': props.bind.calendar ? '' : undefined }, [

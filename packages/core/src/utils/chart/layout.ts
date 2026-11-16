@@ -433,7 +433,7 @@ export function layoutLineSeries(
       datum,
       pointIndex: sourceIndex
     }))
-    const showArea = options.showArea
+    const showArea = s.showArea ?? options.showArea
     return {
       series: s,
       seriesIndex,
@@ -441,7 +441,7 @@ export function layoutLineSeries(
       linePath: createLinePath(points, options.curve),
       areaPath: showArea ? createAreaPath(points, yScale.map(0), options.curve) : '',
       showArea,
-      areaOpacity: showArea ? options.areaOpacity : 0,
+      areaOpacity: showArea ? (s.areaOpacity ?? options.areaOpacity) : 0,
       points,
       opacity: getChartElementOpacity(seriesIndex, options.activeIndex, {
         activeOpacity: options.activeOpacity,
