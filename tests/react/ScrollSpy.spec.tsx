@@ -111,6 +111,25 @@ describe('ScrollSpy', () => {
       expect(screen.getByText('API')).toHaveAttribute('aria-current', 'location')
     })
 
+    it('keeps a controlled disabled activeKey without notifying the parent', () => {
+      const onActiveKeyChange = vi.fn()
+      const probe: ScrollSpyItem[] = [
+        { key: 'off', href: '#off', label: 'Off', disabled: true },
+        { key: 'on', href: '#on', label: 'On' }
+      ]
+      render(
+        <ScrollSpy
+          items={probe}
+          activeKey="off"
+          onActiveKeyChange={onActiveKeyChange}
+          getContainer={() => scrollContainer}
+        />
+      )
+      expect(screen.getByText('Off')).toHaveAttribute('aria-current', 'location')
+      expect(screen.getByText('On')).not.toHaveAttribute('aria-current')
+      expect(onActiveKeyChange).not.toHaveBeenCalled()
+    })
+
     it('does not change the rendered active item in controlled mode after click', () => {
       renderScrollSpy({ activeKey: 'intro', onActiveKeyChange: vi.fn() })
       fireEvent.click(screen.getByText('Usage'))

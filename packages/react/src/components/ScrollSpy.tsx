@@ -84,6 +84,7 @@ export const ScrollSpy = forwardRef<HTMLElement, ScrollSpyProps>(function Scroll
       if (key !== undefined) onActiveKeyChange?.(key, item, payload)
     },
     postState: (key) => {
+      if (activeKey !== undefined) return key
       const item = getScrollSpyItemByKey(items, key)
       if (item && !item.disabled) return key
       return getInitialScrollSpyActiveKey(items, undefined, defaultActiveKey)

@@ -20,8 +20,8 @@ navigation 组 35 个组件（C082–C116）。审查时这一组同样没有浏
 
 ## 概览
 
-本篇 27 条：P2 11、P3 16。
-按波次：W4 11、W9 16。
+本篇 26 条：P2 10、P3 16。
+按波次：W4 10、W9 16。
 
 已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C086-F03（S13）、C088-F05（S13）、C095-F02（S13）、C109-F06（S13）、C112-F01（S13）、C113-F01（S13）、C114-F04（S13）、C116-F05（S13）。
 
@@ -80,11 +80,10 @@ navigation 组 35 个组件（C082–C116）。审查时这一组同样没有浏
 
 报告 `groups/navigation/ScrollSpy.md`，队列状态 needs-evidence。另受 S01 影响。
 
-| 编号     | 级别 | 波次 | 端    | 类别 | 条目                                                 | 验收                                                                                    |
-| -------- | ---- | ---- | ----- | ---- | ---------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| C110-F01 | P2   | W4   | React | 行为 | React 受控禁用键或不存在键被改成第一项，且不通知父级 | React activeKey=off（禁用项）且无 defaultActiveKey 时当前项为 Off，或夹取并通知父级一次 |
-| C110-F02 | P3   | W9   | 双端  | 行为 | 嵌套当前项的 section 属性两端不一致                  | 嵌套 activeKey=child 时 React 的 data-tiger-section-active 为子项 href 而非空串         |
-| C110-F03 | P3   | W9   | Demo  | 示例 | React Demo 02 的说明把回调写成 onChange              | React scroll-spy/02 demo.json 的说明改为 onActiveKeyChange，不含 onChange               |
+| 编号     | 级别 | 波次 | 端   | 类别 | 条目                                    | 验收                                                                            |
+| -------- | ---- | ---- | ---- | ---- | --------------------------------------- | ------------------------------------------------------------------------------- |
+| C110-F02 | P3   | W9   | 双端 | 行为 | 嵌套当前项的 section 属性两端不一致     | 嵌套 activeKey=child 时 React 的 data-tiger-section-active 为子项 href 而非空串 |
+| C110-F03 | P3   | W9   | Demo | 示例 | React Demo 02 的说明把回调写成 onChange | React scroll-spy/02 demo.json 的说明改为 onActiveKeyChange，不含 onChange       |
 
 ### C111 Spotlight
 
