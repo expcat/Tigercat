@@ -143,6 +143,17 @@ describe('Timeline (Vue)', () => {
     expect(screen.queryByText('全局加载中')).toBeNull()
   })
 
+  it('does not announce Loading... when the pending slot replaces it', async () => {
+    render(Timeline, {
+      props: { pending: true },
+      slots: {
+        pending: () => h('div', {}, 'Visible pending')
+      }
+    })
+    await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)))
+    expect(screen.getByRole('status').textContent).not.toBe('Loading...')
+  })
+
   it('supports reverse order', () => {
     const items: TimelineItem[] = [
       { key: 1, content: 'Event 1' },

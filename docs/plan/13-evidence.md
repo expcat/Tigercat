@@ -216,7 +216,7 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | C134 | Countdown     | needs-evidence | C134-F01 已修复。无 title、interval=0 时 timer 可访问名为 00:00:05，根 aria-label 仍是付款倒计时。视觉 0/16、键盘 0/16 均 blocked，截图 0；vitest 3 files 77 passed（happy-dom，TIGER_A11Y=1）；未跑 docs:api:check；无读屏                                                                   |
 | C135 | DataExport    | needs-evidence | C135-F01、C135-F02 已修复。默认笔记与 Demo 为 xlsx/csv/markdown；隐藏 secret 时 customExport 无 secret 与 render-only 列，name 为 X:Ada。视觉 0/8、键盘 0/8 均 blocked，截图 0；vitest 3 files 40 passed（happy-dom，axe 未扫）；临时 happy-dom 探针（非浏览器、非 SSR）；未跑 docs:api:check |
 | C136 | Table         | needs-evidence | C136-F01、C136-F02 已修复。sorts={[]} 不再挂出 header menu，多列排序走表头；grid 的 ArrowRight 落到下一格。视觉 0/64、键盘 0/64 均 blocked，截图 0；vitest Table.spec、table-utils、w9-bind 通过（happy-dom，TIGER_A11Y=1）；IAB 不可用，未做浏览器键盘；menu/05 属 C098                      |
-| C137 | Timeline      | needs-evidence | 视觉 0/24、键盘 0/24 均 blocked，截图 0；vitest 3 files 45 passed；happy-dom 探针通过（已删，非视觉）；未跑 SSR；无读屏；alternate、right、horizontal 无画面                                                                                                                                  |
+| C137 | Timeline      | needs-evidence | C137-F01 已修复。元素 pendingContent 的 role=status 不再含 [object Object]；Vue pending 槽不再把 role=status 播成 Loading...。视觉 0/24、键盘 0/24 均 blocked，截图 0；vitest 3 files 47 passed（happy-dom，TIGER_A11Y=1）；happy-dom 探针通过（已删，非视觉）；未跑 SSR；无读屏；alternate、right、horizontal 无画面                                                                                                                                  |
 
 ### charts
 

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import React from 'react'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { Timeline } from '@expcat/tigercat-react/Timeline'
@@ -129,6 +129,14 @@ describe('Timeline (React)', () => {
     )
     expect(screen.getByText('Custom pending')).toBeInTheDocument()
     expect(screen.queryByText('全局加载中')).toBeNull()
+  })
+
+  it('does not announce [object Object] for element pendingContent', async () => {
+    render(<Timeline pending pendingContent={<div>Visible pending</div>} />)
+    await act(async () => {
+      await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)))
+    })
+    expect(screen.getByRole('status').textContent ?? '').not.toContain('[object Object]')
   })
 
   it('supports reverse order', () => {

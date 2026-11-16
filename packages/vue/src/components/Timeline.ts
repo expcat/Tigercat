@@ -95,7 +95,9 @@ export const Timeline = defineComponent({
         mergedLocale.value?.common?.loadingText
       )
     )
-    const pendingSignature = computed(() => (props.pending ? pendingText.value : ''))
+    const pendingSignature = computed(() =>
+      props.pending && !slots.pending ? pendingText.value : ''
+    )
     const pendingSeen = ref<string | null>(null)
     const liveRegion = manageLiveRegion('polite')
     watch(

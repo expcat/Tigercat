@@ -79,7 +79,13 @@ export const Timeline: React.FC<TimelineProps> = ({
     mergedLocale?.timeline?.pendingText,
     mergedLocale?.common?.loadingText
   )
-  const pendingSignature = pending ? String(pendingContent ?? pendingText) : ''
+  const pendingSignature = !pending
+    ? ''
+    : typeof pendingContent === 'string'
+      ? pendingContent
+      : pendingContent == null
+        ? pendingText
+        : ''
   const pendingSeen = useRef<string | null>(null)
   const liveRef = useRef<ReturnType<typeof manageLiveRegion> | null>(null)
   useEffect(() => {
