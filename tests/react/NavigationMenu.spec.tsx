@@ -375,6 +375,22 @@ describe('NavigationMenu', () => {
     expect(about.tabIndex).toBe(-1)
   })
 
+  it('keeps content closed when the root is disabled and a value already matches an item', () => {
+    const { rerender } = render(<Demo disabled defaultValue="products" />)
+    expect(getPanel()).toHaveAttribute('hidden')
+    expect(screen.getByRole('menuitem', { name: 'Products' })).toHaveAttribute(
+      'aria-expanded',
+      'false'
+    )
+
+    rerender(<Demo disabled value="products" />)
+    expect(getPanel()).toHaveAttribute('hidden')
+    expect(screen.getByRole('menuitem', { name: 'Products' })).toHaveAttribute(
+      'aria-expanded',
+      'false'
+    )
+  })
+
   it('keeps aria-controls while closed', () => {
     render(<Demo defaultValue="products" />)
     const products = screen.getByRole('menuitem', { name: 'Products' })

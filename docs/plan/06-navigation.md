@@ -20,8 +20,8 @@ navigation 组 35 个组件（C082–C116）。审查时这一组同样没有浏
 
 ## 概览
 
-本篇 37 条：P2 21、P3 16。
-按波次：W4 21、W9 16。
+本篇 35 条：P2 19、P3 16。
+按波次：W4 19、W9 16。
 
 已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C086-F03（S13）、C088-F05（S13）、C095-F02（S13）、C109-F06（S13）、C112-F01（S13）、C113-F01（S13）、C114-F04（S13）、C116-F05（S13）。
 
@@ -59,15 +59,6 @@ navigation 组 35 个组件（C082–C116）。审查时这一组同样没有浏
 | -------- | ---- | ---- | --------- | ---- | --------------------------------------- | ----------------------------------------------------------------------------------- |
 | C098-F04 | P3   | W9   | Core+测试 | 文档 | 数字 key 的注释与测试名反向描述实际契约 | menu-utils.ts 注释与 menu-controller.spec.ts 测试名均写明 1 与「1」不相等，断言不变 |
 
-### C104 NavigationMenuItem
-
-报告 `groups/navigation/NavigationMenuItem.md`，队列状态 needs-evidence。另受 S01、S02、S07 影响。
-
-| 编号     | 级别 | 波次 | 端          | 类别 | 条目                                                        | 验收                                                                         |
-| -------- | ---- | ---- | ----------- | ---- | ----------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| C104-F01 | P2   | W4   | 双端        | 行为 | 根 disabled 不抑制已有 defaultValue 或受控 value 的面板打开 | 根 disabled 且 defaultValue 或受控 value 命中某 Item 时，双端 Content 不展开 |
-| C104-F02 | P2   | W4   | 文档·生成器 | 文档 | Item 生成示例缺少 Content 或顶层 Link，不构成有效组合       | 重跑 pnpm docs:api 后 Item 的 Examples 与 MCP 片段含 Content 或顶层 Link     |
-
 ### C105 NavigationMenuLink
 
 报告 `groups/navigation/NavigationMenuLink.md`，队列状态 needs-evidence。另受 S01、S02 影响。
@@ -78,7 +69,7 @@ navigation 组 35 个组件（C082–C116）。审查时这一组同样没有浏
 
 ### C106 NavigationMenuList
 
-报告 `groups/navigation/NavigationMenuList.md`，队列状态 needs-evidence。另受 S02、C104-F02 影响。
+报告 `groups/navigation/NavigationMenuList.md`，队列状态 needs-evidence。另受 S02 影响。
 
 | 编号     | 级别 | 波次 | 端    | 类别 | 条目                                                 | 验收                                                                               |
 | -------- | ---- | ---- | ----- | ---- | ---------------------------------------------------- | ---------------------------------------------------------------------------------- |

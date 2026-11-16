@@ -1035,7 +1035,7 @@ export const REQUIRED_USAGE_SNIPPETS = {
     NavigationMenuList:
       '<NavigationMenu><NavigationMenuList><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger></NavigationMenuItem></NavigationMenuList></NavigationMenu>',
     NavigationMenuItem:
-      '<NavigationMenu><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger></NavigationMenuItem></NavigationMenu>',
+      '<NavigationMenu><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger><NavigationMenuContent><NavigationMenuLink href="/guide">Guide</NavigationMenuLink></NavigationMenuContent></NavigationMenuItem></NavigationMenu>',
     NavigationMenuTrigger:
       '<NavigationMenu><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger><NavigationMenuContent><NavigationMenuLink href="/guide">Guide</NavigationMenuLink></NavigationMenuContent></NavigationMenuItem></NavigationMenu>',
     NavigationMenuContent:
@@ -1177,7 +1177,7 @@ export const REQUIRED_USAGE_SNIPPETS = {
     NavigationMenuList:
       '<NavigationMenu><NavigationMenuList><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger></NavigationMenuItem></NavigationMenuList></NavigationMenu>',
     NavigationMenuItem:
-      '<NavigationMenu><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger></NavigationMenuItem></NavigationMenu>',
+      '<NavigationMenu><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger><NavigationMenuContent><NavigationMenuLink href="/guide">Guide</NavigationMenuLink></NavigationMenuContent></NavigationMenuItem></NavigationMenu>',
     NavigationMenuTrigger:
       '<NavigationMenu><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger><NavigationMenuContent><NavigationMenuLink href="/guide">Guide</NavigationMenuLink></NavigationMenuContent></NavigationMenuItem></NavigationMenu>',
     NavigationMenuContent:

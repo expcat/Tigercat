@@ -630,7 +630,9 @@ export const NavigationMenuItem: React.FC<NavigationMenuItemProps> = ({
   const hasPanel = contentNodes.length > 0
   const mega = contentNodes.some((child) => Boolean(child.props.mega))
 
-  const isOpen = Boolean(root && !disabled && isNavigationMenuValueOpen(itemValue, root.value))
+  const isOpen = Boolean(
+    root && !disabled && !root.disabled && isNavigationMenuValueOpen(itemValue, root.value)
+  )
 
   const contentId = `${autoValue}-content`
 

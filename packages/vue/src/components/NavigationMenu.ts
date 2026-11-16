@@ -749,6 +749,7 @@ export const NavigationMenuItem = defineComponent({
       () =>
         Boolean(root) &&
         !props.disabled &&
+        !root?.disabled &&
         isNavigationMenuValueOpen(itemValue.value, root?.value.value)
     )
 
