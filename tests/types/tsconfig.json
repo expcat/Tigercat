@@ -5,8 +5,9 @@
     "jsx": "react-jsx",
     "paths": {
       "@expcat/tigercat-core": ["../../packages/core/src/index.ts"],
+      "react": ["../../packages/react/node_modules/@types/react/index.d.ts"],
       "react/jsx-runtime": ["../../packages/react/node_modules/@types/react/jsx-runtime.d.ts"]
     }
   },
-  "include": ["./select.tsx"]
+  "include": ["./select.tsx", "./float-button.tsx"]
 }

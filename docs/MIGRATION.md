@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+React FloatButton 传 `href` 时现在会调用公开 `onClick`，事件目标与 ref 类型为 `HTMLButtonElement | HTMLAnchorElement`；访问 `disabled` 等 button 专属字段前先判断元素类型。链接禁用时仍渲染 disabled button。FloatButton 与 FloatButtonGroup 的默认 offset 文档改为实际的 `{ x: 24, y: 76 }`，用于避让 BackTop，运行偏移不变。
+
 Vue 声明式 DropdownItem 的已选 radio 现在点击后发出 `check(true)`，与 Space 一致；把事件值写回 `checked` 后仍保持选中。checkbox 的点击和 Space 继续取反。调用方式不用改。
 
 双端 ContextMenu 从外部把 `open` 由 false 改为 true 时，现在与 Shift+F10 打开一样聚焦首个可用菜单项。React ContextMenu 与 Dropdown 的 `items` 配 `closeOnClick=false` 时，普通项点击后保留菜单且不请求关闭，`aria-controls` 指向实际菜单。共享菜单方向键现在依次经过 checkbox / radio 项，ContextMenu 与 Dropdown 均适用。调用方式不用改，依赖旧焦点顺序的键盘脚本需相应调整。

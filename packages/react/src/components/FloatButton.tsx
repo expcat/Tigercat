@@ -45,10 +45,14 @@ const FloatButtonGroupContext = createContext<{
   inGroup: boolean
 } | null>(null)
 
+type FloatButtonElement = HTMLButtonElement | HTMLAnchorElement
+
 export interface FloatButtonProps
-  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'type'>, CoreFloatButtonProps {
+  extends
+    Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'type' | 'onClick'>,
+    CoreFloatButtonProps {
   children?: React.ReactNode
-  onClick?: React.MouseEventHandler<HTMLButtonElement>
+  onClick?: React.MouseEventHandler<FloatButtonElement>
   locale?: Partial<TigerLocale>
 }
 
@@ -77,7 +81,7 @@ function nodeHasVisibleText(node: React.ReactNode): boolean {
   return nodeHasVisibleText(props.children)
 }
 
-export const FloatButton = forwardRef<HTMLButtonElement, FloatButtonProps>(function FloatButton(
+export const FloatButton = forwardRef<FloatButtonElement, FloatButtonProps>(function FloatButton(
   {
     shape,
     size = 'md',
@@ -99,6 +103,13 @@ export const FloatButton = forwardRef<HTMLButtonElement, FloatButtonProps>(funct
   },
   ref
 ) {
+  const setControlRef = useCallback(
+    (node: FloatButtonElement | null) => {
+      if (typeof ref === 'function') return ref(node)
+      if (ref) ref.current = node
+    },
+    [ref]
+  )
   const group = useContext(FloatButtonGroupContext)
   const config = useTigerConfig()
   const resolvedShape: FloatButtonShape = resolveFloatButtonShape(shape, group?.shape)
@@ -150,11 +161,12 @@ export const FloatButton = forwardRef<HTMLButtonElement, FloatButtonProps>(funct
   const control = safeHref ? (
     <a
       {...anchorProps}
-      ref={ref as React.Ref<HTMLAnchorElement>}
+      ref={setControlRef}
       className={classes}
       href={safeHref}
       style={buttonStyle}
-      aria-label={resolvedAriaLabel}>
+      aria-label={resolvedAriaLabel}
+      onClick={onClick}>
       {content}
     </a>
   ) : (
@@ -168,7 +180,7 @@ export const FloatButton = forwardRef<HTMLButtonElement, FloatButtonProps>(funct
       formTarget={_formTarget}
       name={_name}
       value={_value}
-      ref={ref}
+      ref={setControlRef}
       className={classes}
       type="button"
       disabled={disabled}

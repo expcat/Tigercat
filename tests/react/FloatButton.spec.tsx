@@ -67,6 +67,31 @@ describe('FloatButton (React)', () => {
     await fireEvent.click(screen.getByRole('button'))
     expect(onClick).not.toHaveBeenCalled()
   })
+
+  it('forwards link clicks and refs while keeping the disabled button fallback', () => {
+    const ref = React.createRef<HTMLButtonElement | HTMLAnchorElement>()
+    const targets: (HTMLButtonElement | HTMLAnchorElement)[] = []
+    const onClick = vi.fn((event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
+      event.preventDefault()
+      targets.push(event.currentTarget)
+    })
+    const { rerender } = render(<FloatButton href="/inbox" ref={ref} onClick={onClick} />)
+    const link = screen.getByRole('link')
+    expect(link).toHaveAttribute('href', '/inbox')
+    expect(ref.current).toBe(link)
+
+    fireEvent.click(link)
+    expect(onClick).toHaveBeenCalledTimes(1)
+    expect(targets).toEqual([link])
+
+    rerender(<FloatButton href="/inbox" disabled ref={ref} onClick={onClick} />)
+    const button = screen.getByRole('button')
+    expect(button).toBeDisabled()
+    expect(button).not.toHaveAttribute('href')
+    expect(ref.current).toBe(button)
+    fireEvent.click(button)
+    expect(onClick).toHaveBeenCalledTimes(1)
+  })
 })
 
 describe('FloatButtonGroup (React)', () => {

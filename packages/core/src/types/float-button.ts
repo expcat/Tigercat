@@ -78,8 +78,8 @@ export interface FloatButtonProps {
   placement?: ViewportPlacement
 
   /**
-   * Fixed viewport offset used when floating is true.
-   * @default 24
+   * Fixed viewport offset when floating; leaves room for BackTop.
+   * @default { x: 24, y: 76 }
    */
   offset?: ViewportOffset
 }
@@ -134,8 +134,8 @@ export interface FloatButtonGroupProps {
   placement?: ViewportPlacement
 
   /**
-   * Viewport offset used with placement.
-   * @default 24
+   * Viewport offset used with placement; leaves room for BackTop.
+   * @default { x: 24, y: 76 }
    */
   offset?: ViewportOffset
 

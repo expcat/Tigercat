@@ -26,7 +26,7 @@ description: Compact generated Tigercat Navigation props reference
 - `defaultOpen?`: `boolean`; default `false`. Initial open state in uncontrolled mode.
 - `closeOnAction?`: `boolean`; default `true`. Close the group after an action button is activated.
 - `className?`: `string`; default `-`. Additional CSS class name
-- `offset?`: `ViewportOffset`; default `24`. Viewport offset used with placement.
+- `offset?`: `ViewportOffset`; default `{ x: 24, y: 76 }`. Viewport offset used with placement; leaves room for BackTop.
 - `triggerNode?`: `React.ReactNode`; default `-`. -
 - `children?`: `React.ReactNode`; default `-`. -
 - `style?`: `Record<string, string | number>`; default `-`. -

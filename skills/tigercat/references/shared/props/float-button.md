@@ -13,12 +13,12 @@ description: Compact generated Tigercat Navigation props reference
 
 `packages/core/src/types/float-button.ts` · `FloatButtonProps` · 4/15 compact props · [Complete props](#remaining-props-complete-public-api)
 
-| Prop         | Type                | Default          | Notes                                                          |
-| ------------ | ------------------- | ---------------- | -------------------------------------------------------------- |
-| `floating?`  | `boolean`           | `false`          | Whether the standalone button should be fixed to the viewport. |
-| `placement?` | `ViewportPlacement` | `'bottom-right'` | Fixed viewport corner used when floating is true.              |
-| `offset?`    | `ViewportOffset`    | `24`             | Fixed viewport offset used when floating is true.              |
-| `ariaLabel?` | `string`            | `-`              | Accessible label                                               |
+| Prop         | Type                | Default            | Notes                                                          |
+| ------------ | ------------------- | ------------------ | -------------------------------------------------------------- |
+| `floating?`  | `boolean`           | `false`            | Whether the standalone button should be fixed to the viewport. |
+| `placement?` | `ViewportPlacement` | `'bottom-right'`   | Fixed viewport corner used when floating is true.              |
+| `offset?`    | `ViewportOffset`    | `{ x: 24, y: 76 }` | Fixed viewport offset when floating; leaves room for BackTop.  |
+| `ariaLabel?` | `string`            | `-`                | Accessible label                                               |
 
 ### Remaining props (complete public API)
 

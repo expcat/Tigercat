@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **FloatButton 链接与默认偏移（React / Core / MCP，C095-F01、C095-F03、C095-F04）**：React 链接接入公开 `onClick`，click 事件与 ref 类型覆盖 button / anchor，禁用时仍退化为 disabled button。FloatButton 与 Group 的生成 Props 和 MCP 默认 offset 校正为 `{ x: 24, y: 76 }`，说明避让 BackTop，运行值不变。
+
 - **DropdownItem radio 点击（Vue，C093-F02）**：点击与 Space 使用相同的类型分支；已选 radio 继续发出 `check(true)` 并保持 `aria-checked=true`，checkbox 仍取反。
 
 - **Dropdown schema 与 focus 打开（Vue / React，C092-F01、C092-F02、C092-F03、C092-F04）**：Vue schema 叶项遵守父级 `closeOnClick`，子菜单继承禁用与关闭策略，向根菜单转发选择 / 勾选通知；普通项默认整体关闭，checkbox / radio 保持打开。双端 hover 触发器获焦即打开，关闭后回焦不会重新打开。

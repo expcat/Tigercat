@@ -15,7 +15,7 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 
 Runnable modules: `examples/example/vue3/src/examples/tags-input/01/`, `examples/example/vue3/src/examples/tags-input/02/`, `examples/example/vue3/src/examples/tags-input/03/`, `examples/example/react/src/examples/tags-input/01/`, `examples/example/react/src/examples/tags-input/02/`, `examples/example/react/src/examples/tags-input/03/`.
 
-Note: 只读用 `readOnly`。粘贴在光标处插入后再按分隔符切开。错误只走 FormItem。拒绝重复或超限时给一句实时说明。
+Note: 只读用 `readOnly`。Vue 与 React 均可拖拽标签排序，拖放后通过值更新事件提交新数组；禁用或只读时不能拖拽。粘贴在光标处插入后再按分隔符切开。错误只走 FormItem。拒绝重复或超限时给一句实时说明。
 
 Vue: `<TagsInput v-model="tags" />`
 
