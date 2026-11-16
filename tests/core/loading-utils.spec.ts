@@ -13,6 +13,7 @@ import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 import { jaJP } from '@expcat/tigercat-core/locales/ja-JP'
 import { enUS } from '@expcat/tigercat-core/locales/en-US'
+import { tigercatPlugin } from '../../packages/core/src/tailwind-plugin'
 
 const OLD_LOCKED_WHITE_MASK = 'rgba(255, 255, 255, 0.9)'
 
@@ -65,5 +66,24 @@ describe('Loading accessible name', () => {
 
   it('lets an explicit text override the locale', () => {
     expect(getLoadingLabel(zhCN, 'Syncing')).toBe('Syncing')
+  })
+})
+
+describe('Loading animation plugin styles', () => {
+  it('ships dots and bars keyframes through the tailwind plugin', () => {
+    const rules: Record<string, unknown> = {}
+    type PluginInstance = {
+      handler: (api: { addBase: (rule: Record<string, unknown>) => void }) => void
+    }
+    const plugin = tigercatPlugin as unknown as PluginInstance
+    plugin.handler({ addBase: (rule) => Object.assign(rules, rule) })
+    expect(rules['@keyframes tiger-bounce-dot']).toBeDefined()
+    expect(rules['@keyframes tiger-scale-bar']).toBeDefined()
+    expect(rules['.animate-bounce-dot']).toMatchObject({
+      animation: expect.stringContaining('tiger-bounce-dot')
+    })
+    expect(rules['.animate-scale-bar']).toMatchObject({
+      animation: expect.stringContaining('tiger-scale-bar')
+    })
   })
 })
