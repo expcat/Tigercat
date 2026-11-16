@@ -445,7 +445,7 @@ const COMPONENT_USAGE_NOTES = {
   },
   Badge: {
     notes:
-      '无 content 的 number/text 不渲染。`type="text"` 不被 `max` 封顶。叠放必须 `standalone={false}`，计数写进宿主名字。默认不是 live region。`right`/`left` 跟阅读方向。'
+      '无 content 的 number/text 不渲染。standalone 默认显示 0；叠放时 `content=0` 默认隐藏，用 `showZero` 显示。`type="text"` 不被 `max` 封顶。叠放必须 `standalone={false}`，计数写进宿主名字。默认不是 live region。位置只用 `top-start`/`top-end`/`bottom-start`/`bottom-end`，start/end 跟阅读方向。'
   },
   Empty: {
     notes:

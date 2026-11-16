@@ -294,6 +294,7 @@ export default function DemoBlock({ module, className }: DemoBlockProps) {
           <Button
             size="sm"
             variant="secondary"
+            className="scroll-my-4"
             data-testid="demo-edit-source"
             onClick={() => setEditorOpen((open) => !open)}>
             {editorOpen ? chrome.hideSource : chrome.editSource}

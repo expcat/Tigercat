@@ -64,14 +64,21 @@ describe('Rate', () => {
     expect(onChange).toHaveBeenCalledWith(2.5)
   })
 
-  it('locks on readOnly and stays focusable', async () => {
+  it('locks on readOnly, stays focusable and prevents navigation scrolling', async () => {
     const onChange = vi.fn()
     const { container } = render(Rate, {
-      props: { modelValue: 2, readOnly: true, 'onUpdate:modelValue': onChange }
+      props: { defaultValue: 4.5, allowHalf: true, readOnly: true, 'onUpdate:modelValue': onChange }
     })
     const slider = container.querySelector('[role="slider"]') as HTMLElement
+    slider.focus()
     await fireEvent.click(getStars(container)[3])
-    await fireEvent.keyDown(slider, { key: 'ArrowRight' })
+    for (const key of ['Home', 'End', 'ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown']) {
+      const event = new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true })
+      await fireEvent(slider, event)
+      expect(event.defaultPrevented).toBe(true)
+      expect(slider).toHaveAttribute('aria-valuenow', '4.5')
+      expect(slider).toHaveFocus()
+    }
     expect(onChange).not.toHaveBeenCalled()
     expect(slider).toHaveAttribute('aria-readonly', 'true')
     expect(slider).toHaveAttribute('tabindex', '0')

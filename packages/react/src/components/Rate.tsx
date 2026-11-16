@@ -181,7 +181,7 @@ export const Rate = forwardRef<HTMLDivElement, RateProps>(function Rate(
       }}
       onKeyDown={(e) => {
         onKeyDown?.(e)
-        if (e.defaultPrevented || locked) return
+        if (e.defaultPrevented || disabled) return
         const rtl = getComputedStyle(e.currentTarget).direction === 'rtl'
         const next = rateKeyboardValue(e.key, normalized, count, step, rtl)
         if (next == null) return

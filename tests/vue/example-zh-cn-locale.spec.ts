@@ -12,6 +12,8 @@ import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 import CronEditorDemo from '../../examples/example/vue3/src/examples/cron-editor/01/App.vue'
 import DatePickerDemo from '../../examples/example/vue3/src/examples/datepicker/01/App.vue'
 import DataExportDemo from '../../examples/example/vue3/src/examples/data-export/01/App.vue'
+import RateSizeDemo from '../../examples/example/vue3/src/examples/rate/02/App.vue'
+import RateStateDemo from '../../examples/example/vue3/src/examples/rate/03/App.vue'
 
 function renderDemo(demo: object, locale: object = zhCN) {
   return render({
@@ -22,6 +24,18 @@ function renderDemo(demo: object, locale: object = zhCN) {
 }
 
 describe('Vue example pages on zh-CN', () => {
+  it('names each Rate row by its visible size or state', () => {
+    const sizes = renderDemo(RateSizeDemo)
+    for (const label of ['sm', 'md', 'lg', 'count']) {
+      expect(sizes.getByRole('slider', { name: `评分（${label}）` })).toBeInTheDocument()
+    }
+    sizes.unmount()
+    const states = renderDemo(RateStateDemo)
+    for (const label of ['自定义', '只读', '禁用']) {
+      expect(states.getByRole('slider', { name: `${label}评分` })).toBeInTheDocument()
+    }
+  })
+
   it('renders CronEditor with Simplified copy', () => {
     renderDemo(CronEditorDemo)
     expect(screen.getByText('执行计划')).toBeInTheDocument()

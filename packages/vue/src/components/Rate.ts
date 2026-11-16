@@ -120,7 +120,7 @@ export const Rate = defineComponent({
 
     function handleKeydown(e: KeyboardEvent) {
       callUnknownEventHandler(attrs.onKeydown, e)
-      if (e.defaultPrevented || locked.value) return
+      if (e.defaultPrevented || props.disabled) return
       const target = e.currentTarget
       const rtl = target instanceof HTMLElement && getComputedStyle(target).direction === 'rtl'
       const next = rateKeyboardValue(e.key, normalized.value, starCount.value, step.value, rtl)

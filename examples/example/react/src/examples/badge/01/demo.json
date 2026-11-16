@@ -1,7 +1,7 @@
 {
   "id": "badge-01",
   "title": "计数、零、点状",
-  "description": "数字徽章超过 max 显示 max+。content=0 默认隐藏，showZero 才显示。type=dot 忽略 content。",
+  "description": "数字徽章超过 max 显示 max+。standalone 默认显示 0；叠放时 content=0 默认隐藏，showZero 才显示。type=dot 忽略 content。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }

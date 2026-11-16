@@ -4,6 +4,12 @@
 
 ## v3.0.1（未发布）
 
+- **ConfigProvider RTL 属性说明（文档 / MCP，C001-F004）**：i18n 方向解析说明改为 explicit dir prop，与公开属性一致。
+- **Badge 默认零值与位置说明（Demo / 文档 / MCP，C007-F04）**：两端 Demo 和生成笔记写明 standalone 默认显示 0，位置只用 top-start、top-end、bottom-start、bottom-end。
+- **Demo 外壳焦点留白（Demo，C013-V01）**：两端「编辑源码」按钮加入 16px 上下滚动边距，为自然 Tab 聚焦及 4px 焦点环留出空间；happy-dom 与几何核对通过，IAB 受子代理限制，窄屏真实复验待补。
+- **Rate 示例行名称（Demo，C026-V01）**：两端 Demo02/03 的 slider 名称带上 sm、md、lg、count、自定义、只读、禁用描述。
+- **Rate 只读导航按键（React / Vue，C026-V04）**：只读 Home、End 与方向键取消默认滚动，值仍为 4.5，焦点保持；双端回归先红后绿。
+
 - **Figma 行高变量（Core，X02-F005）**：生成器将四个行高变量名映射为 `--tiger-primitive-font-lh-*`，167 个 Figma 变量均对应 tokens.css 的声明。
 - **Card 键盘点击事件（React / Vue，C034-F07）**：根节点 Enter / Space 激活走原生 click，onClick 收到符合点击契约的事件，不再收到 keydown。
 - **AutoComplete 空值注释（Core，C052-F04）**：AutoCompleteOption.value 注释与 Props 统一，空串表示未提交。

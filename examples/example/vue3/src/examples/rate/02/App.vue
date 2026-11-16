@@ -10,11 +10,11 @@ const sizes = ['sm', 'md', 'lg'] as const
   <div class="space-y-3">
     <div v-for="size in sizes" :key="size" class="flex items-center gap-3">
       <span class="w-10 text-sm text-gray-500">{{ size }}</span>
-      <Rate v-model="value" :size="size" />
+      <Rate v-model="value" :size="size" :aria-label="`评分（${size}）`" />
     </div>
     <div class="flex items-center gap-3">
       <span class="w-10 text-sm text-gray-500">count</span>
-      <Rate :default-value="8" :count="10" />
+      <Rate :default-value="8" :count="10" aria-label="评分（count）" />
     </div>
   </div>
 </template>

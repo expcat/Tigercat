@@ -298,6 +298,7 @@ onBeforeUnmount(() => {
         <Button
           size="sm"
           variant="secondary"
+          class="scroll-my-4"
           data-testid="demo-edit-source"
           @click="editorOpen = !editorOpen">
           {{ editorOpen ? chrome.hideSource : chrome.editSource }}

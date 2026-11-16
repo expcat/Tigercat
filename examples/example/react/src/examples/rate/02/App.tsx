@@ -11,12 +11,12 @@ export default function App() {
       {sizes.map((size) => (
         <div key={size} className="flex items-center gap-3">
           <span className="w-10 text-sm text-gray-500">{size}</span>
-          <Rate value={value} onChange={setValue} size={size} />
+          <Rate value={value} onChange={setValue} size={size} aria-label={`评分（${size}）`} />
         </div>
       ))}
       <div className="flex items-center gap-3">
         <span className="w-10 text-sm text-gray-500">count</span>
-        <Rate defaultValue={8} count={10} />
+        <Rate defaultValue={8} count={10} aria-label="评分（count）" />
       </div>
     </div>
   )
