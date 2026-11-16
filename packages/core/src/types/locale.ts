@@ -1167,6 +1167,8 @@ export interface TigerLocaleRichTextEditor {
   clear?: string
   linkPrompt?: string
   imagePrompt?: string
+  /** Live announcement when an image paste is rejected. */
+  imageRejected?: string
 }
 
 export interface TigerLocaleCronEditor {

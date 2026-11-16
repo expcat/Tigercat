@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, fireEvent } from '@testing-library/react'
+import { render, fireEvent, waitFor } from '@testing-library/react'
 import React from 'react'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { RichTextEditor } from '@expcat/tigercat-react/RichTextEditor'
@@ -74,6 +74,14 @@ describe('RichTextEditor', () => {
       })
       const placeholders = container.querySelectorAll('[aria-hidden]')
       expect(placeholders.length).toBe(0)
+    })
+
+    it('does not cover an image-only document with the placeholder', () => {
+      const { container } = renderEditor({
+        value: '<p><img src="https://example.com/a.png" alt="a"></p>',
+        placeholder: 'Type here...'
+      })
+      expect(container.textContent).not.toContain('Type here...')
     })
   })
 
@@ -232,6 +240,33 @@ describe('RichTextEditor', () => {
       editor.innerHTML = '<p>Hello <strong>world</strong></p>'
       fireEvent.input(editor)
       expect(onChange).toHaveBeenCalledWith('Hello world')
+    })
+
+    it('opens a localized link field and focuses it', () => {
+      const { container } = render(<RichTextEditor value="<p>Hello</p>" locale={zhCN} />)
+      const link = container.querySelector('[aria-label="链接"]') as HTMLButtonElement
+      fireEvent.click(link)
+      const input = container.querySelector('form input') as HTMLInputElement
+      expect(input.placeholder).toBe('输入链接地址')
+      expect(document.activeElement).toBe(input)
+    })
+
+    it('announces a rejected image paste in the active locale', async () => {
+      const { container } = render(<RichTextEditor value="<p>Hello</p>" locale={zhCN} />)
+      const editor = container.querySelector('[role="textbox"]') as HTMLElement
+      const paste = new Event('paste', { bubbles: true, cancelable: true })
+      Object.defineProperty(paste, 'clipboardData', {
+        value: {
+          files: [{ type: 'image/png', size: 1_500_001, name: 'big.png' }],
+          getData: () => ''
+        }
+      })
+      editor.dispatchEvent(paste)
+      const status = document.querySelector('[data-tiger-live-region="polite"]') as HTMLElement
+      await waitFor(() => {
+        expect(status.textContent).toContain('图片未粘贴')
+        expect(status.textContent).not.toContain('Image was not pasted.')
+      })
     })
   })
 

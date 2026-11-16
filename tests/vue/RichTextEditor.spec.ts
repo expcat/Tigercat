@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, fireEvent } from '@testing-library/vue'
+import { render, fireEvent, waitFor } from '@testing-library/vue'
 import { defineComponent, h, nextTick, ref } from 'vue'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { RichTextEditor } from '@expcat/tigercat-vue/RichTextEditor'
@@ -67,6 +67,14 @@ describe('RichTextEditor', () => {
       })
       const placeholders = container.querySelectorAll('[aria-hidden]')
       expect(placeholders.length).toBe(0)
+    })
+
+    it('does not cover an image-only document with the placeholder', () => {
+      const { container } = renderEditor({
+        modelValue: '<p><img src="https://example.com/a.png" alt="a"></p>',
+        placeholder: 'Type here...'
+      })
+      expect(container.textContent).not.toContain('Type here...')
     })
   })
 
@@ -264,6 +272,75 @@ describe('RichTextEditor', () => {
       const { container } = renderEditor({ readOnly: true })
       const editor = container.querySelector('[role="textbox"]') as HTMLElement
       expect(editor.tabIndex).toBe(0)
+    })
+
+    it('opens a localized link field and focuses it', async () => {
+      const { container } = render({
+        render() {
+          return h(RichTextEditor, { modelValue: '<p>Hello</p>', locale: zhCN })
+        }
+      })
+      const link = container.querySelector('[aria-label="链接"]') as HTMLButtonElement
+      await fireEvent.click(link)
+      const input = container.querySelector('form input') as HTMLInputElement
+      expect(input.placeholder).toBe('输入链接地址')
+      expect(document.activeElement).toBe(input)
+    })
+
+    it('announces a rejected image paste in the active locale', async () => {
+      const { container } = render({
+        render() {
+          return h(RichTextEditor, { modelValue: '<p>Hello</p>', locale: zhCN })
+        }
+      })
+      const editor = container.querySelector('[role="textbox"]') as HTMLElement
+      const paste = new Event('paste', { bubbles: true, cancelable: true })
+      Object.defineProperty(paste, 'clipboardData', {
+        value: {
+          files: [{ type: 'image/png', size: 1_500_001, name: 'big.png' }],
+          getData: () => ''
+        }
+      })
+      editor.dispatchEvent(paste)
+      const status = document.querySelector('[data-tiger-live-region="polite"]') as HTMLElement
+      await waitFor(() => {
+        expect(status.textContent).toContain('图片未粘贴')
+        expect(status.textContent).not.toContain('Image was not pasted.')
+      })
+    })
+
+    it('keeps caller keydown, blur, paste, and click listeners and still runs hotkeys', async () => {
+      const counts = { keydown: 0, blur: 0, paste: 0, click: 0 }
+      const doc = document as Document & { execCommand?: () => boolean }
+      if (typeof doc.execCommand !== 'function') doc.execCommand = () => true
+      const exec = vi.spyOn(document, 'execCommand').mockImplementation(() => true)
+      const { container } = render({
+        render() {
+          return h(RichTextEditor, {
+            modelValue: '<p>Hello</p>',
+            onKeydown: () => {
+              counts.keydown += 1
+            },
+            onBlur: () => {
+              counts.blur += 1
+            },
+            onPaste: () => {
+              counts.paste += 1
+            },
+            onClick: () => {
+              counts.click += 1
+            }
+          })
+        }
+      })
+      const editor = container.querySelector('[role="textbox"]') as HTMLElement
+      await fireEvent.keyDown(editor, { key: 'b', ctrlKey: true })
+      await fireEvent.blur(editor)
+      await fireEvent.paste(editor)
+      await fireEvent.click(editor)
+      expect(counts).toEqual({ keydown: 1, blur: 1, paste: 1, click: 1 })
+      expect(exec.mock.calls.some((call) => call[0] === 'bold')).toBe(true)
+      exec.mockRestore()
     })
   })
 

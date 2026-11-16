@@ -757,7 +757,8 @@ export const viVN: TigerLocale = {
     redo: 'Làm lại',
     clear: 'Xóa định dạng',
     linkPrompt: 'Nhập URL',
-    imagePrompt: 'Nhập URL hình ảnh'
+    imagePrompt: 'Nhập URL hình ảnh',
+    imageRejected: 'Không dán được hình ảnh.'
   },
   cronEditor: {
     summaryEveryMinute: 'mỗi phút',

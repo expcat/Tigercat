@@ -757,7 +757,8 @@ export const ptBR: TigerLocale = {
     redo: 'Refazer',
     clear: 'Limpar formatação',
     linkPrompt: 'Inserir URL',
-    imagePrompt: 'Inserir URL da imagem'
+    imagePrompt: 'Inserir URL da imagem',
+    imageRejected: 'A imagem não foi colada.'
   },
   cronEditor: {
     summaryEveryMinute: 'a cada minuto',

@@ -114,6 +114,8 @@ export interface RichTextEngineMountContext {
   requestUrl?(kind: 'link' | 'image'): string | null
   /** Announce a rejected paste. The component owns the live region. */
   announce?(message: string): void
+  /** Localized rejection copy, read when a bitmap paste is refused. */
+  imageRejectedText?: () => string
 }
 
 export interface RichTextEngineInstance {
@@ -177,6 +179,10 @@ function blockFormatsFromSelection(host: HTMLElement): Set<string> {
   return next
 }
 
+function plainDomStillHasFormatting(html: string): boolean {
+  return /<(?!\/?(?:p|br)\b)[a-z]/i.test(html)
+}
+
 export function createBuiltinRichTextEngine(): RichTextEngine {
   return {
     name: 'builtin',
@@ -237,10 +243,14 @@ export function createBuiltinRichTextEngine(): RichTextEngine {
         if (readOnly || disabled) return
         const pasteEvent = event as ClipboardEvent
         const file = pastedBitmap(pasteEvent)
+        const announceRejectedImage = () => {
+          const message = ctx.imageRejectedText?.()
+          if (message) ctx.announce?.(message)
+        }
         if (file) {
           pasteEvent.preventDefault()
           if (file.size > RICH_TEXT_PASTE_IMAGE_MAX_BYTES) {
-            ctx.announce?.('Image was not pasted.')
+            announceRejectedImage()
             return
           }
           const reader = new FileReader()
@@ -250,7 +260,7 @@ export function createBuiltinRichTextEngine(): RichTextEngine {
             const url =
               typeof reader.result === 'string' ? cappedBitmapDataUrl(reader.result) : null
             if (!url) {
-              ctx.announce?.('Image was not pasted.')
+              announceRejectedImage()
               return
             }
             insertSanitizedHtml(element, `<img src="${url}" alt="">`)
@@ -356,7 +366,12 @@ export function createBuiltinRichTextEngine(): RichTextEngine {
           const sanitized = richTextModeToHtml(html, mode)
           const current = richTextHtmlToMode(element.innerHTML, mode)
           const next = richTextHtmlToMode(sanitized, mode)
-          if (current === next) return
+          if (
+            current === next &&
+            (mode !== 'plain' || !plainDomStillHasFormatting(element.innerHTML))
+          ) {
+            return
+          }
           cancelPendingReaders()
           element.innerHTML = sanitized
         },

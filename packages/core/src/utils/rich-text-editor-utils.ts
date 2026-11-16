@@ -634,6 +634,7 @@ export function sanitizeHtml(html: string): string {
 
 /** Check if content is empty or only whitespace/empty tags */
 export function isContentEmpty(html: string): boolean {
+  if (/<img\b/i.test(html)) return false
   const stripped = html
     .replace(/<br\s*\/?>/gi, '')
     .replace(/<\/?[^>]*>/g, '')
@@ -830,7 +831,12 @@ export function richTextHtmlToMode(html: string, mode: RichTextEditorMode = 'htm
       })
       .replace(/<hr\s*\/?>/gi, '\n---\n')
       .replace(/<a[^>]*href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi, '[$2]($1)')
-      .replace(/<img[^>]*src="([^"]*)"[^>]*(?:alt="([^"]*)")?[^>]*>/gi, '![$2]($1)')
+      .replace(/<img\b[^>]*>/gi, (tag) => {
+        const src = /\ssrc="([^"]*)"/i.exec(tag)?.[1]
+        if (src === undefined) return tag
+        const alt = /\salt="([^"]*)"/i.exec(tag)?.[1] ?? ''
+        return `![${alt}](${src})`
+      })
       .replace(/<strong[^>]*>([\s\S]*?)<\/strong>/gi, '**$1**')
       .replace(/<b[^>]*>([\s\S]*?)<\/b>/gi, '**$1**')
       .replace(/<em[^>]*>([\s\S]*?)<\/em>/gi, '*$1*')

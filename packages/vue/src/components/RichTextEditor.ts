@@ -6,6 +6,7 @@ import {
   watch,
   onMounted,
   onBeforeUnmount,
+  nextTick,
   inject,
   PropType
 } from 'vue'
@@ -36,6 +37,7 @@ import {
   getRichTextEditorLabels,
   getToolbarButtons,
   nextToolbarRovingIndex,
+  callUnknownEventHandler,
   type RichTextEditorMode,
   type ToolbarButton,
   type ToolbarItem,
@@ -176,6 +178,7 @@ export const RichTextEditor = defineComponent({
         placeholder: props.placeholder,
         toolbar: toolbarItems.value,
         requestUrl: (kind) => (props.onRequestUrl ? props.onRequestUrl(kind) : urlValue.value),
+        imageRejectedText: () => labels.value.imageRejected,
         announce: (message) => live.announce(message),
         notifyChange: (html) => commit(props.mode === 'html' ? sanitizeHtml(html) : html),
         notifyActiveFormats(next) {
@@ -236,6 +239,10 @@ export const RichTextEditor = defineComponent({
       if ((btn.name === 'link' || btn.name === 'image') && !props.onRequestUrl) {
         urlPrompt.value = btn.name
         urlDraft.value = ''
+        void nextTick(() => {
+          const input = editorRef.value?.closest('[data-tiger-rte]')?.querySelector('form input')
+          if (input instanceof HTMLElement) input.focus()
+        })
         return
       }
       engineInstance?.exec(btn.name)
@@ -286,7 +293,13 @@ export const RichTextEditor = defineComponent({
     })
 
     return () => {
-      const { class: _attrClass, style: _attrStyle, ...restAttrs } = attrs
+      const {
+        class: _attrClass,
+        style: _attrStyle,
+        onKeydown: attrOnKeydown,
+        onBlur: attrOnBlur,
+        ...restAttrs
+      } = attrs
       const showToolbar = toolbarItems.value.length > 0
       const toolbarEl = showToolbar
         ? h(
@@ -358,8 +371,14 @@ export const RichTextEditor = defineComponent({
         'data-placeholder': props.placeholder,
         'data-name': effectiveName.value,
         tabindex: props.readOnly && !effectiveDisabled.value ? 0 : undefined,
-        onKeydown: handleKeydown,
-        onBlur: () => formItemControl?.onBlur()
+        onKeydown: (event: KeyboardEvent) => {
+          callUnknownEventHandler(attrOnKeydown, event)
+          handleKeydown(event)
+        },
+        onBlur: (event: FocusEvent) => {
+          callUnknownEventHandler(attrOnBlur, event)
+          formItemControl?.onBlur()
+        }
       })
 
       const placeholderEl =
@@ -393,7 +412,8 @@ export const RichTextEditor = defineComponent({
                 class:
                   'min-w-0 flex-1 rounded border border-[var(--tiger-border)] bg-transparent px-2 py-1 text-sm',
                 'aria-label': urlPrompt.value === 'image' ? labels.value.image : labels.value.link,
-                placeholder: 'https://',
+                placeholder:
+                  urlPrompt.value === 'image' ? labels.value.imagePrompt : labels.value.linkPrompt,
                 value: urlDraft.value,
                 onInput: (event: Event) => {
                   urlDraft.value = (event.target as HTMLInputElement).value

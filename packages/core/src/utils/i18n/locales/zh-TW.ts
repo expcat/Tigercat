@@ -757,7 +757,8 @@ export const zhTW: TigerLocale = {
     redo: '重做',
     clear: '清除格式',
     linkPrompt: '輸入連結網址',
-    imagePrompt: '輸入圖片網址'
+    imagePrompt: '輸入圖片網址',
+    imageRejected: '圖片未貼上。'
   },
   cronEditor: {
     summaryEveryMinute: '每分鐘',

@@ -19,10 +19,10 @@ advanced 组 11 个组件（C159–C169），视觉与键盘全部 blocked。
 
 ## 概览
 
-本篇 11 条：P2 6、P3 5。
-按波次：W6 6、W9 5。
+本篇 5 条：P2 0、P3 5。
+按波次：W9 5。
 
-已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C160-F04（S03）、C162-F03（S03）、C159-F01、C160-F01、C160-F02、C160-F03、C161-F01、C161-F02、C162-F01、C162-F02、C163-F01、C163-F02、C163-F03、C164-F01、C164-F02、C164-F03、C165-F01、C165-F02、C169-F02、C169-F03、C169-F04。
+已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C160-F04（S03）、C162-F03（S03）、C159-F01、C160-F01、C160-F02、C160-F03、C161-F01、C161-F02、C162-F01、C162-F02、C163-F01、C163-F02、C163-F03、C164-F01、C164-F02、C164-F03、C165-F01、C165-F02、C167-F02、C167-F03、C167-F04、C167-F05、C167-F06、C167-F07、C169-F02、C169-F03、C169-F04。
 
 ## 条目
 
@@ -76,14 +76,8 @@ advanced 组 11 个组件（C159–C169），视觉与键盘全部 blocked。
 
 报告 `groups/advanced/RichTextEditor.md`，队列状态 needs-evidence。另受 S01 影响。
 
-| 编号     | 级别 | 波次 | 端   | 类别 | 条目                                             | 验收                                                                                        |
-| -------- | ---- | ---- | ---- | ---- | ------------------------------------------------ | ------------------------------------------------------------------------------------------- |
-| C167-F02 | P2   | W6   | 双端 | i18n | 链接表单占位写死 https://，打开后不聚焦输入框    | zh-CN、不传 onRequestUrl 时触发链接表单，placeholder 为「输入链接地址」且活动元素是该 input |
-| C167-F03 | P2   | W6   | Core | 行为 | plain 模式受控回写后编辑区仍残留 strong 等格式   | mode=plain、编辑区含 strong 段落、受控值回写 Hello world 后，innerHTML 不再含 strong        |
-| C167-F04 | P2   | W6   | Core | 行为 | 只有图片的内容被判为空，placeholder 仍盖在图片上 | 正文只有 img 并传 placeholder 时 isContentEmpty 为 false、不显示占位；空段落仍算空          |
-| C167-F05 | P2   | W6   | Core | i18n | 图片粘贴被拒的 live 公告写死英文，不走 locale    | locale 为 zh-CN 时粘贴被拒图片，live region 文本为中文拒绝文案，不含 Image was not pasted.  |
-| C167-F06 | P2   | W6   | Vue  | 行为 | Vue 内部 onKeydown、onBlur 盖住调用方            | 给 Vue RichTextEditor 传 keydown、blur、paste、click 监听后四个计数都为 1，内部热键仍生效   |
-| C167-F07 | P2   | W6   | Core | 行为 | HTML 转 markdown 时图片 alt 丢失                 | alt 在 src 前或后的 img 转 markdown 后，方括号内都保留 alt 文本                             |
+| 编号 | 级别 | 波次 | 端  | 类别 | 条目 | 验收 |
+| ---- | ---- | ---- | --- | ---- | ---- | ---- |
 
 ### C168 VirtualList
 

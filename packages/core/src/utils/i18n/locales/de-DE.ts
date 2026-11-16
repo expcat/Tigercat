@@ -758,7 +758,8 @@ export const deDE: TigerLocale = {
     redo: 'Wiederholen',
     clear: 'Formatierung löschen',
     linkPrompt: 'URL eingeben',
-    imagePrompt: 'Bild-URL eingeben'
+    imagePrompt: 'Bild-URL eingeben',
+    imageRejected: 'Bild wurde nicht eingefügt.'
   },
   cronEditor: {
     summaryEveryMinute: 'jede Minute',

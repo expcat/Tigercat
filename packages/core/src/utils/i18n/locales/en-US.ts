@@ -757,7 +757,8 @@ export const enUS: TigerLocale = {
     redo: 'Redo',
     clear: 'Clear',
     linkPrompt: 'Enter URL',
-    imagePrompt: 'Enter image URL'
+    imagePrompt: 'Enter image URL',
+    imageRejected: 'Image was not pasted.'
   },
   cronEditor: {
     summaryEveryMinute: 'every minute',

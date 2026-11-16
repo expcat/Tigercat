@@ -757,7 +757,8 @@ export const thTH: TigerLocale = {
     redo: 'ทำซ้ำ',
     clear: 'ล้างรูปแบบ',
     linkPrompt: 'ป้อน URL',
-    imagePrompt: 'ป้อน URL รูปภาพ'
+    imagePrompt: 'ป้อน URL รูปภาพ',
+    imageRejected: 'ยังไม่ได้วางรูปภาพ'
   },
   cronEditor: {
     summaryEveryMinute: 'ทุกนาที',

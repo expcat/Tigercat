@@ -758,7 +758,8 @@ export const esES: TigerLocale = {
     redo: 'Rehacer',
     clear: 'Borrar formato',
     linkPrompt: 'Introducir URL',
-    imagePrompt: 'Introducir URL de imagen'
+    imagePrompt: 'Introducir URL de imagen',
+    imageRejected: 'La imagen no se pegó.'
   },
   cronEditor: {
     summaryEveryMinute: 'cada minuto',

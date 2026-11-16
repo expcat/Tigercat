@@ -757,7 +757,8 @@ export const zhCN: TigerLocale = {
     redo: '重做',
     clear: '清除格式',
     linkPrompt: '输入链接地址',
-    imagePrompt: '输入图片地址'
+    imagePrompt: '输入图片地址',
+    imageRejected: '图片未粘贴。'
   },
   cronEditor: {
     summaryEveryMinute: '每分钟',

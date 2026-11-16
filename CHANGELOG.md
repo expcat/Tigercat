@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **富文本链接、纯文本与图片（Core / React / Vue，C167-F02、C167-F03、C167-F04、C167-F05、C167-F06、C167-F07）**：zh-CN 链接表单占位为「输入链接地址」，打开后聚焦输入框。plain 模式受控回写 Hello world 后编辑区不再残留 strong。只有图片时 isContentEmpty 为 false 且不显示占位，空段落仍算空。粘贴被拒图片的 live 公告走 locale，zh-CN 为「图片未粘贴。」。Vue 先调用调用方的 keydown 与 blur，再跑内部热键，paste 与 click 仍到达。HTML 转 markdown 时，alt 写在 src 前或后都留在方括号里。
+
 - **打印纸面墨色与虚拟表窗口（Core / React / Vue / 文档 / MCP，C165-F01、C165-F02、C169-F02、C169-F03、C169-F04）**：页眉、页脚和分页符标签改用纸面墨色 #111827，暗色主题不再把它们改成次级浅色。横向纸张的 bind 预览按纸高和 20mm 边距计页，landscape 且 contentHeightMm 为 250 时至少两页，预览节点带 print:hidden。VirtualTable 的 overscan 传入纵向窗口。virtualItemHeight 的运行时、类型注释和生成 Props 默认对齐为 40。React 与 Vue 一样，未传 pagination 时关闭，传入 pageSize 5 时两端都渲染 5 行并显示分页导航。
 
 - **无限滚动文案与 Markdown 窗格（Core / React / Vue / Demo，C163-F01、C163-F02、C163-F03、C164-F01、C164-F02、C164-F03）**：错误和重试走 infiniteScroll locale，传入文案优先。container 滚动根可被 Tab 聚焦并带焦点样式，默认视口根不加 tabindex。两端 Demo 01 写明第一页 12 条、容器根、内容不满时不自动连拉。Vue 窄屏 split 可在编辑和预览之间切换，目录按钮聚焦编辑器自身，组合输入期间不执行格式热键。

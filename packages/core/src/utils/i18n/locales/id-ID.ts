@@ -757,7 +757,8 @@ export const idID: TigerLocale = {
     redo: 'Ulangi',
     clear: 'Hapus format',
     linkPrompt: 'Masukkan URL',
-    imagePrompt: 'Masukkan URL gambar'
+    imagePrompt: 'Masukkan URL gambar',
+    imageRejected: 'Gambar tidak ditempel.'
   },
   cronEditor: {
     summaryEveryMinute: 'setiap menit',

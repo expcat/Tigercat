@@ -130,6 +130,7 @@ export const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
     )
     const [urlPrompt, setUrlPrompt] = useState<'link' | 'image' | null>(null)
     const [urlDraft, setUrlDraft] = useState('')
+    const urlInputRef = useRef<HTMLInputElement>(null)
     const urlRef = useRef<string | null>(null)
     const liveRef = useRef<ReturnType<typeof manageLiveRegion> | null>(null)
     const toolbarItems = useMemo(
@@ -157,7 +158,8 @@ export const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
       placeholder,
       toolbarItems,
       onRequestUrl,
-      setContent
+      setContent,
+      imageRejectedText: labels.imageRejected
     })
     createOptionsRef.current = {
       currentContent,
@@ -167,7 +169,8 @@ export const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
       placeholder,
       toolbarItems,
       onRequestUrl,
-      setContent
+      setContent,
+      imageRejectedText: labels.imageRejected
     }
 
     useEffect(() => {
@@ -187,6 +190,7 @@ export const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
           if (external) return external(kind)
           return urlRef.current
         },
+        imageRejectedText: () => createOptionsRef.current.imageRejectedText,
         announce(message) {
           liveRef.current?.announce(message)
         },
@@ -244,6 +248,11 @@ export const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
       setUrlPrompt(null)
       setUrlDraft('')
     }, [urlDraft, urlPrompt])
+
+    useEffect(() => {
+      if (!urlPrompt) return
+      urlInputRef.current?.focus()
+    }, [urlPrompt])
 
     const handleKeydown = useCallback(
       (e: React.KeyboardEvent) => {
@@ -383,9 +392,10 @@ export const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
               submitUrlPrompt()
             }}>
             <input
+              ref={urlInputRef}
               className="min-w-0 flex-1 rounded border border-[var(--tiger-border)] bg-transparent px-2 py-1 text-sm"
               aria-label={urlPrompt === 'image' ? labels.image : labels.link}
-              placeholder="https://"
+              placeholder={urlPrompt === 'image' ? labels.imagePrompt : labels.linkPrompt}
               value={urlDraft}
               onChange={(event) => setUrlDraft(event.target.value)}
             />

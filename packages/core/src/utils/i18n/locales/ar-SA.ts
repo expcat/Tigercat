@@ -757,7 +757,8 @@ export const arSA: TigerLocale = {
     redo: 'إعادة',
     clear: 'مسح التنسيق',
     linkPrompt: 'أدخل الرابط',
-    imagePrompt: 'أدخل رابط الصورة'
+    imagePrompt: 'أدخل رابط الصورة',
+    imageRejected: 'لم يتم لصق الصورة.'
   },
   cronEditor: {
     summaryEveryMinute: 'كل دقيقة',

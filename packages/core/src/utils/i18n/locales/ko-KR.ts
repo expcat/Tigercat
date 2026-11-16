@@ -757,7 +757,8 @@ export const koKR: TigerLocale = {
     redo: '다시 실행',
     clear: '서식 지우기',
     linkPrompt: 'URL 입력',
-    imagePrompt: '이미지 URL 입력'
+    imagePrompt: '이미지 URL 입력',
+    imageRejected: '이미지를 붙여 넣지 않았습니다.'
   },
   cronEditor: {
     summaryEveryMinute: '매분',

@@ -757,7 +757,8 @@ export const frFR: TigerLocale = {
     redo: 'Rétablir',
     clear: 'Effacer la mise en forme',
     linkPrompt: 'Saisir l’URL',
-    imagePrompt: 'Saisir l’URL de l’image'
+    imagePrompt: 'Saisir l’URL de l’image',
+    imageRejected: 'L’image n’a pas été collée.'
   },
   cronEditor: {
     summaryEveryMinute: 'chaque minute',

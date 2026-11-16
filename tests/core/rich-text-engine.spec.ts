@@ -156,6 +156,15 @@ describe('rich-text-engine', () => {
     expect(ctx.element.firstChild).toBe(beforeRef)
   })
 
+  it('rewrites a plain-mode editor when the text matches but formatting remains', () => {
+    const { ctx } = makeContext({ mode: 'plain', initialValue: 'Hello world' })
+    instance = builtinRichTextEngine.create(ctx)
+    ctx.element.innerHTML = '<p>Hello <strong>world</strong></p>'
+    instance.setValue('Hello world')
+    expect(ctx.element.innerHTML.toLowerCase()).not.toContain('strong')
+    expect(instance.getValue()).toBe('Hello world')
+  })
+
   it('getValue returns sanitised current content', () => {
     const { ctx } = makeContext({ initialValue: '<b>x</b>' })
     instance = builtinRichTextEngine.create(ctx)

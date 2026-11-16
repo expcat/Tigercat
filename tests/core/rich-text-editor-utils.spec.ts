@@ -12,7 +12,8 @@ import {
   parseHeight,
   isValidUrl,
   isToolbarSeparator,
-  getToolbarButtons
+  getToolbarButtons,
+  richTextHtmlToMode
 } from '@expcat/tigercat-core'
 import type { ToolbarItem } from '@expcat/tigercat-core'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
@@ -375,6 +376,13 @@ describe('isContentEmpty', () => {
   it('returns false for text with tags', () => {
     expect(isContentEmpty('<strong>text</strong>')).toBe(false)
   })
+
+  it('treats an image as content and an empty paragraph as empty', () => {
+    expect(isContentEmpty('<img src="https://example.com/a.png" alt="a">')).toBe(false)
+    expect(isContentEmpty('<p><img src="https://example.com/a.png"></p>')).toBe(false)
+    expect(isContentEmpty('<p></p>')).toBe(true)
+    expect(isContentEmpty('<p><br></p>')).toBe(true)
+  })
 })
 
 describe('parseHeight', () => {
@@ -388,5 +396,16 @@ describe('parseHeight', () => {
 
   it('passes string through', () => {
     expect(parseHeight('50vh')).toBe('50vh')
+  })
+})
+
+describe('richTextHtmlToMode image alt', () => {
+  it('keeps alt text whether it is written before or after src', () => {
+    expect(richTextHtmlToMode('<img alt="Cat" src="https://example.com/a.png">', 'markdown')).toBe(
+      '![Cat](https://example.com/a.png)'
+    )
+    expect(richTextHtmlToMode('<img src="https://example.com/a.png" alt="Cat">', 'markdown')).toBe(
+      '![Cat](https://example.com/a.png)'
+    )
   })
 })

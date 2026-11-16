@@ -757,7 +757,8 @@ export const jaJP: TigerLocale = {
     redo: 'やり直す',
     clear: '書式をクリア',
     linkPrompt: 'URL を入力',
-    imagePrompt: '画像 URL を入力'
+    imagePrompt: '画像 URL を入力',
+    imageRejected: '画像は貼り付けられませんでした。'
   },
   cronEditor: {
     summaryEveryMinute: '毎分',
