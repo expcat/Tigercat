@@ -17,7 +17,9 @@ export function SankeyChart({
   links,
   width = 480,
   height = 280,
+  padding = 16,
   title,
+  desc,
   className,
   responsive = true
 }: SankeyChartProps) {
@@ -36,7 +38,13 @@ export function SankeyChart({
         onClick={exportChart}>
         {getW9DataLabels(config.locale).exportChart}
       </button>
-      <ChartCanvas width={width} height={height} title={title} responsive={responsive} padding={16}>
+      <ChartCanvas
+        width={width}
+        height={height}
+        title={title}
+        desc={desc}
+        responsive={responsive}
+        padding={padding}>
         {(ctx) => {
           const laid = layoutSankey(
             nodes,
@@ -62,6 +70,8 @@ export function SankeyChart({
                 <rect
                   key={node.id}
                   data-sankey-node={node.id}
+                  role="img"
+                  aria-label={node.label}
                   x={node.x}
                   y={node.y}
                   width={node.width}

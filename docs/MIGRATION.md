@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+双端 SankeyChart 节点与 WaterfallChart 柱现在使用布局 label 作为可访问名称，矩形带 role=img；padding 和 desc 传入画布，默认 padding 仍分别为 16 和 24。OrgChart 02 示例改用 HTTPS 头像，data: 地址仍不渲染。
+
 Gantt 的 `YYYY-MM-DD` 式 maxDate 现在包含当天，与任务 end 一致；需要精确截止时刻时传 Date、时间戳或带时间的字符串。responsive 同时作用于外壳与画布，省略时按类型约定默认 false；需要随容器缩放时显式传 true。两端 gantt/02 示例均支持拖拽后回写任务日期。
 
 GaugeChart 的中心文字、valueFormatter 与 meter 现在使用夹取到 min/max 的值。角度递减时弧沿反向绘制；整圈拆段，绝对跨度超过 360° 的弧不绘制，请将角度保持在一圈以内。

@@ -4,9 +4,12 @@
 
 import { fireEvent, render } from '@testing-library/vue'
 import { describe, expect, it } from 'vitest'
+import { h } from 'vue'
+import { renderToString } from 'vue/server-renderer'
 import { OrgChart } from '@expcat/tigercat-vue/OrgChart'
 import { getOrgChartNodeMarkerGeometry, type OrgChartNode } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils'
+import OrgChartAvatarDemo from '../../examples/example/vue3/src/examples/org-chart/02/App.vue'
 
 const data: OrgChartNode = {
   id: 'ceo',
@@ -20,6 +23,20 @@ const data: OrgChartNode = {
 }
 
 describe('OrgChart', () => {
+  it('renders allowed avatar URLs in the demo DOM and SSR', async () => {
+    const { container } = render(OrgChartAvatarDemo)
+    const ssr = document.createElement('div')
+    ssr.innerHTML = await renderToString(h(OrgChartAvatarDemo))
+
+    for (const root of [container, ssr]) {
+      const images = root.querySelectorAll('[data-org-chart-nodes] image')
+      expect(images).toHaveLength(5)
+      for (const image of images) {
+        expect(image.getAttribute('href')).toMatch(/^(https:\/\/|\/(?!\/))/)
+      }
+    }
+  })
+
   it('renders svg nodes and links', () => {
     const { container } = render(OrgChart, { props: { data } })
 

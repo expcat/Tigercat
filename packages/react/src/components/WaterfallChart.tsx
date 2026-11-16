@@ -22,8 +22,10 @@ export function WaterfallChart({
   data,
   width = 480,
   height = 280,
+  padding = 24,
   colors,
   title,
+  desc,
   className,
   responsive = true
 }: WaterfallChartProps) {
@@ -46,7 +48,13 @@ export function WaterfallChart({
         onClick={exportChart}>
         {getW9DataLabels(config.locale).exportChart}
       </button>
-      <ChartCanvas width={width} height={height} title={title} responsive={responsive} padding={24}>
+      <ChartCanvas
+        width={width}
+        height={height}
+        title={title}
+        desc={desc}
+        responsive={responsive}
+        padding={padding}>
         {(ctx) => {
           const band = laid.length > 0 ? ctx.innerRect.width / laid.length : 0
           return laid.map((bar) => {
@@ -58,6 +66,8 @@ export function WaterfallChart({
               <rect
                 key={bar.index}
                 data-waterfall-bar={bar.kind}
+                role="img"
+                aria-label={bar.label}
                 x={bar.index * band + 2}
                 y={y}
                 width={Math.max(1, band - 4)}

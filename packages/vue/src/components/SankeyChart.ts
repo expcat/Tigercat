@@ -5,6 +5,7 @@ import {
   resolveButtonClasses,
   layoutSankey,
   readPageWritingDirection,
+  type ChartPadding,
   type SankeyChartProps as CoreSankeyChartProps,
   type SankeyLink,
   type SankeyNode
@@ -23,7 +24,9 @@ export const SankeyChart = defineComponent({
     links: { type: Array as PropType<SankeyLink[]>, required: true },
     width: { type: Number, default: 480 },
     height: { type: Number, default: 280 },
+    padding: { type: [Number, Object] as PropType<ChartPadding>, default: 16 },
     title: { type: String, default: undefined },
+    desc: { type: String, default: undefined },
     className: { type: String, default: undefined },
     responsive: { type: Boolean, default: true }
   },
@@ -52,8 +55,9 @@ export const SankeyChart = defineComponent({
             width: props.width,
             height: props.height,
             title: props.title,
+            desc: props.desc,
             responsive: props.responsive,
-            padding: 16
+            padding: props.padding
           },
           {
             default: (ctx: { innerRect: { width: number; height: number } }) => {
@@ -80,6 +84,8 @@ export const SankeyChart = defineComponent({
                   h('rect', {
                     key: node.id,
                     'data-sankey-node': node.id,
+                    role: 'img',
+                    'aria-label': node.label,
                     x: node.x,
                     y: node.y,
                     width: node.width,

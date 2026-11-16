@@ -1,9 +1,11 @@
 import React from 'react'
 import { fireEvent, render } from '@testing-library/react'
+import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 import { OrgChart } from '@expcat/tigercat-react/OrgChart'
 import { getOrgChartNodeMarkerGeometry, type OrgChartNode } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
+import OrgChartAvatarDemo from '../../examples/example/react/src/examples/org-chart/02/App'
 
 const data: OrgChartNode = {
   id: 'ceo',
@@ -17,6 +19,21 @@ const data: OrgChartNode = {
 }
 
 describe('OrgChart', () => {
+  it('renders allowed avatar URLs in the demo DOM and SSR', () => {
+    const demo = <OrgChartAvatarDemo />
+    const { container } = render(demo)
+    const ssr = document.createElement('div')
+    ssr.innerHTML = renderToStaticMarkup(demo)
+
+    for (const root of [container, ssr]) {
+      const images = root.querySelectorAll('[data-org-chart-nodes] image')
+      expect(images).toHaveLength(5)
+      for (const image of images) {
+        expect(image.getAttribute('href')).toMatch(/^(https:\/\/|\/(?!\/))/)
+      }
+    }
+  })
+
   it('writes only allowlisted avatar addresses into svg image', () => {
     const withAvatar: OrgChartNode = {
       id: 'ceo',

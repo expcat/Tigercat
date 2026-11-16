@@ -4,6 +4,7 @@ import {
   getW9DataLabels,
   resolveButtonClasses,
   layoutWaterfall,
+  type ChartPadding,
   type WaterfallChartProps as CoreWaterfallChartProps,
   type WaterfallDatum
 } from '@expcat/tigercat-core'
@@ -26,11 +27,13 @@ export const WaterfallChart = defineComponent({
     data: { type: Array as PropType<WaterfallDatum[]>, required: true },
     width: { type: Number, default: 480 },
     height: { type: Number, default: 280 },
+    padding: { type: [Number, Object] as PropType<ChartPadding>, default: 24 },
     colors: {
       type: Object as PropType<CoreWaterfallChartProps['colors']>,
       default: undefined
     },
     title: { type: String, default: undefined },
+    desc: { type: String, default: undefined },
     className: { type: String, default: undefined },
     responsive: { type: Boolean, default: true }
   },
@@ -63,8 +66,9 @@ export const WaterfallChart = defineComponent({
             width: props.width,
             height: props.height,
             title: props.title,
+            desc: props.desc,
             responsive: props.responsive,
-            padding: 24
+            padding: props.padding
           },
           {
             default: (ctx: { innerRect: { width: number; height: number } }) => {
@@ -78,6 +82,8 @@ export const WaterfallChart = defineComponent({
                 return h('rect', {
                   key: bar.index,
                   'data-waterfall-bar': bar.kind,
+                  role: 'img',
+                  'aria-label': bar.label,
                   x: bar.index * band + 2,
                   y,
                   width: Math.max(1, band - 4),

@@ -3,9 +3,7 @@ import { OrgChart } from '@expcat/tigercat-react/OrgChart'
 import type { OrgChartNode } from '@expcat/tigercat-core'
 
 const createAvatar = (initials: string, background: string) =>
-  `data:image/svg+xml,${encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><rect width="64" height="64" rx="32" fill="${background}"/><text x="32" y="39" text-anchor="middle" font-family="sans-serif" font-size="22" fill="white">${initials}</text></svg>`
-  )}`
+  `https://ui-avatars.com/api/?name=${initials}&background=${background.slice(1)}&color=fff&size=64`
 
 const data: OrgChartNode = {
   id: 'ceo',
