@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Empty showImage 说明（Core / 文档 / MCP，C013-F01）**：类型注释与生成笔记写明 `showImage=false` 时自定义 image 节点/插槽也不渲染，Props、Examples 与 MCP 同步，行为不变。
+
 - **Divider 空白标签与示例预览焦点（Vue / Demo，C012-F001、C012-V01）**：Vue 在交给共享分类前展开 Fragment 并去掉注释与空白文本，条件隐藏或空白 slot 输出整条装饰线且 `aria-hidden="true"`。两端示例预览 iframe 在键盘聚焦时显示内缩轮廓。
 
 - **CropUpload 名称与 id（React / Vue，C011-F001、C011-F002、C011-F003）**：两端文件输入引用触发按钮的名称，保留调用方显式 `aria-label`；Vue 优先使用显式 `id`，文件输入沿用 `-input` 后缀。

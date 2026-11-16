@@ -449,7 +449,7 @@ const COMPONENT_USAGE_NOTES = {
   },
   Empty: {
     notes:
-      '`preset` 只换默认文案和内置插图（`simple` 无图，`error` / `no-results` 各自有标）。自定义 `image` / 插槽不被 `showImage={false}` 丢掉。无 ConfigProvider 时默认英文。默认插图是装饰，`aria-hidden`。'
+      '`preset` 只换默认文案和内置插图（`simple` 无图，`error` / `no-results` 各自有标）。`showImage=false` 时自定义 `image` 节点/插槽也不渲染。无 ConfigProvider 时默认英文。默认插图是装饰，`aria-hidden`。'
   },
   Result: {
     notes:

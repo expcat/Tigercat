@@ -15,7 +15,7 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 
 Runnable modules: `examples/example/vue3/src/examples/empty/01/`, `examples/example/vue3/src/examples/empty/02/`, `examples/example/vue3/src/examples/empty/03/`, `examples/example/react/src/examples/empty/01/`, `examples/example/react/src/examples/empty/02/`, `examples/example/react/src/examples/empty/03/`.
 
-Note: `preset` 只换默认文案和内置插图（`simple` 无图，`error` / `no-results` 各自有标）。自定义 `image` / 插槽不被 `showImage={false}` 丢掉。无 ConfigProvider 时默认英文。默认插图是装饰，`aria-hidden`。
+Note: `preset` 只换默认文案和内置插图（`simple` 无图，`error` / `no-results` 各自有标）。`showImage=false` 时自定义 `image` 节点/插槽也不渲染。无 ConfigProvider 时默认英文。默认插图是装饰，`aria-hidden`。
 
 Vue: `<Empty />`
 

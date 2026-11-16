@@ -32,8 +32,7 @@ export interface EmptyProps {
   description?: string
 
   /**
-   * Whether to show the built-in illustration. A custom `image` / image slot
-   * still renders when this is false.
+   * Whether to show an illustration. `false` also hides a custom image node or slot.
    * @default true
    */
   showImage?: boolean

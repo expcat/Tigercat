@@ -13,13 +13,13 @@ description: Compact generated Tigercat Basic props reference
 
 `packages/core/src/types/empty.ts` · `EmptyProps` · 4/9 compact props · [Complete props](#remaining-props-complete-public-api)
 
-Note: `preset` 只换默认文案和内置插图（`simple` 无图，`error` / `no-results` 各自有标）。自定义 `image` / 插槽不被 `showImage={false}` 丢掉。无 ConfigProvider 时默认英文。默认插图是装饰，`aria-hidden`。
+Note: `preset` 只换默认文案和内置插图（`simple` 无图，`error` / `no-results` 各自有标）。`showImage=false` 时自定义 `image` 节点/插槽也不渲染。无 ConfigProvider 时默认英文。默认插图是装饰，`aria-hidden`。
 
 | Prop           | Type                   | Default     | Notes                                                                                      |
 | -------------- | ---------------------- | ----------- | ------------------------------------------------------------------------------------------ |
 | `preset?`      | `EmptyPreset`          | `'default'` | Preset default copy. Built-in illustration follows the preset (`simple` has none, `erro... |
 | `description?` | `string`               | `-`         | Description text below the illustration                                                    |
-| `showImage?`   | `boolean`              | `true`      | Whether to show the built-in illustration. A custom `image` / image slot still renders...  |
+| `showImage?`   | `boolean`              | `true`      | Whether to show an illustration. `false` also hides a custom image node or slot.           |
 | `locale?`      | `Partial<TigerLocale>` | `-`         | Locale override merged on top of ConfigProvider locale.                                    |
 
 ### Remaining props (complete public API)
