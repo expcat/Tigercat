@@ -166,6 +166,7 @@ export const zhTW: TigerLocale = {
     addsignBefore: '前加簽',
     addsignAfter: '後加簽',
     addsignTag: '加簽',
+    pendingAfterAddsign: '待後加簽：{names} {comment}',
     confirmAddsign: '確認加簽？',
     confirmAddsignDescription: '被加簽人將在臨時節點審批。',
     confirmReturn: '確認退回？',
@@ -574,6 +575,7 @@ export const zhTW: TigerLocale = {
     defaultGroupTitle: '預設',
     filterAriaLabel: '閱讀狀態',
     markedReadText: '已將 {count} 則標為已讀',
+    markedUnreadText: '已將 {count} 則標為未讀',
     newItemText: '新通知：{title}',
     unreadCountText: '{count} 則未讀'
   },

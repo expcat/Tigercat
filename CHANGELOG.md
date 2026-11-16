@@ -4,6 +4,14 @@
 
 ## v3.0.1（未发布）
 
+- **通知铃未读播报（React / Vue，C177-F01）**：未读数从 1 改成 3 后 live 文案是 3 unread，全部已读后是 0 unread，zh-CN 是「1 条未读」。
+- **通知铃打开焦点（React / Vue，C177-F02）**：全部已读时点开铃铛，焦点落在本实例面板内可聚焦的控件，而不是禁用的 Mark all as read。
+- **通知铃条目类型（Core / 文档 / MCP，C177-F03）**：NotificationBellItem 删除。items 改为 NotificationItem[]，并增加 onItemReadChange；Vue 事件名仍是 item-read-change。生成 Props 写出该事件。
+- **通知中心空分组（React / Vue，C178-F01）**：传入 groups=[] 时角标、全部已读和列表只看分组内条目；此时计数为 0、全部已读禁用。loading 走居中 Loading，没有遮罩和 inert。
+- **通知中心单条已读播报（React / Vue，C178-F02）**：不传 manageReadState 时，点 Mark as read 两端都播报已读；再标回未读后礼貌区是 Marked 1 as unread，不再停在 Marked 1 as read。
+- **时间线停放后加签（Core / React / Vue，C183-F01）**：pendingAfterAddsign 写出加签人和意见，例如专家、稍后补签；空对象不显示。真实临时加签节点仍显示位置词 After。
+- **加签多人提交（React / Vue，C184-F01）**：加签保持 multiple，先点 Lin 再点 Expert 后确认，assignees 含两人。转交仍是单选。
+
 - **表单向导步变化（文档 / Demo，C176-F01）**：生成说明改为 Vue 听 step-change、React 听 onStepChange；vue 02 用 step-change 清掉「流程已完成」。
 - **表单向导禁用步（Core / React / Vue，C176-F03）**：disabled 只禁止进入，描述仍是 Later；Next 只跨过 skipCondition。
 - **表单向导外部切步（React / Vue，C176-F04）**：父级把 current 从 0 改成 1 时重拍快照，model 已从 a 改成 b 也不弹离开框。

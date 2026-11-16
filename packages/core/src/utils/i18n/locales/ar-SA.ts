@@ -166,6 +166,7 @@ export const arSA: TigerLocale = {
     addsignBefore: 'قبل',
     addsignAfter: 'بعد',
     addsignTag: 'معتمد مضاف',
+    pendingAfterAddsign: 'إضافة لاحقة معلّقة: {names} {comment}',
     confirmAddsign: 'إضافة معتمد؟',
     confirmAddsignDescription: 'سيعتمد الشخص المضاف على عقدة مؤقتة.',
     confirmReturn: 'إرجاع هذا الطلب؟',
@@ -574,6 +575,7 @@ export const arSA: TigerLocale = {
     defaultGroupTitle: 'افتراضي',
     filterAriaLabel: 'حالة القراءة',
     markedReadText: 'تم تعليم {count} كمقروء',
+    markedUnreadText: 'تم تعليم {count} كغير مقروء',
     newItemText: 'إشعار جديد: {title}',
     unreadCountText: '{count} غير مقروء'
   },

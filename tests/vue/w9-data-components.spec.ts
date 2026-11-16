@@ -54,6 +54,64 @@ describe('W9 vue data components', () => {
     expect(view.container.querySelector('[aria-live="polite"]')?.textContent).toContain('1')
   })
 
+  it('updates the notification bell live text when the unread count or locale changes', async () => {
+    const view = render(NotificationBell, {
+      props: {
+        items: [
+          { id: '1', title: 'One', read: false },
+          { id: '2', title: 'Two', read: true }
+        ]
+      }
+    })
+    const live = () => view.container.querySelector('[aria-live="polite"]')?.textContent ?? ''
+    expect(live()).toContain('1 unread')
+
+    await view.rerender({
+      items: [
+        { id: '1', title: 'One', read: false },
+        { id: '2', title: 'Two', read: false },
+        { id: '3', title: 'Three', read: false }
+      ]
+    })
+    expect(live()).toContain('3 unread')
+
+    await view.rerender({
+      items: [
+        { id: '1', title: 'One', read: true },
+        { id: '2', title: 'Two', read: true },
+        { id: '3', title: 'Three', read: true }
+      ]
+    })
+    expect(live()).toContain('0 unread')
+
+    await view.rerender({
+      items: [{ id: '1', title: 'One', read: false }],
+      locale: zhCN
+    })
+    expect(live()).toContain('1 条未读')
+  })
+
+  it('focuses an enabled control inside the opened bell panel', async () => {
+    const read = [{ id: '1', title: 'Read', read: true }]
+    const Host = defineComponent({
+      setup() {
+        return () =>
+          h('div', [h(NotificationBell, { items: read }), h(NotificationBell, { items: read })])
+      }
+    })
+    const view = render(Host)
+    const bells = view.getAllByRole('button', { name: /0 unread/ })
+    await fireEvent.click(bells[1])
+    await waitFor(() => {
+      const panels = [...document.querySelectorAll('[data-tiger-notification-bell-panel]')]
+      const active = document.activeElement
+      const owner = panels.find((panel) => panel.contains(active))
+      expect(owner).toBe(panels[panels.length - 1])
+      expect(active?.textContent ?? '').not.toContain('Mark all as read')
+      expect((active as HTMLButtonElement).disabled).toBe(false)
+    })
+  })
+
   it('filters assignees and emits selected ids', async () => {
     const selected = ref<string[]>([])
     const Host = defineComponent({

@@ -94,7 +94,26 @@ interface ActionDraft {
   position?: WorkflowAddsignPosition
   signMode?: WorkflowSignMode
   assignee?: WorkflowTimelineActor
+  assignees?: WorkflowTimelineActor[]
   error?: string
+}
+
+function toggleAddsignAssignees(
+  current: readonly WorkflowTimelineActor[] | undefined,
+  actor: WorkflowTimelineActor | undefined
+): WorkflowTimelineActor[] {
+  if (!actor) return []
+  const keyOf = (item: WorkflowTimelineActor) =>
+    item.id != null ? `id:${String(item.id)}` : `name:${item.name ?? ''}`
+  const key = keyOf(actor)
+  const list = [...(current ?? [])]
+  const index = list.findIndex((item) => keyOf(item) === key)
+  if (index >= 0) {
+    list.splice(index, 1)
+    return list
+  }
+  list.push(actor)
+  return list
 }
 
 function emptyActionDraft(
@@ -459,7 +478,13 @@ export const WorkflowActionBar = defineComponent({
           event?.preventDefault()
           return false
         }
-        if (picker === 'assignee' && !draft.assignee) {
+        const chosenAssignees =
+          item.action === 'addsign'
+            ? draft.assignees
+            : draft.assignee
+              ? [draft.assignee]
+              : undefined
+        if (picker === 'assignee' && (!chosenAssignees || chosenAssignees.length === 0)) {
           patchDraft(item, { error: labels.assigneeRequired })
           event?.preventDefault()
           return false
@@ -471,8 +496,11 @@ export const WorkflowActionBar = defineComponent({
           targetNodeKey: draft.targetNodeKey,
           position: draft.position,
           signMode: draft.signMode ?? props.currentSignMode,
-          assignee: draft.assignee,
-          assignees: draft.assignee ? [draft.assignee] : undefined
+          assignee:
+            item.action === 'addsign'
+              ? draft.assignees?.[draft.assignees.length - 1]
+              : draft.assignee,
+          assignees: chosenAssignees
         })
         if (payload) emit('action', item, payload)
         else emit('action', item)
@@ -501,9 +529,28 @@ export const WorkflowActionBar = defineComponent({
         }
         const assigneeCtx: WorkflowAssigneePickerContext = {
           action: item.action,
-          value: draft.assignee,
-          values: draft.assignee ? [draft.assignee] : undefined,
-          onChange: (actor) => patchDraft(item, { assignee: actor, error: undefined }),
+          value:
+            item.action === 'addsign'
+              ? draft.assignees?.[draft.assignees.length - 1]
+              : draft.assignee,
+          values:
+            item.action === 'addsign'
+              ? draft.assignees
+              : draft.assignee
+                ? [draft.assignee]
+                : undefined,
+          onChange: (actor) => {
+            if (item.action !== 'addsign') {
+              patchDraft(item, { assignee: actor, error: undefined })
+              return
+            }
+            const assignees = toggleAddsignAssignees(getDraft(item).assignees, actor)
+            patchDraft(item, {
+              assignees,
+              assignee: assignees[assignees.length - 1],
+              error: undefined
+            })
+          },
           multiple: item.action === 'addsign'
         }
         const customReturn = returnPickerFn?.(returnPickerCtx) as VNodeChild | undefined

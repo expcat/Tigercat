@@ -6,6 +6,7 @@ import {
   type TigerLocale,
   notificationItemsPendingRead,
   resolveButtonClasses,
+  type NotificationBellProps as CoreNotificationBellProps,
   type NotificationItem
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './tiger-config'
@@ -15,9 +16,9 @@ import { NotificationCenter } from './NotificationCenter'
 import { Popover } from './Popover'
 
 export interface NotificationBellProps extends React.HTMLAttributes<HTMLDivElement> {
-  items?: NotificationItem[]
-  locale?: Partial<TigerLocale>
-  onItemReadChange?: (item: NotificationItem, read: boolean) => void
+  items?: CoreNotificationBellProps['items']
+  locale?: CoreNotificationBellProps['locale']
+  onItemReadChange?: CoreNotificationBellProps['onItemReadChange']
 }
 
 export function NotificationBell({
@@ -28,6 +29,7 @@ export function NotificationBell({
 }: NotificationBellProps) {
   const [open, setOpen] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
   const wasOpen = useRef(false)
   const config = useTigerConfig()
   const mergedLocale = mergeTigerLocale(config.locale, locale)
@@ -38,8 +40,15 @@ export function NotificationBell({
   useEffect(() => {
     if (open) {
       wasOpen.current = true
-      const panel = document.querySelector('[data-tiger-notification-bell-panel]')
-      const focusable = panel?.querySelector<HTMLElement>('button, [href], input, [tabindex]')
+      const panel = panelRef.current
+      const candidates = panel
+        ? [...panel.querySelectorAll<HTMLElement>('button, [href], input, [tabindex]')]
+        : []
+      const focusable = candidates.find((element) => {
+        if (element.hasAttribute('disabled')) return false
+        if (element.getAttribute('aria-disabled') === 'true') return false
+        return element.tabIndex >= 0
+      })
       focusable?.focus()
       return
     }
@@ -59,7 +68,7 @@ export function NotificationBell({
         ariaLabel={formatW9Label(labels.unreadCount, { count: unread })}
         onOpenChange={setOpen}
         content={
-          <div data-tiger-notification-bell-panel="">
+          <div ref={panelRef} data-tiger-notification-bell-panel="">
             <NotificationCenter
               locale={mergedLocale}
               items={items}

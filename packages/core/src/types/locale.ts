@@ -236,6 +236,8 @@ export interface TigerLocaleWorkflowTimeline {
   addsignAfter?: string
   /** Tag on a temporary add-sign node */
   addsignTag?: string
+  /** Parked after-add-sign waiting to be applied. Supports {names} and {comment}. */
+  pendingAfterAddsign?: string
   /** ActionBar confirm title: add-sign */
   confirmAddsign?: string
   /** ActionBar confirm description: add-sign */
@@ -861,6 +863,8 @@ export interface TigerLocaleNotificationCenter {
   filterAriaLabel?: string
   /** Polite announcement after marking items read. Supports {count}. */
   markedReadText?: string
+  /** Polite announcement after marking items unread. Supports {count}. */
+  markedUnreadText?: string
   /** Polite announcement for a new item. Supports {title}. */
   newItemText?: string
 }

@@ -166,6 +166,7 @@ export const jaJP: TigerLocale = {
     addsignBefore: '前に追加',
     addsignAfter: '後に追加',
     addsignTag: '追加承認',
+    pendingAfterAddsign: '後追加の待機：{names} {comment}',
     confirmAddsign: '承認者を追加しますか？',
     confirmAddsignDescription: '追加された人は一時ノードで承認します。',
     confirmReturn: 'この申請を差し戻しますか？',
@@ -574,6 +575,7 @@ export const jaJP: TigerLocale = {
     defaultGroupTitle: 'デフォルト',
     filterAriaLabel: '既読状態',
     markedReadText: '{count} 件を既読にしました',
+    markedUnreadText: '{count} 件を未読にしました',
     newItemText: '新しい通知: {title}',
     unreadCountText: '未読 {count} 件'
   },

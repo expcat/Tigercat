@@ -201,10 +201,15 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
 
   const effectiveItems = useMemo(() => applyReadOverrides(items), [items, applyReadOverrides])
 
-  const allManagedItems = useMemo(() => {
-    const grouped = effectiveGroups.flatMap((group) => group.items)
-    return grouped.length > 0 ? grouped : effectiveItems
-  }, [effectiveGroups, effectiveItems])
+  const groupedItems = useMemo(
+    () => effectiveGroups.flatMap((group) => group.items),
+    [effectiveGroups]
+  )
+  const groupedMode = shouldUseNotificationTabs(groups, groupBy)
+  const allManagedItems = useMemo(
+    () => (groupedMode ? groupedItems : effectiveItems),
+    [groupedMode, groupedItems, effectiveItems]
+  )
 
   useEffect(() => {
     const ids = allManagedItems.map((item) => notificationItemKey(item.id))
@@ -224,10 +229,9 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   const hasUnread = useMemo(() => allManagedItems.some((item) => !item.read), [allManagedItems])
 
   const totalUnread = useMemo(() => {
-    const allItems = effectiveGroups.flatMap((group) => group.items)
-    if (allItems.length === 0) return effectiveItems.filter((item) => !item.read).length
-    return allItems.filter((item) => !item.read).length
-  }, [effectiveGroups, effectiveItems])
+    const source = groupedMode ? groupedItems : effectiveItems
+    return source.filter((item) => !item.read).length
+  }, [groupedMode, groupedItems, effectiveItems])
 
   const wrapperClasses = useMemo(
     () => classNames('tiger-notification-center', 'w-full', 'flex', 'flex-col', className),
@@ -355,9 +359,9 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                 return next
               })
             }
-            if (!isRead) {
-              setPoliteText(labels.markedReadText.split('{count}').join('1'))
-            }
+            setPoliteText(
+              (isRead ? labels.markedUnreadText : labels.markedReadText).split('{count}').join('1')
+            )
             onItemReadChange?.(item, !isRead)
           }}>
           {isRead ? resolvedMarkUnreadText : resolvedMarkReadText}
@@ -442,9 +446,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     renderNotificationScroller(filteredFlatItems)
   )
 
-  const hasList = shouldUseNotificationTabs(groups, groupBy)
-    ? resolvedGroups.length > 0 || filteredFlatItems.length > 0
-    : filteredFlatItems.length > 0
+  const hasList = groupedMode ? groupedItems.length > 0 : filteredFlatItems.length > 0
   const content =
     loading && !hasList ? (
       <div className="flex items-center justify-center py-16">

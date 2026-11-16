@@ -166,6 +166,7 @@ export const deDE: TigerLocale = {
     addsignBefore: 'Davor',
     addsignAfter: 'Danach',
     addsignTag: 'Zusätzlicher Freigeber',
+    pendingAfterAddsign: 'Nachträgliche Freigabe ausstehend: {names} {comment}',
     confirmAddsign: 'Einen Freigeber hinzufügen?',
     confirmAddsignDescription: 'Die hinzugefügte Person gibt auf einem temporären Knoten frei.',
     confirmReturn: 'Diesen Antrag zurückgeben?',
@@ -575,6 +576,7 @@ export const deDE: TigerLocale = {
     defaultGroupTitle: 'Standard',
     filterAriaLabel: 'Lesestatus',
     markedReadText: '{count} als gelesen markiert',
+    markedUnreadText: '{count} als ungelesen markiert',
     newItemText: 'Neue Benachrichtigung: {title}',
     unreadCountText: '{count} ungelesen'
   },

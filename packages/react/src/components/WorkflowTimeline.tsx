@@ -98,7 +98,26 @@ interface ActionDraft {
   position?: WorkflowAddsignPosition
   signMode?: string
   assignee?: WorkflowTimelineActor
+  assignees?: WorkflowTimelineActor[]
   error?: string
+}
+
+function toggleAddsignAssignees(
+  current: readonly WorkflowTimelineActor[] | undefined,
+  actor: WorkflowTimelineActor | undefined
+): WorkflowTimelineActor[] {
+  if (!actor) return []
+  const keyOf = (item: WorkflowTimelineActor) =>
+    item.id != null ? 'id:' + String(item.id) : 'name:' + (item.name ?? '')
+  const key = keyOf(actor)
+  const list = [...(current ?? [])]
+  const index = list.findIndex((item) => keyOf(item) === key)
+  if (index >= 0) {
+    list.splice(index, 1)
+    return list
+  }
+  list.push(actor)
+  return list
 }
 
 const workflowTimelineRootClasses = 'flex flex-col gap-4'
@@ -390,7 +409,9 @@ export const WorkflowActionBar: React.FC<WorkflowActionBarProps> = ({
       event?.preventDefault()
       return false
     }
-    if (picker === 'assignee' && !draft.assignee) {
+    const chosenAssignees =
+      item.action === 'addsign' ? draft.assignees : draft.assignee ? [draft.assignee] : undefined
+    if (picker === 'assignee' && (!chosenAssignees || chosenAssignees.length === 0)) {
       patchDraft(item, { error: stepLabels.assigneeRequired })
       event?.preventDefault()
       return false
@@ -403,8 +424,9 @@ export const WorkflowActionBar: React.FC<WorkflowActionBarProps> = ({
       targetNodeKey: draft.targetNodeKey,
       position: draft.position,
       signMode: (draft.signMode as WorkflowActionPayload['signMode']) ?? currentSignMode,
-      assignee: draft.assignee,
-      assignees: draft.assignee ? [draft.assignee] : undefined
+      assignee:
+        item.action === 'addsign' ? draft.assignees?.[draft.assignees.length - 1] : draft.assignee,
+      assignees: chosenAssignees
     })
     if (payload) onAction?.(item, payload)
     else onAction?.(item)
@@ -431,9 +453,22 @@ export const WorkflowActionBar: React.FC<WorkflowActionBarProps> = ({
 
     const assigneeCtx: WorkflowAssigneePickerContext = {
       action: item.action,
-      value: draft.assignee,
-      values: draft.assignee ? [draft.assignee] : undefined,
-      onChange: (actor) => patchDraft(item, { assignee: actor, error: undefined }),
+      value:
+        item.action === 'addsign' ? draft.assignees?.[draft.assignees.length - 1] : draft.assignee,
+      values:
+        item.action === 'addsign' ? draft.assignees : draft.assignee ? [draft.assignee] : undefined,
+      onChange: (actor) => {
+        if (item.action !== 'addsign') {
+          patchDraft(item, { assignee: actor, error: undefined })
+          return
+        }
+        const assignees = toggleAddsignAssignees(getDraft(item).assignees, actor)
+        patchDraft(item, {
+          assignees,
+          assignee: assignees[assignees.length - 1],
+          error: undefined
+        })
+      },
       multiple: item.action === 'addsign'
     }
 

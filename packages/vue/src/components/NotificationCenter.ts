@@ -281,10 +281,12 @@ export const NotificationCenter = defineComponent({
 
     const effectiveItems = computed(() => applyReadOverrides(props.items))
 
+    const groupedItems = computed(() => effectiveGroups.value.flatMap((group) => group.items))
+    const groupedMode = computed(() => shouldUseNotificationTabs(props.groups, props.groupBy))
+
     const totalUnread = computed(() => {
-      const allItems = effectiveGroups.value.flatMap((group) => group.items)
-      if (allItems.length === 0) return effectiveItems.value.filter((item) => !item.read).length
-      return allItems.filter((item) => !item.read).length
+      const source = groupedMode.value ? groupedItems.value : effectiveItems.value
+      return source.filter((item) => !item.read).length
     })
 
     const filterItems = (items: NotificationItem[]) => {
@@ -297,10 +299,9 @@ export const NotificationCenter = defineComponent({
       })
     }
 
-    const allManagedItems = computed(() => {
-      const grouped = effectiveGroups.value.flatMap((group) => group.items)
-      return grouped.length > 0 ? grouped : effectiveItems.value
-    })
+    const allManagedItems = computed(() =>
+      groupedMode.value ? groupedItems.value : effectiveItems.value
+    )
     const seenNotificationIds = ref<Set<string> | null>(null)
     watch(
       allManagedItems,
@@ -392,11 +393,11 @@ export const NotificationCenter = defineComponent({
       if (props.manageReadState) {
         const next = new Map(readStateOverrides.value)
         next.set(notificationItemKey(item.id), nextRead)
-        if (nextRead) {
-          politeText.value = labels.value.markedReadText.split('{count}').join('1')
-        }
         readStateOverrides.value = next
       }
+      politeText.value = (nextRead ? labels.value.markedReadText : labels.value.markedUnreadText)
+        .split('{count}')
+        .join('1')
       emit('item-read-change', item, nextRead)
     }
 
@@ -712,8 +713,8 @@ export const NotificationCenter = defineComponent({
           ? renderTabs()
           : renderNotificationScroller([])
         : renderNotificationScroller(filteredFlatItems.value)
-      const hasList = shouldUseNotificationTabs(props.groups, props.groupBy)
-        ? resolvedGroups.value.length > 0 || filteredFlatItems.value.length > 0
+      const hasList = groupedMode.value
+        ? groupedItems.value.length > 0
         : filteredFlatItems.value.length > 0
       const content =
         props.loading && !hasList

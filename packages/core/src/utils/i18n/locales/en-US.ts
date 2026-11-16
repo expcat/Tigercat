@@ -165,6 +165,7 @@ export const enUS: TigerLocale = {
     addsignBefore: 'Before',
     addsignAfter: 'After',
     addsignTag: 'Added approver',
+    pendingAfterAddsign: 'Pending add-sign: {names} {comment}',
     confirmAddsign: 'Add an approver?',
     confirmAddsignDescription: 'The added person will approve on a temporary node.',
     confirmReturn: 'Return this request?',
@@ -574,6 +575,7 @@ export const enUS: TigerLocale = {
     defaultGroupTitle: 'Default',
     filterAriaLabel: 'Read state',
     markedReadText: 'Marked {count} as read',
+    markedUnreadText: 'Marked {count} as unread',
     newItemText: 'New notification: {title}',
     unreadCountText: '{count} unread'
   },

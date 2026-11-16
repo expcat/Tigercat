@@ -166,6 +166,7 @@ export const koKR: TigerLocale = {
     addsignBefore: '앞에 추가',
     addsignAfter: '뒤에 추가',
     addsignTag: '추가 결재',
+    pendingAfterAddsign: '뒤에 추가 대기: {names} {comment}',
     confirmAddsign: '결재자를 추가할까요?',
     confirmAddsignDescription: '추가된 사람은 임시 노드에서 결재합니다.',
     confirmReturn: '이 요청을 되돌릴까요?',
@@ -574,6 +575,7 @@ export const koKR: TigerLocale = {
     defaultGroupTitle: '기본',
     filterAriaLabel: '읽음 상태',
     markedReadText: '{count}개를 읽음으로 표시했습니다',
+    markedUnreadText: '{count}개를 읽지 않음으로 표시했습니다',
     newItemText: '새 알림: {title}',
     unreadCountText: '읽지 않음 {count}개'
   },

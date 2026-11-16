@@ -6,6 +6,7 @@ import {
   type TigerLocale,
   notificationItemsPendingRead,
   resolveButtonClasses,
+  type NotificationBellProps,
   type NotificationItem
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './tiger-config'
@@ -20,12 +21,17 @@ export const NotificationBell = defineComponent({
   name: 'TigerNotificationBell',
   props: {
     items: { type: Array as PropType<NotificationItem[]>, default: () => [] },
-    locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined }
+    locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
+    onItemReadChange: {
+      type: Function as PropType<NotificationBellProps['onItemReadChange']>,
+      default: undefined
+    }
   },
   emits: ['item-read-change', 'update:open'],
   setup(props, { emit }) {
     const open = ref(false)
     const buttonRef = ref<HTMLButtonElement | null>(null)
+    const panelRef = ref<HTMLElement | null>(null)
     const config = useTigerConfig()
     const labels = () => getW9DataLabels(mergeTigerLocale(config.value.locale, props.locale))
     const announced = computed(() =>
@@ -38,8 +44,15 @@ export const NotificationBell = defineComponent({
       emit('update:open', value)
       void nextTick(() => {
         if (value) {
-          const panel = document.querySelector('[data-tiger-notification-bell-panel]')
-          const focusable = panel?.querySelector<HTMLElement>('button, [href], input, [tabindex]')
+          const panel = panelRef.value
+          const candidates = panel
+            ? [...panel.querySelectorAll<HTMLElement>('button, [href], input, [tabindex]')]
+            : []
+          const focusable = candidates.find((element) => {
+            if (element.hasAttribute('disabled')) return false
+            if (element.getAttribute('aria-disabled') === 'true') return false
+            return element.tabIndex >= 0
+          })
           focusable?.focus()
           return
         }
@@ -83,11 +96,12 @@ export const NotificationBell = defineComponent({
                 ]
               ),
             content: () =>
-              h('div', { 'data-tiger-notification-bell-panel': '' }, [
+              h('div', { ref: panelRef, 'data-tiger-notification-bell-panel': '' }, [
                 h(NotificationCenter, {
                   items: props.items,
                   locale: mergeTigerLocale(config.value.locale, props.locale),
                   onItemReadChange: (item: NotificationItem, nextRead: boolean) => {
+                    props.onItemReadChange?.(item, nextRead)
                     emit('item-read-change', item, nextRead)
                   }
                 })

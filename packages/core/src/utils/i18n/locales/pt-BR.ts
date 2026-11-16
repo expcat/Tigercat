@@ -166,6 +166,7 @@ export const ptBR: TigerLocale = {
     addsignBefore: 'Antes',
     addsignAfter: 'Depois',
     addsignTag: 'Aprovador adicionado',
+    pendingAfterAddsign: 'Inclusão posterior pendente: {names} {comment}',
     confirmAddsign: 'Adicionar um aprovador?',
     confirmAddsignDescription: 'A pessoa adicionada aprovará em um nó temporário.',
     confirmReturn: 'Devolver esta solicitação?',
@@ -574,6 +575,7 @@ export const ptBR: TigerLocale = {
     defaultGroupTitle: 'Padrão',
     filterAriaLabel: 'Estado de leitura',
     markedReadText: '{count} marcadas como lidas',
+    markedUnreadText: '{count} marcadas como não lidas',
     newItemText: 'Nova notificação: {title}',
     unreadCountText: '{count} não lidas'
   },

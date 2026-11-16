@@ -236,10 +236,10 @@ function copyTasks(tasks: WorkflowTask[] | undefined): WorkflowTask[] | undefine
 function copyPendingAfter(
   pending: WorkflowPendingAfterAddsign | undefined
 ): WorkflowPendingAfterAddsign | undefined {
-  if (!pending) return undefined
+  if (!pending || !pendingAfterAddsignContent(pending)) return undefined
   return {
     ...pending,
-    assignees: pending.assignees.map((actor) => ({ ...actor }))
+    assignees: (pending.assignees ?? []).map((actor) => ({ ...actor }))
   }
 }
 
@@ -266,8 +266,9 @@ function copyStep(step: WorkflowTimelineStep): WorkflowTimelineStep {
   }
   if (step.advanced) next.advanced = copyAdvanced(step.advanced)
   if (step.origin) next.origin = { ...step.origin }
-  if (step.pendingAfterAddsign)
-    next.pendingAfterAddsign = copyPendingAfter(step.pendingAfterAddsign)
+  const pendingAfter = copyPendingAfter(step.pendingAfterAddsign)
+  if (pendingAfter) next.pendingAfterAddsign = pendingAfter
+  else delete next.pendingAfterAddsign
   return next
 }
 
@@ -669,6 +670,34 @@ export interface WorkflowStepRuntimeChrome {
   pendingAfterAddsignLabel?: string
 }
 
+function pendingAfterAddsignContent(
+  pending: WorkflowPendingAfterAddsign | undefined
+): { names: string[]; comment: string } | undefined {
+  if (!pending) return undefined
+  const names = (pending.assignees ?? [])
+    .map((actor) => (actor.name?.trim() || (actor.id != null ? String(actor.id) : '')).trim())
+    .filter((name) => name.length > 0)
+  const comment = pending.comment?.trim() ?? ''
+  if (names.length === 0 && comment.length === 0) return undefined
+  return { names, comment }
+}
+
+function formatPendingAfterAddsign(
+  pending: WorkflowPendingAfterAddsign | undefined,
+  labels: Partial<TigerLocaleWorkflowTimeline>
+): string | undefined {
+  const content = pendingAfterAddsignContent(pending)
+  if (!content) return undefined
+  const template = labels.pendingAfterAddsign || 'Pending add-sign: {names} {comment}'
+  return template
+    .split('{names}')
+    .join(content.names.join(', '))
+    .split('{comment}')
+    .join(content.comment)
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
 export function getWorkflowStepRuntimeChrome(
   step: Pick<WorkflowTimelineStep, 'temporary' | 'origin' | 'pendingAfterAddsign'>,
   labels: Partial<TigerLocaleWorkflowTimeline>,
@@ -699,9 +728,8 @@ export function getWorkflowStepRuntimeChrome(
       ? labels.currentPath || 'Current path'
       : labels.offPath || 'Untaken branch'
   }
-  if (step.pendingAfterAddsign) {
-    chrome.pendingAfterAddsignLabel = labels.addsignAfter || 'After'
-  }
+  const pendingAfterAddsignLabel = formatPendingAfterAddsign(step.pendingAfterAddsign, labels)
+  if (pendingAfterAddsignLabel) chrome.pendingAfterAddsignLabel = pendingAfterAddsignLabel
   return chrome
 }
 

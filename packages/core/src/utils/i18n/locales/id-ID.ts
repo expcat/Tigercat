@@ -166,6 +166,7 @@ export const idID: TigerLocale = {
     addsignBefore: 'Tambah sebelum',
     addsignAfter: 'Tambah sesudah',
     addsignTag: 'Persetujuan tambahan',
+    pendingAfterAddsign: 'Menunggu tambah sesudah: {names} {comment}',
     confirmAddsign: 'Tambah pemberi persetujuan?',
     confirmAddsignDescription: 'Orang yang ditambahkan akan menyetujui pada simpul sementara.',
     confirmReturn: 'Kembalikan permintaan ini?',
@@ -574,6 +575,7 @@ export const idID: TigerLocale = {
     defaultGroupTitle: 'Bawaan',
     filterAriaLabel: 'Status baca',
     markedReadText: '{count} ditandai sudah dibaca',
+    markedUnreadText: '{count} ditandai belum dibaca',
     newItemText: 'Notifikasi baru: {title}',
     unreadCountText: '{count} belum dibaca'
   },

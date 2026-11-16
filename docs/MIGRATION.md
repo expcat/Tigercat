@@ -4,6 +4,12 @@
 
 ## v3.0.1（未发布）
 
+NotificationBell 删除 `NotificationBellItem`。`items` 改为 `NotificationItem[]`；已读变化增加 `onItemReadChange(item, read)`，Vue 事件名仍是 `item-read-change`。引用旧条目类型的调用方改为 `NotificationItem`。
+
+NotificationCenter 在传入 `groups` 或 `groupBy` 后，角标、全部已读和列表只统计分组内条目。`groups={[]}` 现在是空列表，不再回落 `items`。
+
+WorkflowTimeline 的停放后加签会显示加签人与意见，不再只显示位置词。加签确认的 `assignees` 保留本次点选的全部人员；转交仍只提交一人。
+
 CodeEditor 替换同名 highlighter 后立即使用新函数生成 token。Drag 未禁用项现在进入 Tab 顺序，Space / Enter 拿起和放下、方向键移动目标、Escape 取消；悬停播报使用目标列表的位置。React Drag 的原生属性、样式和点击现在落到列表根。调用方式不用改。
 
 双端 SankeyChart 节点与 WaterfallChart 柱现在使用布局 label 作为可访问名称，矩形带 role=img；padding 和 desc 传入画布，默认 padding 仍分别为 16 和 24。OrgChart 02 示例改用 HTTPS 头像，data: 地址仍不渲染。

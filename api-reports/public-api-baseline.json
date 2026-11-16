@@ -3650,7 +3650,6 @@
       "NotificationActionContext",
       "notificationActionsClasses",
       "notificationBaseClasses",
-      "NotificationBellItem",
       "NotificationBellProps",
       "NotificationCenterProps",
       "notificationCloseButtonClasses",
@@ -7881,7 +7880,7 @@
     },
     "NotificationBellProps": {
       "extends": [],
-      "props": ["items", "locale"]
+      "props": ["items", "locale", "onItemReadChange"]
     },
     "NotificationCenterProps": {
       "extends": [],

@@ -98,6 +98,46 @@ describe('NotificationCenter (Vue)', () => {
     expect(onItemReadChange).toHaveBeenCalledTimes(1)
     expect(onItemReadChange).toHaveBeenCalledWith(items[0], true)
   })
+
+  it('does not use flat items when groups is an empty list', () => {
+    const items: NotificationItem[] = [{ id: 1, title: 'FlatUnread', read: false }]
+    const idle = render(NotificationCenter, { props: { items, groups: [] } })
+    expect(screen.queryByText('FlatUnread')).not.toBeInTheDocument()
+    expect(idle.container.querySelector('[aria-label="1 unread"]')).toBeNull()
+    expect(screen.getByRole('button', { name: 'Mark all as read' })).toBeDisabled()
+    idle.unmount()
+
+    const loading = render(NotificationCenter, {
+      props: { items, groups: [], loading: true, loadingText: 'LOAD' }
+    })
+    expect(screen.getByText('LOAD')).toBeInTheDocument()
+    expect(loading.container.querySelector('[inert]')).toBeNull()
+    expect(loading.container.querySelector('.pointer-events-auto')).toBeNull()
+  })
+
+  it('announces single read and unread changes without internal read state', async () => {
+    const externalItems: NotificationItem[] = [{ id: 1, title: 'One', read: false }]
+    const external = render(NotificationCenter, { props: { items: externalItems } })
+    const externalLive = () =>
+      external.container.querySelector('[aria-live="polite"]')?.textContent ?? ''
+    expect(externalLive()).toBe('')
+    await fireEvent.click(screen.getByRole('button', { name: 'Mark as read' }))
+    expect(externalLive()).toBe('Marked 1 as read')
+    external.unmount()
+
+    const managed = render(NotificationCenter, {
+      props: {
+        items: [{ id: 1, title: 'One', read: false }],
+        manageReadState: true
+      }
+    })
+    const managedLive = () =>
+      managed.container.querySelector('[aria-live="polite"]')?.textContent ?? ''
+    await fireEvent.click(screen.getByRole('button', { name: 'Mark as read' }))
+    expect(managedLive()).toBe('Marked 1 as read')
+    await fireEvent.click(screen.getByRole('button', { name: 'Mark as unread' }))
+    expect(managedLive()).toBe('Marked 1 as unread')
+  })
   it('renders empty state with emptyText', () => {
     render(NotificationCenter, { props: { items: [], emptyText: '暂无通知' } })
     expect(screen.getByText('暂无通知')).toBeInTheDocument()

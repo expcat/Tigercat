@@ -166,6 +166,7 @@ export const thTH: TigerLocale = {
     addsignBefore: 'เพิ่มก่อน',
     addsignAfter: 'เพิ่มหลัง',
     addsignTag: 'ผู้อนุมัติเพิ่ม',
+    pendingAfterAddsign: 'รอเพิ่มหลัง: {names} {comment}',
     confirmAddsign: 'เพิ่มผู้อนุมัติ?',
     confirmAddsignDescription: 'ผู้ที่เพิ่มจะอนุมัติบนโหนดชั่วคราว',
     confirmReturn: 'ส่งคำขอนี้กลับ?',
@@ -574,6 +575,7 @@ export const thTH: TigerLocale = {
     defaultGroupTitle: 'ค่าเริ่มต้น',
     filterAriaLabel: 'สถานะการอ่าน',
     markedReadText: 'ทำเครื่องหมายว่าอ่านแล้ว {count} รายการ',
+    markedUnreadText: 'ทำเครื่องหมายว่ายังไม่ได้อ่าน {count} รายการ',
     newItemText: 'การแจ้งเตือนใหม่: {title}',
     unreadCountText: 'ยังไม่อ่าน {count} รายการ'
   },

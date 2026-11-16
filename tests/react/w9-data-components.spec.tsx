@@ -3,7 +3,7 @@
  */
 import React from 'react'
 import { describe, expect, it, vi } from 'vitest'
-import { fireEvent, render } from '@testing-library/react'
+import { fireEvent, render, waitFor } from '@testing-library/react'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { WaterfallChart } from '../../packages/react/src/components/WaterfallChart'
 import { SankeyChart } from '../../packages/react/src/components/SankeyChart'
@@ -52,6 +52,66 @@ describe('W9 react data components', () => {
     )
     expect(view.getByRole('button').textContent).toContain('1')
     expect(view.container.querySelector('[aria-live="polite"]')?.textContent).toContain('1')
+  })
+
+  it('updates the notification bell live text when the unread count or locale changes', () => {
+    const view = render(
+      <NotificationBell
+        items={[
+          { id: '1', title: 'One', read: false },
+          { id: '2', title: 'Two', read: true }
+        ]}
+      />
+    )
+    const live = () => view.container.querySelector('[aria-live="polite"]')?.textContent ?? ''
+    expect(live()).toContain('1 unread')
+
+    view.rerender(
+      <NotificationBell
+        items={[
+          { id: '1', title: 'One', read: false },
+          { id: '2', title: 'Two', read: false },
+          { id: '3', title: 'Three', read: false }
+        ]}
+      />
+    )
+    expect(live()).toContain('3 unread')
+
+    view.rerender(
+      <NotificationBell
+        items={[
+          { id: '1', title: 'One', read: true },
+          { id: '2', title: 'Two', read: true },
+          { id: '3', title: 'Three', read: true }
+        ]}
+      />
+    )
+    expect(live()).toContain('0 unread')
+
+    view.rerender(
+      <NotificationBell items={[{ id: '1', title: 'One', read: false }]} locale={zhCN} />
+    )
+    expect(live()).toContain('1 条未读')
+  })
+
+  it('focuses an enabled control inside the opened bell panel', async () => {
+    const read = [{ id: '1', title: 'Read', read: true }]
+    const view = render(
+      <div>
+        <NotificationBell items={read} />
+        <NotificationBell items={read} />
+      </div>
+    )
+    const bells = view.getAllByRole('button', { name: /0 unread/ })
+    fireEvent.click(bells[1])
+    await waitFor(() => {
+      const panels = [...document.querySelectorAll('[data-tiger-notification-bell-panel]')]
+      const active = document.activeElement
+      const owner = panels.find((panel) => panel.contains(active))
+      expect(owner).toBe(panels[panels.length - 1])
+      expect(active?.textContent ?? '').not.toContain('Mark all as read')
+      expect((active as HTMLButtonElement).disabled).toBe(false)
+    })
   })
 
   it('filters assignees and emits selected ids', () => {

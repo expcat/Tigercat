@@ -13,9 +13,9 @@ description: Compact generated Tigercat Composite props reference
 
 `packages/core/src/types/notification-bell.ts` · `NotificationBellProps`
 
-| Prop      | Type                     | Default | Notes                                               |
-| --------- | ------------------------ | ------- | --------------------------------------------------- |
-| `items?`  | `NotificationBellItem[]` | `-`     | Inbox rows. The bell does not read the toast queue. |
-| `locale?` | `Partial<TigerLocale>`   | `-`     | Locale object for unread copy.                      |
+| Prop      | Type                   | Default | Notes                                               |
+| --------- | ---------------------- | ------- | --------------------------------------------------- |
+| `items?`  | `NotificationItem[]`   | `-`     | Inbox rows. The bell does not read the toast queue. |
+| `locale?` | `Partial<TigerLocale>` | `-`     | Locale object for unread copy.                      |
 
 Events/callback props: `onItemReadChange?`.

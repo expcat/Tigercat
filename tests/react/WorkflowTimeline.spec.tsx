@@ -227,6 +227,42 @@ describe('WorkflowTimeline (React)', () => {
     expect(screen.queryByText('Canceled')).not.toBeInTheDocument()
   })
 
+  it('shows parked after-addsign people and comment, not only the position word', () => {
+    render(
+      <WorkflowTimeline
+        steps={[
+          {
+            key: 'cs',
+            title: 'Countersign',
+            status: 'active',
+            signMode: 'countersign',
+            pendingAfterAddsign: {
+              assignees: [{ name: '专家' }],
+              comment: '稍后补签'
+            }
+          },
+          {
+            key: 'empty',
+            title: 'Empty park',
+            status: 'pending',
+            pendingAfterAddsign: {} as WorkflowTimelineStep['pendingAfterAddsign']
+          },
+          {
+            key: 'temp',
+            title: 'Temp',
+            status: 'approved',
+            temporary: true,
+            origin: { type: 'addsign', position: 'after', fromNodeKey: 'cs' }
+          }
+        ]}
+      />
+    )
+
+    expect(screen.getByText(/专家/)).toBeInTheDocument()
+    expect(screen.getByText(/稍后补签/)).toBeInTheDocument()
+    expect(screen.getAllByText('After')).toHaveLength(1)
+  })
+
   describe('WorkflowActionBar', () => {
     beforeEach(() => {
       vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue(
@@ -425,6 +461,49 @@ describe('WorkflowTimeline (React)', () => {
           expect.objectContaining({
             position: 'after',
             assignee: expect.objectContaining({ id: 'expert' })
+          })
+        )
+      )
+    })
+
+    it('keeps every add-sign assignee selected before confirm', async () => {
+      const user = userEvent.setup()
+      const onAction = vi.fn()
+      const people: WorkflowTimelineActor[] = [
+        { id: 'lin', name: 'Lin' },
+        { id: 'expert', name: 'Expert' }
+      ]
+      render(
+        <WorkflowActionBar
+          viewerRole="approver"
+          items={[{ key: 'addsign', label: 'Add approver', action: 'addsign' }]}
+          confirm
+          addsignPositions={['after']}
+          onAction={onAction}
+          renderAssigneePicker={({ onChange }) => (
+            <div>
+              {people.map((person) => (
+                <button key={String(person.id)} type="button" onClick={() => onChange(person)}>
+                  {'Pick ' + person.name}
+                </button>
+              ))}
+            </div>
+          )}
+        />
+      )
+
+      await user.click(screen.getByRole('button', { name: 'Add approver' }))
+      await user.click(await screen.findByRole('button', { name: 'Pick Lin' }))
+      await user.click(screen.getByRole('button', { name: 'Pick Expert' }))
+      await user.click(screen.getByRole('button', { name: 'OK' }))
+      await waitFor(() =>
+        expect(onAction).toHaveBeenCalledWith(
+          expect.objectContaining({ action: 'addsign' }),
+          expect.objectContaining({
+            assignees: [
+              expect.objectContaining({ id: 'lin', name: 'Lin' }),
+              expect.objectContaining({ id: 'expert', name: 'Expert' })
+            ]
           })
         )
       )

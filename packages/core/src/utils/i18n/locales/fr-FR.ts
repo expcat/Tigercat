@@ -166,6 +166,7 @@ export const frFR: TigerLocale = {
     addsignBefore: 'Avant',
     addsignAfter: 'Après',
     addsignTag: 'Approbateur ajouté',
+    pendingAfterAddsign: 'Ajout ultérieur en attente : {names} {comment}',
     confirmAddsign: 'Ajouter un approbateur ?',
     confirmAddsignDescription: 'La personne ajoutée approuvera sur un nœud temporaire.',
     confirmReturn: 'Renvoyer cette demande ?',
@@ -574,6 +575,7 @@ export const frFR: TigerLocale = {
     defaultGroupTitle: 'Par défaut',
     filterAriaLabel: 'État de lecture',
     markedReadText: '{count} marqués comme lus',
+    markedUnreadText: '{count} marqués comme non lus',
     newItemText: 'Nouvelle notification : {title}',
     unreadCountText: '{count} non lues'
   },

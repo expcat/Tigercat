@@ -166,6 +166,7 @@ export const esES: TigerLocale = {
     addsignBefore: 'Antes',
     addsignAfter: 'Después',
     addsignTag: 'Aprobador añadido',
+    pendingAfterAddsign: 'Añadido posterior pendiente: {names} {comment}',
     confirmAddsign: '¿Añadir un aprobador?',
     confirmAddsignDescription: 'La persona añadida aprobará en un nodo temporal.',
     confirmReturn: '¿Devolver esta solicitud?',
@@ -575,6 +576,7 @@ export const esES: TigerLocale = {
     defaultGroupTitle: 'Predeterminado',
     filterAriaLabel: 'Estado de lectura',
     markedReadText: '{count} marcadas como leídas',
+    markedUnreadText: '{count} marcadas como no leídas',
     newItemText: 'Nueva notificación: {title}',
     unreadCountText: '{count} no leídas'
   },

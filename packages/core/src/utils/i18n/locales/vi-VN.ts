@@ -166,6 +166,7 @@ export const viVN: TigerLocale = {
     addsignBefore: 'Thêm trước',
     addsignAfter: 'Thêm sau',
     addsignTag: 'Duyệt bổ sung',
+    pendingAfterAddsign: 'Chờ thêm sau: {names} {comment}',
     confirmAddsign: 'Thêm người duyệt?',
     confirmAddsignDescription: 'Người được thêm sẽ duyệt trên nút tạm.',
     confirmReturn: 'Trả yêu cầu này về?',
@@ -574,6 +575,7 @@ export const viVN: TigerLocale = {
     defaultGroupTitle: 'Mặc định',
     filterAriaLabel: 'Trạng thái đọc',
     markedReadText: 'Đã đánh dấu {count} là đã đọc',
+    markedUnreadText: 'Đã đánh dấu {count} là chưa đọc',
     newItemText: 'Thông báo mới: {title}',
     unreadCountText: '{count} chưa đọc'
   },
