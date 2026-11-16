@@ -47,7 +47,7 @@ X03 到 X07 五份专题：CLI 与 MCP、API 文档与生成器、Example 平台
 
 ### X05 Example 平台与 SSR
 
-报告 `project/example-platform-ssr.md`，队列状态 needs-evidence。另受 C012-V01、C013-V01、C017-V01、C025-F05 影响。
+报告 `project/example-platform-ssr.md`，队列状态 needs-evidence。另受 C013-V01、C017-V01、C025-F05 影响。
 
 | 编号 | 级别 | 波次 | 端  | 类别 | 条目 | 验收 |
 | ---- | ---- | ---- | --- | ---- | ---- | ---- |

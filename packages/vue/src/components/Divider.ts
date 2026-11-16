@@ -1,4 +1,4 @@
-import { defineComponent, h, PropType } from 'vue'
+import { defineComponent, h, Text, type PropType, type VNode } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -11,6 +11,12 @@ import {
   type DividerLineStyle,
   type DividerSpacing
 } from '@expcat/tigercat-core'
+import { flattenSlotVNodes } from '../utils/flatten-vnodes'
+
+/** Drop comments and fragments, then let hasDividerLabel judge text. */
+function dividerLabelContent(nodes: VNode[] | undefined): unknown {
+  return flattenSlotVNodes(nodes).map((node) => (node.type === Text ? node.children : true))
+}
 
 export interface VueDividerProps {
   orientation?: DividerOrientation
@@ -53,7 +59,7 @@ export const Divider = defineComponent({
     return () => {
       const attrsRecord = attrs as Record<string, unknown>
       const children = slots.default?.()
-      const labeled = hasDividerLabel(children)
+      const labeled = hasDividerLabel(dividerLabelContent(children))
       const lineStyleObj = getDividerStyle(
         props.orientation,
         props.color,

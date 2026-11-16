@@ -289,7 +289,7 @@ onBeforeUnmount(() => {
           :srcdoc="sandbox.document"
           :sandbox="getSandboxAttribute(module.meta)"
           :allow="(module.meta.permissions ?? []).includes('fullscreen') ? 'fullscreen' : undefined"
-          class="block w-full border-0 bg-transparent"
+          class="block w-full border-0 bg-transparent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--tiger-focus-ring)]"
           :style="{ height: `${viewport.height ?? iframeHeight}px` }" />
       </div>
 

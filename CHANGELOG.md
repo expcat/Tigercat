@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Divider 空白标签与示例预览焦点（Vue / Demo，C012-F001、C012-V01）**：Vue 在交给共享分类前展开 Fragment 并去掉注释与空白文本，条件隐藏或空白 slot 输出整条装饰线且 `aria-hidden="true"`。两端示例预览 iframe 在键盘聚焦时显示内缩轮廓。
+
 - **CropUpload 名称与 id（React / Vue，C011-F001、C011-F002、C011-F003）**：两端文件输入引用触发按钮的名称，保留调用方显式 `aria-label`；Vue 优先使用显式 `id`，文件输入沿用 `-input` 后缀。
 
 - **CopyButton 按钮属性与异步焦点（React / Vue，C010-F001、C010-F002）**：Vue 的原生按钮属性传给真实 button，class/style 继续用于外层布局；两端复制完成后保留用户已移走的焦点。

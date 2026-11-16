@@ -74,7 +74,26 @@ describe('Divider (Vue)', () => {
     const { container } = render(Divider, { slots: { default: 'OR' } })
     const divider = getRoot(container)
     expect(divider.textContent).toBe('OR')
+    expect(divider).toHaveAttribute('role', 'separator')
     expect(divider.querySelectorAll('[aria-hidden="true"]').length).toBe(2)
+  })
+
+  it('keeps a decorative line when the default slot is hidden or blank', () => {
+    const hidden = render({
+      components: { Divider },
+      template: '<Divider><span v-if="false">OR</span></Divider>'
+    })
+    const blank = render({
+      components: { Divider },
+      template: '<Divider>   </Divider>'
+    })
+    for (const { container } of [hidden, blank]) {
+      const divider = getRoot(container)
+      expect(divider).toHaveAttribute('aria-hidden', 'true')
+      expect(divider).not.toHaveAttribute('role')
+      expect(divider.className).not.toContain('tiger-divider-labeled')
+      expect(divider.querySelector('span')).toBeNull()
+    }
   })
 
   it('merges className without replacing base classes', () => {
