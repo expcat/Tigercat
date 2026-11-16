@@ -97,7 +97,7 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | C035 | Carousel     | complete       | F01/F02/F03 已修复；45 spec（axe）、types:check 通过；happy-dom 验证受控释放与 slot 更新。IAB 不可用待复验；旧视觉 16/16、键盘 8/8 组 pass；RTL/hover/读屏/hydration/E2E 未测 |
 | C036 | Col          | needs-evidence | F01 已修复；35 spec（双端 SSR）、types:check 通过；IAB 不可用，改用变量/CSS 断言。视觉/键盘 0/24 blocked（owner C046）；断点、offset/RTL/flex 几何及 hydration/E2E/读屏未测   |
 | C037 | Container    | needs-evidence | 视觉 0/8 blocked、真实外壳键盘 0/8 blocked、截图 0（8 格 owner 均为 C042 Layout）；未跑 hydration、浏览器 E2E、读屏；Terra 运行时模型未独立核验                               |
-| C038 | Content      | needs-evidence | 视觉 0/24 blocked、真实外壳键盘 0/24 blocked、截图 0（24 格 owner 均为 C042 Layout）；未启动 Demo 服务；未跑 hydration、浏览器 E2E、读屏；跳转链接点击与真实滚动未测          |
+| C038 | Content      | needs-evidence | F01 已修复；50 spec（双端 SSR/DOM）、types:check 通过；IAB 不可用，改用 href/id 断言。视觉/键盘 0/24 blocked（owner C042）；跳转点击、真实滚动及 hydration/E2E/读屏未测       |
 | C039 | Descriptions | needs-evidence | 视觉 0/16 blocked、键盘 0/16 blocked、截图 0；视觉代理因 Terra 额度超限未执行；未跑 hydration、读屏；docs:links exit 1（.local 资料 1128 个链接错误）                         |
 | C040 | Footer       | needs-evidence | 视觉 0/16 blocked、外壳键盘 0/16 blocked、截图 0（owner 均为 C042）；未启动服务；未跑 hydration、浏览器 E2E、读屏、docs:links；无 Footer 专属 E2E                             |
 | C041 | Header       | needs-evidence | 视觉 0/24 blocked、外壳键盘 0/24 blocked、截图 0（owner 均为 C042）；未跑 hydration、浏览器 E2E、读屏；docs:links exit 1（.local 目录 1143 处失效链接）                       |

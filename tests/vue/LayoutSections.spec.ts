@@ -4,7 +4,8 @@
 
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/vue'
-import { Fragment, h } from 'vue'
+import { renderToString } from '@vue/server-renderer'
+import { createSSRApp, Fragment, h } from 'vue'
 import { expectNoA11yViolationsIsolated } from '../utils/a11y-helpers'
 import { Content } from '@expcat/tigercat-vue/Content'
 import { Footer } from '@expcat/tigercat-vue/Footer'
@@ -222,6 +223,23 @@ describe('Layout Sections', () => {
     const header = container.querySelector('header')
     expect(header?.className).toContain('tiger-header-blur')
     expect(header?.className).toContain('tiger-header-sticky')
+  })
+
+  it.each([
+    [' custom-main ', 'custom-main'],
+    ['   ', 'tiger-main']
+  ])('normalizes Content id %j for skip links in SSR and DOM', async (id, expectedId) => {
+    const content = {
+      render: () => h(Layout, null, () => h(Content, { id }, () => 'Body'))
+    }
+    const ssr = document.createElement('div')
+    ssr.innerHTML = await renderToString(createSSRApp(content))
+    const { container } = render(content)
+
+    for (const root of [ssr, container]) {
+      expect(root.querySelector('a.tiger-skip-link')).toHaveAttribute('href', `#${expectedId}`)
+      expect.soft(root.querySelector('main')).toHaveAttribute('id', expectedId)
+    }
   })
 
   it('keeps text children inside fragments and still emits the skip link', () => {

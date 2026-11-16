@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Content 跳转目标 id（React / Vue，C038-F01）**：双端 Content 与 Layout 共用 Core id 解析，首尾空格会修剪，纯空格回退为 tiger-main；跳转链接 href 与实际 main.id 保持一致。
+
 - **Col flex 隐藏语义（Core / React / Vue，C036-F01）**：flex 只跳过 span 宽度，保留 span=0 及响应式断点的隐藏变量；flex 样式读取同一 display 变量，非零断点恢复显示。
 
 - **Carousel 圆点说明与 Vue 状态同步（Demo / 测试 / Vue，C035-F01、C035-F02、C035-F03）**：两端 Demo01 和 React 测试标题改述导航按钮与 aria-current。Vue 释放初始受控索引后保留当前页，每次 render 读取新 slot 内容，页数改变时同步窗口顺序与位移。

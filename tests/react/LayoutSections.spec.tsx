@@ -3,6 +3,7 @@
  */
 
 import React from 'react'
+import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, it, expect, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { expectNoA11yViolationsIsolated } from '../utils/a11y-helpers'
@@ -244,6 +245,25 @@ describe('Layout Sections', () => {
     const header = container.querySelector('header')
     expect(header?.className).toContain('tiger-header-blur')
     expect(header?.className).toContain('tiger-header-sticky')
+  })
+
+  it.each([
+    [' custom-main ', 'custom-main'],
+    ['   ', 'tiger-main']
+  ])('normalizes Content id %j for skip links in SSR and DOM', (id, expectedId) => {
+    const content = (
+      <Layout>
+        <Content id={id}>Body</Content>
+      </Layout>
+    )
+    const ssr = document.createElement('div')
+    ssr.innerHTML = renderToStaticMarkup(content)
+    const { container } = render(content)
+
+    for (const root of [ssr, container]) {
+      expect(root.querySelector('a.tiger-skip-link')).toHaveAttribute('href', `#${expectedId}`)
+      expect.soft(root.querySelector('main')).toHaveAttribute('id', expectedId)
+    }
   })
 
   it('keeps text children inside fragments and still emits the skip link', () => {
