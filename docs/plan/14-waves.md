@@ -11,7 +11,7 @@
 | W1   | 安全                   |    0 |   0 |   0 |   0 | 12                                         |
 | W2   | 共享 Core、主题与 i18n |    0 |   0 |   0 |   0 | 02                                         |
 | W3   | 表单                   |    0 |   0 |   0 |   0 | 05                                         |
-| W4   | 导航与反馈             |   48 |   0 |  48 |   0 | 06、07                                     |
+| W4   | 导航与反馈             |   45 |   0 |  45 |   0 | 06、07                                     |
 | W5   | 基础与布局             |  118 |   0 | 118 |   0 | 03、04                                     |
 | W6   | 数据、图表与高级       |   65 |   0 |  65 |   0 | 08、09、10                                 |
 | W7   | 组合组件               |   39 |   0 |  39 |   0 | 11                                         |
@@ -19,7 +19,7 @@
 | W9   | P3 收尾                |   99 |   0 |   0 |  99 | 02、03、04、05、06、07、08、09、10、11、12 |
 | W10  | 证据补采与复验         |   11 |   — |   — |   — | 13                                         |
 
-W1–W9 合计 376 条 Review 发现（P2 277、P3 99）。W10 的 11 条是 E01–E11。已完成条目见 [CHANGELOG.md](../../CHANGELOG.md)。
+W1–W9 合计 373 条 Review 发现（P2 274、P3 99）。W10 的 11 条是 E01–E11。已完成条目见 [CHANGELOG.md](../../CHANGELOG.md)。
 
 ## 各波在收什么
 
@@ -54,7 +54,6 @@ W1–W9 合计 376 条 Review 发现（P2 277、P3 99）。W10 的 11 条是 E01
 | C021-F03  | Inplace               | [03](03-basic.md)      | 文案改为「Escape 退出编辑，保留当前输入」，或 Demo 自存草稿并明确提交/放弃；不新增组件事件 API  |
 | C043-F04  | List                  | [04](04-layout.md)     | 给两端 App 显式传 hoverable，或删除描述中的悬停承诺，二者择一                                   |
 | C049-F01  | Skeleton              | [04](04-layout.md)     | 先确定 preset 与 variant 的公开关系，再接入一处共享解析，或在获准的 API 调整中撤销该未实现字段  |
-| C097-F02  | FullscreenButton      | [06](06-navigation.md) | 先确认非禁用 SSR 是有意契约，再同步 Demo/说明；不为对齐文案引入 hydration 属性变化              |
 | C111-F05  | Spotlight             | [06](06-navigation.md) | 有查询时仍让命中的 recentIds 排在其余命中前，或把注释改为只约束空查询；未命中的 recent 不硬插回 |
 | C116-F03  | Tree                  | [06](06-navigation.md) | 删掉这两个公开 prop，或让 resolveTreeSelection 在未写 selectionMode 时读它们；测试标题对齐      |
 | C117-F04  | Alert                 | [07](07-feedback.md)   | defaultPrevented 时停止关闭，或不再把事件标成 cancelable                                        |

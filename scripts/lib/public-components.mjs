@@ -262,7 +262,7 @@ export const FRAMEWORK_COMPONENTS = {
       'packages/react/src/components/FullscreenButton.tsx',
       'packages/vue/src/components/FullscreenButton.ts'
     ],
-    propsInterfaces: ['FullscreenButtonProps', 'VueFullscreenButtonProps']
+    propsInterfaces: ['FullscreenProps']
   }
 }
 

@@ -4,6 +4,7 @@ import {
   onMounted,
   ref,
   toValue,
+  watch,
   type MaybeRefOrGetter
 } from 'vue'
 import {
@@ -73,6 +74,7 @@ export function useFullscreen(
   }
 
   if (getCurrentInstance()) {
+    watch(() => getOptions().target, sync)
     onMounted(() => {
       supported.value = isFullscreenSupported()
       sync()

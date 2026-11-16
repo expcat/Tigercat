@@ -4269,7 +4269,7 @@
         "packages/react/src/components/FullscreenButton.tsx",
         "packages/vue/src/components/FullscreenButton.ts"
       ],
-      "propsInterfaces": ["FullscreenButtonProps", "VueFullscreenButtonProps"],
+      "propsInterfaces": ["FullscreenProps"],
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",

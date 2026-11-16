@@ -21,8 +21,8 @@ navigation 组 35 个组件（C082–C116）。审查时这一组同样没有浏
 
 ## 概览
 
-本篇 49 条：P2 33、P3 16。
-按波次：W4 33、W9 16。
+本篇 46 条：P2 30、P3 16。
+按波次：W4 30、W9 16。
 
 已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C086-F03（S13）、C088-F05（S13）、C095-F02（S13）、C109-F06（S13）、C112-F01（S13）、C113-F01（S13）、C114-F04（S13）、C116-F05（S13）。
 
@@ -59,16 +59,6 @@ navigation 组 35 个组件（C082–C116）。审查时这一组同样没有浏
 | 编号     | 级别 | 波次 | 端    | 类别 | 条目                                                | 验收                                                                              |
 | -------- | ---- | ---- | ----- | ---- | --------------------------------------------------- | --------------------------------------------------------------------------------- |
 | C093-F01 | P3   | W9   | React | 行为 | React itemKey 未消费，泄漏为小写 DOM 属性并触发警告 | React DropdownItem 传 itemKey=「identity-7」后 DOM 无 itemkey 属性且无 React 警告 |
-
-### C097 FullscreenButton
-
-报告 `groups/navigation/FullscreenButton.md`，队列状态 needs-evidence。另受 S01、S07 影响。
-
-| 编号     | 级别 | 波次 | 端          | 类别 | 条目                                         | 验收                                                                                       |
-| -------- | ---- | ---- | ----------- | ---- | -------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| C097-F01 | P2   | W4   | 双端        | 行为 | 全屏期间切换 target 后状态与 toggle 目标脱节 | target A 全屏中改为 B 后 aria-pressed=false 并显示 Enter 标签，下一次点击对 B 发出进入请求 |
-| C097-F02 | P2   | W4   | Demo        | 示例 | SSR 输出与「SSR 时按钮禁用」说明相反         | 双端 fullscreen-button/01 的 demo.json 与页面描述不再声称 SSR 时禁用，与实际 SSR 输出一致  |
-| C097-F03 | P2   | W4   | 文档·生成器 | 文档 | 生成 Props 与 MCP 未列出 onChange/onError    | pnpm docs:api 后 fullscreen-button Props/MCP 出现 onChange/onError 事件行                  |
 
 ### C098 Menu
 

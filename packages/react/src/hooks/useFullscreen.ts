@@ -36,7 +36,7 @@ export function useFullscreen(options: UseFullscreenOptions = {}): UseFullscreen
     setSupported(isFullscreenSupported())
     sync()
     return subscribeFullscreenChange(sync)
-  }, [sync])
+  }, [options.target, sync])
 
   const enter = useCallback(async () => {
     const target = resolveFullscreenTarget(optionsRef.current.target)

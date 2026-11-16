@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **FullscreenButton 目标同步与说明（Vue / React / MCP，C097-F01、C097-F02、C097-F03）**：双端全屏期间切换 target 后重新同步 pressed 状态与标签，下一次点击进入新目标。Demo 说明 SSR 首屏不禁用、挂载后检查浏览器支持；生成 Props 与 MCP 按 Core `FullscreenProps` 解析并公开 `onChange` / `onError`。
+
 - **FloatButtonGroup 关闭焦点与鼠标事件（Vue / React，C096-F02、C096-F03）**：双端从面板内按 Escape 或默认动作关闭后回焦触发器，`closeOnAction=false` 保留动作焦点。Vue 根节点在 click / hover 模式下保留调用方 mouseenter / mouseleave，并继续执行内部 hover 开合。
 
 - **FloatButton 链接与默认偏移（React / Core / MCP，C095-F01、C095-F03、C095-F04）**：React 链接接入公开 `onClick`，click 事件与 ref 类型覆盖 button / anchor，禁用时仍退化为 disabled button。FloatButton 与 Group 的生成 Props 和 MCP 默认 offset 校正为 `{ x: 24, y: 76 }`，说明避让 BackTop，运行值不变。

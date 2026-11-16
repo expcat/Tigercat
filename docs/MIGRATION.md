@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+双端 FullscreenButton 与 `useFullscreen` 的 target 变化现在会重新同步全屏状态：A 全屏期间改为 B 后，按钮显示进入全屏，下一次点击对 B 发出进入请求，`onChange` / `change` 同步为 false。调用方式不用改。SSR 首屏仍不禁用，挂载后检查浏览器支持，Demo 说明已对齐。
+
 双端 FloatButtonGroup 在焦点位于动作面板内时，按 Escape 或默认动作关闭后会把焦点移回触发器；`closeOnAction=false` 时焦点继续留在动作按钮。Vue 根节点的调用方 `mouseenter` / `mouseleave` 现在在 click 和 hover 模式下都会执行，hover 模式同时保留内部开合。调用方式不用改。
 
 React FloatButton 传 `href` 时现在会调用公开 `onClick`，事件目标与 ref 类型为 `HTMLButtonElement | HTMLAnchorElement`；访问 `disabled` 等 button 专属字段前先判断元素类型。链接禁用时仍渲染 disabled button。FloatButton 与 FloatButtonGroup 的默认 offset 文档改为实际的 `{ x: 24, y: 76 }`，用于避让 BackTop，运行偏移不变。
