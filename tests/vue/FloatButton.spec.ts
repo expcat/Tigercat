@@ -146,6 +146,64 @@ describe('FloatButtonGroup (Vue)', () => {
     expect(screen.queryByRole('button', { name: 'Child' })).not.toBeInTheDocument()
   })
 
+  it.each(['Escape', 'action', 'persistent action'] as const)(
+    'keeps focus on the expected control after %s',
+    async (interaction) => {
+      const user = userEvent.setup()
+      render({
+        setup: () => () =>
+          h(
+            FloatButtonGroup,
+            {
+              defaultOpen: true,
+              closeOnAction: interaction === 'persistent action' ? false : undefined
+            },
+            {
+              trigger: () => h(FloatButton, { ariaLabel: 'Open' }),
+              default: () => h(FloatButton, { ariaLabel: 'Child' })
+            }
+          )
+      })
+      const trigger = screen.getByRole('button', { name: 'Open' })
+      const action = screen.getByRole('button', { name: 'Child' })
+      action.focus()
+      expect(action).toHaveFocus()
+
+      if (interaction === 'Escape') await user.keyboard('{Escape}')
+      else await user.click(action)
+
+      if (interaction === 'persistent action') {
+        expect(action).toHaveFocus()
+        expect(trigger).toHaveAttribute('aria-expanded', 'true')
+      } else {
+        expect(screen.queryByRole('button', { name: 'Child' })).not.toBeInTheDocument()
+        expect(trigger).toHaveFocus()
+      }
+    }
+  )
+
+  it.each(['click', 'hover'] as const)(
+    'preserves root mouse handlers with the %s trigger',
+    async (trigger) => {
+      const onMouseenter = vi.fn()
+      const onMouseleave = vi.fn()
+      render(FloatButtonGroup, {
+        props: { portal: false, trigger },
+        attrs: { 'data-testid': 'group', onMouseenter, onMouseleave },
+        slots: { default: () => h(FloatButton, { ariaLabel: 'Child' }) }
+      })
+      const group = screen.getByTestId('group')
+
+      await fireEvent.mouseEnter(group)
+      expect(onMouseenter).toHaveBeenCalledTimes(1)
+      expect(Boolean(screen.queryByRole('button', { name: 'Child' }))).toBe(trigger === 'hover')
+
+      await fireEvent.mouseLeave(group)
+      expect(onMouseleave).toHaveBeenCalledTimes(1)
+      expect(screen.queryByRole('button', { name: 'Child' })).not.toBeInTheDocument()
+    }
+  )
+
   it('inherits group square shape on child buttons', () => {
     render({
       setup: () => () =>

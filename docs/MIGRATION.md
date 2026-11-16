@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+双端 FloatButtonGroup 在焦点位于动作面板内时，按 Escape 或默认动作关闭后会把焦点移回触发器；`closeOnAction=false` 时焦点继续留在动作按钮。Vue 根节点的调用方 `mouseenter` / `mouseleave` 现在在 click 和 hover 模式下都会执行，hover 模式同时保留内部开合。调用方式不用改。
+
 React FloatButton 传 `href` 时现在会调用公开 `onClick`，事件目标与 ref 类型为 `HTMLButtonElement | HTMLAnchorElement`；访问 `disabled` 等 button 专属字段前先判断元素类型。链接禁用时仍渲染 disabled button。FloatButton 与 FloatButtonGroup 的默认 offset 文档改为实际的 `{ x: 24, y: 76 }`，用于避让 BackTop，运行偏移不变。
 
 Vue 声明式 DropdownItem 的已选 radio 现在点击后发出 `check(true)`，与 Space 一致；把事件值写回 `checked` 后仍保持选中。checkbox 的点击和 Space 继续取反。调用方式不用改。

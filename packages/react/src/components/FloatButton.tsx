@@ -263,8 +263,12 @@ export const FloatButtonGroup = forwardRef<HTMLDivElement, FloatButtonGroupProps
     }, [setOpen])
 
     const close = useCallback(() => {
+      const panel = groupRef.current?.ownerDocument.getElementById(panelId)
+      if (panel?.contains(panel.ownerDocument.activeElement)) {
+        groupRef.current?.querySelector<HTMLElement>(`[aria-controls="${panelId}"]`)?.focus()
+      }
       setOpen(false)
-    }, [setOpen])
+    }, [panelId, setOpen])
 
     const handleMouseEnter = useCallback(() => {
       setOpen(true)
@@ -277,7 +281,7 @@ export const FloatButtonGroup = forwardRef<HTMLDivElement, FloatButtonGroupProps
     useClickOutside({
       enabled: isOpen,
       refs: [groupRef],
-      onOutsideClick: close,
+      onOutsideClick: () => setOpen(false),
       defer: true
     })
     useEscapeKey({ enabled: isOpen, onEscape: close, layerRef: groupRef })

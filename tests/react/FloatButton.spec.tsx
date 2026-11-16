@@ -173,14 +173,46 @@ describe('FloatButtonGroup (React)', () => {
       </div>
     )
     expect(screen.getByRole('button', { name: 'Child' })).toBeInTheDocument()
+    screen.getByRole('button', { name: 'Outside' }).focus()
     await user.keyboard('{Escape}')
     expect(screen.queryByRole('button', { name: 'Child' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Outside' })).toHaveFocus()
 
     await user.click(screen.getByRole('button', { name: 'Open' }))
     expect(screen.getByRole('button', { name: 'Child' })).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Outside' }))
     expect(screen.queryByRole('button', { name: 'Child' })).not.toBeInTheDocument()
   })
+
+  it.each(['Escape', 'action', 'persistent action'] as const)(
+    'keeps focus on the expected control after %s',
+    async (interaction) => {
+      const user = userEvent.setup()
+      render(
+        <FloatButtonGroup
+          defaultOpen
+          closeOnAction={interaction === 'persistent action' ? false : undefined}
+          triggerNode={<FloatButton ariaLabel="Open" />}>
+          <FloatButton ariaLabel="Child" />
+        </FloatButtonGroup>
+      )
+      const trigger = screen.getByRole('button', { name: 'Open' })
+      const action = screen.getByRole('button', { name: 'Child' })
+      action.focus()
+      expect(action).toHaveFocus()
+
+      if (interaction === 'Escape') await user.keyboard('{Escape}')
+      else await user.click(action)
+
+      if (interaction === 'persistent action') {
+        expect(action).toHaveFocus()
+        expect(trigger).toHaveAttribute('aria-expanded', 'true')
+      } else {
+        expect(screen.queryByRole('button', { name: 'Child' })).not.toBeInTheDocument()
+        expect(trigger).toHaveFocus()
+      }
+    }
+  )
 
   it('inherits group square shape on child and trigger buttons', () => {
     render(

@@ -2,6 +2,7 @@ import {
   defineComponent,
   computed,
   h,
+  mergeProps,
   ref,
   provide,
   inject,
@@ -334,7 +335,13 @@ export const FloatButtonGroup = defineComponent({
     }
 
     const toggle = () => setOpen(!isOpen.value)
-    const close = () => setOpen(false)
+    const close = () => {
+      const panel = groupRef.value?.ownerDocument.getElementById(panelId)
+      if (panel?.contains(panel.ownerDocument.activeElement)) {
+        groupRef.value?.querySelector<HTMLElement>(`[aria-controls="${panelId}"]`)?.focus()
+      }
+      setOpen(false)
+    }
 
     const groupClasses = computed(() =>
       classNames(
@@ -354,7 +361,7 @@ export const FloatButtonGroup = defineComponent({
       cleanupOutside = useVueClickOutside({
         enabled: isOpen,
         containerRef: groupRef,
-        onOutsideClick: close,
+        onOutsideClick: () => setOpen(false),
         defer: true
       })
       cleanupEscape = useVueEscapeKey({ enabled: isOpen, onEscape: close, layerRef: groupRef })
@@ -433,28 +440,24 @@ export const FloatButtonGroup = defineComponent({
 
       const groupRoot = h(
         'div',
-        {
-          ...attrs,
-          ref: groupRef,
-          class: groupClasses.value,
-          style: mergeStyleValues(
-            getFloatButtonOffsetStyle(props.placement, props.offset, true),
-            attrsRecord.style,
-            props.style
-          ),
-          onMouseenter:
-            props.trigger === 'hover'
-              ? () => {
-                  setOpen(true)
-                }
-              : undefined,
-          onMouseleave:
-            props.trigger === 'hover'
-              ? () => {
-                  setOpen(false)
-                }
-              : undefined
-        },
+        mergeProps(
+          {
+            ...attrs,
+            ref: groupRef,
+            class: groupClasses.value,
+            style: mergeStyleValues(
+              getFloatButtonOffsetStyle(props.placement, props.offset, true),
+              attrsRecord.style,
+              props.style
+            )
+          },
+          props.trigger === 'hover'
+            ? {
+                onMouseenter: () => setOpen(true),
+                onMouseleave: () => setOpen(false)
+              }
+            : {}
+        ),
         [trigger, actions]
       )
 
