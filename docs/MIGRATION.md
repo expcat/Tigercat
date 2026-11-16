@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+Vue inline Menu 的嵌套 MenuItemGroup 现在继续继承父分组层级，标题和叶项保留已有缩进，与 React 一致。调用方式不用改。
+
 双端 MenuItem 的原生 click / keydown 现在先调用调用方 handler，再执行内部选择与导航；需要取消本次内部动作时调用 `event.preventDefault()`。Vue SubMenu 同样适用。React inline 子项的自定义 style 现在与层级缩进合并，冲突时内部 `paddingInlineStart` 优先，其他样式保留。双端字符定位只匹配当前层可用项，并让命中项成为唯一 tab stop；关闭子菜单内的隐藏项不会获得焦点。
 
 Vue Menu 现在与 React 一致：`items` 非 `null` / `undefined` 时只渲染数据项，包括 `items=[]`；默认 slot / children 不再追加。需要渲染默认内容时，移除 `items` 或传 `undefined`；需要追加菜单项时，将它们放入同一个 `items` 数组。

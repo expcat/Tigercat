@@ -796,7 +796,7 @@ export const MenuItemGroup = defineComponent({
               withChildProps(
                 slots.default() as VNode[],
                 { level: props.level, collapsed: props.collapsed },
-                ['TigerMenuItem', 'TigerSubMenu']
+                ['TigerMenuItem', 'TigerSubMenu', 'TigerMenuItemGroup']
               )
             )
           : null

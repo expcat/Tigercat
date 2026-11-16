@@ -98,6 +98,25 @@ describe('Menu', () => {
       expect(getItem('Slot item')).toBeInTheDocument()
     })
 
+    it('preserves inline indentation through nested groups', () => {
+      render(Menu, {
+        props: { mode: 'inline', defaultOpenKeys: ['section'] },
+        slots: {
+          default: () =>
+            h(SubMenu, { itemKey: 'section', title: 'Section' }, () =>
+              h(MenuItemGroup, { title: 'Outer' }, () =>
+                h(MenuItemGroup, { title: 'Inner' }, () =>
+                  h(MenuItem, { itemKey: 'leaf' }, () => 'Leaf')
+                )
+              )
+            )
+        }
+      })
+
+      expect(screen.getByText('Inner')).toHaveStyle({ paddingInlineStart: '24px' })
+      expect(getItem('Leaf')).toHaveStyle({ paddingInlineStart: '24px' })
+    })
+
     it('expands ancestors when searching a nested label without defaultOpenKeys', async () => {
       render(Menu, { props: { items: dataItems, searchable: true } })
       await fireEvent.update(screen.getByRole('searchbox'), 'Roles')
