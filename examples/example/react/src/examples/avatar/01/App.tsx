@@ -14,7 +14,7 @@ export default function App() {
       <Avatar>
         <Icon name="user" />
       </Avatar>
-      <Avatar text="TC" shape="square" bgColor="primary" textColor="#ffffff" />
+      <Avatar text="TC" shape="square" bgColor="primary" textColor="primaryForeground" />
     </div>
   )
 }

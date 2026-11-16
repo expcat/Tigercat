@@ -49,6 +49,21 @@ describe('Avatar', () => {
     expect(screen.getByRole('img', { name: 'Jane' })).toBeInTheDocument()
   })
 
+  it.each([undefined, 'Old name'])('keeps image and fallback naming consistent (alt=%s)', (alt) => {
+    render(
+      <>
+        <p id="person-name">Ada Lovelace</p>
+        <Avatar src="/photo.jpg" alt={alt} aria-labelledby="person-name" />
+      </>
+    )
+    const name = alt ?? 'Ada Lovelace'
+    const image = screen.getByRole('img', { name })
+    expect(image).toHaveAttribute('src', '/photo.jpg')
+
+    fireEvent.error(image)
+    expect(screen.getByRole('img', { name })).not.toHaveAttribute('src')
+  })
+
   it('treats unlabeled image avatar as decorative', () => {
     const { container } = render(<Avatar src="/test-avatar.jpg" data-testid="avatar" />)
     const wrapper = container.querySelector('[data-testid="avatar"]')
@@ -106,14 +121,17 @@ describe('Avatar', () => {
 describe('AvatarGroup', () => {
   it('shows overflow for extra avatars and names it', () => {
     render(
-      <AvatarGroup max={2}>
+      <AvatarGroup max={3} size="md">
         <Avatar text="A" />
         <Avatar text="B" />
-        <Avatar text="C" />
-        <Avatar text="D" />
+        <Avatar text="陈晨" />
+        <Avatar text="赵六" />
       </AvatarGroup>
     )
-    expect(screen.getByRole('button', { name: '2 more' })).toHaveTextContent('+2')
+    const overflow = screen.getByRole('button', { name: '1 more' })
+    expect(overflow).toHaveTextContent('+1')
+    expect(overflow).toHaveClass('-ms-1')
+    expect(screen.getByRole('img', { name: '陈晨' })).toHaveClass('-ms-2')
   })
 
   it('ignores non-avatar children when counting max', () => {

@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+双端 Avatar 现在将 `aria-labelledby` 传给实际图片；图片与回退统一按 `aria-label`、`alt`、`text`、`aria-labelledby` 的顺序命名。依赖回退分支中外部标签覆盖显式名称的用法应只保留预期的命名来源。AvatarGroup 的溢出按钮重叠缩至 4px，普通头像间保持 8px；调用方式不用改。
+
 ConfigProvider 的嵌套 `localeLoading` 现在在本层或任一父层仍加载时为 true，与 i18n 文档一致；依赖旧内层 ready 状态的断言需调整。撤销根 `theme` 后恢复文档基线主题，无基线时使用 default。React StrictMode 重放后自建图标表保持同一引用，最终卸载时清空。调用方式不用改。
 
 React Progress 的默认百分比文字现在遵循 ConfigProvider 的 locale，与 Vue 一致。fr-FR 下的 50% 现在输出 `50\u00A0%`；依赖旧百分比文字的断言需按 locale 调整，调用方式不用改。

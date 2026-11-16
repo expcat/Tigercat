@@ -126,6 +126,7 @@ export const Avatar = defineComponent({
         ariaLabelledby: spanAttrs['aria-labelledby'],
         ariaHidden: spanAttrs['aria-hidden']
       })
+      const ariaLabelledby = computedLabel ? undefined : spanAttrs['aria-labelledby']
 
       const autoBg = !props.bgColor && props.text ? generateAvatarColor(props.text) : undefined
       const bgPaint = resolveAvatarPaint(props.bgColor, 'bg', autoBg ?? avatarDefaultBgColor)
@@ -175,11 +176,17 @@ export const Avatar = defineComponent({
       if (hasImage.value) {
         return h(
           'span',
-          { ...baseSpanProps, 'aria-hidden': isDecorative ? true : spanAttrs['aria-hidden'] },
+          {
+            ...baseSpanProps,
+            'aria-labelledby': undefined,
+            'aria-hidden': isDecorative ? true : spanAttrs['aria-hidden']
+          },
           [
             h('img', {
               src: props.src,
               alt: computedLabel ?? '',
+              role: isDecorative ? undefined : 'img',
+              'aria-labelledby': ariaLabelledby,
               srcset: props.srcSet ?? imageAttrs.srcSet,
               sizes: props.sizes ?? imageAttrs.sizes,
               crossorigin: props.crossOrigin ?? imageAttrs.crossOrigin,
@@ -205,7 +212,7 @@ export const Avatar = defineComponent({
             : {
                 role: 'img',
                 'aria-label': computedLabel,
-                'aria-labelledby': spanAttrs['aria-labelledby']
+                'aria-labelledby': ariaLabelledby
               })
         },
         displayText || slots.default?.()

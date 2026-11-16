@@ -67,7 +67,7 @@ export function getAvatarGroupOverflowClasses(
 ): string {
   return classNames(
     avatarGroupOverflowBaseClasses,
-    overlap && '-ms-2',
+    overlap && '-ms-1',
     ownRecordValue<string>(avatarSizeClasses, size),
     ownRecordValue<string>(avatarShapeClasses, shape),
     ...classes

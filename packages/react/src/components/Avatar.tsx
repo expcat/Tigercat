@@ -72,6 +72,9 @@ export const Avatar = forwardRef<HTMLSpanElement, AvatarProps>(function Avatar(
     ariaLabelledby: spanRest['aria-labelledby'],
     ariaHidden: spanRest['aria-hidden']
   })
+  const ariaLabelledby = computedLabel
+    ? undefined
+    : (spanRest['aria-labelledby'] as string | undefined)
 
   const autoBg = !bgColor && text ? generateAvatarColor(text) : undefined
   const bgPaint = resolveAvatarPaint(bgColor, 'bg', autoBg ?? avatarDefaultBgColor)
@@ -123,10 +126,13 @@ export const Avatar = forwardRef<HTMLSpanElement, AvatarProps>(function Avatar(
         ref={ref}
         {...spanRest}
         className={avatarClasses}
+        aria-labelledby={undefined}
         aria-hidden={isDecorative ? true : (spanRest['aria-hidden'] as boolean | undefined)}>
         <img
           src={src}
           alt={computedLabel ?? ''}
+          role={isDecorative ? undefined : 'img'}
+          aria-labelledby={ariaLabelledby}
           srcSet={srcSet}
           sizes={sizes}
           crossOrigin={crossOrigin}
@@ -156,7 +162,7 @@ export const Avatar = forwardRef<HTMLSpanElement, AvatarProps>(function Avatar(
         : {
             role: 'img',
             'aria-label': computedLabel,
-            'aria-labelledby': spanRest['aria-labelledby'] as string | undefined
+            'aria-labelledby': ariaLabelledby
           })}>
       {displayText || children}
     </span>

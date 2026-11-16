@@ -60,7 +60,7 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | C003 | Text           | complete       | 主责 32 格视觉 16 pass / 8 finding / 8 blocked，键盘 24 pass / 8 blocked；关联 8 pass / 40 blocked；31 项 spec 通过；04 tooltip、剪贴板仍阻塞                          |
 | C004 | Button         | complete       | 24 格：视觉 20 pass/4 finding（Vue 01，F002）/0 blocked；键盘 24 pass；160 图；测试 80 通过；F001 浏览器未复现；X01-F002 仅 SSR；对比度、读屏未验证                    |
 | C005 | Avatar         | complete       | 视觉 32 格：20 pass/12 finding/0 blocked；键盘 32 pass；184 图亲看；测试 41 passed；SSR 完成，hydration 未测；F001 无浏览器 AX；读屏未验证                             |
-| C006 | AvatarGroup    | complete       | 适用 18 格/120 图均亲看；03 的 8 格沿用 C005-F003，04 的 8 格无新增；键盘主路径有证据，React fixture Shift+Tab 超时 partial；测试 55 通过；hydration、读屏未测         |
+| C006 | AvatarGroup    | complete       | 适用 18 格/120 图均亲看；03 的 8 格沿用 Avatar 证据，04 的 8 格无新增；键盘主路径有证据，React fixture Shift+Tab 超时 partial；测试 55 通过；hydration、读屏未测       |
 | C007 | Badge          | complete       | 主责 24 格：视觉 8 pass/16 finding（均 F04）/0 blocked；键盘 24 pass；136 图亲看；6 个关联消费 Demo 真实验证 0/6；测试 42 通过；hydration、实际对比度、读屏未测        |
 | C008 | ButtonGroup    | complete       | 两端 button/03 共 8 格已展示状态视觉/Tab 均 pass（复用 C004 的 48 图）；组内 disabled/loading 各 8 格 blocked（Demo 无入口）；测试 81 通过；hydration、读屏未测        |
 | C009 | Code           | complete       | 视觉 32/32 pass；键盘主路径 32/32 pass；312 图亲看；剪贴板 payload 读回 32 格 blocked；测试 86 通过；无专属 E2E；父页 DOM 截断；复制失败路径、长行软换行未覆盖         |

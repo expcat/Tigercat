@@ -15,6 +15,6 @@ const avatarSrc = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(
     <Avatar>
       <Icon name="user" />
     </Avatar>
-    <Avatar text="TC" shape="square" bg-color="primary" text-color="#ffffff" />
+    <Avatar text="TC" shape="square" bg-color="primary" text-color="primaryForeground" />
   </div>
 </template>
