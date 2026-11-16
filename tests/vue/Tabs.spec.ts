@@ -622,6 +622,28 @@ describe('Tabs', () => {
   })
 
   describe('TabPane', () => {
+    it('uses the label slot for the visible title and accessible name', () => {
+      render(Tabs, {
+        slots: {
+          default: () => [
+            h(
+              TabPane,
+              { tabKey: 'overview', label: '概览' },
+              {
+                label: () => '自定义',
+                default: () => '面板'
+              }
+            )
+          ]
+        }
+      })
+
+      const tab = screen.getByRole('tab', { name: '自定义', exact: true })
+      expect(tab).toHaveAccessibleName('自定义')
+      expect(tab).toHaveTextContent('自定义')
+      expect(tab).not.toHaveTextContent('概览')
+    })
+
     it('should render tab pane with content', () => {
       render(Tabs, {
         slots: {

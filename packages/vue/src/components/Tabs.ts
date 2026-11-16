@@ -259,6 +259,9 @@ export const TabPane = defineComponent({
 
     return () => {
       if (props.renderMode === 'tab') {
+        const labelSlot = slots.label?.()
+        const visibleLabel = labelSlot ?? props.label
+        const usesLabelSlot = labelSlot != null
         return h(
           'button',
           {
@@ -275,7 +278,7 @@ export const TabPane = defineComponent({
             'aria-controls': panelMounted.value ? props.panelId : undefined,
             'aria-selected': isActive.value,
             'aria-disabled': props.disabled || undefined,
-            'aria-label': props.label,
+            'aria-label': usesLabelSlot ? undefined : props.label,
             tabindex: props.disabled
               ? -1
               : typeof props.tabIndex === 'number'
@@ -292,7 +295,7 @@ export const TabPane = defineComponent({
           },
           [
             props.icon && h('span', { class: 'flex items-center' }, props.icon),
-            h('span', { 'aria-hidden': 'true' }, slots.label?.() ?? props.label),
+            h('span', usesLabelSlot ? undefined : { 'aria-hidden': 'true' }, visibleLabel),
             isClosable.value &&
               h(
                 'span',
@@ -660,14 +663,18 @@ export const Tabs = defineComponent({
         const tabId = `${idBase}-tab-${formatTabKey(child.key)}`
         const panelId = `${idBase}-panel-${formatTabKey(child.key)}`
         tabItems.push(
-          h(child.type, {
-            ...child.props,
-            key: `tab-${String(child.key)}`,
-            renderMode: 'tab',
-            tabId,
-            panelId,
-            tabIndex: isKeyActive(child.key, displayedKey) ? 0 : -1
-          })
+          h(
+            child.type,
+            {
+              ...child.props,
+              key: `tab-${String(child.key)}`,
+              renderMode: 'tab',
+              tabId,
+              panelId,
+              tabIndex: isKeyActive(child.key, displayedKey) ? 0 : -1
+            },
+            child.children as VNode[] | undefined
+          )
         )
         tabPanes.push(
           h(
