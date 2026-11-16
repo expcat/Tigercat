@@ -43,7 +43,7 @@ const chromeSource = {
     contextTheme: '树内 theme',
     documentTheme: 'document theme',
     caption:
-      '应用根 ConfigProvider 管理 document（本 iframe 的 html）的 theme / colorScheme / dir / lang。内层 theme 作用于子树；document=false 时仅提供 context。colorScheme=auto 首屏当 light。'
+      '本示例嵌套在沙箱的 ConfigProvider 内。语言、主题、配色与方向控件只作用于示例子树；iframe 的 html 由沙箱外层管理。内层 minimal 主题只作用于预览区域。'
   },
   'en-US': {
     language: 'Language',
@@ -56,7 +56,7 @@ const chromeSource = {
     contextTheme: 'tree theme',
     documentTheme: 'document theme',
     caption:
-      'The root ConfigProvider manages document theme / colorScheme / dir / lang (this iframe html). Nested themes apply to their subtree; document=false provides context only. colorScheme=auto is light on first paint.'
+      'This example is nested inside the sandbox ConfigProvider. Language, theme, color scheme, and direction controls apply to this example subtree; the sandbox provider manages the iframe html. The inner minimal theme applies only to the preview.'
   }
 } as const
 

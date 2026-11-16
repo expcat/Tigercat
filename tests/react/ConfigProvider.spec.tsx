@@ -10,6 +10,8 @@ import {
   activateFeedbackScope,
   enqueueNotification,
   getActiveFeedbackScope,
+  createIconRegistry,
+  type IconRegistry,
   type TigerLocale
 } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
@@ -96,6 +98,41 @@ describe('ConfigProvider', () => {
       unmount()
       expect(getActiveFeedbackScope()).toBeNull()
     })
+  })
+
+  describe('icon registry lifecycle', () => {
+    it.each(['normal', 'strict', 'strict-caller-owned'] as const)(
+      'keeps the committed registry across theme changes (%s)',
+      (mode) => {
+        const provided = mode === 'strict-caller-owned' ? createIconRegistry() : undefined
+        let currentRegistry: IconRegistry | undefined
+        function RegistryDisplay() {
+          currentRegistry = useTigerConfig().iconRegistry
+          return null
+        }
+        const tree = (theme: string) => {
+          const provider = (
+            <ConfigProvider theme={theme} iconRegistry={provided}>
+              <RegistryDisplay />
+            </ConfigProvider>
+          )
+          return mode === 'normal' ? provider : <React.StrictMode>{provider}</React.StrictMode>
+        }
+        const { rerender, unmount } = render(tree('default'))
+        const registry = currentRegistry!
+        const custom = { viewBox: '0 0 24 24', paths: ['M4 4h16v16H4z'], mode: 'stroke' as const }
+        registry.register('c001-custom', custom)
+
+        rerender(tree('minimal'))
+
+        expect(currentRegistry).toBe(registry)
+        expect(currentRegistry?.get('c001-custom')).toBe(custom)
+
+        unmount()
+        expect(registry.customNames()).toEqual(provided ? ['c001-custom'] : [])
+        provided?.dispose()
+      }
+    )
   })
 
   describe('sync locale', () => {
@@ -265,7 +302,7 @@ describe('ConfigProvider', () => {
         </ConfigProvider>
       )
 
-      expect(getByTestId('loading').textContent).toBe('ready')
+      expect(getByTestId('loading').textContent).toBe('loading')
 
       await act(async () => {
         resolveOuter({ common: { okText: 'Outer Done' } })

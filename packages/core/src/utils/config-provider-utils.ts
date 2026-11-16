@@ -54,7 +54,7 @@ export function resolveTigerConfig(input: ResolveTigerConfigInput): TigerConfig 
 
   return {
     locale: mergedLocale,
-    localeLoading: Boolean(input.localeLoading),
+    localeLoading: Boolean(input.localeLoading || input.parent?.localeLoading),
     localeLoadError: input.localeLoadError,
     direction,
     theme: input.theme ?? input.parent?.theme,

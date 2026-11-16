@@ -1,7 +1,7 @@
 {
   "id": "config-provider-01",
-  "title": "全局配置",
-  "description": "官方 zhCN/enUS 对象、modern 主题、colorScheme=auto。最外层管理 document（iframe 的 html），内层 theme 作用于子树；document=false 时仅提供 context。",
+  "title": "局部配置与嵌套",
+  "description": "沙箱外层 ConfigProvider 管理 iframe 的 html；示例控件只改变子树内的语言、主题、配色与方向，可切换预览区域的内层 minimal 主题。",
   "order": 1,
   "entry": "App.tsx"
 }

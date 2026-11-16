@@ -105,7 +105,7 @@ function paintOwner(root: HTMLElement, state: OwnerState): void {
   restore(root, state.baseline)
   if (!current) return
   const values = current.values
-  if (values.theme) current.themeScope.setTheme(values.theme)
+  current.themeScope.setTheme(values.theme || state.baseline.theme || 'default')
   if (values.colorScheme) current.themeScope.setColorScheme(values.colorScheme)
   else current.themeScope.setColorScheme('auto')
   if (values.direction) {

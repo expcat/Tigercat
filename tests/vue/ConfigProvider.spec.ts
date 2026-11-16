@@ -256,7 +256,7 @@ describe('ConfigProvider', () => {
         })
       )
 
-      expect(getByTestId('loading').textContent).toBe('ready')
+      expect(getByTestId('loading').textContent).toBe('loading')
 
       resolveOuter({ common: { okText: 'Outer Done' } })
 

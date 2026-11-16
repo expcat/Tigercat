@@ -40,6 +40,27 @@ describe('document config ownership', () => {
     expect(document.documentElement.getAttribute('dir')).toBe('ltr')
   })
 
+  it.each([null, 'modern'])(
+    'resets a removed theme to the baseline or default (%s)',
+    (baseline) => {
+      const root = document.documentElement
+      if (baseline) root.setAttribute('data-tiger-theme', baseline)
+      const handle = createDocumentConfigHandle()
+      try {
+        handle.apply({ theme: 'vibrant' })
+        expect(root.getAttribute('data-tiger-theme')).toBe('vibrant')
+
+        handle.apply({})
+
+        expect(root.getAttribute('data-tiger-theme')).toBe(baseline ?? 'default')
+        expect(handle.themeScope.getCurrentTheme()).toBe(baseline ?? 'default')
+      } finally {
+        handle.dispose()
+      }
+      expect(root.getAttribute('data-tiger-theme')).toBe(baseline)
+    }
+  )
+
   it('keeps each owner locale and reads the current owner', () => {
     const first = createDocumentConfigHandle()
     first.setLocale({ common: { okText: '第一' } })

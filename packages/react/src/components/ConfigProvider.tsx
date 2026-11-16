@@ -113,8 +113,8 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({
 
   useLayoutEffect(() => {
     return () => {
+      // dispose clears entries; retain the registry through StrictMode effect replay.
       ownRegistryRef.current?.dispose()
-      ownRegistryRef.current = null
     }
   }, [])
 

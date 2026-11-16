@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+ConfigProvider 的嵌套 `localeLoading` 现在在本层或任一父层仍加载时为 true，与 i18n 文档一致；依赖旧内层 ready 状态的断言需调整。撤销根 `theme` 后恢复文档基线主题，无基线时使用 default。React StrictMode 重放后自建图标表保持同一引用，最终卸载时清空。调用方式不用改。
+
 React Progress 的默认百分比文字现在遵循 ConfigProvider 的 locale，与 Vue 一致。fr-FR 下的 50% 现在输出 `50\u00A0%`；依赖旧百分比文字的断言需按 locale 调整，调用方式不用改。
 
 双端 Popconfirm 打开并完成定位后，现在聚焦确定按钮，Enter 可直接确认；Shift+Tab 到取消，Tab 回确定时弹层保持打开。调用方式不用改，依赖旧焦点停留行为的键盘脚本需相应调整。
