@@ -227,6 +227,106 @@ describe('FormWizard (Vue)', () => {
     await waitFor(() => expect(autoSave).toHaveBeenCalledWith(1, steps[1]))
   })
 
+  it('keeps a disabled step in place instead of marking it skipped', async () => {
+    const disabledSteps = [
+      { title: 'Step 1' },
+      { title: 'Step 2', description: 'Later', disabled: true },
+      { title: 'Step 3' }
+    ]
+
+    render(FormWizard, {
+      props: { steps: disabledSteps },
+      slots: {
+        step: ({ index }: { index: number }) => h('div', `Content ${index + 1}`)
+      }
+    })
+
+    expect(screen.getByText('Later')).toBeInTheDocument()
+    expect(screen.queryByText('Skipped')).not.toBeInTheDocument()
+    await fireEvent.click(screen.getByRole('button', { name: 'Next' }))
+    expect(await screen.findByText('Content 2')).toBeInTheDocument()
+    expect(screen.getByText('Later')).toBeInTheDocument()
+    expect(screen.queryByText('Skipped')).not.toBeInTheDocument()
+  })
+
+  it('does not ask to leave when the parent moves to another step', async () => {
+    const wizard = ref<{ requestClose: () => Promise<boolean> }>()
+    const model = ref({ name: 'a' })
+    const current = ref(0)
+    render({
+      setup: () => () =>
+        h(ConfigProvider, () =>
+          h(FormWizard, {
+            ref: wizard,
+            steps,
+            model: model.value,
+            current: current.value,
+            'onUpdate:current': (next: number) => {
+              current.value = next
+            }
+          })
+        )
+    })
+
+    model.value = { name: 'b' }
+    current.value = 1
+    await nextTick()
+    const pending = wizard.value!.requestClose()
+    await nextTick()
+    const dialog = screen.queryByRole('dialog', { name: 'Leave this step' })
+    if (dialog) {
+      await fireEvent.click(within(dialog).getByRole('button', { name: 'Stay on this step' }))
+    }
+    expect(dialog).toBeNull()
+    await expect(pending).resolves.toBe(true)
+  })
+
+  it('shows a form validation alert when Finish cannot submit hidden fields', async () => {
+    const onFinish = vi.fn()
+    const model = ref({ name: 'Ann', email: '' })
+
+    render({
+      setup() {
+        return () =>
+          h(
+            Form,
+            {
+              modelValue: model.value,
+              rules: {
+                name: [{ required: true, message: 'Name is required' }],
+                email: [{ required: true, message: 'Email is required' }]
+              },
+              'onUpdate:modelValue': (next: { name: string; email: string }) => {
+                model.value = next
+              }
+            },
+            {
+              default: () =>
+                h(
+                  FormWizard,
+                  {
+                    steps: [{ title: 'Name', fields: ['name'] }, { title: 'Confirm' }],
+                    onFinish
+                  },
+                  {
+                    step: ({ index }: { index: number }) =>
+                      index === 0
+                        ? h(FormItem, { name: 'name', label: 'Name' }, { default: () => h(Input) })
+                        : h('p', 'Confirm only')
+                  }
+                )
+            }
+          )
+      }
+    })
+
+    await fireEvent.click(screen.getByRole('button', { name: 'Next' }))
+    expect(await screen.findByText('Confirm only')).toBeInTheDocument()
+    await fireEvent.click(screen.getByRole('button', { name: 'Finish' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent('Email is required')
+    expect(onFinish).not.toHaveBeenCalled()
+  })
+
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(FormWizard, {

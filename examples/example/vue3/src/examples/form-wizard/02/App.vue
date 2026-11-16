@@ -38,7 +38,7 @@ const validateBeforeNext = async (index: number) => {
       v-model:current="current"
       :steps="steps"
       :before-next="validateBeforeNext"
-      @change="finished = false"
+      @step-change="finished = false"
       @finish="finished = true">
       <template #step="{ index }">
         <Input v-if="index === 0" v-model="name" placeholder="请输入用户名" />

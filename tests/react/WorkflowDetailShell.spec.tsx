@@ -69,6 +69,23 @@ describe('WorkflowDetailShell (React)', () => {
     expect(screen.getByText('Only form')).toBeInTheDocument()
   })
 
+  it('treats empty strings as empty regions and still shows zero', () => {
+    const { container } = render(
+      <>
+        <WorkflowDetailShell header="" form="" tabs="" action="   " />
+        <WorkflowDetailShell header={0} form={0} />
+      </>
+    )
+    const shells = container.querySelectorAll('[data-tiger-workflow-detail-shell]')
+    expect(shells).toHaveLength(2)
+    expect(shells[0].querySelector('[data-slot="form"]')).toBeNull()
+    expect(shells[0].querySelector('[data-slot="tabs"]')).toBeNull()
+    expect(shells[0].querySelector('[data-slot="action"]')).toBeNull()
+    expect(shells[0].querySelector('[data-slot="header"]')).toHaveTextContent('Approval')
+    expect(shells[1].querySelector('[data-slot="header"]')).toHaveTextContent('0')
+    expect(shells[1].querySelector('[data-slot="form"]')).toHaveTextContent('0')
+  })
+
   it('has no accessibility violations', async () => {
     const { container } = render(
       <WorkflowDetailShell

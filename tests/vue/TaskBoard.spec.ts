@@ -663,6 +663,27 @@ describe('TaskBoard (Vue)', () => {
       expect(lane?.querySelector('[data-tiger-taskboard-card]')).toBeNull()
       expect(queryByText('Bug task')).toBeNull()
     })
+    it('collapses a listened swimlane without a parent write-back', async () => {
+      const onSwimlaneCollapse = vi.fn()
+      const { container, emitted } = render(TaskBoard, {
+        props: {
+          columns: swimlaneColumns,
+          swimlaneField: 'type',
+          swimlanes: [{ id: 'bug', label: 'Bugs' }],
+          onSwimlaneCollapse
+        }
+      })
+      const button = screen.getByRole('button', { name: /Bugs/ })
+      expect(button).toHaveAttribute('aria-expanded', 'true')
+      await fireEvent.click(button)
+      expect(onSwimlaneCollapse).toHaveBeenCalledWith('bug', true)
+      expect(emitted()['swimlane-collapse']?.[0]).toEqual(['bug', true])
+      expect(screen.getByRole('button', { name: /Bugs/ })).toHaveAttribute('aria-expanded', 'false')
+      expect(
+        container.querySelector('[data-tiger-kanban-swimlane-id="bug"] [data-tiger-taskboard-card]')
+      ).toBeNull()
+      expect(screen.queryByText('Bug task')).not.toBeInTheDocument()
+    })
   })
 
   describe('Column description', () => {

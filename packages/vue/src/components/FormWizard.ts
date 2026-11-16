@@ -45,6 +45,21 @@ import { Icon } from './Icon'
 import { useTigerConfig } from './tiger-config'
 import { useFormContext } from './Form'
 
+function wizardFormErrorText(
+  errors: readonly { message?: string }[] | undefined
+): string | undefined {
+  if (!errors?.length) return undefined
+  const seen = new Set<string>()
+  const messages: string[] = []
+  for (const error of errors) {
+    const message = error.message?.trim()
+    if (!message || seen.has(message)) continue
+    seen.add(message)
+    messages.push(message)
+  }
+  return messages.length ? messages.join(' ') : undefined
+}
+
 export type { WizardStep }
 
 export interface VueFormWizardProps extends Omit<CoreFormWizardProps, 'style'> {
@@ -213,13 +228,15 @@ export const FormWizard = defineComponent({
           selfStep = false
           return
         }
-        if (prev === undefined) return
-        emit(
-          'step-change',
-          clampStepIndex(next, totalCount.value),
-          clampStepIndex(prev, totalCount.value),
-          { skippedValidation: true }
-        )
+        if (prev !== undefined) {
+          emit(
+            'step-change',
+            clampStepIndex(next, totalCount.value),
+            clampStepIndex(prev, totalCount.value),
+            { skippedValidation: true }
+          )
+        }
+        snapshot.value = stableModelSnapshot(props.model)
       }
     )
 
@@ -237,6 +254,11 @@ export const FormWizard = defineComponent({
       })
     }
 
+    const showFormErrors = () => {
+      const message = wizardFormErrorText(formApi()?.errors)
+      if (message) errorMessage.value = message
+    }
+
     const finishAt = async (index: number) => {
       const form = formApi()
       if (form) {
@@ -244,14 +266,20 @@ export const FormWizard = defineComponent({
         const names = fields?.length ? fields : form.getMountedFieldNames()
         if (names.length === 0) {
           try {
-            if (!(await form.validate())) return
+            if (!(await form.validate())) {
+              showFormErrors()
+              return
+            }
           } catch (error) {
             if (isFormValidationSuperseded(error)) return
             throw error
           }
         }
         const submitted = await form.submit()
-        if (!submitted) return
+        if (!submitted) {
+          showFormErrors()
+          return
+        }
       }
       if (props.autoSave && props.steps[index]) {
         try {

@@ -36,9 +36,10 @@ describe('form-wizard-utils', () => {
   })
 
   describe('findNextUnskippedStep', () => {
-    it('skips disabled steps moving forward', () => {
+    it('does not skip disabled steps', () => {
       const steps = [step(), step({ disabled: true }), step()]
-      expect(findNextUnskippedStep(1, 1, steps, 0)).toBe(2)
+      expect(findNextUnskippedStep(1, 1, steps, 0)).toBe(1)
+      expect(findNextUnskippedStep(1, -1, steps, 2)).toBe(1)
     })
 
     it('skips steps with skipCondition returning true', () => {
@@ -46,13 +47,12 @@ describe('form-wizard-utils', () => {
       expect(findNextUnskippedStep(1, 1, steps, 0)).toBe(2)
     })
 
-    it('skips backward symmetrically', () => {
-      const steps = [step(), step({ disabled: true }), step()]
-      expect(findNextUnskippedStep(1, -1, steps, 2)).toBe(0)
-    })
-
     it('returns fallback when bounds exhausted with no candidate', () => {
-      const steps = [step(), step({ disabled: true }), step({ disabled: true })]
+      const steps = [
+        step(),
+        step({ skipCondition: () => true }),
+        step({ skipCondition: () => true })
+      ]
       expect(findNextUnskippedStep(1, 1, steps, 0)).toBe(0)
     })
 

@@ -21,12 +21,12 @@ export function clampStepIndex(next: number, totalCount: number): number {
 
 export function isStepSkipped(step: WizardStep | undefined): boolean {
   if (!step) return true
-  return Boolean(step.disabled || step.skipCondition?.())
+  return Boolean(step.skipCondition?.())
 }
 
 /**
  * Walk `steps` from `from` in `direction` (+1 / -1) skipping items where
- * `disabled === true` or `skipCondition()` returns `true`.
+ * `skipCondition()` returns `true`. A `disabled` step stays in place.
  *
  * If no valid step is found before the bounds are exceeded, returns
  * `fallbackIndex` (the caller's current index) so the caller can no-op.

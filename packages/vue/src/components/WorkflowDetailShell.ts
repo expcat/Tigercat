@@ -12,7 +12,7 @@
  * while form/tabs scroll. `submit()` merges through `mergeWorkflowFormValues`.
  */
 
-import { computed, defineComponent, h, PropType } from 'vue'
+import { Comment, computed, defineComponent, Fragment, h, isVNode, PropType, Text } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -52,7 +52,14 @@ export interface WorkflowDetailShellHandle {
 }
 
 function hasSlotContent(nodes: unknown): boolean {
-  return Array.isArray(nodes) && nodes.length > 0
+  if (nodes == null || typeof nodes === 'boolean') return false
+  if (typeof nodes === 'string' || typeof nodes === 'number') return String(nodes).trim().length > 0
+  if (Array.isArray(nodes)) return nodes.some(hasSlotContent)
+  if (!isVNode(nodes) || nodes.type === Comment) return false
+  if (nodes.type === Text || nodes.type === Fragment || typeof nodes.type === 'string') {
+    return hasSlotContent(nodes.children)
+  }
+  return true
 }
 
 export const WorkflowDetailShell = defineComponent({

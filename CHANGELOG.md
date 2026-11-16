@@ -4,6 +4,13 @@
 
 ## v3.0.1（未发布）
 
+- **表单向导步变化（文档 / Demo，C176-F01）**：生成说明改为 Vue 听 step-change、React 听 onStepChange；vue 02 用 step-change 清掉「流程已完成」。
+- **表单向导禁用步（Core / React / Vue，C176-F03）**：disabled 只禁止进入，描述仍是 Later；Next 只跨过 skipCondition。
+- **表单向导外部切步（React / Vue，C176-F04）**：父级把 current 从 0 改成 1 时重拍快照，model 已从 a 改成 b 也不弹离开框。
+- **表单向导完成校验（React / Vue，C176-F05）**：确认步没有字段时，Finish 整表校验失败会把 Email is required 写进 role=alert。
+- **任务板泳道折叠（React / Vue，C180-F01）**：有 onSwimlaneCollapse 时事件照发，本地折叠仍写入，aria-expanded 变 false，泳道卡片离开 DOM。
+- **流程详情空槽（React / Vue，C182-F01）**：注释、空白和空串不算内容，不渲染 form/tabs/action，header 回退 Approval；数字 0 仍显示。
+
 - **查询条与 SchemaForm 接线（Core / React / Vue / Demo / 文档 / MCP，C175-F01、C175-F02、C175-F03、C175-F05、C175-F06、C179-F01、C179-F02）**：查询区重置按钮走 table locale，zh-CN 为「重置」。React 受控 name 重置后输入框、onReset 和行集仍是 Ann。Vue 后传入或替换的 query.api.getQueryValues 仍是 function。两端 data-table-with-toolbar/02 关闭不筛表的搜索框。生成的 Custom Filters 示例让 Input onChange 直接收值。input 的 maxLength 与 prefix 传到控件；DatePicker 没有的 picker、showTime 移出允许列表，未知参数按键各自警告。生成示例和优先列表改用 Vue modelValue、React value。
 
 - **聊天窗与评论串（Core / React / Vue / Demo / 文档 / MCP，C173-F01、C173-F02、C173-F03、C174-F01、C174-F02、C174-F03、C174-F04、C174-F05）**：不传 virtual 时满 40 条自动开窗，传 false 仍是普通 log；类型注释和生成 Props 默认写 auto (>=40)。Vue 关掉自动滚动后，挂载一帧 scrollTop 为 0。React 虚拟模式下同一条正文从 hello 改成 hello world，礼貌区跟着更新。replyPlaceholder 为「写下回复」时，两端行内回复框 aria-label 也是「写下回复」。Vue 的 onReply 同步抛错后根草稿仍是 top。两端 02 从根输入框发送 top 后列表出现 top。只传 onMore 就显示 More actions。nodes 里两个 id 为 a 时 alert 为 Duplicate comment id a，且只有一篇 article。

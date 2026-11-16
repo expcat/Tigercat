@@ -562,10 +562,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
 
   const handleToggleSwimlane = useCallback(
     (laneId: string | number, collapsed: boolean) => {
-      if (onSwimlaneCollapse) {
-        onSwimlaneCollapse(laneId, collapsed)
-        return
-      }
+      onSwimlaneCollapse?.(laneId, collapsed)
       setCollapsedOverride((prev) => ({ ...prev, [String(laneId)]: collapsed }))
     },
     [onSwimlaneCollapse]

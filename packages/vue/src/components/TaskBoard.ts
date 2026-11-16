@@ -234,11 +234,8 @@ export const TaskBoard = defineComponent({
     }
 
     const toggleSwimlane = (laneId: string | number, collapsed: boolean) => {
-      const handled = hasListener('swimlane-collapse')
       emit('swimlane-collapse', laneId, collapsed)
-      if (!handled) {
-        collapsedOverride.value = { ...collapsedOverride.value, [String(laneId)]: collapsed }
-      }
+      collapsedOverride.value = { ...collapsedOverride.value, [String(laneId)]: collapsed }
     }
 
     const dragSnap = ref<TaskBoardDragSnapshot>(createDefaultDragSnapshot())

@@ -286,6 +286,114 @@ describe('FormWizard (React)', () => {
     await vi.waitFor(() => expect(onFinish).toHaveBeenCalledTimes(1))
   })
 
+  it('keeps a disabled step in place instead of marking it skipped', async () => {
+    const user = userEvent.setup()
+    const disabledSteps = [
+      { title: 'Step 1' },
+      { title: 'Step 2', description: 'Later', disabled: true },
+      { title: 'Step 3' }
+    ]
+
+    render(
+      <FormWizard
+        steps={disabledSteps}
+        renderStep={(_step, index) => <div>Content {index + 1}</div>}
+      />
+    )
+
+    expect(screen.getByText('Later')).toBeInTheDocument()
+    expect(screen.queryByText('Skipped')).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Next' }))
+    expect(await screen.findByText('Content 2')).toBeInTheDocument()
+    expect(screen.getByText('Later')).toBeInTheDocument()
+    expect(screen.queryByText('Skipped')).not.toBeInTheDocument()
+  })
+
+  it('does not ask to leave when the parent moves to another step', async () => {
+    const user = userEvent.setup()
+    const wizard = React.createRef<FormWizardHandle>()
+
+    function Example() {
+      const [model, setModel] = useState({ name: 'a' })
+      const [current, setCurrent] = useState(0)
+      return (
+        <>
+          <button
+            type="button"
+            onClick={() => {
+              setModel({ name: 'b' })
+              setCurrent(1)
+            }}>
+            Jump
+          </button>
+          <FormWizard
+            ref={wizard}
+            steps={steps}
+            model={model}
+            current={current}
+            onStepChange={(next) => setCurrent(next)}
+          />
+        </>
+      )
+    }
+
+    render(
+      <ConfigProvider>
+        <Example />
+      </ConfigProvider>
+    )
+    await user.click(screen.getByRole('button', { name: 'Jump' }))
+    let pending!: Promise<boolean>
+    act(() => {
+      pending = wizard.current!.requestClose()
+    })
+    const dialog = screen.queryByRole('dialog', { name: 'Leave this step' })
+    if (dialog) {
+      await user.click(within(dialog).getByRole('button', { name: 'Stay on this step' }))
+    }
+    expect(dialog).toBeNull()
+    await expect(pending).resolves.toBe(true)
+  })
+
+  it('shows a form validation alert when Finish cannot submit hidden fields', async () => {
+    const user = userEvent.setup()
+    const onFinish = vi.fn()
+
+    function Example() {
+      const [model, setModel] = useState({ name: 'Ann', email: '' })
+      return (
+        <Form
+          value={model}
+          rules={{
+            name: [{ required: true, message: 'Name is required' }],
+            email: [{ required: true, message: 'Email is required' }]
+          }}
+          onChange={setModel}>
+          <FormWizard
+            steps={[{ title: 'Name', fields: ['name'] }, { title: 'Confirm' }]}
+            onFinish={onFinish}
+            renderStep={(_step, index) =>
+              index === 0 ? (
+                <FormItem name="name" label="Name">
+                  <Input />
+                </FormItem>
+              ) : (
+                <p>Confirm only</p>
+              )
+            }
+          />
+        </Form>
+      )
+    }
+
+    render(<Example />)
+    await user.click(screen.getByRole('button', { name: 'Next' }))
+    expect(await screen.findByText('Confirm only')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Finish' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent('Email is required')
+    expect(onFinish).not.toHaveBeenCalled()
+  })
+
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(

@@ -579,7 +579,7 @@ const COMPONENT_USAGE_NOTES = {
   FormWizard: {
     uses: ['Steps/StepsItem', 'Button', 'Form', 'ConfigProvider'],
     notes:
-      '包在 Form 里时，当前步 `fields` 会交给 `validateFields`，没写 `fields` 就校验当前步挂上的项。Finish 再 `validate` + `submit`。`submit()` 返回 false 时不发 `finish`，也不跑 `autoSave`。父级直接改 `current` 时，`step-change` 的第三参 `{ skippedValidation: true }`。`beforeNext` 返回字符串会显示在内容区 `role="alert"`。`isLast` 是后面没有未跳过步，不是数组尾巴。`clickable` 只能回已走过的步。Vue 用 `v-model:current`。`onChange` 是步下标。`size` 是 Steps 的 `small|default`，不是 Form 的 `sm|md|lg`。'
+      '包在 Form 里时，当前步 `fields` 会交给 `validateFields`，没写 `fields` 就校验当前步挂上的项。Finish 再 `validate` + `submit`。`submit()` 返回 false 时不发 `finish`，也不跑 `autoSave`。父级直接改 `current` 时，`step-change` 的第三参 `{ skippedValidation: true }`。`beforeNext` 返回字符串会显示在内容区 `role="alert"`。`isLast` 是后面没有未跳过步，不是数组尾巴。`clickable` 只能回已走过的步。Vue 用 `v-model:current`。Vue 听 `step-change`，React 听 `onStepChange`。`size` 是 Steps 的 `small|default`，不是 Form 的 `sm|md|lg`。'
   },
   SchemaForm: {
     uses: ['Form', 'FormItem', 'Input', 'Select', 'Button'],

@@ -3,7 +3,7 @@
  */
 
 import { describe, expect, it } from 'vitest'
-import { h } from 'vue'
+import { Comment, h, Text } from 'vue'
 import { render, screen } from '@testing-library/vue'
 import { WorkflowDetailShell } from '@expcat/tigercat-vue/WorkflowDetailShell'
 import { expectNoA11yViolations } from '../utils'
@@ -71,6 +71,24 @@ describe('WorkflowDetailShell (Vue)', () => {
     expect(container.querySelector('[data-slot="action"]')).toBeNull()
     expect(screen.queryByRole('button', { name: 'Hidden approve' })).not.toBeInTheDocument()
     expect(screen.getByText('Only form')).toBeInTheDocument()
+  })
+
+  it('treats comments and whitespace as empty slots', () => {
+    const { container } = render(WorkflowDetailShell, {
+      slots: {
+        header: () => [h(Comment, 'note')],
+        form: () => [h(Comment, 'note')],
+        tabs: () => [h(Comment, 'note')],
+        action: () => [h(Text, '   ')],
+        default: () => 0
+      }
+    })
+
+    expect(container.querySelector('[data-slot="form"]')).toBeNull()
+    expect(container.querySelector('[data-slot="tabs"]')).toBeNull()
+    expect(container.querySelector('[data-slot="action"]')).toBeNull()
+    expect(container.querySelector('[data-slot="header"]')).toHaveTextContent('Approval')
+    expect(container.querySelector('[data-slot="body"]')).toHaveTextContent('0')
   })
 
   it('has no accessibility violations', async () => {

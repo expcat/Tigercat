@@ -37,6 +37,21 @@ import { useTigerConfig } from './tiger-config'
 import { useFormContext } from './Form'
 import { useControlledState } from '../hooks/useControlledState'
 
+function wizardFormErrorText(
+  errors: readonly { message?: string }[] | undefined
+): string | undefined {
+  if (!errors?.length) return undefined
+  const seen = new Set<string>()
+  const messages: string[] = []
+  for (const error of errors) {
+    const message = error.message?.trim()
+    if (!message || seen.has(message)) continue
+    seen.add(message)
+    messages.push(message)
+  }
+  return messages.length ? messages.join(' ') : undefined
+}
+
 export type { WizardStep }
 
 export interface FormWizardHandle {
@@ -91,6 +106,8 @@ export const FormWizard = forwardRef<FormWizardHandle, FormWizardProps>(function
   const titleId = useId()
   const liveId = useId()
   const [errorMessage, setErrorMessage] = useState<string | undefined>()
+  const [formAlertNonce, setFormAlertNonce] = useState(0)
+  const formAlertRequest = useRef(0)
   const [pending, setPending] = useState(false)
   const lockRef = useRef(createAsyncLock())
   const mergedLocale = useMemo(
@@ -165,11 +182,20 @@ export const FormWizard = forwardRef<FormWizardHandle, FormWizardProps>(function
       selfStep.current = false
       return
     }
-    if (prev === undefined) return
-    onStepChange?.(clampStepIndex(current, totalCount), clampStepIndex(prev, totalCount), {
-      skippedValidation: true
-    })
-  }, [current, onStepChange, totalCount])
+    if (prev !== undefined) {
+      onStepChange?.(clampStepIndex(current, totalCount), clampStepIndex(prev, totalCount), {
+        skippedValidation: true
+      })
+    }
+    snapshot.current = stableModelSnapshot(model)
+  }, [current, model, onStepChange, totalCount])
+
+  useEffect(() => {
+    if (formAlertNonce === 0) return
+    const message = wizardFormErrorText(form?.errors)
+    if (!message) return
+    setErrorMessage(message)
+  }, [form, formAlertNonce])
 
   const validateAdvance = useCallback(
     () =>
@@ -195,6 +221,11 @@ export const FormWizard = forwardRef<FormWizardHandle, FormWizardProps>(function
     })()
   }, [confirmLeave, currentIndex, setCurrent, steps])
 
+  const requestFormAlert = useCallback(() => {
+    formAlertRequest.current += 1
+    setFormAlertNonce(formAlertRequest.current)
+  }, [])
+
   const finishAt = useCallback(
     async (index: number) => {
       if (form) {
@@ -202,14 +233,20 @@ export const FormWizard = forwardRef<FormWizardHandle, FormWizardProps>(function
         const names = fields?.length ? fields : form.getMountedFieldNames()
         if (names.length === 0) {
           try {
-            if (!(await form.validate())) return
+            if (!(await form.validate())) {
+              requestFormAlert()
+              return
+            }
           } catch (error) {
             if (isFormValidationSuperseded(error)) return
             throw error
           }
         }
         const submitted = await form.submit()
-        if (!submitted) return
+        if (!submitted) {
+          requestFormAlert()
+          return
+        }
       }
       if (autoSave && steps[index]) {
         try {
@@ -220,7 +257,7 @@ export const FormWizard = forwardRef<FormWizardHandle, FormWizardProps>(function
       }
       onFinish?.(index, steps, form?.getValues())
     },
-    [autoSave, form, onFinish, steps]
+    [autoSave, form, onFinish, requestFormAlert, steps]
   )
 
   const handleNext = useCallback(async () => {
