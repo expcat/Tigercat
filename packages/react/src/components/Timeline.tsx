@@ -51,6 +51,14 @@ export interface TimelineProps extends Omit<React.HTMLAttributes<HTMLUListElemen
   locale?: Partial<TigerLocale>
 }
 
+const timelineMachineDateTime =
+  /^(?:\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}(?::\d{2})?(?:Z|[+-]\d{2}:\d{2})?)?|\d{2}:\d{2}(?::\d{2})?)$/
+
+function timelineLabelDateTime(label: string): string | undefined {
+  const value = label.trim()
+  return timelineMachineDateTime.test(value) ? value : undefined
+}
+
 export const Timeline: React.FC<TimelineProps> = ({
   items,
   mode = 'left',
@@ -190,7 +198,7 @@ export const Timeline: React.FC<TimelineProps> = ({
     const labelNode = item.label ? (
       <time
         className={mode === 'horizontal' ? timelineHorizontalLabelClasses : timelineLabelClasses}
-        dateTime={String(item.label)}
+        dateTime={timelineLabelDateTime(item.label)}
         data-timeline-label-side={labelSide}>
         {item.label}
       </time>

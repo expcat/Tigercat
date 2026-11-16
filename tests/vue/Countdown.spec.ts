@@ -239,6 +239,15 @@ describe('Countdown', () => {
     expect(vi.getTimerCount()).toBe(0)
   })
 
+  it('announces an elapsed or disabled countdown once on mount', async () => {
+    vi.useFakeTimers()
+    renderWithProps(Countdown, { value: baseTime - 1000, now: baseTime, interval: 0 })
+    await vi.advanceTimersByTimeAsync(16)
+    expect(document.querySelector('[data-tiger-live-region]')?.textContent).toBe(
+      'Countdown 00:00:00'
+    )
+  })
+
   describe('Edge Cases', () => {
     it('handles invalid value without crashing', () => {
       renderWithProps(Countdown, { value: 'invalid-date' })

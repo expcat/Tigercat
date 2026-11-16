@@ -58,6 +58,19 @@ describe('Collapse', () => {
       expect(screen.queryByText('Content 2')).not.toBeInTheDocument()
     })
 
+    it('leaves the content shell without an unused height transition', () => {
+      render(Collapse, {
+        props: { activeKey: '1' },
+        slots: {
+          default: () => [h(CollapsePanel, { panelKey: '1', header: 'Panel 1' }, () => 'Content 1')]
+        }
+      })
+
+      const shell = getContentWrapper('Content 1')
+      expect(shell.className).not.toContain('transition-[max-height,opacity]')
+      expect(shell.className).not.toContain('duration-300')
+    })
+
     it('should render with bordered style by default', () => {
       const { container } = render(Collapse, {
         slots: {

@@ -43,6 +43,7 @@ import {
   getPopconfirmArrowClasses,
   shouldCloseOnMaskClick,
   getTourLabels,
+  getLocaleDirection,
   type TourProps as CoreTourProps,
   type TourPlacement,
   type TourRect,
@@ -380,14 +381,10 @@ export const Tour = React.forwardRef<TourHandle, TourProps>(function Tour(
   if (!visible || !step || !ctx) return anchor
 
   const placement: TourPlacement = step.placement ?? 'bottom'
+  const direction = getLocaleDirection(mergedLocale)
   const showMask = step.mask !== false
   const popoverStyle = {
-    ...getTourPopoverStyle(
-      targetRect,
-      popoverSize,
-      placement,
-      mergedLocale?.direction === 'rtl' ? 'rtl' : 'ltr'
-    ),
+    ...getTourPopoverStyle(targetRect, popoverSize, placement, direction),
     ...style
   } as React.CSSProperties
   const hasTitle = Boolean(renderTitle || step.title)
@@ -481,12 +478,7 @@ export const Tour = React.forwardRef<TourHandle, TourProps>(function Tour(
           <span
             data-tiger-tour-arrow=""
             className={getPopconfirmArrowClasses()}
-            style={getTourArrowStyle(
-              targetRect,
-              popoverSize,
-              placement,
-              mergedLocale?.direction === 'rtl' ? 'rtl' : 'ltr'
-            )}
+            style={getTourArrowStyle(targetRect, popoverSize, placement, direction)}
           />
         ) : null}
         {closable && (

@@ -442,7 +442,7 @@ export const Calendar = defineComponent({
           h('div', { key: wi, class: weekGridClass, role: 'row' }, [
             h(
               'div',
-              { class: weekNumberClass, 'data-week-number': '' },
+              { class: weekNumberClass, role: 'rowheader', 'data-week-number': '' },
               String(calendarWeekNumber(week[0], weekStartsOn.value))
             ),
             ...week.map((date) => {

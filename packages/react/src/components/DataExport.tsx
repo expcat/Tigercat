@@ -187,7 +187,9 @@ function DataExportInner<T extends Record<string, unknown>>(
       {...rest}
       disabled={triggerDisabled}
       aria-label={
-        offeredFormats.length > 1 || formatsEmpty ? resolvedLabels.triggerAriaLabel : undefined
+        offeredFormats.length > 1 || formatsEmpty
+          ? resolvedLabels.triggerAriaLabel
+          : rest['aria-label']
       }
       aria-busy={exporting || undefined}
       onClick={

@@ -4,6 +4,14 @@
 
 ## v3.0.1（未发布）
 
+- **Tour 方向（React / Vue，C130-F03）**：气泡按合并 locale 的方向定位。ConfigProvider 为 rtl 时，显式 direction ltr 的 popover left 为 400px；locale id ar-SA 推断为 rtl，left 为 440px。
+- **Calendar 周次角色（React / Vue，C131-F02）**：月网格的周次单元格改为 rowheader，每行仍是 8 个表头或单元格。
+- **Collapse 内容壳（Core / React / Vue，C133-F02）**：内容壳去掉未使用的 max-height、opacity 过渡，只保留 overflow-hidden。
+- **Countdown 挂载播报（Vue，C134-F02）**：剩余时间在挂载时立即播报一次。已结束且 interval 为 0 时，礼貌区是 Countdown 00:00:00。
+- **DataExport 单格式名称（React / Vue，C135-F04）**：只有一种格式时保留调用方 aria-label；多种格式仍使用 triggerAriaLabel。
+- **Table 卡片虚拟说明（Core，C136-F03）**：类型注释写明卡片树忽略 virtual，只有 cardItemHeight 为正数才开窗。运行逻辑不变。
+- **Timeline 时间属性（React / Vue，C137-F02）**：datetime 只写 YYYY-MM-DD、HH:mm 或 ISO 日期时间。文案「第一步」不再写入 datetime。
+
 - **Alert 取消关闭（React / Vue，C117-F04）**：close 事件的 preventDefault 阻止关闭、可见性回调与焦点移动，保留原有未取消路径。
 - **Drawer 首帧遮罩（React，C118-F03）**：层登记移到 layout effect，首次绘制即带遮罩；服务端仍不登记层。
 - **Drawer 描述引用（Vue，C118-F05）**：优先保留调用方 aria-describedby，未传时仍回退默认槽内容 id。

@@ -427,7 +427,10 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(function Calen
           </div>
           {weeks.map((week, wi) => (
             <div key={wi} className={getCalendarWeekGridClasses(fullscreen)} role="row">
-              <div className={getCalendarWeekNumberClasses(fullscreen)} data-week-number="">
+              <div
+                className={getCalendarWeekNumberClasses(fullscreen)}
+                role="rowheader"
+                data-week-number="">
                 {calendarWeekNumber(week[0], weekStartsOn)}
               </div>
               {week.map((date) => {

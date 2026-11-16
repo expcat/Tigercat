@@ -155,22 +155,26 @@ export const Countdown = defineComponent({
 
     const liveRegion = manageLiveRegion('polite')
     const announced = { tick: false, finish: false }
-    watch(remaining, (value) => {
-      const name =
-        typeof props.title === 'string' && props.title
-          ? props.title
-          : props.ariaLabel || 'Countdown'
-      const text = `${name} ${formatCountdown(value, props.format)}`
-      if (value > 0 && !announced.tick) {
-        announced.tick = true
-        liveRegion.announce(text)
-        return
-      }
-      if (value <= 0 && !announced.finish) {
-        announced.finish = true
-        liveRegion.announce(text)
-      }
-    })
+    watch(
+      remaining,
+      (value) => {
+        const name =
+          typeof props.title === 'string' && props.title
+            ? props.title
+            : props.ariaLabel || 'Countdown'
+        const text = `${name} ${formatCountdown(value, props.format)}`
+        if (value > 0 && !announced.tick) {
+          announced.tick = true
+          liveRegion.announce(text)
+          return
+        }
+        if (value <= 0 && !announced.finish) {
+          announced.finish = true
+          liveRegion.announce(text)
+        }
+      },
+      { immediate: true }
+    )
     onBeforeUnmount(() => {
       mounted = false
       stopTimer()

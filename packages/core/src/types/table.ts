@@ -787,7 +787,7 @@ export interface TableProps<T = Record<string, unknown>> {
   /**
    * Enable virtual scrolling for large datasets.
    * Ignored when `expandable` or `groupBy` is set (row height is not fixed).
-   * The active card tree uses the same row window.
+   * The card tree ignores this flag. Card windowing only runs when `cardItemHeight` is a positive number.
    * @default false
    */
   virtual?: boolean

@@ -214,6 +214,23 @@ describe('Calendar', () => {
     expect(cell?.textContent).toContain('Ship')
   })
 
+  it('gives every week number in the month grid a row header role', () => {
+    const { container } = renderCalendar({ modelValue: testDate })
+    const grid = screen.getByRole('grid')
+    expect(grid).toHaveAttribute('aria-colcount', '8')
+    const rows = grid.querySelectorAll('[role="row"]')
+    expect(rows).toHaveLength(7)
+    for (const row of rows) {
+      const cells = row.querySelectorAll(
+        '[role="columnheader"], [role="rowheader"], [role="gridcell"]'
+      )
+      expect(cells).toHaveLength(8)
+    }
+    const weekNumbers = container.querySelectorAll('[data-week-number]')
+    expect(weekNumbers).toHaveLength(6)
+    for (const cell of weekNumbers) expect(cell).toHaveAttribute('role', 'rowheader')
+  })
+
   it('uses the dateCell slot instead of default dots', () => {
     render(Calendar, {
       props: {

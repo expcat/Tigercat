@@ -241,7 +241,7 @@ export const DataExport = defineComponent({
           'aria-label':
             offeredFormats.value.length > 1 || formatsEmpty.value
               ? resolvedLabels.value.triggerAriaLabel
-              : undefined,
+              : restAttrs['aria-label'],
           onClick:
             offeredFormats.value.length === 1 && !formatsEmpty.value
               ? (event: MouseEvent) => {

@@ -98,6 +98,65 @@ describe('Tour', () => {
     expect(await screen.findByRole('dialog', { name: 'Step 1' })).toBeInTheDocument()
   })
 
+  it('follows the merged locale direction when it overrides ConfigProvider', async () => {
+    const target = mountTarget('tour-direction-target')
+    target.getBoundingClientRect = () =>
+      ({
+        top: 100,
+        left: 400,
+        width: 40,
+        height: 20,
+        right: 440,
+        bottom: 120,
+        x: 400,
+        y: 100,
+        toJSON: () => ({})
+      }) as DOMRect
+    render(ConfigProvider, {
+      props: { direction: 'rtl' },
+      slots: {
+        default: () =>
+          h(Tour, {
+            steps: [{ title: 'Direction', target, placement: 'bottom-start' }],
+            open: true,
+            locale: { locale: 'en-US', direction: 'ltr' }
+          })
+      }
+    })
+    const bubble = await screen.findByRole('dialog', { name: 'Direction' })
+    await waitFor(() => expect(bubble).toHaveStyle({ left: '400px' }))
+  })
+
+  it('follows an overriding locale id when ConfigProvider is rtl', async () => {
+    const target = mountTarget('tour-locale-id-target')
+    target.getBoundingClientRect = () =>
+      ({
+        top: 100,
+        left: 400,
+        width: 40,
+        height: 20,
+        right: 440,
+        bottom: 120,
+        x: 400,
+        y: 100,
+        toJSON: () => ({})
+      }) as DOMRect
+    render(ConfigProvider, {
+      props: { direction: 'rtl' },
+      slots: {
+        default: () =>
+          h(Tour, {
+            steps: [{ title: 'Direction', target, placement: 'bottom-start' }],
+            open: true,
+            locale: { locale: 'ar-SA' }
+          })
+      }
+    })
+    await waitFor(() =>
+      expect(screen.getByRole('dialog', { name: 'Direction' })).toHaveStyle({ left: '440px' })
+    )
+  })
+
   it('emits finish then close then update:open on Finish', async () => {
     const onFinish = vi.fn()
     const onClose = vi.fn()

@@ -259,4 +259,21 @@ describe('Calendar date cells', () => {
     expect(cell.querySelector('[aria-hidden="true"]')).toBeNull()
     expect(cell.parentElement).toHaveTextContent('Ship')
   })
+
+  it('gives every week number in the month grid a row header role', () => {
+    const { container } = render(<Calendar value={testDate} now={now} />)
+    const grid = screen.getByRole('grid')
+    expect(grid).toHaveAttribute('aria-colcount', '8')
+    const rows = grid.querySelectorAll('[role="row"]')
+    expect(rows).toHaveLength(7)
+    for (const row of rows) {
+      const cells = row.querySelectorAll(
+        '[role="columnheader"], [role="rowheader"], [role="gridcell"]'
+      )
+      expect(cells).toHaveLength(8)
+    }
+    const weekNumbers = container.querySelectorAll('[data-week-number]')
+    expect(weekNumbers).toHaveLength(6)
+    for (const cell of weekNumbers) expect(cell).toHaveAttribute('role', 'rowheader')
+  })
 })

@@ -18,6 +18,22 @@ describe('Timeline (React)', () => {
     expect(screen.getByText('Create project')).toBeTruthy()
   })
 
+  it('writes datetime only for a date or time label', () => {
+    const { container } = render(
+      <Timeline
+        items={[
+          { key: 1, label: '第一步', content: 'Start' },
+          { key: 2, label: '2024-01-02', content: 'Ship' },
+          { key: 3, label: '09:00', content: 'Meet' }
+        ]}
+      />
+    )
+    const times = [...container.querySelectorAll('time')]
+    expect(times[0]).not.toHaveAttribute('datetime')
+    expect(times[1]).toHaveAttribute('datetime', '2024-01-02')
+    expect(times[2]).toHaveAttribute('datetime', '09:00')
+  })
+
   it('renders ReactNode item content', () => {
     const items: TimelineItem[] = [
       { key: 1, label: 'Now', content: <strong data-testid="rich-content">Updated profile</strong> }

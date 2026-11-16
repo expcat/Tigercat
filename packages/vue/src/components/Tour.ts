@@ -44,6 +44,7 @@ import {
   getPopconfirmArrowClasses,
   shouldCloseOnMaskClick,
   getTourLabels,
+  getLocaleDirection,
   mergeTigerLocale,
   captureActiveElement,
   restoreFocus,
@@ -135,9 +136,7 @@ export const Tour = defineComponent({
         finishText: props.finishText
       })
     )
-    const direction = computed<'ltr' | 'rtl'>(() =>
-      config.value.direction === 'rtl' || mergedLocale.value?.direction === 'rtl' ? 'rtl' : 'ltr'
-    )
+    const direction = computed(() => getLocaleDirection(mergedLocale.value))
     const internalStep = ref(0)
     const resolvedSteps = ref<TourStep[]>([])
     const loadPhase = ref<'idle' | 'loading' | 'ready' | 'error'>('idle')

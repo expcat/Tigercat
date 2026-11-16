@@ -48,6 +48,14 @@ export interface VueTimelineProps {
 
 export type TimelineProps = VueTimelineProps
 
+const timelineMachineDateTime =
+  /^(?:\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}(?::\d{2})?(?:Z|[+-]\d{2}:\d{2})?)?|\d{2}:\d{2}(?::\d{2})?)$/
+
+function timelineLabelDateTime(label: string): string | undefined {
+  const value = label.trim()
+  return timelineMachineDateTime.test(value) ? value : undefined
+}
+
 export const Timeline = defineComponent({
   name: 'TigerTimeline',
   inheritAttrs: false,
@@ -220,7 +228,7 @@ export const Timeline = defineComponent({
             {
               class:
                 props.mode === 'horizontal' ? timelineHorizontalLabelClasses : timelineLabelClasses,
-              datetime: String(item.label),
+              datetime: timelineLabelDateTime(item.label),
               'data-timeline-label-side': labelSide
             },
             item.label

@@ -101,6 +101,45 @@ describe('Tour', () => {
     target.remove()
   })
 
+  it('follows the merged locale direction when it overrides ConfigProvider', async () => {
+    const target = mountTarget('tour-direction-target')
+    target.getBoundingClientRect = () =>
+      ({
+        top: 100,
+        left: 400,
+        width: 40,
+        height: 20,
+        right: 440,
+        bottom: 120,
+        x: 400,
+        y: 100,
+        toJSON: () => ({})
+      }) as DOMRect
+    const { rerender } = render(
+      <ConfigProvider direction="rtl">
+        <Tour
+          steps={[{ title: 'Direction', target, placement: 'bottom-start' }]}
+          open
+          locale={{ locale: 'en-US', direction: 'ltr' }}
+        />
+      </ConfigProvider>
+    )
+    const bubble = await screen.findByRole('dialog', { name: 'Direction' })
+    expect(bubble).toHaveStyle({ left: '400px' })
+
+    rerender(
+      <ConfigProvider direction="rtl">
+        <Tour
+          steps={[{ title: 'Direction', target, placement: 'bottom-start' }]}
+          open
+          locale={{ locale: 'ar-SA' }}
+        />
+      </ConfigProvider>
+    )
+    expect(await screen.findByRole('dialog', { name: 'Direction' })).toHaveStyle({ left: '440px' })
+    target.remove()
+  })
+
   it('should not show Previous button on the first step', async () => {
     render(<Tour steps={baseSteps} open={true} />)
     await screen.findByRole('dialog')

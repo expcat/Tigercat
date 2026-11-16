@@ -87,6 +87,24 @@ describe('DataExport', () => {
     expect(screen.getByRole('button', { name: 'Download workbook' })).toBeInTheDocument()
   })
 
+  it('keeps a caller aria-label on a single format and the trigger label on many', () => {
+    const single = render(DataExport, {
+      props: { columns, dataSource: data, formats: ['markdown'] },
+      attrs: { 'aria-label': 'Save table' }
+    })
+    expect(screen.getByRole('button', { name: 'Save table' })).toHaveAttribute(
+      'aria-label',
+      'Save table'
+    )
+    single.unmount()
+
+    render(DataExport, { props: { columns, dataSource: data } })
+    expect(screen.getByRole('button', { name: 'Export data' })).toHaveAttribute(
+      'aria-label',
+      'Export data'
+    )
+  })
+
   it('exports on click and emits export with the format', async () => {
     const { emitted } = render(DataExport, {
       props: { columns, dataSource: data, formats: ['markdown'] }

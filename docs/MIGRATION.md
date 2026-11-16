@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+双端 Tour 按合并后的 locale 方向定位气泡，组件上的 direction 或语言 id（如 ar-SA）盖过 ConfigProvider。Calendar 周次格为 rowheader。Collapse 内容壳去掉未使用的高度与透明度过渡。Vue Countdown 在挂载时播报一次，已经结束的计时也会播报。单格式 DataExport 保留调用方 aria-label，多种格式仍用触发器文案。Timeline 只在标签是日期或时间时写入 datetime。Table 卡片树忽略 virtual 只补了注释，开窗仍只看正数 cardItemHeight。调用方式不用改。
+
 双端 Alert 的 close 事件现在可通过 preventDefault() 取消关闭，取消时保留打开状态与焦点。双端 Drawer 的 resizable 分隔条进入 Tab 顺序，方向键每次调整 10px，下限仍为 80px；Vue Drawer 优先保留调用方 aria-describedby。React Drawer 与 delay=0 的 Loading 在首次绘制前完成遮罩同步。
 
 Loading 有子节点时，React className 与 Vue className / class 统一只落到区域根，全屏时也如此。原先用这些类修饰区域遮罩或全屏浮层的调用方，应改用 background / style 设置遮罩样式。没有子节点时，类名仍落在指示器上。
