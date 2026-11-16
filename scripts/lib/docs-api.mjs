@@ -131,7 +131,7 @@ export const COMPONENT_PROP_PRIORITY = {
   Rate: ['allowHalf?', 'allowClear?', 'character?', 'readOnly?', 'disabled?', 'size?', 'count?'],
   Segmented: ['options?', 'block?', 'disabled?', 'size?', 'name?'],
   Watermark: ['content?', 'font?', 'gapX?', 'gapY?', 'image?', 'rotate?'],
-  Layout: ['hasSider?', 'fullHeight?', 'direction?'],
+  Layout: ['hasSider?', 'fullHeight?', 'mode?'],
   Header: ['variant?', 'height?'],
   Sidebar: ['collapsed?', 'width?', 'collapsedWidth?', 'side?'],
   Content: ['as?', 'padding?'],

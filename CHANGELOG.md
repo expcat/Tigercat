@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Layout 横排属性（文档 / MCP，C042-F01）**：生成笔记与优先字段改为公开的 `mode`。Layout 文档与 MCP 写 `mode=horizontal`，不再出现 `direction=horizontal`。
+
 - **Header 示例说明（Demo，C041-F01）**：两端 layout/01 改为写 blur 半透明顶栏，不再写未启用的 sticky 盖住滚动内容。
 
 - **Descriptions 属性、标题与组合语义（React / Vue，C039-F01、C039-F02、C039-F04、C039-F05）**：children/default slot 保留根属性与样式；Vue title slot 关联 table/dl 名称；空数据仍显示标题，有数据时保留 caption；DescriptionsItem 使用 dl 容纳 dt/dd。
