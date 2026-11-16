@@ -16,23 +16,14 @@ navigation 组 35 个组件（C082–C116）。审查时这一组同样没有浏
 
 ## 依赖与顺序
 
-- NavigationMenu：先 C102-F03，再做 Item、Link、List、Trigger 的条目。
 - Affix 的 16 格没有任何浏览器证据，见 [13](13-evidence.md) 的 E03。
 
 ## 概览
 
-本篇 38 条：P2 22、P3 16。
-按波次：W4 22、W9 16。
+本篇 37 条：P2 21、P3 16。
+按波次：W4 21、W9 16。
 
 已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C086-F03（S13）、C088-F05（S13）、C095-F02（S13）、C109-F06（S13）、C112-F01（S13）、C113-F01（S13）、C114-F04（S13）、C116-F05（S13）。
-
-## 波及多个组件的条目
-
-这些条目的行在下面各组件的表里。修的时候把右列的组件一起验。
-
-| 条目                                                    | 归属           | 同验                                   |
-| ------------------------------------------------------- | -------------- | -------------------------------------- |
-| C102-F03 React 现有 axe 用例命中 menubar 必需子角色违规 | NavigationMenu | NavigationMenuLink、NavigationMenuList |
 
 ## 条目
 
@@ -68,14 +59,6 @@ navigation 组 35 个组件（C082–C116）。审查时这一组同样没有浏
 | -------- | ---- | ---- | --------- | ---- | --------------------------------------- | ----------------------------------------------------------------------------------- |
 | C098-F04 | P3   | W9   | Core+测试 | 文档 | 数字 key 的注释与测试名反向描述实际契约 | menu-utils.ts 注释与 menu-controller.spec.ts 测试名均写明 1 与「1」不相等，断言不变 |
 
-### C102 NavigationMenu
-
-报告 `groups/navigation/NavigationMenu.md`，队列状态 needs-evidence。另受 S01、S04 影响。
-
-| 编号     | 级别 | 波次 | 端    | 类别   | 条目                                           | 验收                                                                       |
-| -------- | ---- | ---- | ----- | ------ | ---------------------------------------------- | -------------------------------------------------------------------------- |
-| C102-F03 | P2   | W4   | React | 无障碍 | React 现有 axe 用例命中 menubar 必需子角色违规 | TIGER_A11Y=1 下 React NavigationMenu spec 的 axe 用例通过（现 29 过 1 败） |
-
 ### C104 NavigationMenuItem
 
 报告 `groups/navigation/NavigationMenuItem.md`，队列状态 needs-evidence。另受 S01、S02、S07 影响。
@@ -87,7 +70,7 @@ navigation 组 35 个组件（C082–C116）。审查时这一组同样没有浏
 
 ### C105 NavigationMenuLink
 
-报告 `groups/navigation/NavigationMenuLink.md`，队列状态 needs-evidence。另受 S01、S02、C102-F03 影响。
+报告 `groups/navigation/NavigationMenuLink.md`，队列状态 needs-evidence。另受 S01、S02 影响。
 
 | 编号     | 级别 | 波次 | 端   | 类别 | 条目                                  | 验收                                                                                    |
 | -------- | ---- | ---- | ---- | ---- | ------------------------------------- | --------------------------------------------------------------------------------------- |
@@ -95,7 +78,7 @@ navigation 组 35 个组件（C082–C116）。审查时这一组同样没有浏
 
 ### C106 NavigationMenuList
 
-报告 `groups/navigation/NavigationMenuList.md`，队列状态 needs-evidence。另受 S02、C102-F03、C104-F02 影响。
+报告 `groups/navigation/NavigationMenuList.md`，队列状态 needs-evidence。另受 S02、C104-F02 影响。
 
 | 编号     | 级别 | 波次 | 端    | 类别 | 条目                                                 | 验收                                                                               |
 | -------- | ---- | ---- | ----- | ---- | ---------------------------------------------------- | ---------------------------------------------------------------------------------- |
@@ -195,6 +178,6 @@ navigation 组 35 个组件（C082–C116）。审查时这一组同样没有浏
 | C090 | ContextMenuMenu       | `groups/navigation/ContextMenuMenu.md`       | S02                |
 | C091 | ContextMenuSub        | `groups/navigation/ContextMenuSub.md`        | S02、S07           |
 | C094 | DropdownMenu          | `groups/navigation/DropdownMenu.md`          | S02                |
-| C103 | NavigationMenuContent | `groups/navigation/NavigationMenuContent.md` | S02、S07、C102-F01 |
+| C103 | NavigationMenuContent | `groups/navigation/NavigationMenuContent.md` | S02、S07           |
 | C112 | Steps                 | `groups/navigation/Steps.md`                 | S01、S04、S08      |
 | C113 | StepsItem             | `groups/navigation/StepsItem.md`             | S01、S02、S04、S08 |

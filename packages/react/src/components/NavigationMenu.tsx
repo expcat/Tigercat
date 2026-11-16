@@ -600,11 +600,7 @@ export const NavigationMenuContent: React.FC<NavigationMenuContentProps> = ({
     </div>
   )
 
-  return isOpen && portalEnabled ? (
-    <OverlayPortal target={overlay.target}>{popup}</OverlayPortal>
-  ) : (
-    popup
-  )
+  return portalEnabled ? <OverlayPortal target={overlay.target}>{popup}</OverlayPortal> : popup
 }
 
 export interface NavigationMenuItemProps

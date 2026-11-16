@@ -171,12 +171,12 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | C099 | MenuItem              | needs-evidence | F01–F04 已修复并通过定向自动门禁；原 Demo（owner C098）视觉 40 blocked、原生键盘 40 blocked、截图 0；无专属 E2E；hydration 未测                                           |
 | C100 | MenuItemGroup         | needs-evidence | Demo（owner C098）视觉 40 blocked、原生键盘 40 blocked、截图 0；TIGER_A11Y=1 下 79 项 2 failed（归 C098-F01）；无专属 E2E；hydration、读屏未测                            |
 | C101 | SubMenu               | needs-evidence | 视觉 0/40 blocked；原生键盘 0/40 blocked；截图 0；无专属 E2E；SSR 字符串无警告，hydration 未测；TIGER_A11Y 79 项 77 passed/2 failed；读屏、RTL 几何未测                   |
-| C102 | NavigationMenu        | needs-evidence | 视觉 0/16 blocked；原生键盘 0/16 blocked；截图 0；E2E、SSR 未跑；TIGER_A11Y 100 项 99 passed/1 failed（React axe）；RTL 几何未测                                          |
-| C103 | NavigationMenuContent | needs-evidence | 视觉 0/16 blocked；原生键盘 0/16 blocked；截图 0；E2E 未执行；SSR/hydration 未跑且无专项覆盖；定向测试 100 项 99 passed/1 failed（C102-F03）                              |
-| C104 | NavigationMenuItem    | needs-evidence | 视觉 0/16 blocked；原生键盘 0/16 blocked；截图 0；E2E 未执行；SSR/hydration 未跑且无专项覆盖；定向测试 100 项 99 passed/1 failed（C102-F03）                              |
-| C105 | NavigationMenuLink    | needs-evidence | 视觉 0/16 blocked；原生键盘 0/16 blocked；截图 0；E2E 未执行；SSR/hydration 未跑且无专项覆盖；定向测试 104 项 103 passed/1 failed（C102-F03）                             |
-| C106 | NavigationMenuList    | needs-evidence | 视觉 0/16 blocked；原生键盘 0/16 blocked；截图 0；E2E 未执行；SSR/hydration 未跑；定向测试 114 项 113 passed/1 failed（C102-F03）；真实像素与 resize 未测                 |
-| C107 | NavigationMenuTrigger | needs-evidence | 视觉 0/16 blocked；原生键盘 0/16 blocked；截图 0；E2E 未执行；SSR/hydration、w9-t07 未跑；定向测试 74 项 73 passed/1 failed（C102-F03）；无浏览器清单                     |
+| C102 | NavigationMenu        | needs-evidence | 视觉 0/16 blocked；原生键盘 0/16 blocked；截图 0；E2E、SSR 未跑；React NavigationMenu 组合的 TIGER_A11Y=1 单文件 33 项通过；RTL 几何未测                                  |
+| C103 | NavigationMenuContent | needs-evidence | 视觉 0/16 blocked；原生键盘 0/16 blocked；截图 0；E2E 未执行；SSR/hydration 未跑且无专项覆盖；React NavigationMenu 组合的 TIGER_A11Y=1 单文件 33 项通过                   |
+| C104 | NavigationMenuItem    | needs-evidence | 视觉 0/16 blocked；原生键盘 0/16 blocked；截图 0；E2E 未执行；SSR/hydration 未跑且无专项覆盖；React NavigationMenu 组合的 TIGER_A11Y=1 单文件 33 项通过                   |
+| C105 | NavigationMenuLink    | needs-evidence | 视觉 0/16 blocked；原生键盘 0/16 blocked；截图 0；E2E 未执行；SSR/hydration 未跑且无专项覆盖；React NavigationMenu 组合的 TIGER_A11Y=1 单文件 33 项通过                   |
+| C106 | NavigationMenuList    | needs-evidence | 视觉 0/16 blocked；原生键盘 0/16 blocked；截图 0；E2E 未执行；SSR/hydration 未跑；React NavigationMenu 组合的 TIGER_A11Y=1 单文件 33 项通过；真实像素与 resize 未测       |
+| C107 | NavigationMenuTrigger | needs-evidence | 视觉 0/16 blocked；原生键盘 0/16 blocked；截图 0；E2E 未执行；SSR/hydration、w9-t07 未跑；React NavigationMenu 组合的 TIGER_A11Y=1 单文件 33 项通过；无浏览器清单         |
 | C108 | PageHeader            | needs-evidence | 视觉 0/32 blocked；原生键盘 0/32 blocked；截图空；无 PageHeader E2E；SSR/hydration、w9-t07 未跑；测试 38 passed；happy-dom 探针 1 passed；无浏览器清单                    |
 | C109 | Pagination            | needs-evidence | 视觉 0/40 blocked；原生键盘 0/40 blocked；截图空；无 Pagination E2E；SSR/hydration、w9-t07 未跑；测试 54 passed；happy-dom 探针 1 passed；无浏览器清单                    |
 | C110 | ScrollSpy             | needs-evidence | 视觉 0/16 blocked；原生键盘 0/16 blocked；截图空；无 E2E；SSR 仅探针静态渲染，hydration 未跑；测试 87 passed，w9-t07 1 passed/14 skipped；无浏览器清单                    |
@@ -325,7 +325,7 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | C082 | Affix                 | C082-F01/F02 已修复并同验 Anchor、AnchorLink；Anchor 启用 affix 时用 Affix 包裹 nav 且只传 offsetTop。待验证观察：自定义滚动根移动后仅发 window scroll 未更新固定 top，原生 IntersectionObserver 是否补通知未验证，未登记为缺陷                         |
 | C091 | ContextMenuSub        | 待验证：展开后把 disabled 改为 true，4 组仍 aria-expanded=true 且 popup 保留（expanded 不含 disabled），Core 未定义预期，未立项。X01-F017 原判保留未重演。Sub 用例只测开合键                                                                            |
 | C092 | Dropdown              | X02-F001 只确认 chevron 消费链，未证可见失效；Vue 递归 schema 子菜单 role=null、ArrowRight 不展开且不继承外层 portal（未编号观察）；实际消费者含 SplitButton/DataExport/Tabs/WorkflowTimeline                                                           |
-| C103 | NavigationMenuContent | 无独立主责文件与 Demo；4 个 Demo 均未开 viewport，恢复浏览器后仍需另行覆盖；C102-F02/F03 原判保留，失败目标不在 Content；React useFloating 在 floating ref 缺失时逐帧重试，无性能实测、未立项                                                           |
+| C103 | NavigationMenuContent | 无独立主责文件与 Demo；4 个 Demo 均未开 viewport，恢复浏览器后仍需另行覆盖；React useFloating 在 floating ref 缺失时逐帧重试，无性能实测、未立项                                                                                                        |
 | C108 | PageHeader            | 22 个主责文件与 8/8 Demo 已读；labels.backAriaLabel 传空串会覆盖 locale 并落到英文 Back（边角，未立项）；AppShell 内 header 在 main 中不是 banner，不记缺陷；Vue subTitle 同为 Boolean 判断但未探针                                                     |
 | C110 | ScrollSpy             | 14 个主责文件与 4/4 Demo 已读；与 Anchor 共享 createAnchorObserver；其注释称无 IntersectionObserver 时返回空函数，实际仍挂 scroll/resize（未立项）；DOM 直写 aria-label 会被 locale 默认值盖住                                                          |
 | C111 | Spotlight             | 现有测试未覆盖 hotkey false→true、搜索框上的切换热键、已注册图标名、带查询的 recent 顺序、SSR 首帧 aria-activedescendant；有可见标题时调用方 aria-label 被 aria-labelledby 取代（与现有 locale 测试一致，未立项）                                       |
