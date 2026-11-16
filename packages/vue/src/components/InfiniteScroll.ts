@@ -28,6 +28,7 @@ import {
   infiniteScrollLoaderClasses,
   infiniteScrollEndClasses,
   infiniteScrollSentinelClasses,
+  infiniteScrollContainerFocusClasses,
   type TigerLocale
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './tiger-config'
@@ -77,6 +78,7 @@ export const InfiniteScroll = defineComponent({
     const containerClasses = computed(() =>
       classNames(
         getInfiniteScrollContainerClasses(props.orientation, props.className),
+        props.root === 'container' ? infiniteScrollContainerFocusClasses : undefined,
         coerceClassValue(attrs.class)
       )
     )
@@ -255,8 +257,16 @@ export const InfiniteScroll = defineComponent({
         props.endText,
         mergedLocale.value?.common?.noMoreText
       )
-      const errorName = resolveLocaleText('Could not load more', props.errorText, props.errorText)
-      const retryName = resolveLocaleText('Retry', props.retryText, props.retryText)
+      const errorName = resolveLocaleText(
+        'Could not load more',
+        props.errorText,
+        mergedLocale.value?.infiniteScroll?.errorText
+      )
+      const retryName = resolveLocaleText(
+        'Retry',
+        props.retryText,
+        mergedLocale.value?.infiniteScroll?.retryText
+      )
       const end =
         !props.hasMore && !props.loading && !props.error
           ? h(
@@ -302,6 +312,7 @@ export const InfiniteScroll = defineComponent({
         'div',
         {
           ...restAttrs,
+          ...(props.root === 'container' ? { tabindex: 0 } : {}),
           ref: containerRef,
           class: containerClasses.value,
           style: mergeStyleValues(

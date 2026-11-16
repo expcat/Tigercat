@@ -212,6 +212,72 @@ describe('MarkdownEditor', () => {
     })
   })
 
+  describe('narrow split and input', () => {
+    async function withNarrowViewport<T>(run: () => Promise<T>): Promise<T> {
+      const previous = globalThis.matchMedia
+      const stub = (query: string) =>
+        ({
+          matches: query.includes('767px'),
+          media: query,
+          onchange: null,
+          addEventListener: () => undefined,
+          removeEventListener: () => undefined,
+          addListener: () => undefined,
+          removeListener: () => undefined,
+          dispatchEvent: () => false
+        }) as MediaQueryList
+      globalThis.matchMedia = stub
+      try {
+        return await run()
+      } finally {
+        globalThis.matchMedia = previous
+      }
+    }
+
+    it('switches edit and preview panes when the mode switch is off', async () => {
+      await withNarrowViewport(async () => {
+        const { getByRole, container } = renderEditor({
+          mode: 'split',
+          showModeSwitch: false,
+          toolbar: false,
+          value: '# Hello'
+        })
+        expect(getByRole('button', { name: 'Edit' })).toBeTruthy()
+        expect(getByRole('button', { name: 'Preview' })).toBeTruthy()
+        expect(container.querySelector('textarea')).toBeTruthy()
+        fireEvent.click(getByRole('button', { name: 'Preview' }))
+        expect(container.querySelector('[aria-label="Markdown preview"]')).toBeTruthy()
+        expect(container.querySelector('textarea')).toBeNull()
+      })
+    })
+
+    it('focuses its own textarea from the outline button', () => {
+      const { container, getByRole } = render(
+        <div>
+          <textarea id="other" defaultValue="abcdef" />
+          <MarkdownEditor value="# Hello" bind={{}} />
+        </div>
+      )
+      const other = container.querySelector('#other') as HTMLTextAreaElement
+      other.setSelectionRange(3, 3)
+      fireEvent.click(getByRole('button', { name: 'Hello' }))
+      const editor = container.querySelectorAll('textarea')[1] as HTMLTextAreaElement
+      expect(document.activeElement).toBe(editor)
+      expect(other.selectionStart).toBe(3)
+      expect(other.selectionEnd).toBe(3)
+    })
+
+    it('does not apply format hotkeys during composition', () => {
+      const onChange = vi.fn()
+      const { getByRole } = renderEditor({ value: 'hello', onChange })
+      const textarea = getByRole('textbox') as HTMLTextAreaElement
+      textarea.setSelectionRange(0, 5)
+      fireEvent.compositionStart(textarea)
+      fireEvent.keyDown(textarea, { key: 'b', ctrlKey: true })
+      expect(onChange).not.toHaveBeenCalled()
+    })
+  })
+
   describe('Accessibility', () => {
     it('labels editor and preview regions', () => {
       const { container } = renderEditor()

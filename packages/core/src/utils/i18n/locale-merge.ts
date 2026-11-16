@@ -33,6 +33,7 @@ export const TIGER_LOCALE_KEY_SET = {
   descriptions: true,
   list: true,
   scrollArea: true,
+  infiniteScroll: true,
   printLayout: true,
   timeline: true,
   workflowTimeline: true,

@@ -37,6 +37,10 @@ export const ptBR: TigerLocale = {
     moreOptionsText: 'Mais opções',
     confirmTitle: 'Tem certeza de que deseja continuar?'
   },
+  infiniteScroll: {
+    errorText: 'Não foi possível carregar mais',
+    retryText: 'Tentar novamente'
+  },
   empty: {
     noData: 'Sem dados',
     noDataAvailable: 'Nenhum dado disponível',

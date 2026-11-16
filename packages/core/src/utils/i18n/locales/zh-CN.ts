@@ -36,6 +36,10 @@ export const zhCN: TigerLocale = {
     moreOptionsText: '更多操作',
     confirmTitle: '确定要执行此操作吗？'
   },
+  infiniteScroll: {
+    errorText: '无法加载更多',
+    retryText: '重试'
+  },
   empty: {
     noData: '暂无数据',
     noDataAvailable: '暂无可用数据',

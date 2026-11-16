@@ -37,6 +37,10 @@ export const zhTW: TigerLocale = {
     moreOptionsText: '更多選項',
     confirmTitle: '確定要執行此操作嗎？'
   },
+  infiniteScroll: {
+    errorText: '無法載入更多',
+    retryText: '重試'
+  },
   empty: {
     noData: '暫無資料',
     noDataAvailable: '暫無可用資料',

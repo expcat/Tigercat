@@ -37,6 +37,10 @@ export const arSA: TigerLocale = {
     moreOptionsText: 'المزيد من الخيارات',
     confirmTitle: 'هل أنت متأكد أنك تريد المتابعة؟'
   },
+  infiniteScroll: {
+    errorText: 'تعذر تحميل المزيد',
+    retryText: 'إعادة المحاولة'
+  },
   empty: {
     noData: 'لا توجد بيانات',
     noDataAvailable: 'لا توجد بيانات متاحة',

@@ -37,6 +37,10 @@ export const idID: TigerLocale = {
     moreOptionsText: 'Opsi lainnya',
     confirmTitle: 'Yakin ingin melanjutkan?'
   },
+  infiniteScroll: {
+    errorText: 'Tidak dapat memuat lebih banyak',
+    retryText: 'Coba lagi'
+  },
   empty: {
     noData: 'Tidak ada data',
     noDataAvailable: 'Tidak ada data tersedia',

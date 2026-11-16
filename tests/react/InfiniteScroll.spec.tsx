@@ -2,6 +2,8 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, waitFor } from '@testing-library/react'
 import React from 'react'
 import { InfiniteScroll } from '@expcat/tigercat-react/InfiniteScroll'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { expectNoA11yViolations } from '../utils/react'
 
 describe('InfiniteScroll (React)', () => {
@@ -220,6 +222,47 @@ describe('InfiniteScroll (React)', () => {
     )
     await Promise.resolve()
     expect(onLoadMore).not.toHaveBeenCalled()
+  })
+
+  it('uses zh-CN for the error and retry, and prefers errorText', () => {
+    const localized = render(
+      <ConfigProvider locale={zhCN}>
+        <InfiniteScroll error hasMore />
+      </ConfigProvider>
+    )
+    expect(localized.getByRole('alert', { name: '无法加载更多' })).toBeTruthy()
+    expect(localized.getByRole('button', { name: '重试' })).toBeTruthy()
+    localized.unmount()
+
+    const overridden = render(
+      <ConfigProvider locale={zhCN}>
+        <InfiniteScroll error errorText="加载失败" />
+      </ConfigProvider>
+    )
+    expect(overridden.getByRole('alert', { name: '加载失败' })).toBeTruthy()
+    expect(overridden.queryByRole('alert', { name: '无法加载更多' })).toBeNull()
+  })
+
+  it('focuses a container scroll root and leaves the viewport root out of tab order', () => {
+    const containerRoot = render(
+      <InfiniteScroll root="container" hasMore={false} error={false}>
+        <div>Row</div>
+      </InfiniteScroll>
+    )
+    const scroller = containerRoot.container.firstElementChild as HTMLElement
+    expect(scroller.getAttribute('tabindex')).toBe('0')
+    expect(scroller.className).toContain('focus-visible:outline')
+    scroller.focus()
+    expect(document.activeElement).toBe(scroller)
+    containerRoot.unmount()
+
+    const viewport = render(
+      <InfiniteScroll hasMore={false} error={false}>
+        <div>Row</div>
+      </InfiniteScroll>
+    )
+    const viewportRoot = viewport.container.firstElementChild as HTMLElement
+    expect(viewportRoot.hasAttribute('tabindex')).toBe(false)
   })
 
   describe('Accessibility', () => {

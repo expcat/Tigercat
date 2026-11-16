@@ -1,6 +1,8 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render } from '@testing-library/vue'
 import { InfiniteScroll } from '@expcat/tigercat-vue/InfiniteScroll'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { h, nextTick } from 'vue'
 import { expectNoA11yViolations } from '../utils'
 import { MockIntersectionObserver } from '../utils/mock-observers'
@@ -231,6 +233,47 @@ describe('InfiniteScroll (Vue)', () => {
     await rerender({ hasMore: false, height: 288, onLoadMore })
     await Promise.resolve()
     expect(onLoadMore).not.toHaveBeenCalled()
+  })
+
+  it('uses zh-CN for the error and retry, and prefers errorText', () => {
+    const localized = render({
+      components: { ConfigProvider, InfiniteScroll },
+      template:
+        '<ConfigProvider :locale="locale"><InfiniteScroll :error="true" :has-more="true" /></ConfigProvider>',
+      setup: () => ({ locale: zhCN })
+    })
+    expect(localized.getByRole('alert', { name: '无法加载更多' })).toBeTruthy()
+    expect(localized.getByRole('button', { name: '重试' })).toBeTruthy()
+    localized.unmount()
+
+    const overridden = render({
+      components: { ConfigProvider, InfiniteScroll },
+      template:
+        '<ConfigProvider :locale="locale"><InfiniteScroll :error="true" error-text="加载失败" /></ConfigProvider>',
+      setup: () => ({ locale: zhCN })
+    })
+    expect(overridden.getByRole('alert', { name: '加载失败' })).toBeTruthy()
+    expect(overridden.queryByRole('alert', { name: '无法加载更多' })).toBeNull()
+  })
+
+  it('focuses a container scroll root and leaves the viewport root out of tab order', () => {
+    const containerRoot = render(InfiniteScroll, {
+      props: { root: 'container', hasMore: false, error: false },
+      slots: { default: () => h('div', {}, 'Row') }
+    })
+    const scroller = containerRoot.container.firstElementChild as HTMLElement
+    expect(scroller.getAttribute('tabindex')).toBe('0')
+    expect(scroller.className).toContain('focus-visible:outline')
+    scroller.focus()
+    expect(document.activeElement).toBe(scroller)
+    containerRoot.unmount()
+
+    const viewport = render(InfiniteScroll, {
+      props: { hasMore: false, error: false },
+      slots: { default: () => h('div', {}, 'Row') }
+    })
+    const viewportRoot = viewport.container.firstElementChild as HTMLElement
+    expect(viewportRoot.hasAttribute('tabindex')).toBe(false)
   })
 
   describe('Accessibility', () => {

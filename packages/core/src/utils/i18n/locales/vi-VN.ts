@@ -37,6 +37,10 @@ export const viVN: TigerLocale = {
     moreOptionsText: 'Thêm tùy chọn',
     confirmTitle: 'Bạn có chắc muốn tiếp tục?'
   },
+  infiniteScroll: {
+    errorText: 'Không tải thêm được',
+    retryText: 'Thử lại'
+  },
   empty: {
     noData: 'Không có dữ liệu',
     noDataAvailable: 'Không có dữ liệu khả dụng',

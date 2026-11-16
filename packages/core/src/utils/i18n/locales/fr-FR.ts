@@ -37,6 +37,10 @@ export const frFR: TigerLocale = {
     moreOptionsText: 'Plus d’options',
     confirmTitle: 'Voulez-vous vraiment continuer ?'
   },
+  infiniteScroll: {
+    errorText: 'Impossible de charger davantage',
+    retryText: 'Réessayer'
+  },
   empty: {
     noData: 'Aucune donnée',
     noDataAvailable: 'Aucune donnée disponible',

@@ -14,7 +14,8 @@ import {
   getInfiniteScrollChromeClasses,
   infiniteScrollLoaderClasses,
   infiniteScrollEndClasses,
-  infiniteScrollSentinelClasses
+  infiniteScrollSentinelClasses,
+  infiniteScrollContainerFocusClasses
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './tiger-config'
 
@@ -64,8 +65,12 @@ export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
   const anchorStartRef = useRef<number | null>(null)
 
   const containerClasses = useMemo(
-    () => getInfiniteScrollContainerClasses(orientation, className),
-    [orientation, className]
+    () =>
+      classNames(
+        getInfiniteScrollContainerClasses(orientation, className),
+        root === 'container' ? infiniteScrollContainerFocusClasses : undefined
+      ),
+    [orientation, className, root]
   )
 
   const requestLoad = useCallback(() => {
@@ -192,8 +197,12 @@ export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
   ) : null
 
   const endName = resolveLocaleText('No more data', endText, mergedLocale?.common?.noMoreText)
-  const errorName = resolveLocaleText('Could not load more', errorText, errorText)
-  const retryName = resolveLocaleText('Retry', retryText, retryText)
+  const errorName = resolveLocaleText(
+    'Could not load more',
+    errorText,
+    mergedLocale?.infiniteScroll?.errorText
+  )
+  const retryName = resolveLocaleText('Retry', retryText, mergedLocale?.infiniteScroll?.retryText)
   const endEl =
     !hasMore && !loading && !error ? (
       <div
@@ -234,6 +243,7 @@ export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
   return (
     <div
       {...rest}
+      {...(root === 'container' ? { tabIndex: 0 } : {})}
       ref={containerRef}
       className={classNames(containerClasses)}
       style={{ ...style, ...(height !== undefined ? { height: `${height}px` } : {}) }}

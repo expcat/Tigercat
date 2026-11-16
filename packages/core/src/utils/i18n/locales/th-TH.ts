@@ -37,6 +37,10 @@ export const thTH: TigerLocale = {
     moreOptionsText: 'ตัวเลือกเพิ่มเติม',
     confirmTitle: 'คุณแน่ใจหรือไม่ว่าต้องการดำเนินการต่อ?'
   },
+  infiniteScroll: {
+    errorText: 'โหลดเพิ่มไม่ได้',
+    retryText: 'ลองอีกครั้ง'
+  },
   empty: {
     noData: 'ไม่มีข้อมูล',
     noDataAvailable: 'ไม่มีข้อมูลที่ใช้ได้',

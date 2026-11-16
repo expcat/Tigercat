@@ -1348,6 +1348,13 @@ export interface TigerLocaleAssigneePicker {
   listAriaLabel?: string
 }
 
+export interface TigerLocaleInfiniteScroll {
+  /** Error text when the next page fails to load. Not the top loading bar. */
+  errorText?: string
+  /** Retry control shown with the infinite-scroll error. */
+  retryText?: string
+}
+
 export interface TigerLocale {
   assigneePicker?: TigerLocaleAssigneePicker
   /** BCP 47 locale identifier, for Intl formatting and direction inference. */
@@ -1370,6 +1377,7 @@ export interface TigerLocale {
   list?: TigerLocaleList
   masonry?: TigerLocaleMasonry
   scrollArea?: TigerLocaleScrollArea
+  infiniteScroll?: TigerLocaleInfiniteScroll
   printLayout?: TigerLocalePrintLayout
   timeline?: TigerLocaleTimeline
   workflowTimeline?: TigerLocaleWorkflowTimeline

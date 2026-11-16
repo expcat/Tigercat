@@ -4,7 +4,7 @@
 
 import { describe, it, expect } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
-import { h } from 'vue'
+import { h, nextTick } from 'vue'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { MarkdownEditor } from '@expcat/tigercat-vue/MarkdownEditor'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
@@ -211,6 +211,73 @@ describe('MarkdownEditor', () => {
 
       expect((container.querySelector('textarea') as HTMLTextAreaElement).value).toBe('')
       expect(container.querySelector('[aria-label="Markdown preview"]')?.textContent).toBe('')
+    })
+  })
+
+  describe('narrow split and input', () => {
+    async function withNarrowViewport<T>(run: () => Promise<T>): Promise<T> {
+      const previous = globalThis.matchMedia
+      const stub = (query: string) =>
+        ({
+          matches: query.includes('767px'),
+          media: query,
+          onchange: null,
+          addEventListener: () => undefined,
+          removeEventListener: () => undefined,
+          addListener: () => undefined,
+          removeListener: () => undefined,
+          dispatchEvent: () => false
+        }) as MediaQueryList
+      globalThis.matchMedia = stub
+      try {
+        return await run()
+      } finally {
+        globalThis.matchMedia = previous
+      }
+    }
+
+    it('switches edit and preview panes when the mode switch is off', async () => {
+      await withNarrowViewport(async () => {
+        const { getByRole, container } = renderEditor({
+          mode: 'split',
+          showModeSwitch: false,
+          toolbar: false,
+          modelValue: '# Hello'
+        })
+        await nextTick()
+        expect(getByRole('button', { name: 'Edit' })).toBeTruthy()
+        expect(getByRole('button', { name: 'Preview' })).toBeTruthy()
+        expect(container.querySelector('textarea')).toBeTruthy()
+        await fireEvent.click(getByRole('button', { name: 'Preview' }))
+        expect(container.querySelector('[aria-label="Markdown preview"]')).toBeTruthy()
+        expect(container.querySelector('textarea')).toBeNull()
+      })
+    })
+
+    it('focuses its own textarea from the outline button', async () => {
+      const { container, getByRole } = render({
+        components: { MarkdownEditor },
+        template:
+          '<div><textarea id="other">abcdef</textarea><MarkdownEditor :model-value="value" :bind="bind" /></div>',
+        setup: () => ({ value: '# Hello', bind: {} })
+      })
+      const other = container.querySelector('#other') as HTMLTextAreaElement
+      other.setSelectionRange(3, 3)
+      await fireEvent.click(getByRole('button', { name: 'Hello' }))
+      const editor = container.querySelectorAll('textarea')[1] as HTMLTextAreaElement
+      expect(document.activeElement).toBe(editor)
+      expect(other.selectionStart).toBe(3)
+      expect(other.selectionEnd).toBe(3)
+    })
+
+    it('does not apply format hotkeys during composition', async () => {
+      const { getByRole, emitted } = renderEditor({ modelValue: 'hello' })
+      const textarea = getByRole('textbox') as HTMLTextAreaElement
+      textarea.setSelectionRange(0, 5)
+      await fireEvent.compositionStart(textarea)
+      await fireEvent.keyDown(textarea, { key: 'b', ctrlKey: true })
+      expect(emitted()['update:modelValue']).toBeUndefined()
+      expect(emitted().change).toBeUndefined()
     })
   })
 

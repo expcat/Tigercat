@@ -37,6 +37,10 @@ export const jaJP: TigerLocale = {
     moreOptionsText: 'その他の操作',
     confirmTitle: 'この操作を実行しますか？'
   },
+  infiniteScroll: {
+    errorText: 'これ以上読み込めません',
+    retryText: '再試行'
+  },
   empty: {
     noData: 'データなし',
     noDataAvailable: '利用できるデータがありません',

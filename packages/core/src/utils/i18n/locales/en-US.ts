@@ -36,6 +36,10 @@ export const enUS: TigerLocale = {
     loadingFailedText: 'Loading failed',
     viewText: 'View'
   },
+  infiniteScroll: {
+    errorText: 'Could not load more',
+    retryText: 'Retry'
+  },
   empty: {
     noData: 'No data',
     noDataAvailable: 'No data available',

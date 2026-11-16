@@ -71,6 +71,7 @@ export interface VueMarkdownEditorProps {
   locale?: Partial<TigerLocale>
   labels?: Partial<TigerLocaleMarkdownEditor>
   className?: string
+  bind?: { html?: string; lockScroll?: boolean }
   style?: Record<string, string | number>
   tabSize?: number
   ariaLabel?: string
@@ -311,7 +312,7 @@ export const MarkdownEditor = defineComponent({
       }
       if (event.key !== 'Tab') allowTabExit.value = false
 
-      if (props.readOnly || effectiveDisabled.value) return
+      if (props.readOnly || effectiveDisabled.value || composing.value) return
       const match = findMarkdownHotkeyMatch(toolbarItems.value, event)
       if (match) {
         event.preventDefault()
@@ -481,6 +482,34 @@ export const MarkdownEditor = defineComponent({
           )
         : null
 
+      const narrowSwitch =
+        narrow.value && currentMode.value === 'split'
+          ? h('div', { class: markdownEditorToolbarGroupClasses }, [
+              h(
+                'button',
+                {
+                  type: 'button',
+                  class: getMarkdownToolbarButtonClasses(narrowPane.value === 'edit'),
+                  onClick: () => {
+                    narrowPane.value = 'edit'
+                  }
+                },
+                labels.value.showEditorText
+              ),
+              h(
+                'button',
+                {
+                  type: 'button',
+                  class: getMarkdownToolbarButtonClasses(narrowPane.value === 'preview'),
+                  onClick: () => {
+                    narrowPane.value = 'preview'
+                  }
+                },
+                labels.value.showPreviewText
+              )
+            ])
+          : null
+
       return h(
         'div',
         {
@@ -504,11 +533,10 @@ export const MarkdownEditor = defineComponent({
                         type: 'button',
                         'data-toc': heading.text,
                         onClick: () => {
-                          const area = document.querySelector('textarea')
-                          if (area instanceof HTMLTextAreaElement) {
-                            area.focus()
-                            area.setSelectionRange(heading.index, heading.index)
-                          }
+                          const area = textareaRef.value
+                          if (!area) return
+                          area.focus()
+                          area.setSelectionRange(heading.index, heading.index)
                         }
                       },
                       heading.text
@@ -544,6 +572,7 @@ export const MarkdownEditor = defineComponent({
               )
             : null,
           toolbarNode,
+          narrowSwitch,
           h('div', { class: getMarkdownBodyClasses(showEditor.value && showPreview.value) }, [
             textareaNode,
             previewNode

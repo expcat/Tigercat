@@ -37,6 +37,10 @@ export const deDE: TigerLocale = {
     moreOptionsText: 'Weitere Optionen',
     confirmTitle: 'Möchten Sie fortfahren?'
   },
+  infiniteScroll: {
+    errorText: 'Weitere Inhalte konnten nicht geladen werden',
+    retryText: 'Erneut versuchen'
+  },
   empty: {
     noData: 'Keine Daten',
     noDataAvailable: 'Keine Daten verfügbar',

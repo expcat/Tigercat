@@ -1,7 +1,7 @@
 {
   "id": "infinite-scroll-01",
   "title": "增量加载",
-  "description": "容器必须定高（height 或 class）。第一页只有 3 条，不够高时会连拉到填满。文案走 locale.common。",
+  "description": "容器必须定高（height 或 class）。第一页 12 条，滚动根是容器。内容不满容器高度时不自动连拉。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

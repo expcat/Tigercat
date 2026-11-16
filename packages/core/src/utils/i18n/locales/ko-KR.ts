@@ -37,6 +37,10 @@ export const koKR: TigerLocale = {
     moreOptionsText: '추가 작업',
     confirmTitle: '이 작업을 계속하시겠습니까?'
   },
+  infiniteScroll: {
+    errorText: '더 불러올 수 없습니다',
+    retryText: '다시 시도'
+  },
   empty: {
     noData: '데이터 없음',
     noDataAvailable: '사용 가능한 데이터가 없습니다',

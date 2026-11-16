@@ -37,6 +37,10 @@ export const esES: TigerLocale = {
     moreOptionsText: 'Más opciones',
     confirmTitle: '¿Seguro que quieres continuar?'
   },
+  infiniteScroll: {
+    errorText: 'No se pudo cargar más',
+    retryText: 'Reintentar'
+  },
   empty: {
     noData: 'Sin datos',
     noDataAvailable: 'No hay datos disponibles',

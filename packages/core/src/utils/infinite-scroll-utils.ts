@@ -8,6 +8,9 @@
 
 export const infiniteScrollContainerClasses = 'tiger-infinite-scroll relative overflow-auto'
 
+export const infiniteScrollContainerFocusClasses =
+  'focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--tiger-focus-ring)]'
+
 export const infiniteScrollLoaderClasses =
   'flex items-center justify-center py-4 text-sm text-[var(--tiger-text-secondary)]'
 
