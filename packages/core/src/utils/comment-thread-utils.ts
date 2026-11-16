@@ -69,8 +69,41 @@ export const resolveCommentNodes = (
   nodes?: CommentNode[] | null,
   items?: CommentNode[]
 ): CommentTreeBuild => {
-  if (nodes != null) return { roots: nodes, errors: [] }
+  if (nodes != null) return sanitizeCommentNodes(nodes)
   return buildCommentTree(items ?? EMPTY_COMMENT_NODES)
+}
+
+const sanitizeCommentNodes = (nodes: CommentNode[]): CommentTreeBuild => {
+  const errors: CommentTreeError[] = []
+  const seen = new Set<string>()
+
+  const walk = (list: CommentNode[], path: Set<string>): CommentNode[] => {
+    const next: CommentNode[] = []
+    for (const node of list) {
+      const key = commentIdKey(node.id)
+      if (path.has(key)) {
+        errors.push({ code: 'cycle', id: key })
+        continue
+      }
+      if (seen.has(key)) {
+        errors.push({ code: 'duplicate-id', id: key })
+        continue
+      }
+      seen.add(key)
+      const children = node.children
+      if (!children || children.length === 0) {
+        next.push(node)
+        continue
+      }
+      path.add(key)
+      const walked = walk(children, path)
+      path.delete(key)
+      next.push({ ...node, children: walked })
+    }
+    return next
+  }
+
+  return { roots: walk(nodes, new Set()), errors }
 }
 
 export const buildCommentTree = (items: CommentNode[] = []): CommentTreeBuild => {

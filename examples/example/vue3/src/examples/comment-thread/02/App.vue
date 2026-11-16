@@ -48,13 +48,18 @@ const handleLike = (node: CommentNode, liked: boolean) => {
   activity.value = `${liked ? '点赞' : '取消点赞'}：${node.user?.name ?? node.id}`
 }
 
-const handleReply = (node: CommentNode, value: string) => {
+const handleReply = (node: CommentNode | undefined, value: string) => {
   const reply: CommentNode = {
     id: `reply-${nextReplyId++}`,
-    parentId: node.id,
+    parentId: node?.id,
     content: value,
     user: { name: '我' },
     time: '刚刚'
+  }
+  if (!node) {
+    comments.value = [...comments.value, reply]
+    activity.value = '已发布根评论'
+    return
   }
   comments.value = updateComments(comments.value, node.id, (item) => ({
     ...item,

@@ -96,7 +96,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
   showDivider = true,
   showLike = true,
   showReply = true,
-  showMore = false,
+  showMore: _showMore,
   showComposer = true,
   onLike,
   onReply,
@@ -341,7 +341,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
       )
     }
 
-    if (showMore && onMore) {
+    if (onMore) {
       actions.push(
         <Button
           key="more"
@@ -487,7 +487,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
                   value={replyValue}
                   placeholder={resolveLocaleText(labels.replyPlaceholder, replyPlaceholder)}
                   className={commentThreadReplyTextareaClasses}
-                  aria-label={resolveLocaleText(labels.replyText, replyText)}
+                  aria-label={resolveLocaleText(labels.replyPlaceholder, replyPlaceholder)}
                   onChange={setReplyValue}
                 />
                 <div className="flex items-center gap-2 justify-end">

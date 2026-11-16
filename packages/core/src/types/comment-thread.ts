@@ -235,8 +235,7 @@ export interface CommentThreadProps {
    */
   showReply?: boolean
   /**
-   * Show more action. Default off; the control is rendered when `onMore` is present.
-   * @default false
+   * More actions render when `onMore` is present. This flag does not hide them.
    */
   showMore?: boolean
   /**

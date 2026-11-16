@@ -96,6 +96,23 @@ describe('comment-thread-utils tree', () => {
     expect(tree.errors.some((error) => error.code === 'cycle')).toBe(true)
   })
 
+  it('reports duplicate ids and cycles in nodes', () => {
+    const duplicated = resolveCommentNodes([
+      { id: 'a', content: 'first' },
+      { id: 'a', content: 'second' }
+    ])
+    expect(duplicated.roots).toHaveLength(1)
+    expect(duplicated.roots[0]?.content).toBe('first')
+    expect(duplicated.errors).toEqual([{ code: 'duplicate-id', id: 'a' }])
+
+    const loop = { id: 'a', content: 'loop', children: [] as { id: string; content: string }[] }
+    loop.children = [loop]
+    const cycled = resolveCommentNodes([loop])
+    expect(cycled.errors).toEqual([{ code: 'cycle', id: 'a' }])
+    expect(cycled.roots).toHaveLength(1)
+    expect(cycled.roots[0]?.children).toEqual([])
+  })
+
   it('clips children past maxDepth and records clipped ids', () => {
     const clippedIds = new Set<string | number>()
     const clipped = clipCommentTreeDepth(

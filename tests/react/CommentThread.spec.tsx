@@ -422,6 +422,65 @@ describe('CommentThread (React)', () => {
     })
   })
 
+  it('names the inline reply box with replyPlaceholder', async () => {
+    const nodes: CommentNode[] = [{ id: 1, content: 'Root', user: { name: 'A' } }]
+    render(<CommentThread nodes={nodes} replyPlaceholder="写下回复" />)
+    await userEvent.click(screen.getByRole('button', { name: 'Reply' }))
+    expect(screen.getAllByRole('textbox', { name: '写下回复' })).toHaveLength(2)
+  })
+
+  it('keeps the root draft when onReply throws synchronously', async () => {
+    const nodes: CommentNode[] = [{ id: 'a', content: 'Root', user: { name: 'A' } }]
+    render(
+      <CommentThread
+        nodes={nodes}
+        onReply={() => {
+          throw new Error('nope')
+        }}
+      />
+    )
+    const input = screen.getByRole('textbox', { name: 'Write a reply...' }) as HTMLTextAreaElement
+    await userEvent.type(input, 'top')
+    await userEvent.click(screen.getByRole('button', { name: 'Send reply' }))
+    expect(input).toHaveValue('top')
+  })
+
+  it('shows More actions when only onMore is passed', async () => {
+    const onMore = vi.fn()
+    const nodes: CommentNode[] = [{ id: 1, content: 'Root', user: { name: 'A' } }]
+    render(
+      <CommentThread nodes={nodes} showComposer={false} moreText="More actions" onMore={onMore} />
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'More actions' }))
+    expect(onMore).toHaveBeenCalledTimes(1)
+  })
+
+  it('alerts when nodes repeat an id and renders one article', () => {
+    render(
+      <CommentThread
+        showComposer={false}
+        nodes={[
+          { id: 'a', content: 'first' },
+          { id: 'a', content: 'second' }
+        ]}
+      />
+    )
+    expect(screen.getByRole('alert')).toHaveTextContent('Duplicate comment id a')
+    expect(document.querySelectorAll('article[id$="-article-a"]')).toHaveLength(1)
+  })
+
+  it('posts a root comment from the 02 demo', async () => {
+    const { default: Demo } =
+      await import('../../examples/example/react/src/examples/comment-thread/02/App')
+    render(<Demo />)
+    const input = screen.getByRole('textbox', { name: 'Write a reply...' }) as HTMLTextAreaElement
+    await userEvent.type(input, 'top')
+    await userEvent.click(screen.getByRole('button', { name: 'Send reply' }))
+    expect(screen.getByText('top')).toBeInTheDocument()
+    await userEvent.click(screen.getAllByRole('button', { name: 'More' })[0]!)
+    expect(screen.getByText('打开 Ada 的更多操作')).toBeInTheDocument()
+  })
+
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(<CommentThread />)

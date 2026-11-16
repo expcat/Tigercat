@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **聊天窗与评论串（Core / React / Vue / Demo / 文档 / MCP，C173-F01、C173-F02、C173-F03、C174-F01、C174-F02、C174-F03、C174-F04、C174-F05）**：不传 virtual 时满 40 条自动开窗，传 false 仍是普通 log；类型注释和生成 Props 默认写 auto (>=40)。Vue 关掉自动滚动后，挂载一帧 scrollTop 为 0。React 虚拟模式下同一条正文从 hello 改成 hello world，礼貌区跟着更新。replyPlaceholder 为「写下回复」时，两端行内回复框 aria-label 也是「写下回复」。Vue 的 onReply 同步抛错后根草稿仍是 top。两端 02 从根输入框发送 top 后列表出现 top。只传 onMore 就显示 More actions。nodes 里两个 id 为 a 时 alert 为 Duplicate comment id a，且只有一篇 article。
+
 - **受理人选择器键盘、过滤与文档回写（Core / React / Vue / 文档 / MCP，C172-F01、C172-F02、C172-F03、C172-F04、C172-F05、C172-F06）**：搜索框方向键把活动项从 Ada 移到 Bea，名称不再与列表相同。点击 Cy 后 Enter 作用在 Cy，不会把 Bea 加进已选。三人名单搜索 zzz 显示 No results found，zh-CN 为「暂无结果」；options 为空仍是 The directory is empty /「目录为空」。选中 Cy 和 Bea 后搜索 Design 仍显示 2 selected。30 人按 End 时列表含 overflow-auto 和最大高度，最后一人滚进容器。生成 Props 与示例写明 Vue v-model:selected-ids 和 React onChange。
 
 - **动态流开窗与应用壳页签（Core / React / Vue / 文档 / MCP，C170-F02、C170-F03、C170-F04、C171-F01、C171-F02）**：开窗后自定义分组头仍显示 CUSTOM-HEADER。groupByDate 按调用方时区归组，UTC 下 2024-05-02T20:00:00.000Z 归到 2024-05-02，section 含 Evening。loadError 显示本地化说明和重试，zh-CN 为「无法加载更多动态。」和「重试」，点一次再请求 1 次。AppShell 正文只在选中的 tabpanel 内。breadcrumbExtra 与 tabsExtra 和数组一起渲染，空数组只留自定义节点。

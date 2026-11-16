@@ -501,7 +501,7 @@ export const CommentThread = defineComponent({
         )
       }
 
-      if (props.showMore && hasMoreHandler()) {
+      if (hasMoreHandler()) {
         actions.push(
           h(
             Button,
@@ -708,7 +708,10 @@ export const CommentThread = defineComponent({
                           props.replyPlaceholder
                         ),
                         className: commentThreadReplyTextareaClasses,
-                        'aria-label': labels.value.replyPlaceholder,
+                        'aria-label': resolveLocaleText(
+                          labels.value.replyPlaceholder,
+                          props.replyPlaceholder
+                        ),
                         'onUpdate:modelValue': (value: string) => {
                           replyValue.value = value
                         }

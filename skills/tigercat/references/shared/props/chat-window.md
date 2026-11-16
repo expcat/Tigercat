@@ -15,14 +15,14 @@ description: Compact generated Tigercat Composite props reference
 
 Uses: `Avatar`, `Textarea/Input`, `Button`, `VirtualList`, `Empty`.
 
-Note: `messages` 全受控，`onSend` 不 push。不绑发送时发送钮禁用。贴底才跟最新；`virtual` 时 VirtualList 是唯一 scroller，行高动态量。时间 `0` 合法。Vue `v-model` 只走 `update:modelValue`。
+Note: `messages` 全受控，`onSend` 不 push。不绑发送时发送钮禁用。贴底才跟最新；不传 `virtual` 时满 40 条自动开窗，传 `false` 关闭。`virtual` 时 VirtualList 是唯一 scroller，行高动态量。时间 `0` 合法。Vue `v-model` 只走 `update:modelValue`。
 
-| Prop                  | Type            | Default | Notes                                                                                      |
-| --------------------- | --------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `messages?`           | `ChatMessage[]` | `-`     | Message list                                                                               |
-| `virtual?`            | `boolean`       | `false` | Enable virtualized rendering for the message list. The VirtualList is the only scroller... |
-| `autoScrollToBottom?` | `boolean`       | `true`  | Follow the latest message only while the list is pinned to the bottom (within 32px) or...  |
-| `sendOnEnter?`        | `boolean`       | `true`  | Send on Enter                                                                              |
+| Prop                  | Type            | Default       | Notes                                                                                     |
+| --------------------- | --------------- | ------------- | ----------------------------------------------------------------------------------------- |
+| `messages?`           | `ChatMessage[]` | `-`           | Message list                                                                              |
+| `virtual?`            | `boolean`       | `auto (>=40)` | Virtual window opens automatically at 40 messages. Pass `false` to keep the plain log.... |
+| `autoScrollToBottom?` | `boolean`       | `true`        | Follow the latest message only while the list is pinned to the bottom (within 32px) or... |
+| `sendOnEnter?`        | `boolean`       | `true`        | Send on Enter                                                                             |
 
 ### Remaining props (complete public API)
 

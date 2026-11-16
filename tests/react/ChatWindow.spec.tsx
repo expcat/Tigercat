@@ -132,6 +132,40 @@ describe('ChatWindow (React)', () => {
     expect(bubbles.length).toBeGreaterThan(0)
     expect(bubbles.length).toBeLessThan(40)
   })
+
+  it('opens the virtual window at 40 messages unless virtual is false', () => {
+    const forty = Array.from({ length: 40 }, (_, i) => ({
+      id: String(i + 1),
+      content: 'm' + (i + 1)
+    }))
+    const opened = render(<ChatWindow messages={forty} />)
+    expect(opened.container.querySelector('[data-tiger-chat-scroller]')).toHaveAttribute(
+      'role',
+      'presentation'
+    )
+    opened.unmount()
+
+    const shortMessages = forty.slice(0, 39)
+    const short = render(<ChatWindow messages={shortMessages} />)
+    expect(short.container.querySelector('[data-tiger-chat-scroller]')).toHaveAttribute(
+      'role',
+      'log'
+    )
+    short.unmount()
+
+    const forced = render(<ChatWindow messages={forty} virtual={false} />)
+    expect(forced.container.querySelector('[data-tiger-chat-scroller]')).toHaveAttribute(
+      'role',
+      'log'
+    )
+  })
+
+  it('announces a virtual message content edit in the polite log', () => {
+    const view = render(<ChatWindow virtual messages={[{ id: 1, content: 'hello' }]} />)
+    expect(screen.getByRole('log')).not.toHaveTextContent('hello')
+    view.rerender(<ChatWindow virtual messages={[{ id: 1, content: 'hello world' }]} />)
+    expect(screen.getByRole('log')).toHaveTextContent('hello world')
+  })
   describe('locale', () => {
     it('uses ConfigProvider zh-CN for empty, send, placeholder, and failed status', () => {
       render(

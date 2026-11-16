@@ -57,13 +57,17 @@ export default function App() {
           setActivity(`${liked ? '点赞' : '取消点赞'}：${node.user?.name ?? node.id}`)
         }}
         onReply={(node, value) => {
-          if (!node) return
           const reply: CommentNode = {
             id: `reply-${nextReplyId.current++}`,
-            parentId: node.id,
+            parentId: node?.id,
             content: value,
             user: { name: '我' },
             time: '刚刚'
+          }
+          if (!node) {
+            setComments((current) => [...current, reply])
+            setActivity('已发布根评论')
+            return
           }
           setComments((current) =>
             updateComments(current, node.id, (item) => ({

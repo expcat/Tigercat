@@ -17,7 +17,7 @@ Runnable modules: `examples/example/vue3/src/examples/chat-window/01/`, `example
 
 Uses: `Avatar`, `Textarea/Input`, `Button`, `VirtualList`, `Empty`.
 
-Note: `messages` 全受控，`onSend` 不 push。不绑发送时发送钮禁用。贴底才跟最新；`virtual` 时 VirtualList 是唯一 scroller，行高动态量。时间 `0` 合法。Vue `v-model` 只走 `update:modelValue`。
+Note: `messages` 全受控，`onSend` 不 push。不绑发送时发送钮禁用。贴底才跟最新；不传 `virtual` 时满 40 条自动开窗，传 `false` 关闭。`virtual` 时 VirtualList 是唯一 scroller，行高动态量。时间 `0` 合法。Vue `v-model` 只走 `update:modelValue`。
 
 Vue: `<ChatWindow :messages="messages" @send="onSend" />`
 

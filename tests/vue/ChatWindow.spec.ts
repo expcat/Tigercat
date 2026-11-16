@@ -194,6 +194,50 @@ describe('ChatWindow (Vue)', () => {
     expect(bubbles.length).toBeLessThan(40)
   })
 
+  it('opens the virtual window at 40 messages unless virtual is false', () => {
+    const forty = createMessages(40)
+    const opened = render(ChatWindow, { props: { messages: forty } })
+    expect(getChatScroller(opened.container)).toHaveAttribute('role', 'presentation')
+    opened.unmount()
+
+    const short = render(ChatWindow, { props: { messages: createMessages(39) } })
+    expect(getChatScroller(short.container)).toHaveAttribute('role', 'log')
+    short.unmount()
+
+    const forced = render(ChatWindow, { props: { messages: forty, virtual: false } })
+    expect(getChatScroller(forced.container)).toHaveAttribute('role', 'log')
+  })
+
+  it('documents automatic virtualization once a thread reaches 40 messages', () => {
+    const source = readFileSync(resolve(process.cwd(), 'packages/core/src/types/chat.ts'), 'utf8')
+    const marker = 'virtual?: boolean'
+    const block = source.slice(
+      source.lastIndexOf('/**', source.indexOf(marker)),
+      source.indexOf(marker)
+    )
+    expect(block).toContain('40')
+    expect(block).not.toContain('@default false')
+    expect(block).toContain('@default auto (>=40)')
+
+    const props = readFileSync(
+      resolve(process.cwd(), 'skills/tigercat/references/shared/props/chat-window.md'),
+      'utf8'
+    )
+    expect(props).toContain('auto (>=40)')
+  })
+
+  it('announces a virtual message content edit in the polite log', async () => {
+    const { rerender } = render(ChatWindow, {
+      props: { virtual: true, messages: [{ id: 1, content: 'hello' }] }
+    })
+    await flushScrollFrames()
+    expect(screen.getByRole('log')).not.toHaveTextContent('hello')
+
+    await rerender({ virtual: true, messages: [{ id: 1, content: 'hello world' }] })
+    await flushScrollFrames()
+    expect(screen.getByRole('log')).toHaveTextContent('hello world')
+  })
+
   describe('locale', () => {
     it('uses ConfigProvider zh-CN for empty, send, placeholder, and failed status', () => {
       const Wrapper = defineComponent({
@@ -364,6 +408,17 @@ describe('ChatWindow (Vue)', () => {
       await flushScrollFrames()
 
       expect(scroller.scrollTop).toBe(400)
+    })
+
+    it('stays at the top on mount when autoScrollToBottom is false', async () => {
+      const messages = createMessages(8)
+      const { container } = render(ChatWindow, {
+        props: { messages, autoScrollToBottom: false }
+      })
+      const scroller = getChatScroller(container)
+      mockScrollerMetrics(scroller, { scrollHeight: 1000, clientHeight: 400 })
+      await flushScrollFrames()
+      expect(scroller.scrollTop).toBe(0)
     })
   })
 

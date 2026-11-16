@@ -1,7 +1,7 @@
 import {
-  callWithErrorHandling,
   camelize,
   ErrorCodes,
+  handleError,
   toHandlerKey,
   type ComponentInternalInstance
 } from 'vue'
@@ -71,7 +71,9 @@ export function hasEmitHandler(instance: ComponentInternalInstance | null, event
  * array handlers, once bookkeeping and Vue's sync error semantics. Listener
  * Promises are consumed exactly once here: the returned Promise settles after
  * every listener Promise settles and rejects with the first rejection.
- * Returns undefined when no listener returned a thenable.
+ * A synchronous throw is still reported through Vue, and the returned Promise
+ * rejects with that error so callers can keep a draft. Returns undefined when
+ * no listener threw and none returned a thenable.
  */
 export function emitWithReturn(
   instance: ComponentInternalInstance | null,
@@ -82,15 +84,22 @@ export function emitWithReturn(
   const { handler, onceHandler, handlerName } = resolveEmitHandlers(instance, event)
 
   const results: unknown[] = []
+  let syncError: unknown
+  const call = (listener: (...args: unknown[]) => unknown): void => {
+    try {
+      results.push(listener(...args))
+    } catch (error) {
+      if (syncError === undefined) syncError = error
+      handleError(error, instance, ErrorCodes.COMPONENT_EVENT_HANDLER)
+    }
+  }
   const invoke = (fn: unknown): void => {
     if (typeof fn === 'function') {
-      results.push(callWithErrorHandling(fn, instance, ErrorCodes.COMPONENT_EVENT_HANDLER, args))
+      call(fn as (...args: unknown[]) => unknown)
     } else if (Array.isArray(fn)) {
       for (const item of fn) {
         if (typeof item === 'function') {
-          results.push(
-            callWithErrorHandling(item, instance, ErrorCodes.COMPONENT_EVENT_HANDLER, args)
-          )
+          call(item as (...args: unknown[]) => unknown)
         }
       }
     }
@@ -108,6 +117,15 @@ export function emitWithReturn(
   }
 
   const pending = results.filter(isThenable)
+  if (syncError !== undefined) {
+    if (pending.length === 0) return Promise.reject(syncError)
+    return Promise.allSettled(pending).then((settled) => {
+      const rejected = settled.find((entry) => entry.status === 'rejected') as
+        PromiseRejectedResult | undefined
+      if (rejected) throw rejected.reason
+      throw syncError
+    })
+  }
   if (pending.length === 0) return undefined
   return Promise.allSettled(pending).then((settled) => {
     const rejected = settled.find((entry) => entry.status === 'rejected') as

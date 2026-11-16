@@ -194,11 +194,12 @@ export interface ChatWindowProps {
    */
   clearOnSend?: boolean
   /**
-   * Enable virtualized rendering for the message list. The VirtualList is the
-   * only scroller (`virtualHeight` is its viewport). Rows use dynamic height
-   * with `virtualItemHeight` as the estimate. The root must be given a height
-   * (`h-full min-h-0` or an explicit height) or the list will grow the page.
-   * @default false
+   * Virtual window opens automatically at 40 messages. Pass `false` to keep
+   * the plain log. The VirtualList is the only scroller (`virtualHeight` is
+   * its viewport). Rows use dynamic height with `virtualItemHeight` as the
+   * estimate. The root must be given a height (`h-full min-h-0` or an
+   * explicit height) or the list will grow the page.
+   * @default auto (>=40)
    */
   virtual?: boolean
   /**

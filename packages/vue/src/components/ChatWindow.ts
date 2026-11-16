@@ -253,7 +253,7 @@ export const ChatWindow = defineComponent({
 
     let seenIds = new Set<string>()
 
-    const applyScrollPlan = () => {
+    const applyScrollPlan = (announce = true) => {
       if (props.autoScrollToBottom === false) return
       const nextMessages = messages.value
       const ids = nextMessages.map((message) => message.id)
@@ -276,6 +276,7 @@ export const ChatWindow = defineComponent({
         }
       }
       seenIds = new Set(ids.filter((id) => id != null).map((id) => String(id)))
+      if (!announce) return
       const last = nextMessages[nextMessages.length - 1]
       if (last && virtualOn.value) liveText.value = String(last.content ?? '')
     }
@@ -330,7 +331,9 @@ export const ChatWindow = defineComponent({
       handleSend()
     }
 
-    onMounted(scrollToBottom)
+    onMounted(() => {
+      requestAnimationFrame(() => applyScrollPlan(false))
+    })
     watch(
       () =>
         [

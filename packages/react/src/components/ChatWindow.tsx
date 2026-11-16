@@ -123,7 +123,9 @@ export const ChatWindow = forwardRef<ChatWindowHandle, ChatWindowProps>(function
   const virtualListRef = useRef<VirtualListHandle | null>(null)
   const previousIdsRef = useRef(new Set<string>())
   const anchorIdRef = useRef<string | number | null>(null)
-  const seenLastIdRef = useRef<string | number | null | undefined>(undefined)
+  const seenLiveRef = useRef<{ id: string | number | null; content: unknown } | undefined>(
+    undefined
+  )
   const [liveText, setLiveText] = useState('')
   const [documentTimeZone, setDocumentTimeZone] = useState<string | null>(timeZone ?? null)
   const clockZone = timeZone ?? documentTimeZone
@@ -291,19 +293,21 @@ export const ChatWindow = forwardRef<ChatWindowHandle, ChatWindowProps>(function
     setDocumentTimeZone(readDocumentTimeZone())
   }, [timeZone])
 
-  const lastId = messages[messages.length - 1]?.id ?? null
+  const lastMessage = messages[messages.length - 1]
+  const lastId = lastMessage?.id ?? null
+  const lastContent = lastMessage?.content
 
   useEffect(() => {
-    if (seenLastIdRef.current === undefined) {
-      seenLastIdRef.current = lastId
+    if (seenLiveRef.current === undefined) {
+      seenLiveRef.current = { id: lastId, content: lastContent }
       return
     }
-    if (lastId !== seenLastIdRef.current) {
-      seenLastIdRef.current = lastId
-      const last = messages[messages.length - 1]
-      setLiveText(last ? String(last.content ?? '') : '')
-    }
-  }, [lastId, messages])
+    const previous = seenLiveRef.current
+    if (previous.id === lastId && Object.is(previous.content, lastContent)) return
+    seenLiveRef.current = { id: lastId, content: lastContent }
+    if (!virtualOn) return
+    setLiveText(lastMessage ? String(lastMessage.content ?? '') : '')
+  }, [lastContent, lastId, lastMessage, virtualOn])
 
   useEffect(() => {
     if (!autoScrollToBottom) return undefined

@@ -46,7 +46,7 @@ Note: `nodes` 一旦传入（含 `[]`）不再回落 `items`。输入框和空�
 - `showDivider?`: `boolean`; default `true`. Show divider
 - `showLike?`: `boolean`; default `true`. Show like action
 - `showReply?`: `boolean`; default `true`. Show reply action
-- `showMore?`: `boolean`; default `false`. Show more action. Default off; the control is rendered when `onMore` is present.
+- `showMore?`: `boolean`; default `-`. More actions render when `onMore` is present. This flag does not hide them.
 - `showComposer?`: `boolean`; default `true`. Show the root composer (including empty state).
 - `hasMore?`: `boolean`; default `-`. Another page of root comments exists. The sentinel stays outside the feed and uses the...
 - `loadError?`: `boolean`; default `-`. The last root page request failed.
