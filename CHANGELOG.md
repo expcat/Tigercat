@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **MessageContainer outlet 实例（Vue，C122-F01）**：容器使用稳定的实例 id，切换 position 时更新原条目；同位实例卸载一个时保留另一个。
+
 - **LoadingBar 粘色说明（Demo / MCP，C121-F01）**：两端示例 03 与 command-apis 写明，省略选项的 `start()` 沿用上次 color，直到 hide 或 clear。
 
 - **Loading dots 与 bars 动画（Core，C119-F01）**：主题插件纳入 `loadingAnimationBaseStyles`。`variant` 为 dots 或 bars 时，产物 CSS 含 `tiger-bounce-dot` 与 `tiger-scale-bar` 的 keyframes，对应节点按这两个类名播放。

@@ -3,13 +3,14 @@
  */
 
 import { describe, it, expect, vi, beforeAll, beforeEach, afterEach } from 'vitest'
-import { createApp, h, nextTick } from 'vue'
+import { createApp, h, nextTick, ref } from 'vue'
 import { jaJP } from '@expcat/tigercat-core/locales/ja-JP'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 import { Message } from '@expcat/tigercat-vue/Message'
 import { MessageContainer } from '@expcat/tigercat-vue/MessageContainer'
 import { ConfigProvider } from '../../packages/vue/src/components/ConfigProvider'
+import { OverlayOutletProvider } from '../../packages/vue/src/utils/overlay-outlet'
 import { expectNoA11yViolations } from '../utils'
 
 function getMessages() {
@@ -178,5 +179,52 @@ describe('Message (Vue)', () => {
     await nextTick()
     expect(onClose).toHaveBeenCalledWith('one')
     app.unmount()
+  })
+
+  it('replaces the outlet entry when the container position changes', async () => {
+    const position = ref<'top' | 'bottom'>('top')
+    const root = document.createElement('div')
+    document.body.append(root)
+    const app = createApp({
+      render: () =>
+        h(OverlayOutletProvider, null, () => h(MessageContainer, { position: position.value }))
+    })
+    app.mount(root)
+    try {
+      await flushHost()
+      position.value = 'bottom'
+      await flushHost()
+      expect(
+        [...root.querySelectorAll('[data-tiger-message-container]')].map((container) =>
+          container.getAttribute('data-tiger-message-position')
+        )
+      ).toEqual(['bottom'])
+    } finally {
+      app.unmount()
+      root.remove()
+    }
+  })
+
+  it('keeps the other same-position container when one unmounts', async () => {
+    const showFirst = ref(true)
+    const root = document.createElement('div')
+    document.body.append(root)
+    const app = createApp({
+      render: () =>
+        h(OverlayOutletProvider, null, () => [
+          showFirst.value ? h(MessageContainer, { key: 'first' }) : null,
+          h(MessageContainer, { key: 'second' })
+        ])
+    })
+    app.mount(root)
+    try {
+      await flushHost()
+      showFirst.value = false
+      await flushHost()
+      expect(root.querySelectorAll('[data-tiger-message-container]')).toHaveLength(1)
+    } finally {
+      app.unmount()
+      root.remove()
+    }
   })
 })

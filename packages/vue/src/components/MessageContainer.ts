@@ -18,7 +18,7 @@ import {
   type MessagePosition
 } from '@expcat/tigercat-core'
 import { createStatusIcon, createStatusIconWithLoading } from '../utils/icon-helpers'
-import { renderVueOverlayOutlet } from '../utils/overlay-outlet'
+import { createOverlayOutletId, renderVueOverlayOutlet } from '../utils/overlay-outlet'
 import { useResolvedTigerLocale } from './tiger-config'
 
 export interface VueMessageContainerProps {
@@ -52,6 +52,7 @@ export const MessageContainer = /* @__PURE__ */ defineComponent({
   },
   emits: ['close', 'pause', 'resume'],
   setup(props, { emit }) {
+    const outletId = createOverlayOutletId('message')
     const locale = useResolvedTigerLocale()
     const containerClasses = computed(() =>
       classNames(messageContainerBaseClasses, messagePositionClasses[props.position])
@@ -150,7 +151,7 @@ export const MessageContainer = /* @__PURE__ */ defineComponent({
         },
         props.messages.map(renderMessageItem)
       )
-      return props.portal ? renderVueOverlayOutlet(`message-${props.position}`, node) : node
+      return props.portal ? renderVueOverlayOutlet(outletId, node) : node
     }
   }
 })

@@ -18,8 +18,8 @@ feedback 组 14 个组件（C117–C130）。这一组没有截图，视觉与�
 
 ## 概览
 
-本篇 17 条：P1 0、P2 8、P3 9。
-按波次：W4 8、W9 9。
+本篇 16 条：P1 0、P2 7、P3 9。
+按波次：W4 7、W9 9。
 
 已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C118-F04（S13）、C121-F01、C124-F03（S13）、C127-F01（S13）、C129-F01（S13）。
 
@@ -52,14 +52,6 @@ feedback 组 14 个组件（C117–C130）。这一组没有截图，视觉与�
 | C119-F02 | P3   | W9   | 双端  | 行为 | 有子节点时两端的 class 落点不一样 | 带子节点的区域模式下，两端同一 class 落在同一节点（区域根或指示器），全屏加子节点时不重复落两处 |
 | C119-F03 | P3   | W9   | React | 行为 | React 的遮罩要等 effect 才出现    | delay=0、spinning=true 且有子节点时，React 首次绘制即有遮罩且内容为 inert                       |
 
-### C122 MessageContainer
-
-报告 `groups/feedback/MessageContainer.md`，队列状态 needs-evidence。另受 S02、S04 影响。
-
-| 编号     | 级别 | 波次 | 端  | 类别 | 条目                                                           | 验收                                                                                    |
-| -------- | ---- | ---- | --- | ---- | -------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| C122-F01 | P2   | W4   | Vue | 行为 | Vue outlet id 绑在 position 上，换位留旧条目、同位实例互相覆盖 | Vue 容器 position 从 top 改 bottom 后不残留 message-top；同位两实例卸载一个，另一个仍在 |
-
 ### C124 Modal
 
 报告 `groups/feedback/Modal.md`，队列状态 needs-evidence。另受 S01、S04、C118-F05 影响。
@@ -71,7 +63,7 @@ feedback 组 14 个组件（C117–C130）。这一组没有截图，视觉与�
 
 ### C125 NotificationContainer
 
-报告 `groups/feedback/NotificationContainer.md`，队列状态 needs-evidence。另受 S01、S02、S04、S08、C122-F01 影响。
+报告 `groups/feedback/NotificationContainer.md`，队列状态 needs-evidence。另受 S01、S02、S04、S08 影响。
 
 | 编号     | 级别 | 波次 | 端  | 类别 | 条目                                                         | 验收                                                                              |
 | -------- | ---- | ---- | --- | ---- | ------------------------------------------------------------ | --------------------------------------------------------------------------------- |
