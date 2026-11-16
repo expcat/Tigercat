@@ -4,6 +4,14 @@
 
 ## v3.0.1（未发布）
 
+- **组件文档索引（文档·生成器，X04-F01）**：生成索引和 Vue/React 框架索引改为打开 `shared/props/{kebab}.md` 与 `examples/{kebab}.md`。Form、Layout 仍指向内嵌标题的分类页。command-apis 改为指向 message、loading-bar、notification-container 三份拆页。
+- **预发布 latest 修复（工具链，X06-F01）**：publish-on-tag 不再写死 `STABLE=2.9.4`，改用五个包 version 里最后一个不含预发布号的版本。当前是 3.0.0。
+- **发布前核对标签（工具链，X06-F02）**：changeset publish 之前读取五个包的 version，与标签去掉 `v` 之后不一致就失败退出。
+- **Vitest 子路径别名（测试，X06-F03）**：补上 React `useFullscreen` 和两端 `notification`（NotificationRoot）别名，具体别名排在根包别名之前。
+- **README 版本（文档，X07-F01）**：根 README 与 Vue、React 包 README 改为当前版本 3.0.0，安装、CLI、MCP 命令去掉 `@next`。
+- **Carousel 迁移说明（文档，X07-F02）**：3.0 迁移指南改为水平轨道位移随 `dir` 改符号，RTL 为正，与 `getScrollTransform` 一致。
+- **3.0 preview.1–6 标题（文档，X07-F03）**：CHANGELOG 补上 3.0.0-preview.1 到 preview.6 的独立标题。preview.3–6 取已发布 changeset；preview.1 与 preview.2 没有对应 changeset，不新编组件变更。
+
 - **通知铃未读播报（React / Vue，C177-F01）**：未读数从 1 改成 3 后 live 文案是 3 unread，全部已读后是 0 unread，zh-CN 是「1 条未读」。
 - **通知铃打开焦点（React / Vue，C177-F02）**：全部已读时点开铃铛，焦点落在本实例面板内可聚焦的控件，而不是禁用的 Mark all as read。
 - **通知铃条目类型（Core / 文档 / MCP，C177-F03）**：NotificationBellItem 删除。items 改为 NotificationItem[]，并增加 onItemReadChange；Vue 事件名仍是 item-read-change。生成 Props 写出该事件。
@@ -512,6 +520,30 @@
 - **Splitter**：拖动 gutter 回写 `update:sizes` / `onSizesChange` 时保持各 pane 的单位。百分比仍是内容区（容器减去 gutter）的百分比，所以 `v-model:sizes` 之后比例继续跟容器走；像素仍是像素。`resize` 事件里的 sizes 仍是像素。示例水平分割把面板文案绑到这份受控值。Vue/React 对称。无新 prop。
 - **Spotlight**：快捷键徽标只出现在对应命令行的行尾。去掉面板底部重复列出同一快捷键的 footer，以及只为它存在的 `spotlightFooterShortcuts` 和 `navLabels.spotlightFooter`。
 - **OrgChart**：节点左侧色条改为与卡片圆角同心的内缩条，边框画在色条之上。各节点色条长度和与左边框的间距一致。Vue/React 对称。无新 prop。
+
+## v3.0.0-preview.6（2026-09-27）
+
+- Hotfix for the preview.5 declaration build: narrow polygon and freehand before path data so React dts accepts ImageAnnotation geometry. 来源：[preview-3-0-0-preview-6.md](.changeset/published/preview-3-0-0-preview-6.md)。
+
+## v3.0.0-preview.5（2026-09-27）
+
+- Example visual-QA wave2 N1–N24 (batches A–Q): TreeSelect/overlay, ColorPicker, DatePicker, Tabs, Steps, Spotlight, Tooltip, charts focus, OrgChart, Splitter, ImageAnnotation, icon-only Button, SchemaForm nested groups, approval connectors, timeline axis, CropUpload, Example shell accordion and locale/theme. 来源：[preview-3-0-0-preview-5.md](.changeset/published/preview-3-0-0-preview-5.md)。
+
+## v3.0.0-preview.4（2026-09-26）
+
+- Example visual-QA wave N01–N35 (batches A–J): locale defaults, focus/popup chrome, feedback tokens, overlay dismiss, form controls, timeline axis, steps/tabs/nav, data layout, demo chrome, workflow/inspector design. 来源：[preview-3-0-0-preview-4.md](.changeset/published/preview-3-0-0-preview-4.md)。
+
+## v3.0.0-preview.3（2026-09-26）
+
+- 3.0.0-preview.3: visual QA fix wave — tear down portaled overlays on route change, show the date-range month, place image-preview chrome, paint avatar/badge fills, clip rate half-stars, round the input focus ring, shrink short demo frames, load rocketIcon in the sandbox, put the code language label in a header, paint the dark theme surface, draw watermark tiles at 15% ink, show skeleton bars, give linear progress a track height, scroll ScrollSpy sections inside srcdoc, keep message controls clear of toasts, position React dropdown menus, and keep FloatButton groups in their own viewport. 来源：[preview-3-0-0.md](.changeset/published/preview-3-0-0.md)（文件名不带 preview.3，正文写的是这一版）。
+
+## v3.0.0-preview.2（2026-09-25）
+
+`.changeset/published/` 没有这一版的 changeset，这里不补写组件变更。
+
+## v3.0.0-preview.1（2026-09-24）
+
+`.changeset/published/` 没有这一版的 changeset，这里不补写组件变更。
 
 ## v2.9.4
 

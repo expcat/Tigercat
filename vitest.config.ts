@@ -40,7 +40,8 @@ function buildHookAliases(framework: 'vue' | 'react') {
           'useControlledState',
           'useFormController',
           'useChartInteraction',
-          'useResponsiveChartSize'
+          'useResponsiveChartSize',
+          'useFullscreen'
         ]
   return Object.fromEntries(
     names.map((name) => [
@@ -48,6 +49,19 @@ function buildHookAliases(framework: 'vue' | 'react') {
       resolve(__dirname, `./packages/${framework}/src/${hookDir}/${name}`)
     ])
   )
+}
+
+function buildNotificationAliases() {
+  return {
+    '@expcat/tigercat-vue/notification': resolve(
+      __dirname,
+      './packages/vue/src/components/NotificationRoot.ts'
+    ),
+    '@expcat/tigercat-react/notification': resolve(
+      __dirname,
+      './packages/react/src/components/NotificationRoot.tsx'
+    )
+  }
 }
 
 const testAliases = {
@@ -61,6 +75,7 @@ const testAliases = {
   ...buildSubpathAliases('react'),
   ...buildHookAliases('vue'),
   ...buildHookAliases('react'),
+  ...buildNotificationAliases(),
   '@expcat/tigercat-core': resolve(__dirname, './packages/core/src'),
   '@expcat/tigercat-vue': resolve(__dirname, './packages/vue/src'),
   '@expcat/tigercat-react': resolve(__dirname, './packages/react/src'),

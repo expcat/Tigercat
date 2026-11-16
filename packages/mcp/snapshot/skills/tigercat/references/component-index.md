@@ -7,10 +7,11 @@ description: Canonical Tigercat component route map for props, examples, and typ
 
 # Component Index
 
-每个公开组件只在这里路由一次。定位组件后按以下规则打开文档（`{cat}` = Category 列小写，`{Component}` = 组件名）：
+每个公开组件只在这里路由一次。定位组件后按以下规则打开文档（`{kebab}` = 组件名的 kebab-case，`{Component}` = 组件名）：
 
-- Props：在 `shared/props/{cat}.md` 内找 `## {Component}` 段。
-- Examples：在 `examples/{cat}.md` 内找 `## {Component}` 段或同名片段。
+- Props：打开 `shared/props/{kebab}.md`，该文件含 `## {Component}`。
+- Examples：打开 `examples/{kebab}.md`，该文件含 `## {Component}`。
+- Form、Layout 的 kebab 与分类 slug 相同，`## Form` / `## Layout` 内嵌在分类页 `shared/props/form.md`、`shared/props/layout.md` 与对应的 examples 页，不另有拆页。
 - 类型源码：`packages/core/src/types/` + Type 列；个别跨包组件（如 ConfigProvider）以各框架包内同名文件为准，详见其 props 段。
 
 - Test group：组件批次优先运行 `pnpm test:group:{group}`；需要限定框架时使用 `pnpm test:group -- --group {group} --framework react|vue`。

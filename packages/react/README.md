@@ -11,12 +11,12 @@ React UI components for [Tigercat](https://github.com/expcat/Tigercat) - A Tailw
 
 ## Installation
 
-These commands use the preview channel `@next`. Omit it for stable; keep core on the same version. Current versions and setup are in the [root README](https://github.com/expcat/Tigercat/blob/main/README.md#快速开始).
+These commands install the current **3.0.0** release and match this documentation. The preview channel `@next` is not this 3.0.0 documentation. Keep core on the same version. Current versions and setup are in the [root README](https://github.com/expcat/Tigercat/blob/main/README.md#快速开始).
 
 ```bash
-pnpm add @expcat/tigercat-react@next @expcat/tigercat-core@next
+pnpm add @expcat/tigercat-react @expcat/tigercat-core
 # or
-npm install @expcat/tigercat-react@next @expcat/tigercat-core@next
+npm install @expcat/tigercat-react @expcat/tigercat-core
 ```
 
 **Requirements:** React / React DOM 19.x, Tailwind CSS 4.x, Node.js ≥22.13.0

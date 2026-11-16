@@ -7,8 +7,8 @@
     "skills/tigercat/SKILL.md": "ba66f4b223b88e1e32dcf564e497f6cd731f70fd3436aa030a1991474bb7c78f",
     "skills/tigercat/references/accessibility.md": "7ec86bd8da6445d3dda1765492edf8184a9817689322478c8054503bab4006f0",
     "skills/tigercat/references/cli.md": "2822a031295f5305004928bc359b550ef3a4d59ffb5dc61f09a57cbcc54ff457",
-    "skills/tigercat/references/command-apis.md": "6aab747c874f4808faf97bfce9753d9ed330098f86505cda114168f385d3691e",
-    "skills/tigercat/references/component-index.md": "67dfb4be680641192fcf663d90c553606228b7540db2d25b09a3ff97b3bf2463",
+    "skills/tigercat/references/command-apis.md": "bb83a121fd20778aa52c9fc673eb6a116b79a7cbc87f8e7f8a4dde43fa5233bc",
+    "skills/tigercat/references/component-index.md": "073ac2344402f117e3ddd1d194ed0301139bc4a7f187ef9da69a095c9e7f852b",
     "skills/tigercat/references/examples/activity-feed.md": "e54557a097dd5ad28a6117eaa4c86750d246ead3d6b67b122f5c799a59c427f8",
     "skills/tigercat/references/examples/advanced.md": "2869d92420322748c487b106cfe784e795c3f5e9e975ba66de85a5a2e20adf92",
     "skills/tigercat/references/examples/affix.md": "a507384d1bf4891415d3c1723548504c77bcacd6265f46b04de1f5c00ef0170f",
@@ -204,7 +204,7 @@
     "skills/tigercat/references/getting-started.md": "829c37ff95ec04e3a4734cdb13f8490a008ef4d8fd5ebe8043296eb4f23e16ce",
     "skills/tigercat/references/i18n.md": "b4356fcb7a45fe02b86c595351a00a58d37a27195d5c6a6f48928cf74e6216d2",
     "skills/tigercat/references/performance.md": "bfc47ba1d5357ac19fd935ed57be25e01feb9281c5eb1ba24198426d2c11dd99",
-    "skills/tigercat/references/react/index.md": "bd03853a1ebd65d0ff73036c8af80d70e906fd6e6a714c9b92b4d5f105724681",
+    "skills/tigercat/references/react/index.md": "861fded73c4cc79688b8905fc9c1e1cc9c690ad9a2c6b6fb78c964ee50150c3a",
     "skills/tigercat/references/recipes/building-apps.md": "d29ecb821fe85e819d6c7607c24bb560eee859eb3a915537321c5dd69410d0c7",
     "skills/tigercat/references/release.md": "ff06a322666dda8c7df8df2d84907a4a3928a71b87b90ba6c42076c9ed265712",
     "skills/tigercat/references/shared/api-summary.md": "dacfe3de7595bc39ea21d0834e387ee8f9c2a8acdc1d850734468bd3289d6565",
@@ -405,6 +405,6 @@
     "skills/tigercat/references/ssr.md": "2888f0584f5207bb71106e2c941b05466dc234856895280e1582824d22076751",
     "skills/tigercat/references/theme.md": "0cd948699aec62ac06081e04bc3965eab5a40249abd57a62ba4fa1e051847bb9",
     "skills/tigercat/references/tokens.md": "2cf07f020d17dbed625a97b17b20cc64da54e77b80b08e72a030de3f8171e5a4",
-    "skills/tigercat/references/vue/index.md": "85a86b9cea9cc5f3fb664ddb6e7c0ff3dae77f4b99d027281f5878bb83a9d4b3"
+    "skills/tigercat/references/vue/index.md": "93fc8a5e2fd0fea0dcf342275056521de5272108efc566c9bc136386f0c0f44c"
   }
 }

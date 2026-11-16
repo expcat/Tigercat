@@ -58,6 +58,20 @@ jobs:
           TAG: ${{ github.ref_name }}
         run: |
           set -euo pipefail
+          tag_ver="${TAG#v}"
+          for pkg_json in \
+            packages/core/package.json \
+            packages/vue/package.json \
+            packages/react/package.json \
+            packages/cli/package.json \
+            packages/mcp/package.json
+          do
+            pkg_ver="$(node -p "require('./${pkg_json}').version")"
+            if [[ "$pkg_ver" != "$tag_ver" ]]; then
+              echo "Refusing to publish: ${pkg_json} is ${pkg_ver}, tag is ${tag_ver}" >&2
+              exit 1
+            fi
+          done
           pnpm build
           # Prerelease tags (e.g. v3.0.0-preview.1) must not take npm "latest".
           if [[ "$TAG" == *-* ]]; then
@@ -101,8 +115,36 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           set -euo pipefail
-          # If a prior run parked a prerelease on latest, put latest back on last stable.
-          STABLE=2.9.4
+          # Last non-prerelease version among the five packages. When this
+          # checkout is itself a prerelease, walk that file and take the newest
+          # committed version without a prerelease id. The last such version wins.
+          STABLE=""
+          for pkg_json in \
+            packages/core/package.json \
+            packages/vue/package.json \
+            packages/react/package.json \
+            packages/cli/package.json \
+            packages/mcp/package.json
+          do
+            pkg_ver="$(node -p "require('./${pkg_json}').version")"
+            if [[ "$pkg_ver" == *-* ]]; then
+              pkg_ver=""
+              while read -r rev; do
+                hist="$(git show "${rev}:${pkg_json}" | node --input-type=module -e 'import { readFileSync } from "node:fs"; const version = JSON.parse(readFileSync(0, "utf8")).version; if (typeof version === "string" && !version.includes("-")) process.stdout.write(version)')"
+                if [[ -n "$hist" ]]; then
+                  pkg_ver="$hist"
+                  break
+                fi
+              done < <(git log --format=%H -- "$pkg_json")
+            fi
+            if [[ -n "$pkg_ver" && "$pkg_ver" != *-* ]]; then
+              STABLE="$pkg_ver"
+            fi
+          done
+          if [[ -z "$STABLE" ]]; then
+            echo "No stable version among the five packages; refusing to move latest" >&2
+            exit 1
+          fi
           for pkg in @expcat/tigercat-core @expcat/tigercat-vue @expcat/tigercat-react @expcat/tigercat-cli @expcat/tigercat-mcp; do
             current=$(npm view "$pkg" dist-tags.latest 2>/dev/null || true)
             if [[ "$current" == *-* ]]; then

@@ -8,7 +8,7 @@
 
 基于 Tailwind CSS v4 的 Vue 3 / React UI 组件库。两套框架共享设计 token、类型与交互约定。公开组件权威清单见 [skills/tigercat/references/component-index.md](./skills/tigercat/references/component-index.md)（生成物）。
 
-五个官方包版本对齐，遵循 SemVer。npm `latest` 是稳定版 **2.9.4**（v2，顶部徽章指向它），`next` 是预览版 **3.0.0-rc.3**（v3，当前 `main` 的文档与 API）。使用的 Tigercat 包应保持同一版本。
+五个官方包版本对齐，遵循 SemVer。这份文档与仓库当前版本是 **3.0.0**。下方安装、CLI 与 MCP 命令对应这一版本，不带 `@next`。预览通道 `@next` 不是这份 3.0.0 文档。使用的 Tigercat 包应保持同一版本。
 
 > **🚀 在线示例**：<https://expcat.github.io/Tigercat/> — Vue 3 与 React 组件示例、主题切换与暗色模式实时预览。
 
@@ -28,12 +28,12 @@
 
 ### 使用 CLI 创建项目（推荐）
 
-CLI 会生成已配置 Tailwind CSS v4 的 Vue 3 或 React Vite 项目。下方命令使用预览通道 `@next`，与当前文档一致；使用稳定版时去掉 `@next`，并参阅对应版本的文档。
+CLI 会生成已配置 Tailwind CSS v4 的 Vue 3 或 React Vite 项目。下方命令对应这份 3.0.0 文档。预览通道 `@next` 不是这份文档。
 
 ```bash
-pnpm dlx @expcat/tigercat-cli@next create my-app --template vue3
+pnpm dlx @expcat/tigercat-cli create my-app --template vue3
 # 或
-pnpm dlx @expcat/tigercat-cli@next create my-app --template react
+pnpm dlx @expcat/tigercat-cli create my-app --template react
 
 cd my-app
 pnpm install
@@ -44,9 +44,9 @@ pnpm dev
 
 ```bash
 # Vue 3
-pnpm add @expcat/tigercat-vue@next @expcat/tigercat-core@next
+pnpm add @expcat/tigercat-vue @expcat/tigercat-core
 # React
-pnpm add @expcat/tigercat-react@next @expcat/tigercat-core@next
+pnpm add @expcat/tigercat-react @expcat/tigercat-core
 
 # Tailwind CSS v4（两套框架均需要）
 pnpm add -D tailwindcss @tailwindcss/vite
@@ -60,7 +60,7 @@ pnpm add -D tailwindcss @tailwindcss/vite
 @source '../node_modules/@expcat/tigercat-*/dist/**/*.{js,mjs}';
 ```
 
-用与上面相同的 dist-tag 运行 `pnpm dlx @expcat/tigercat-cli@next doctor`（稳定版去掉 `@next`），检查 Node.js、pnpm、Tailwind CSS、框架 peer dependency 与模板工具链。
+运行 `pnpm dlx @expcat/tigercat-cli doctor`，检查 Node.js、pnpm、Tailwind CSS、框架 peer dependency 与模板工具链。
 
 ### Vue 3 示例
 
@@ -118,18 +118,18 @@ export function App() {
 `@expcat/tigercat-mcp` 是只读 stdio MCP 服务。接入后 Agent 可按任务路由到导入子路径、props/事件与 React/Vue 绑定差异（支持中文别名，如 表单、日期选择、表格），单次只内联所需小节：
 
 ```bash
-# 预览版 next（3.0.0-rc.3）。稳定版 latest（2.9.4）去掉 @next
-claude mcp add tigercat -- npx -y @expcat/tigercat-mcp@next
+# 仓库当前版本 3.0.0，与这份文档一致。预览通道 @next 不是这份文档。
+claude mcp add tigercat -- npx -y @expcat/tigercat-mcp
 ```
 
-或在任意 MCP 客户端的 `mcpServers` 中配置（稳定版把包名改成 `@expcat/tigercat-mcp`）：
+或在任意 MCP 客户端的 `mcpServers` 中配置：
 
 ```json
 {
   "mcpServers": {
     "tigercat": {
       "command": "npx",
-      "args": ["-y", "@expcat/tigercat-mcp@next"]
+      "args": ["-y", "@expcat/tigercat-mcp"]
     }
   }
 }

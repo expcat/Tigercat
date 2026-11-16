@@ -34,6 +34,6 @@ LoadingBar.finish()
 - 关闭名走 locale：`common.closeMessageAriaLabel` / `closeNotificationAriaLabel`。LoadingBar 默认名是 `common.loadingText`。
 - `Message.loading({ duration })` 尊重传入 duration。`LoadingBar` 省略选项的 `start()` 沿用上次 color，直到 hide 或 clear。`error` 和 `finish` 共用 `start` 计数；还有未结束的 `start` 时保持加载。
 
-条目/容器 props 见 [feedback.md](shared/props/feedback.md) 的 `## Message`、`## LoadingBar`、`## NotificationContainer`。绑定差异见 [common.md](shared/patterns/common.md)。文案见 [i18n.md](i18n.md)。
+条目/容器 props 见 [message.md](shared/props/message.md) 的 `## Message`、[loading-bar.md](shared/props/loading-bar.md) 的 `## LoadingBar`、[notification-container.md](shared/props/notification-container.md) 的 `## NotificationContainer`。绑定差异见 [common.md](shared/patterns/common.md)。文案见 [i18n.md](i18n.md)。
 
 Next: [getting-started.md](getting-started.md) · [i18n.md](i18n.md) · [component-index.md](component-index.md)
