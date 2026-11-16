@@ -51,6 +51,41 @@ describe('Popconfirm', () => {
     await waitFor(() => expect(trigger).toHaveAttribute('data-state', 'open'))
   })
 
+  it('moves keyboard focus into the dialog and tabs between its actions', async () => {
+    const user = userEvent.setup()
+    const onConfirm = vi.fn()
+    const onCancel = vi.fn()
+    render(
+      <>
+        <Popconfirm title="Confirm?" onConfirm={onConfirm} onCancel={onCancel}>
+          <button>Action</button>
+        </Popconfirm>
+        <button>Next</button>
+      </>
+    )
+
+    await user.tab()
+    expect(screen.getByRole('button', { name: 'Action' })).toHaveFocus()
+    await user.keyboard('{Enter}')
+
+    const dialog = screen.getByRole('dialog', { name: 'Confirm?' })
+    const confirm = screen.getByRole('button', { name: 'OK' })
+    await waitFor(() => expect(dialog).toContainElement(document.activeElement as HTMLElement))
+    expect(confirm).toHaveFocus()
+
+    await user.tab({ shift: true })
+    expect(screen.getByRole('button', { name: 'Cancel' })).toHaveFocus()
+    expect(dialog).toBeVisible()
+    await user.tab()
+    expect(confirm).toHaveFocus()
+    expect(dialog).toBeVisible()
+    await user.keyboard('{Enter}')
+
+    expect(onConfirm).toHaveBeenCalledTimes(1)
+    expect(onCancel).not.toHaveBeenCalled()
+    await waitFor(() => expect(dialog).not.toBeVisible())
+  })
+
   it('passes open state to function children', async () => {
     const user = userEvent.setup()
     const { getByText } = render(

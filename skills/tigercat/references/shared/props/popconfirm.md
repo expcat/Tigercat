@@ -13,7 +13,7 @@ description: Compact generated Tigercat Feedback props reference
 
 `packages/core/src/types/popconfirm.ts` · `PopconfirmProps` · 4/17 compact props · [Complete props](#remaining-props-complete-public-api)
 
-Note: 打开时焦点留在触发器，Tab 离开即关闭。确认返回的 Promise 在进行中时，Escape、点外面和再点触发器都关不掉；拒绝则留下。Vue 读返回值，不只看 `preventDefault`。
+Note: 打开后聚焦确定按钮，Enter 确认；Shift+Tab 与 Tab 可在取消、确定之间移动。确认返回的 Promise 在进行中时，Escape、点外面和再点触发器都关不掉；拒绝则留下。Vue 读返回值，不只看 `preventDefault`。
 
 | Prop           | Type     | Default | Notes                                                                     |
 | -------------- | -------- | ------- | ------------------------------------------------------------------------- |

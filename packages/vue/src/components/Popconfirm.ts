@@ -8,6 +8,7 @@ import {
   classNames,
   coerceClassValue,
   createDismissActionEvent,
+  focusElement,
   settleDismissAction,
   getArrowStyles,
   getOverlayTriggerAria,
@@ -97,6 +98,7 @@ export const Popconfirm = defineComponent({
   setup(props, { slots, emit, attrs }) {
     const config = useTigerConfig()
     const arrowRef = ref<HTMLElement | null>(null)
+    const confirmButtonRef = ref<HTMLElement | null>(null)
     const confirming = ref(false)
     const vueInstance = getCurrentInstance()
 
@@ -123,6 +125,16 @@ export const Popconfirm = defineComponent({
       restoreFocusOnDismiss: 'all',
       onDismissed: () => emit('cancel')
     })
+
+    watch(
+      [currentVisible, positioned, overlayTarget],
+      ([visible, isPositioned]) => {
+        if (visible && isPositioned) {
+          focusElement(confirmButtonRef.value, { preventScroll: true })
+        }
+      },
+      { flush: 'post' }
+    )
 
     watch(currentVisible, (visible) => {
       if (!visible) confirming.value = false
@@ -305,6 +317,7 @@ export const Popconfirm = defineComponent({
                         h(
                           Button,
                           {
+                            ref: (el) => assignOverlayTriggerRef(confirmButtonRef, el),
                             size: 'sm',
                             variant: 'primary',
                             danger: props.okType === 'danger',

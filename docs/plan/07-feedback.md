@@ -18,8 +18,8 @@ feedback 组 14 个组件（C117–C130）。这一组没有截图，视觉与�
 
 ## 概览
 
-本篇 13 条：P1 0、P2 4、P3 9。
-按波次：W4 4、W9 9。
+本篇 12 条：P1 0、P2 3、P3 9。
+按波次：W4 3、W9 9。
 
 已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C118-F04（S13）、C121-F01、C124-F03（S13）、C127-F01（S13）、C129-F01（S13）。
 
@@ -56,14 +56,6 @@ feedback 组 14 个组件（C117–C130）。这一组没有截图，视觉与�
 
 报告 `groups/feedback/Modal.md`，队列状态 needs-evidence。另受 S01、S04、C118-F05 影响。
 
-### C126 Popconfirm
-
-报告 `groups/feedback/Popconfirm.md`，队列状态 needs-evidence。另受 S01、S08 影响。
-
-| 编号     | 级别 | 波次 | 端   | 类别 | 条目                                   | 验收                                                                                                   |
-| -------- | ---- | ---- | ---- | ---- | -------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| C126-F01 | P2   | W4   | 双端 | 键盘 | 打开后焦点留在触发器，键盘无法走到确认 | 键盘 Enter 打开 Popconfirm 后焦点进入对话框，Tab 能到取消与确定并触发 onConfirm，弹层不因 Tab 提前关闭 |
-
 ### C128 Progress
 
 报告 `groups/feedback/Progress.md`，队列状态 needs-evidence。另受 S01、S08 影响。
@@ -95,8 +87,8 @@ feedback 组 14 个组件（C117–C130）。这一组没有截图，视觉与�
 
 报告没有给这些组件立新的编号。右列是并入的既有条目，修那些条目时要在这里复验。
 
-| 任务 | 组件                | 报告                                     | 并入的条目         |
-| ---- | ------------------- | ---------------------------------------- | ------------------ |
-| C120 | LoadingBarContainer | `groups/feedback/LoadingBarContainer.md` | S01、S02           |
-| C123 | Message             | `groups/feedback/Message.md`             | S01、S04           |
-| C127 | Popover             | `groups/feedback/Popover.md`             | S01、S08、C126-F01 |
+| 任务 | 组件                | 报告                                     | 并入的条目 |
+| ---- | ------------------- | ---------------------------------------- | ---------- |
+| C120 | LoadingBarContainer | `groups/feedback/LoadingBarContainer.md` | S01、S02   |
+| C123 | Message             | `groups/feedback/Message.md`             | S01、S04   |
+| C127 | Popover             | `groups/feedback/Popover.md`             | S01、S08   |

@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Popconfirm 键盘确认（React / Vue，C126-F01）**：打开并完成定位后聚焦确定按钮，Enter 确认；Shift+Tab 与 Tab 可在取消、确定之间移动，不再因焦点留在触发器而提前关闭。
+
 - **NotificationContainer 操作节点（Vue，C125-F01）**：主按钮或 `actions` 与 `actionNode` 同时存在时，自定义节点渲染在同一操作区的按钮之后，与 React 一致。
 
 - **Modal 确认等待与层级（React / Vue，C124-F01、C124-F02）**：React 命令式确认等待 `onOk` 的 Promise，兑现后才关闭；返回 false 或拒绝时保持打开。Vue 自定义 `zIndex` 在打开期间更新，并在离场过渡中保留。

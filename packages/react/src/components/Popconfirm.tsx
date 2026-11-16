@@ -1,7 +1,8 @@
-import React, { forwardRef, useId, useMemo, useRef, useState } from 'react'
+import React, { forwardRef, useEffect, useId, useMemo, useRef, useState } from 'react'
 import {
   classNames,
   createDismissActionEvent,
+  focusElement,
   getArrowStyles,
   getOverlayTriggerAria,
   getPopconfirmIconPath,
@@ -107,6 +108,7 @@ export const Popconfirm = forwardRef<HTMLElement, PopconfirmProps>(function Popc
     resolvedDescription != null && resolvedDescription !== false && resolvedDescription !== ''
   const describedBy = hasDescription ? descriptionId : undefined
   const arrowRef = useRef<HTMLDivElement>(null)
+  const confirmButtonRef = useRef<HTMLButtonElement>(null)
   const [confirming, setConfirming] = useState(false)
   const confirmingRef = useRef(false)
 
@@ -137,6 +139,12 @@ export const Popconfirm = forwardRef<HTMLElement, PopconfirmProps>(function Popc
     restoreFocusOnDismiss: 'all',
     onDismissed: () => onCancel?.()
   })
+
+  useEffect(() => {
+    if (currentVisible && positioned) {
+      focusElement(confirmButtonRef.current, { preventScroll: true })
+    }
+  }, [currentVisible, positioned, overlayTarget])
 
   const handleConfirm = async () => {
     if (confirmingRef.current) return
@@ -252,6 +260,7 @@ export const Popconfirm = forwardRef<HTMLElement, PopconfirmProps>(function Popc
                   {resolvedCancelText}
                 </Button>
                 <Button
+                  ref={confirmButtonRef}
                   size="sm"
                   variant={okType === 'danger' ? 'primary' : 'primary'}
                   danger={okType === 'danger'}
