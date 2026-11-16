@@ -71,7 +71,8 @@ export const rateHalfStarInnerClasses =
 
 export const rateActiveColor =
   'text-[color-mix(in_srgb,var(--tiger-warning)_75%,var(--tiger-text))]'
-export const rateInactiveColor = 'text-[var(--tiger-text-disabled)]'
+/** Enabled empty stars. Disabled stars keep `--tiger-text-disabled` at the call site. */
+export const rateInactiveColor = 'text-[var(--tiger-text-secondary)]'
 export const rateHoverColor = 'text-[color-mix(in_srgb,var(--tiger-warning)_55%,var(--tiger-text))]'
 
 /** True when the pointer is on the inline-start half of the star. */

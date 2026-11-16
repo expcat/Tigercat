@@ -8,7 +8,7 @@ export default function App() {
     <div className="space-y-3">
       <div className="flex items-center gap-3">
         <span className="w-16 text-sm text-gray-500">自定义</span>
-        <Rate value={mood} onChange={setMood} character="❤" allowClear />
+        <Rate value={mood} onChange={setMood} character="♥" allowClear />
       </div>
       <p className="text-sm text-gray-500">
         character 渲染文本或 emoji；allowClear 时再次点击当前值可清零。

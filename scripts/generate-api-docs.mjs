@@ -465,7 +465,7 @@ const COMPONENT_USAGE_NOTES = {
   },
   Rate: {
     notes:
-      '`readOnly` 与 `readonly` 是同一标志（冲突用 `readonly`）。可聚焦、不改值；`disabled` 才出 Tab。半星与方向键跟阅读方向。`valueText` 只替换 `{value}`。需要组名时传 `aria-label`。`size` 是 `sm|md|lg`（`RateSize` = `ComponentSize`）。'
+      '`readOnly` 可聚焦、不改值；`disabled` 才出 Tab。半星与方向键跟阅读方向。`valueText` 只替换 `{value}`。需要组名时传 `aria-label`。`size` 是 `sm|md|lg`（`RateSize` = `ComponentSize`）。'
   },
   Segmented: {
     notes:

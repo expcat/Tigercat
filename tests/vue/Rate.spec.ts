@@ -5,13 +5,18 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
 import { Rate } from '@expcat/tigercat-vue/Rate'
-import { rateHalfStarInnerClasses } from '@expcat/tigercat-core'
+import { rateHalfStarInnerClasses, rateInactiveColor } from '@expcat/tigercat-core'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
 /** The interactive star spans are the direct children of the slider. */
 function getStars(container: HTMLElement): HTMLElement[] {
   const slider = container.querySelector('[role="slider"]') as HTMLElement
   return Array.from(slider.children) as HTMLElement[]
+}
+
+function countFilledStars(container: HTMLElement): number {
+  return getStars(container).filter((star) => star.querySelector('[class*="--tiger-warning"]'))
+    .length
 }
 
 describe('Rate', () => {
@@ -94,6 +99,59 @@ describe('Rate', () => {
     })
     await fireEvent.click(getStars(container)[2])
     expect(onChange).toHaveBeenCalledWith(0)
+  })
+
+  it('keeps a prevented ArrowRight at 2 and runs caller keydown and mouseleave', async () => {
+    const onChange = vi.fn()
+    const onKeydown = vi.fn((event: KeyboardEvent) => {
+      event.preventDefault()
+    })
+    const onMouseleave = vi.fn()
+    const { container } = render(Rate, {
+      props: { defaultValue: 2, 'onUpdate:modelValue': onChange },
+      attrs: { onKeydown, onMouseleave }
+    })
+    const slider = container.querySelector('[role="slider"]') as HTMLElement
+    await fireEvent.keyDown(slider, { key: 'ArrowRight' })
+    expect(onKeydown).toHaveBeenCalledTimes(1)
+    expect(onChange).not.toHaveBeenCalled()
+    expect(slider).toHaveAttribute('aria-valuenow', '2')
+    await fireEvent.mouseLeave(slider)
+    expect(onMouseleave).toHaveBeenCalledTimes(1)
+  })
+
+  it('drops a stale hover preview after locking and does not restore it', async () => {
+    const { container, rerender } = render(Rate, { props: { defaultValue: 2 } })
+    const slider = () => container.querySelector('[role="slider"]') as HTMLElement
+    await fireEvent.mouseMove(getStars(container)[3])
+    expect(countFilledStars(container)).toBe(4)
+
+    await rerender({ defaultValue: 2, readOnly: true, disabled: false })
+    await fireEvent.mouseLeave(slider())
+    expect(countFilledStars(container)).toBe(2)
+    await rerender({ defaultValue: 2, readOnly: false, disabled: false })
+    expect(countFilledStars(container)).toBe(2)
+
+    await fireEvent.mouseMove(getStars(container)[3])
+    await rerender({ defaultValue: 2, readOnly: false, disabled: true })
+    await fireEvent.mouseLeave(slider())
+    expect(countFilledStars(container)).toBe(2)
+    await rerender({ defaultValue: 2, readOnly: false, disabled: false })
+    expect(countFilledStars(container)).toBe(2)
+  })
+
+  it('uses the enabled empty-star color and keeps disabled stars muted', async () => {
+    const { container, rerender } = render(Rate, { props: { defaultValue: 0 } })
+    for (const star of getStars(container)) {
+      const glyph = star.firstElementChild as HTMLElement
+      expect(glyph.className).toContain(rateInactiveColor)
+      expect(glyph.className).not.toContain('--tiger-text-disabled')
+    }
+
+    await rerender({ defaultValue: 0, disabled: true })
+    for (const star of getStars(container)) {
+      expect((star.firstElementChild as HTMLElement).className).toContain('--tiger-text-disabled')
+    }
   })
 
   // --- Half-star clip (Pages /rate) ---

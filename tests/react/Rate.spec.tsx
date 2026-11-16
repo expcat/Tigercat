@@ -7,14 +7,50 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import React from 'react'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { Rate } from '@expcat/tigercat-react/Rate'
-import { rateHalfStarInnerClasses } from '@expcat/tigercat-core'
+import { rateHalfStarInnerClasses, rateInactiveColor } from '@expcat/tigercat-core'
 import { zhCN } from '../../packages/core/src/utils/i18n/locales/zh-CN'
+import { defaultTheme } from '../../packages/core/src/themes/default/theme'
+import { modernTheme } from '../../packages/core/src/themes/modern/theme'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 /** The interactive star spans are the direct children of the slider. */
 function getStars(container: HTMLElement): HTMLElement[] {
   const slider = container.querySelector('[role="slider"]') as HTMLElement
   return Array.from(slider.children) as HTMLElement[]
+}
+
+function countFilledStars(container: HTMLElement): number {
+  return getStars(container).filter((star) => star.querySelector('[class*="--tiger-warning"]'))
+    .length
+}
+
+function srgbChannel(channel: number): number {
+  const value = channel / 255
+  return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4
+}
+
+function contrastRatio(foreground: string, background: string): number {
+  const luminance = (hex: string) => {
+    const normalized = hex.replace('#', '')
+    const red = Number.parseInt(normalized.slice(0, 2), 16)
+    const green = Number.parseInt(normalized.slice(2, 4), 16)
+    const blue = Number.parseInt(normalized.slice(4, 6), 16)
+    return 0.2126 * srgbChannel(red) + 0.7152 * srgbChannel(green) + 0.0722 * srgbChannel(blue)
+  }
+  const lighter = Math.max(luminance(foreground), luminance(background))
+  const darker = Math.min(luminance(foreground), luminance(background))
+  return (lighter + 0.05) / (darker + 0.05)
+}
+
+function enabledEmptyColor(colors: {
+  text: string
+  textSecondary: string
+  textDisabled: string
+}): string {
+  if (rateInactiveColor.includes('--tiger-text-secondary')) return colors.textSecondary
+  if (rateInactiveColor.includes('--tiger-text-disabled')) return colors.textDisabled
+  if (rateInactiveColor === 'text-[var(--tiger-text)]') return colors.text
+  throw new Error('unmapped rate inactive color: ' + rateInactiveColor)
 }
 
 describe('Rate', () => {
@@ -112,6 +148,70 @@ describe('Rate', () => {
     const { container } = render(<Rate value={3} allowClear onChange={onChange} />)
     fireEvent.click(getStars(container)[2])
     expect(onChange).toHaveBeenCalledWith(0)
+  })
+
+  it('keeps a prevented ArrowRight at 2 and runs the caller mouseleave', () => {
+    const onChange = vi.fn()
+    const onKeyDown = vi.fn((event: React.KeyboardEvent<HTMLDivElement>) => {
+      event.preventDefault()
+    })
+    const onMouseLeave = vi.fn()
+    const { container } = render(
+      <Rate
+        defaultValue={2}
+        onChange={onChange}
+        onKeyDown={onKeyDown}
+        onMouseLeave={onMouseLeave}
+      />
+    )
+    const slider = container.querySelector('[role="slider"]') as HTMLElement
+    fireEvent.keyDown(slider, { key: 'ArrowRight' })
+    expect(onKeyDown).toHaveBeenCalledTimes(1)
+    expect(onChange).not.toHaveBeenCalled()
+    expect(slider).toHaveAttribute('aria-valuenow', '2')
+    fireEvent.mouseLeave(slider)
+    expect(onMouseLeave).toHaveBeenCalledTimes(1)
+  })
+
+  it('drops a stale hover preview after locking and does not restore it', () => {
+    const { container, rerender } = render(<Rate defaultValue={2} />)
+    const slider = () => container.querySelector('[role="slider"]') as HTMLElement
+    fireEvent.mouseMove(getStars(container)[3])
+    expect(countFilledStars(container)).toBe(4)
+
+    rerender(<Rate defaultValue={2} readOnly />)
+    fireEvent.mouseLeave(slider())
+    expect(countFilledStars(container)).toBe(2)
+    rerender(<Rate defaultValue={2} readOnly={false} />)
+    expect(countFilledStars(container)).toBe(2)
+
+    fireEvent.mouseMove(getStars(container)[3])
+    rerender(<Rate defaultValue={2} disabled />)
+    fireEvent.mouseLeave(slider())
+    expect(countFilledStars(container)).toBe(2)
+    rerender(<Rate defaultValue={2} disabled={false} />)
+    expect(countFilledStars(container)).toBe(2)
+  })
+
+  it('gives enabled empty stars at least 3:1 contrast and keeps disabled stars muted', () => {
+    const { container, rerender } = render(<Rate defaultValue={0} />)
+    for (const star of getStars(container)) {
+      const glyph = star.firstElementChild as HTMLElement
+      expect(glyph.className).toContain(rateInactiveColor)
+      expect(glyph.className).not.toContain('--tiger-text-disabled')
+    }
+
+    for (const theme of [defaultTheme, modernTheme]) {
+      for (const scheme of ['light', 'dark'] as const) {
+        const colors = theme[scheme].colors
+        expect(contrastRatio(enabledEmptyColor(colors), colors.surface)).toBeGreaterThanOrEqual(3)
+      }
+    }
+
+    rerender(<Rate defaultValue={0} disabled />)
+    for (const star of getStars(container)) {
+      expect((star.firstElementChild as HTMLElement).className).toContain('--tiger-text-disabled')
+    }
   })
 
   // --- Half-star clip (Pages /rate) ---

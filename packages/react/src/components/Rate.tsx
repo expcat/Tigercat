@@ -1,4 +1,4 @@
-import React, { forwardRef, useMemo, useState } from 'react'
+import React, { forwardRef, useEffect, useMemo, useState } from 'react'
 import type { RateProps as CoreRateProps } from '@expcat/tigercat-core'
 import {
   rateBaseClasses,
@@ -54,6 +54,7 @@ export const Rate = forwardRef<HTMLDivElement, RateProps>(function Rate(
     onChange,
     onHoverChange,
     onKeyDown,
+    onMouseLeave,
     'aria-label': ariaLabel,
     ...rest
   },
@@ -79,8 +80,15 @@ export const Rate = forwardRef<HTMLDivElement, RateProps>(function Rate(
   const locked = disabled || isReadOnly
   const step = allowHalf ? 0.5 : 1
   const normalized = sliderNormalizeValue(currentValue, 0, count, step)
-  const displayValue = hoverValue > 0 ? hoverValue : normalized
+  const displayValue = !locked && hoverValue > 0 ? hoverValue : normalized
   const isChar = character != null && character !== false
+  const emptyColor = disabled ? 'text-[var(--tiger-text-disabled)]' : rateInactiveColor
+
+  useEffect(() => {
+    if (!locked || hoverValue === 0) return
+    setHoverValue(0)
+    onHoverChange?.(0)
+  }, [locked, hoverValue, onHoverChange])
 
   const glyph = () =>
     isChar ? (
@@ -106,13 +114,12 @@ export const Rate = forwardRef<HTMLDivElement, RateProps>(function Rate(
   for (let i = 0; i < count; i++) {
     const full = displayValue >= i + 1
     const half = allowHalf && !full && displayValue >= i + 0.5
-    const isHovering = hoverValue > 0
-    const colorClass =
-      full || half ? (isHovering ? rateHoverColor : rateActiveColor) : rateInactiveColor
+    const isHovering = !locked && hoverValue > 0
+    const colorClass = full || half ? (isHovering ? rateHoverColor : rateActiveColor) : emptyColor
 
     const content = half ? (
       <>
-        <span className={classNames('absolute inset-0', rateInactiveColor)}>{glyph()}</span>
+        <span className={classNames('absolute inset-0', emptyColor)}>{glyph()}</span>
         <span
           className={classNames(
             rateHalfStarInnerClasses,
@@ -166,8 +173,9 @@ export const Rate = forwardRef<HTMLDivElement, RateProps>(function Rate(
       aria-orientation="horizontal"
       tabIndex={disabled ? -1 : 0}
       {...rest}
-      onMouseLeave={() => {
-        if (locked) return
+      onMouseLeave={(event) => {
+        onMouseLeave?.(event)
+        if (event.defaultPrevented || (locked && hoverValue === 0)) return
         setHoverValue(0)
         onHoverChange?.(0)
       }}

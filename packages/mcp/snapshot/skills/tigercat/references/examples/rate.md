@@ -15,7 +15,7 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 
 Runnable modules: `examples/example/vue3/src/examples/rate/01/`, `examples/example/vue3/src/examples/rate/02/`, `examples/example/vue3/src/examples/rate/03/`, `examples/example/react/src/examples/rate/01/`, `examples/example/react/src/examples/rate/02/`, `examples/example/react/src/examples/rate/03/`.
 
-Note: `readOnly` 与 `readonly` 是同一标志（冲突用 `readonly`）。可聚焦、不改值；`disabled` 才出 Tab。半星与方向键跟阅读方向。`valueText` 只替换 `{value}`。需要组名时传 `aria-label`。`size` 是 `sm|md|lg`（`RateSize` = `ComponentSize`）。
+Note: `readOnly` 可聚焦、不改值；`disabled` 才出 Tab。半星与方向键跟阅读方向。`valueText` 只替换 `{value}`。需要组名时传 `aria-label`。`size` 是 `sm|md|lg`（`RateSize` = `ComponentSize`）。
 
 Vue: `<Rate :default-value="3" />`
 

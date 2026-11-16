@@ -14,6 +14,7 @@ import {
   starPathD,
   starViewBox,
   classNames,
+  callUnknownEventHandler,
   coerceClassValue,
   mergeTigerLocale,
   getRateLabels,
@@ -77,8 +78,14 @@ export const Rate = defineComponent({
     }
 
     const displayValue = computed(() =>
-      hoverValue.value > 0 ? hoverValue.value : normalized.value
+      !locked.value && hoverValue.value > 0 ? hoverValue.value : normalized.value
     )
+
+    watch(locked, (isLocked) => {
+      if (!isLocked || hoverValue.value === 0) return
+      hoverValue.value = 0
+      emit('hover-change', 0)
+    })
 
     function hitValue(index: number, clientX: number, el: HTMLElement): number {
       const rtl = getComputedStyle(el).direction === 'rtl'
@@ -104,14 +111,16 @@ export const Rate = defineComponent({
       }
     }
 
-    function handleMouseLeave() {
-      if (locked.value) return
+    function handleMouseLeave(event: MouseEvent) {
+      callUnknownEventHandler(attrs.onMouseleave, event)
+      if (event.defaultPrevented || (locked.value && hoverValue.value === 0)) return
       hoverValue.value = 0
       emit('hover-change', 0)
     }
 
     function handleKeydown(e: KeyboardEvent) {
-      if (locked.value) return
+      callUnknownEventHandler(attrs.onKeydown, e)
+      if (e.defaultPrevented || locked.value) return
       const target = e.currentTarget
       const rtl = target instanceof HTMLElement && getComputedStyle(target).direction === 'rtl'
       const next = rateKeyboardValue(e.key, normalized.value, starCount.value, step.value, rtl)
@@ -123,6 +132,7 @@ export const Rate = defineComponent({
     return () => {
       const attrsRecord = attrs as Record<string, unknown>
       const isChar = Boolean(slots.character || props.character)
+      const emptyColor = props.disabled ? 'text-[var(--tiger-text-disabled)]' : rateInactiveColor
       const glyph = () => {
         const slotChar = slots.character?.()
         return slotChar
@@ -144,13 +154,13 @@ export const Rate = defineComponent({
       for (let i = 0; i < starCount.value; i++) {
         const full = displayValue.value >= i + 1
         const half = props.allowHalf && !full && displayValue.value >= i + 0.5
-        const isHovering = hoverValue.value > 0
+        const isHovering = !locked.value && hoverValue.value > 0
         const colorClass =
-          full || half ? (isHovering ? rateHoverColor : rateActiveColor) : rateInactiveColor
+          full || half ? (isHovering ? rateHoverColor : rateActiveColor) : emptyColor
 
         const children = half
           ? [
-              h('span', { class: classNames('absolute inset-0', rateInactiveColor) }, [glyph()]),
+              h('span', { class: classNames('absolute inset-0', emptyColor) }, [glyph()]),
               h(
                 'span',
                 {
