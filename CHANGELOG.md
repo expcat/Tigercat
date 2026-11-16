@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **SubMenu 标题命名与 RTL 弹层（Vue，C101-F01、C101-F02）**：按钮与子列表共用调用方或生成的标题 id，保持 `aria-labelledby` 引用有效。嵌套弹层向现有定位 helper 传入实际方向，RTL 请求 `left-start`，与 React 一致。
+
 - **MenuItemGroup 嵌套缩进（Vue，C100-F01）**：inline 模式下向嵌套分组继续传播当前层级与折叠状态，Inner 标题和 Leaf 保留 24px 缩进，与 React 一致。
 
 - **MenuItem 事件、缩进与字符定位（Vue / React，C099-F01、C099-F02、C099-F03、C099-F04）**：双端原生 click / keydown 与内部选择、导航组合，保留调用方 `preventDefault()` 取消约定；Vue SubMenu 同步修复事件覆盖。React 自定义 style 保留 inline 层级缩进，冲突时内部起始 padding 优先。双端 typeahead 复用当前层可用项枚举，跳过隐藏子菜单，并同步唯一 tab stop。

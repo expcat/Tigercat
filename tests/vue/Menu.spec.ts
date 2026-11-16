@@ -2,11 +2,12 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi } from 'vitest'
+import { afterEach, describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
 import { h } from 'vue'
 import { Menu, MenuItem, MenuItemGroup, SubMenu } from '@expcat/tigercat-vue/Menu'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
+import * as core from '@expcat/tigercat-core'
 import type { MenuItem as CoreMenuItem } from '@expcat/tigercat-core'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { expectNoA11yViolations } from '../utils/a11y-helpers'
@@ -379,6 +380,50 @@ describe('Menu', () => {
   })
 
   describe('SubMenu', () => {
+    afterEach(() => vi.restoreAllMocks())
+
+    it('labels the child list with the custom title ID', () => {
+      render(Menu, {
+        props: { mode: 'horizontal', defaultOpenKeys: ['sub'] },
+        slots: {
+          default: () =>
+            h(SubMenu, { itemKey: 'sub', title: 'Submenu', id: 'consumer-submenu-id' }, () =>
+              h(MenuItem, { itemKey: 'child' }, () => 'Child')
+            )
+        }
+      })
+
+      const trigger = getItem('Submenu')
+      const list = document.getElementById(trigger.getAttribute('aria-controls')!)!
+      expect(trigger).toHaveAttribute('id', 'consumer-submenu-id')
+      expect(document.getElementById(list.getAttribute('aria-labelledby')!)).toBe(trigger)
+    })
+
+    it('requests left-side placement for a nested horizontal submenu in RTL', async () => {
+      const position = vi.spyOn(core, 'computeFloatingPosition')
+      render(ConfigProvider, {
+        props: { dir: 'rtl' },
+        slots: {
+          default: () =>
+            h(Menu, { mode: 'horizontal', defaultOpenKeys: ['parent', 'nested'] }, () =>
+              h(SubMenu, { itemKey: 'parent', title: 'Parent' }, () =>
+                h(SubMenu, { itemKey: 'nested', title: 'Nested' }, () =>
+                  h(MenuItem, { itemKey: 'child' }, () => 'Child')
+                )
+              )
+            )
+        }
+      })
+
+      await waitFor(() =>
+        expect(position).toHaveBeenCalledWith(
+          screen.getByText('Nested').closest('button'),
+          expect.any(HTMLElement),
+          expect.objectContaining({ placement: 'left-start' })
+        )
+      )
+    })
+
     it('composes caller click and keydown with submenu opening and child focus', async () => {
       const onClick = vi.fn()
       const onKeydown = vi.fn((event: KeyboardEvent) => {

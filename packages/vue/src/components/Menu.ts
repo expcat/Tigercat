@@ -853,7 +853,7 @@ export const SubMenu = defineComponent({
     const titleEl = ref<HTMLElement | null>(null)
     const popupEl = ref<HTMLElement | null>(null)
     const submenuContentEl = ref<HTMLElement | null>(null)
-    const titleId = useId()
+    const generatedTitleId = useId()
     const listId = useId()
     let heightTransitionController: SubmenuHeightTransitionController | null = null
     let popupCloseTimer: ReturnType<typeof setTimeout> | null = null
@@ -871,7 +871,11 @@ export const SubMenu = defineComponent({
     const popupPortal = computed(() => Boolean(isPopup.value && menuContext?.popupPortal.value))
     const hasRenderedInline = ref(!isPopup.value && isExpanded.value)
     const popupPlacement = computed<FloatingPlacement>(() =>
-      getMenuPopupPlacement(menuContext?.mode.value ?? 'vertical', props.level)
+      getMenuPopupPlacement(
+        menuContext?.mode.value ?? 'vertical',
+        props.level,
+        menuContext?.dir.value
+      )
     )
     const overlayEnabled = computed(() => isPopup.value && isExpanded.value)
     const overlayOffset = computed(() => (popupPortal.value ? 4 : 0))
@@ -1067,6 +1071,7 @@ export const SubMenu = defineComponent({
 
     return () => {
       if (!menuContext) return null
+      const titleId = attrs.id ?? generatedTitleId
       const inPopup = Boolean(parentScope?.popup)
       const roving = isMenuRoving(menuContext.mode.value, {
         popup: inPopup,
@@ -1102,7 +1107,6 @@ export const SubMenu = defineComponent({
         'button',
         {
           type: 'button',
-          id: titleId,
           ref: titleEl,
           class: titleClasses.value,
           style: titleStyle.value,
@@ -1117,6 +1121,7 @@ export const SubMenu = defineComponent({
           disabled: props.disabled,
           tabindex: props.disabled ? -1 : roving ? (isTabStop ? 0 : -1) : 0,
           ...passthroughAttrs.value,
+          id: titleId,
           onClick: handleTitleClick,
           onKeydown: handleTitleKeyDown
         },
