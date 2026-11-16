@@ -90,10 +90,13 @@ describe('Countdown', () => {
     renderWithProps(Countdown, {
       ariaLabel: '付款倒计时',
       value: baseTime + 5000,
-      now: baseTime
+      now: baseTime,
+      interval: 0
     })
-    expect(screen.getByRole('group', { name: '付款倒计时' })).toBeInTheDocument()
-    expect(screen.getByRole('timer')).toHaveTextContent('00:00:05')
+    const root = screen.getByRole('group', { name: '付款倒计时' })
+    expect(root).toBeInTheDocument()
+    expect(root).toHaveAttribute('aria-label', '付款倒计时')
+    expect(screen.getByRole('timer', { name: '00:00:05' })).toHaveTextContent('00:00:05')
   })
 
   it('ticks using Date.now after the initial SSR-safe value', async () => {

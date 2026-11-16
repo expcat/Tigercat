@@ -1,14 +1,4 @@
-import {
-  computed,
-  defineComponent,
-  h,
-  onBeforeUnmount,
-  onMounted,
-  PropType,
-  ref,
-  useId,
-  watch
-} from 'vue'
+import { computed, defineComponent, h, onBeforeUnmount, onMounted, PropType, ref, watch } from 'vue'
 import {
   COUNTDOWN_DEFAULT_FORMAT,
   COUNTDOWN_DEFAULT_INTERVAL_MS,
@@ -163,7 +153,6 @@ export const Countdown = defineComponent({
       setupTimer()
     })
 
-    const titleId = useId()
     const liveRegion = manageLiveRegion('polite')
     const announced = { tick: false, finish: false }
     watch(remaining, (value) => {
@@ -205,7 +194,7 @@ export const Countdown = defineComponent({
         },
         [
           titleNode != null
-            ? h('div', { id: titleId, class: getCountdownTitleClasses(props.size) }, titleNode)
+            ? h('div', { class: getCountdownTitleClasses(props.size) }, titleNode)
             : null,
           h('div', { class: countdownValueWrapperClasses }, [
             prefixNode != null ? h('span', { class: countdownPrefixClasses }, prefixNode) : null,
@@ -214,8 +203,7 @@ export const Countdown = defineComponent({
               {
                 class: getCountdownValueClasses(props.size),
                 role: 'timer',
-                'aria-labelledby': titleNode != null ? titleId : undefined,
-                'aria-label': titleNode != null ? undefined : props.ariaLabel || 'Countdown'
+                'aria-label': formatted.value
               },
               formatted.value
             ),

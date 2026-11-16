@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Countdown timer 可访问名（React / Vue，C134-F01）**：无 title、interval 为 0、ariaLabel 为「付款倒计时」时，timer 可访问名是 00:00:05，根节点仍用 ariaLabel。React 未传 ariaLabel 时保留调用方的 aria-label。
+
 - **CollapsePanel 收起态 aria-controls（Vue，C133-F01）**：默认收起的标题按钮不再写 aria-controls；展开后等于 region 的 id。关闭仍即卸载。
 
 - **Calendar 生成示例（文档 / MCP，C131-F01）**：Vue 示例改为 `<Calendar v-model="date" />`。组件只声明 modelValue，照示例挂载可以选中日期。

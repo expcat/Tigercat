@@ -1,4 +1,4 @@
-import React, { useEffect, useId, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import {
   COUNTDOWN_DEFAULT_FORMAT,
   COUNTDOWN_DEFAULT_INTERVAL_MS,
@@ -71,7 +71,6 @@ export const Countdown: React.FC<CountdownProps> = ({
 
   const formatted = useMemo(() => formatCountdown(remaining, format), [format, remaining])
   const target = parseCountdownTimestamp(value)
-  const titleId = useId()
   const timerName = typeof title === 'string' && title ? title : ariaLabel || 'Countdown'
 
   useEffect(() => {
@@ -149,20 +148,12 @@ export const Countdown: React.FC<CountdownProps> = ({
       {...rest}
       className={classNames(countdownBaseClasses, className)}
       role={ariaLabel ? 'group' : rest.role}
-      aria-label={ariaLabel}
+      aria-label={ariaLabel ?? rest['aria-label']}
       data-remaining-ratio={String(countdownRemainingRatio(remaining, total))}>
-      {title != null ? (
-        <div id={titleId} className={getCountdownTitleClasses(size)}>
-          {title}
-        </div>
-      ) : null}
+      {title != null ? <div className={getCountdownTitleClasses(size)}>{title}</div> : null}
       <div className={countdownValueWrapperClasses}>
         {prefix != null ? <span className={countdownPrefixClasses}>{prefix}</span> : null}
-        <span
-          className={getCountdownValueClasses(size)}
-          role="timer"
-          aria-labelledby={title != null ? titleId : undefined}
-          aria-label={title != null ? undefined : timerName}>
+        <span className={getCountdownValueClasses(size)} role="timer" aria-label={formatted}>
           {formatted}
         </span>
         {suffix != null ? <span className={countdownSuffixClasses}>{suffix}</span> : null}
