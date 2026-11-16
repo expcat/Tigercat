@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **ImagePreview 循环说明、手势与缩放范围（文档 / Vue / React，C020-F01、C020-F02、C020-F03）**：生成笔记改为多图首尾循环，Props、Examples 与 MCP 不再写到头禁用。Vue 打开期间按图片数量、缩放范围和滑动开关重建手势会话，1 张变 2 张后可以滑动换图，关掉 touchSwipeable 后不再滑动换图。两端打开、切图和 Reset 把比例夹进 minScale 与 maxScale，范围不含 1 时不再发出 scale 1。
+
 - **ImageGroup 受控索引（React / Vue，C019-F01）**：传入 currentIndex 时，切图只发出下一张索引请求，灯箱停在父层那一张。ImageGroup 固定 currentIndex=0 时画面仍是第 1 张。未传 currentIndex 的预览仍自行切图，并在首尾循环。
 
 - **ImageCropper 比例、放大与导出（Core / React / Vue / Demo，C018-F01、C018-F02、C018-F03、C018-F04、C018-K01、C018-V01）**：React 在 `aspectPreset` 变化时同步选中按钮和几何比例。容器放大时先记下新的显示尺寸，再约束选区。锁定比例后，图片仍能放下的最小边会被重新满足；角手柄只收到水平键时按宽度等比缩放。旋转或翻转导出按图片自然尺寸画进预览框，内容对齐变换后的显示选区。两端 04 改为按显示选区裁剪，不再写旋转交换宽高。

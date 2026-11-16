@@ -370,7 +370,7 @@ const COMPONENT_USAGE_NOTES = {
   },
   ImagePreview: {
     notes:
-      '`images` 必填（`string | { src, alt? }`）。未传 `open` 视为关（Alert 相反：省略 `open` 是展示）。缩放用 `minScale`/`maxScale`。到头 disable；空列表关闭。'
+      '`images` 必填（`string | { src, alt? }`）。未传 `open` 视为关（Alert 相反：省略 `open` 是展示）。缩放用 `minScale`/`maxScale`。多图首尾循环；空列表关闭。'
   },
   Alert: {
     notes:

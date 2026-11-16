@@ -15,13 +15,13 @@ basic 组 32 个组件（C001–C032）。这一组的浏览器证据最全，�
 
 ## 依赖与顺序
 
-- C014-V01 的根因在 ImagePreview（C020）。Gallery、Image、ImageGroup 复用同一个预览，修完四个组件一起验。
+- C014-V01 的根因在 ImagePreview。Gallery、Image、ImageGroup 复用同一个预览，修完四个组件一起验。
 - 带 V 后缀的条目里，C013-V01、C017-V01 出在示例平台的预览外壳上，与 [12](12-tooling-docs.md) 的 X05 同批看，先去重再动手。
 
 ## 概览
 
-本篇 49 条：P1 0、P2 38、P3 11。
-按波次：W5 38、W9 11。
+本篇 46 条：P1 0、P2 35、P3 11。
+按波次：W5 35、W9 11。
 
 已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C002-F002（S11）、C003-F003（S11）、C004-F001（S11）、C006-F002（S02）、C022-F03（S13）、C025-F03（S02）、C027-F01（S11）。
 
@@ -79,16 +79,6 @@ basic 组 32 个组件（C001–C032）。这一组的浏览器证据最全，�
 | C017-F03 | P3   | W9   | 测试      | 测试 | 取消与 preventDefault 测试没有进入对应拖动路径 | 两端取消与 preventDefault 用例从 handle 起拖并先断言 dragging=true；取消接线失效时用例失败 |
 | C017-V01 | P3   | W9   | 双端+Demo | 样式 | 纵向端点焦点环被预览边界裁切                   | 两端 Demo 02 四种组合下 Tab 到滑块后按 Home/End，端点焦点环四周完整可辨认                  |
 | C017-V02 | P3   | W9   | 双端      | 样式 | 前后标题叠图时局部可读性弱                     | 两端 Demo 05 亮/暗 × 窄/桌面共 8 格中，「原图」「处理后」标题在当前图片上均清晰可读        |
-
-### C020 ImagePreview
-
-报告 `groups/basic/ImagePreview.md`，队列状态 complete。另受 C014-V01 影响。
-
-| 编号     | 级别 | 波次 | 端          | 类别 | 条目                                       | 验收                                                                                           |
-| -------- | ---- | ---- | ----------- | ---- | ------------------------------------------ | ---------------------------------------------------------------------------------------------- |
-| C020-F01 | P2   | W5   | 文档·生成器 | 文档 | 生成文档/MCP 把首尾循环写成到头禁用        | 重跑生成器后 image-preview 的 Props/Examples 与 MCP 回包描述为首尾循环，不再写「到头 disable」 |
-| C020-F02 | P2   | W5   | Vue         | 行为 | Vue 打开期间手势会话持续使用旧 props       | Vue 打开期间 images 由 1 张变 2 张后可 swipe 换图；touchSwipeable 改 false 后不再换图          |
-| C020-F03 | P2   | W5   | 双端        | 行为 | 初始与重置缩放绕过合法的 minScale/maxScale | minScale=2、maxScale=3 时打开、切图、Reset 后 scale 在 2–3 内，不再发 scaleChange=1            |
 
 ### C021 Inplace
 

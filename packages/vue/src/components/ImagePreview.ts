@@ -13,6 +13,7 @@ import {
 import {
   applyWheelZoom,
   clampLightboxIndex,
+  clampLightboxScale,
   classNames,
   coerceClassValue,
   createDefaultTransform,
@@ -126,7 +127,12 @@ export const ImagePreview = defineComponent({
     const isOpen = computed(() => props.open ?? false)
     const shouldRender = computed(() => isOpen.value && resolved.value.length > 0)
 
-    const transform = ref<GestureTransform>(createDefaultTransform())
+    const restTransform = (): GestureTransform => ({
+      ...createDefaultTransform(),
+      scale: clampLightboxScale(1, scaleRange.value.minScale, scaleRange.value.maxScale)
+    })
+
+    const transform = ref<GestureTransform>(restTransform())
     const index = ref(props.currentIndex)
     const dragging = ref(false)
     const rootRef = ref<HTMLElement | null>(null)
@@ -134,7 +140,7 @@ export const ImagePreview = defineComponent({
     let detachWheel: (() => void) | undefined
 
     const resetTransform = () => {
-      transform.value = createDefaultTransform()
+      transform.value = restTransform()
       dragging.value = false
     }
 
@@ -205,7 +211,7 @@ export const ImagePreview = defineComponent({
 
     const handleReset = () => {
       resetTransform()
-      emit('scale-change', 1)
+      emit('scale-change', transform.value.scale)
     }
 
     const handleRotateLeft = () => {
@@ -325,19 +331,31 @@ export const ImagePreview = defineComponent({
     }
 
     watch(
-      shouldRender,
-      async (open) => {
+      () =>
+        [
+          shouldRender.value,
+          resolved.value.length,
+          scaleRange.value.minScale,
+          scaleRange.value.maxScale,
+          props.zoomable,
+          props.touchSwipeable,
+          props.touchSwipeThreshold,
+          config.value.direction
+        ] as const,
+      async ([open], previous) => {
         if (!isBrowser()) return
+        const wasOpen = previous?.[0] === true
+        gestureSession?.dispose()
+        gestureSession = null
         if (!open) {
           detachWheel?.()
           detachWheel = undefined
-          gestureSession?.dispose()
-          gestureSession = null
           return
         }
-
         attachGesture()
+        if (wasOpen) return
         await nextTick()
+        if (!shouldRender.value) return
         attachWheel()
       },
       { flush: 'post', immediate: true }

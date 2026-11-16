@@ -244,6 +244,27 @@ describe('ImagePreview', () => {
     expect(onCurrentIndexChange).toHaveBeenCalledWith(2)
   })
 
+  it('keeps open, navigate, and reset scale inside minScale and maxScale', () => {
+    const onScaleChange = vi.fn()
+    render(
+      <ImagePreview open images={images} minScale={2} maxScale={3} onScaleChange={onScaleChange} />
+    )
+    const img = () => document.querySelector('[role="dialog"] img') as HTMLImageElement
+    const scaleOf = () => Number(/scale\(([^)]+)\)/.exec(img().style.transform)?.[1])
+    expect(scaleOf()).toBeGreaterThanOrEqual(2)
+    expect(scaleOf()).toBeLessThanOrEqual(3)
+
+    fireEvent.click(screen.getByRole('button', { name: labels.nextImageAriaLabel }))
+    expect(scaleOf()).toBeGreaterThanOrEqual(2)
+    expect(scaleOf()).toBeLessThanOrEqual(3)
+
+    fireEvent.click(screen.getByRole('button', { name: labels.zoomInAriaLabel }))
+    fireEvent.click(screen.getByRole('button', { name: labels.resetAriaLabel }))
+    expect(scaleOf()).toBeGreaterThanOrEqual(2)
+    expect(scaleOf()).toBeLessThanOrEqual(3)
+    expect(onScaleChange).not.toHaveBeenCalledWith(1)
+  })
+
   it('resets transform when the image changes and when reopened', () => {
     function Harness() {
       const [open, setOpen] = useState(true)

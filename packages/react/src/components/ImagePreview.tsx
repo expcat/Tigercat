@@ -10,6 +10,7 @@ import {
   applyWheelZoom,
   classNames,
   createDefaultTransform,
+  clampLightboxScale,
   downloadCurrentImageUrl,
   downloadIconPath,
   flipHorizontalIconPath,
@@ -72,6 +73,13 @@ const SvgIcon: React.FC<{ d: string; cls?: string }> = ({ d, cls = 'w-5 h-5' }) 
   </svg>
 )
 
+function restLightboxTransform(range: { minScale: number; maxScale: number }): GestureTransform {
+  return {
+    ...createDefaultTransform(),
+    scale: clampLightboxScale(1, range.minScale, range.maxScale)
+  }
+}
+
 export const ImagePreview: React.FC<ImagePreviewProps> = ({
   open,
   images,
@@ -111,7 +119,9 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
   const isOpen = open ?? false
   const shouldRender = isOpen && resolved.length > 0
 
-  const [transform, setTransform] = useState<GestureTransform>(createDefaultTransform)
+  const [transform, setTransform] = useState<GestureTransform>(() =>
+    restLightboxTransform(scaleRange)
+  )
   const [index, setIndex] = useState(() =>
     resolved.length ? Math.min(Math.max(0, currentIndex ?? 0), resolved.length - 1) : 0
   )
@@ -125,6 +135,8 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
   const onScaleChangeRef = useRef(onScaleChange)
   const gestureRef = useRef<ReturnType<typeof createLightboxGestureSession> | null>(null)
 
+  const scaleRangeRef = useRef(scaleRange)
+  scaleRangeRef.current = scaleRange
   transformRef.current = transform
   indexRef.current = index
   resolvedRef.current = resolved
@@ -132,7 +144,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
   onScaleChangeRef.current = onScaleChange
 
   const resetTransform = useCallback(() => {
-    setTransform(createDefaultTransform())
+    setTransform(restLightboxTransform(scaleRangeRef.current))
     setDragging(false)
   }, [])
 
@@ -201,8 +213,9 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
   }, [scaleRange.minScale, scaleStep, setScale])
 
   const handleReset = useCallback(() => {
+    const scale = restLightboxTransform(scaleRangeRef.current).scale
     resetTransform()
-    onScaleChangeRef.current?.(1)
+    onScaleChangeRef.current?.(scale)
   }, [resetTransform])
 
   const handleRotateLeft = useCallback(() => {

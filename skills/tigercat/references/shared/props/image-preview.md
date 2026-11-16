@@ -13,7 +13,7 @@ description: Compact generated Tigercat Basic props reference
 
 `packages/core/src/types/image.ts` · `ImagePreviewProps` · 4/17 compact props · [Complete props](#remaining-props-complete-public-api)
 
-Note: `images` 必填（`string | { src, alt? }`）。未传 `open` 视为关（Alert 相反：省略 `open` 是展示）。缩放用 `minScale`/`maxScale`。到头 disable；空列表关闭。
+Note: `images` 必填（`string | { src, alt? }`）。未传 `open` 视为关（Alert 相反：省略 `open` 是展示）。缩放用 `minScale`/`maxScale`。多图首尾循环；空列表关闭。
 
 | Prop        | Type                  | Default | Notes                                                                                     |
 | ----------- | --------------------- | ------- | ----------------------------------------------------------------------------------------- |

@@ -185,6 +185,57 @@ describe('ImagePreview', () => {
     expect(img.style.transform).toContain('translate(30px, 40px)')
   })
 
+  it('rebinds swipe when images or touchSwipeable change while open', async () => {
+    const swipe = async (node: HTMLElement) => {
+      await fireEvent.pointerDown(node, {
+        pointerId: 7,
+        clientX: 180,
+        clientY: 60,
+        pointerType: 'touch'
+      })
+      await fireEvent.pointerMove(document, { pointerId: 7, clientX: 80, clientY: 66 })
+      await fireEvent.pointerUp(document, { pointerId: 7, clientX: 80, clientY: 66 })
+    }
+
+    const grown = render(ImagePreview, { props: { open: true, images: ['/a.jpg'] } })
+    await grown.rerender({ open: true, images: ['/a.jpg', '/b.jpg'] })
+    const grownImg = document.querySelector('[role="dialog"] img') as HTMLImageElement
+    await swipe(grownImg)
+    expect(grown.emitted()['update:currentIndex']?.[0]).toEqual([1])
+    expect(grownImg).toHaveAttribute('src', '/b.jpg')
+    grown.unmount()
+
+    const locked = render(ImagePreview, {
+      props: { open: true, images, touchSwipeable: true }
+    })
+    await locked.rerender({ open: true, images, touchSwipeable: false })
+    const lockedImg = document.querySelector('[role="dialog"] img') as HTMLImageElement
+    await swipe(lockedImg)
+    expect(locked.emitted()['update:currentIndex']).toBeFalsy()
+    expect(lockedImg).toHaveAttribute('src', '/img1.jpg')
+  })
+
+  it('keeps open, navigate, and reset scale inside minScale and maxScale', async () => {
+    const { emitted } = render(ImagePreview, {
+      props: { open: true, images, minScale: 2, maxScale: 3 }
+    })
+    const img = () => document.querySelector('[role="dialog"] img') as HTMLImageElement
+    const scaleOf = () => Number(/scale\(([^)]+)\)/.exec(img().style.transform)?.[1])
+    expect(scaleOf()).toBeGreaterThanOrEqual(2)
+    expect(scaleOf()).toBeLessThanOrEqual(3)
+
+    await fireEvent.click(screen.getByRole('button', { name: labels.nextImageAriaLabel }))
+    expect(scaleOf()).toBeGreaterThanOrEqual(2)
+    expect(scaleOf()).toBeLessThanOrEqual(3)
+
+    await fireEvent.click(screen.getByRole('button', { name: labels.zoomInAriaLabel }))
+    await fireEvent.click(screen.getByRole('button', { name: labels.resetAriaLabel }))
+    expect(scaleOf()).toBeGreaterThanOrEqual(2)
+    expect(scaleOf()).toBeLessThanOrEqual(3)
+    const changes = (emitted()['scale-change'] ?? []) as unknown[][]
+    expect(changes.some((entry) => entry[0] === 1)).toBe(false)
+  })
+
   it('resets transform when the image changes', async () => {
     const Harness = defineComponent({
       setup() {
