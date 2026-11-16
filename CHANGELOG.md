@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **QRCode 图像名称、对比与页尾章节（Core / React / Vue，C025-F01、C025-F02、C025-F04、C025-F05）**：expired 且有刷新时，图像角色只包住二维码，刷新按钮与之并列，两端 a11y 不再报 nested-interactive。显式 aria-label 保留，expired 仍在名称后带状态；locale 与 aria-labelledby 仍可用。--tiger-text 与 --tiger-surface 同为白色时对比诊断为 1:1 并预警。滚动容器到底时，章节导航高亮最后一节。
+
 - **Marquee 复制段与焦点暂停（Core / React / Vue / Demo，C024-F01、C024-F02、C024-F03）**：两端 Demo02 改为 direction 用 end，并写明受控时由外部 Pause/Play 控制、焦点不触发暂停。子层只更新自己的 state 或 ref 时，原内容与复制段都变成新文本。未受控实例在关闭 pauseOnFocus 期间焦点离开后，再打开仍继续滚动。
 
 - **Link 禁用示例说明（Demo，C023-F01）**：两端 link/01 改为写明 disabled 时移除 href 并不可聚焦，不再写禁用仍保留 href。

@@ -225,6 +225,31 @@ describe('ScrollSpy', () => {
       expect(screen.getByText('Intro')).not.toHaveAttribute('aria-current')
       expect(result.emitted('change')?.length ?? 0).toBe(changeCalls)
     })
+
+    it('highlights the last section when the scroll container is at the end', async () => {
+      const intro = document.getElementById('intro') as HTMLElement
+      const usage = document.getElementById('usage') as HTMLElement
+      const api = document.getElementById('api') as HTMLElement
+      vi.spyOn(scrollContainer, 'getBoundingClientRect').mockReturnValue(
+        new DOMRect(0, 0, 1440, 900)
+      )
+      vi.spyOn(intro, 'getBoundingClientRect').mockReturnValue(new DOMRect(0, 40, 100, 20))
+      vi.spyOn(usage, 'getBoundingClientRect').mockReturnValue(new DOMRect(0, 80, 100, 20))
+      vi.spyOn(api, 'getBoundingClientRect').mockReturnValue(new DOMRect(0, 520, 100, 200))
+      Object.defineProperty(scrollContainer, 'clientHeight', { configurable: true, value: 900 })
+      Object.defineProperty(scrollContainer, 'scrollHeight', { configurable: true, value: 1800 })
+      scrollContainer.scrollTop = 900
+
+      renderScrollSpy({ targetOffset: 64 })
+      await nextTick()
+      await nextTick()
+      scrollContainer.dispatchEvent(new Event('scroll'))
+
+      await waitFor(() => {
+        expect(screen.getByText('API')).toHaveAttribute('aria-current', 'location')
+      })
+      expect(screen.getByText('Usage')).not.toHaveAttribute('aria-current')
+    })
   })
 
   describe('Accessibility', () => {

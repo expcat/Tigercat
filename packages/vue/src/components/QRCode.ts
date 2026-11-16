@@ -71,9 +71,16 @@ export const QRCode = defineComponent({
             : props.status === 'scanned'
               ? scannedText
               : ''
-      const imgLabel = statusText
-        ? `${labels.value.ariaLabel}, ${statusText}`
-        : labels.value.ariaLabel
+      const callerLabel = attrsRecord['aria-label']
+      const ariaLabelledBy = attrsRecord['aria-labelledby']
+      const ariaDescribedBy = attrsRecord['aria-describedby']
+      const domAttrs = { ...attrsRecord }
+      delete domAttrs['aria-label']
+      delete domAttrs['aria-labelledby']
+      delete domAttrs['aria-describedby']
+      const callerName = typeof callerLabel === 'string' ? callerLabel.trim() : ''
+      const baseName = callerName || labels.value.ariaLabel
+      const imgLabel = statusText ? `${baseName}, ${statusText}` : baseName
       const scheme = config.value.colorScheme === 'dark' ? 'dark' : 'light'
 
       if (qrNeedsContrastWarning(props.color, props.bgColor, scheme)) {
@@ -108,7 +115,15 @@ export const QRCode = defineComponent({
         ]
       )
 
-      const children: Array<ReturnType<typeof h>> = [svg]
+      const imageProps: Record<string, unknown> = {
+        class: 'absolute inset-0',
+        role: 'img',
+        'aria-label': imgLabel
+      }
+      if (typeof ariaLabelledBy === 'string') imageProps['aria-labelledby'] = ariaLabelledBy
+      if (typeof ariaDescribedBy === 'string') imageProps['aria-describedby'] = ariaDescribedBy
+      const image = h('div', imageProps, [svg])
+      const children: Array<ReturnType<typeof h>> = [image]
       const hasRefresh = Boolean(getCurrentInstance()?.vnode.props?.onRefresh)
 
       if (failed) {
@@ -171,7 +186,7 @@ export const QRCode = defineComponent({
       return h(
         'div',
         {
-          ...attrs,
+          ...domAttrs,
           class: classNames(
             qrcodeContainerClasses,
             props.className,
@@ -180,9 +195,7 @@ export const QRCode = defineComponent({
           style: mergeStyleValues(attrsRecord.style, {
             width: `${props.size}px`,
             height: `${props.size}px`
-          }),
-          role: 'img',
-          'aria-label': imgLabel
+          })
         },
         children
       )

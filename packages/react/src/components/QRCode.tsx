@@ -64,7 +64,15 @@ export const QRCode = forwardRef<HTMLDivElement, QRCodeProps>(function QRCode(
         : status === 'scanned'
           ? scannedText
           : ''
-  const imgLabel = statusText ? `${labels.ariaLabel}, ${statusText}` : labels.ariaLabel
+  const {
+    'aria-label': ariaLabelProp,
+    'aria-labelledby': ariaLabelledBy,
+    'aria-describedby': ariaDescribedBy,
+    ...domRest
+  } = rest
+  const callerName = typeof ariaLabelProp === 'string' ? ariaLabelProp.trim() : ''
+  const baseName = callerName || labels.ariaLabel
+  const imgLabel = statusText ? `${baseName}, ${statusText}` : baseName
   const scheme = config.colorScheme === 'dark' ? 'dark' : 'light'
 
   if (qrNeedsContrastWarning(color, bgColor, scheme)) {
@@ -79,33 +87,38 @@ export const QRCode = forwardRef<HTMLDivElement, QRCodeProps>(function QRCode(
       ref={ref}
       className={classNames(qrcodeContainerClasses, className)}
       style={{ ...style, width: size, height: size }}
-      {...rest}
-      role="img"
-      aria-label={imgLabel}>
-      <svg
-        width={size}
-        height={size}
-        viewBox={`0 0 ${viewBox} ${viewBox}`}
-        xmlns="http://www.w3.org/2000/svg"
-        aria-hidden="true"
-        className="block h-full w-full">
-        <rect width={viewBox} height={viewBox} fill={bgColor} />
-        {encoded.ok ? <path d={qrDarkModulesPath(matrix)} fill={color} /> : null}
-        {iconPath ? (
-          <path
-            d={iconPath}
-            fill={color}
-            transform={`translate(${viewBox / 2 - 3} ${viewBox / 2 - 3}) scale(${6 / 24})`}
-          />
+      {...domRest}>
+      <div
+        className="absolute inset-0"
+        role="img"
+        aria-label={imgLabel}
+        aria-labelledby={ariaLabelledBy}
+        aria-describedby={ariaDescribedBy}>
+        <svg
+          width={size}
+          height={size}
+          viewBox={`0 0 ${viewBox} ${viewBox}`}
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+          className="block h-full w-full">
+          <rect width={viewBox} height={viewBox} fill={bgColor} />
+          {encoded.ok ? <path d={qrDarkModulesPath(matrix)} fill={color} /> : null}
+          {iconPath ? (
+            <path
+              d={iconPath}
+              fill={color}
+              transform={`translate(${viewBox / 2 - 3} ${viewBox / 2 - 3}) scale(${6 / 24})`}
+            />
+          ) : null}
+        </svg>
+        {iconNode ? (
+          <div
+            className="pointer-events-none absolute inset-0 flex items-center justify-center"
+            aria-hidden="true">
+            {iconNode}
+          </div>
         ) : null}
-      </svg>
-      {iconNode ? (
-        <div
-          className="pointer-events-none absolute inset-0 flex items-center justify-center"
-          aria-hidden="true">
-          {iconNode}
-        </div>
-      ) : null}
+      </div>
 
       {failed ? (
         <div className={qrcodeOverlayClasses} role="status">

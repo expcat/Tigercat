@@ -4,6 +4,8 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
+import { renderToString } from '@vue/server-renderer'
+import { h } from 'vue'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
@@ -94,6 +96,9 @@ describe('QRCode', () => {
     })
     expect(screen.getByRole('button', { name: zhCN.qrcode!.refreshText })).toBeInTheDocument()
     expect(screen.getByText(zhCN.qrcode!.expiredText!)).toBeInTheDocument()
+    expect(
+      screen.getByRole('img', { name: `${zhCN.qrcode!.ariaLabel}, ${zhCN.qrcode!.expiredText}` })
+    ).toBeInTheDocument()
     unmount()
 
     render({
@@ -109,6 +114,60 @@ describe('QRCode', () => {
     renderWithProps(QRCode, { value: 'test', status: 'active' })
     expect(screen.queryByText('QR code expired')).not.toBeInTheDocument()
     expect(screen.queryByText('Loading...')).not.toBeInTheDocument()
+  })
+
+  it('keeps an explicit image name and does not nest the refresh button inside it', () => {
+    const active = render(QRCode, {
+      props: { value: 'pay' },
+      attrs: { 'aria-label': '付款二维码' }
+    })
+    expect(screen.getByRole('img', { name: '付款二维码' })).toBeInTheDocument()
+    active.unmount()
+
+    const expired = render(QRCode, {
+      props: { value: 'pay', status: 'expired' },
+      attrs: { 'aria-label': '付款二维码', onRefresh: () => undefined }
+    })
+    const img = screen.getByRole('img', { name: '付款二维码, QR code expired' })
+    const button = screen.getByRole('button', { name: 'Refresh' })
+    expect(img).not.toContainElement(button)
+    expired.unmount()
+
+    render(QRCode, {
+      props: { value: 'pay' },
+      attrs: { 'aria-labelledby': 'pay-title' }
+    })
+    expect(screen.getByRole('img')).toHaveAttribute('aria-labelledby', 'pay-title')
+  })
+
+  it('keeps the caller image name in server markup', async () => {
+    const active = await renderToString(h(QRCode, { value: 'pay', 'aria-label': '付款二维码' }))
+    expect(active).toContain('aria-label="付款二维码"')
+    expect(active).not.toContain('aria-label="QR Code"')
+
+    const expired = await renderToString(
+      h(QRCode, {
+        value: 'pay',
+        status: 'expired',
+        'aria-label': '付款二维码',
+        onRefresh: () => undefined
+      })
+    )
+    expect(expired).toContain('aria-label="付款二维码, QR code expired"')
+    const imageEnd = expired.indexOf('</div>', expired.indexOf('role="img"'))
+    const buttonAt = expired.indexOf('<button')
+    expect(imageEnd).toBeGreaterThan(-1)
+    expect(buttonAt).toBeGreaterThan(imageEnd)
+
+    const labelled = await renderToString(
+      h(QRCode, { value: 'pay', 'aria-labelledby': 'pay-title' })
+    )
+    expect(labelled).toContain('aria-labelledby="pay-title"')
+
+    const localized = await renderToString(
+      h(ConfigProvider, { locale: zhCN }, () => h(QRCode, { value: 'pay' }))
+    )
+    expect(localized).toContain('aria-label="二维码"')
   })
 
   describe('Accessibility', () => {

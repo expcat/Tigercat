@@ -4,6 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
+import { renderToStaticMarkup } from 'react-dom/server'
 import React, { createRef } from 'react'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
@@ -85,6 +86,9 @@ describe('QRCode', () => {
     )
     expect(screen.getByRole('button', { name: zhCN.qrcode!.refreshText })).toBeInTheDocument()
     expect(screen.getByText(zhCN.qrcode!.expiredText!)).toBeInTheDocument()
+    expect(
+      screen.getByRole('img', { name: `${zhCN.qrcode!.ariaLabel}, ${zhCN.qrcode!.expiredText}` })
+    ).toBeInTheDocument()
 
     rerender(
       <ConfigProvider locale={zhTW}>
@@ -98,6 +102,47 @@ describe('QRCode', () => {
     render(<QRCode value="test" status="active" />)
     expect(screen.queryByText('QR code expired')).not.toBeInTheDocument()
     expect(screen.queryByText('Loading...')).not.toBeInTheDocument()
+  })
+
+  it('keeps an explicit image name and does not nest the refresh button inside it', () => {
+    const { rerender } = render(<QRCode value="pay" aria-label="付款二维码" />)
+    expect(screen.getByRole('img', { name: '付款二维码' })).toBeInTheDocument()
+
+    rerender(
+      <QRCode value="pay" aria-label="付款二维码" status="expired" onRefresh={() => undefined} />
+    )
+    const img = screen.getByRole('img', { name: '付款二维码, QR code expired' })
+    const button = screen.getByRole('button', { name: 'Refresh' })
+    expect(img).not.toContainElement(button)
+
+    rerender(<QRCode value="pay" aria-labelledby="pay-title" />)
+    expect(screen.getByRole('img')).toHaveAttribute('aria-labelledby', 'pay-title')
+  })
+
+  it('keeps the caller image name in server markup', () => {
+    const active = renderToStaticMarkup(<QRCode value="pay" aria-label="付款二维码" />)
+    expect(active).toContain('aria-label="付款二维码"')
+    expect(active).not.toContain('>QR Code<')
+    expect(active).not.toContain('aria-label="QR Code"')
+
+    const expired = renderToStaticMarkup(
+      <QRCode value="pay" aria-label="付款二维码" status="expired" onRefresh={() => undefined} />
+    )
+    expect(expired).toContain('aria-label="付款二维码, QR code expired"')
+    const imageEnd = expired.indexOf('</div>', expired.indexOf('role="img"'))
+    const buttonAt = expired.indexOf('<button')
+    expect(imageEnd).toBeGreaterThan(-1)
+    expect(buttonAt).toBeGreaterThan(imageEnd)
+
+    const labelled = renderToStaticMarkup(<QRCode value="pay" aria-labelledby="pay-title" />)
+    expect(labelled).toContain('aria-labelledby="pay-title"')
+
+    const localized = renderToStaticMarkup(
+      <ConfigProvider locale={zhCN}>
+        <QRCode value="pay" />
+      </ConfigProvider>
+    )
+    expect(localized).toContain('aria-label="二维码"')
   })
 
   describe('Accessibility', () => {

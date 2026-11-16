@@ -538,13 +538,41 @@ export interface AnchorObserverOptions {
   holdUntilScroll?: boolean
 }
 
+const SCROLL_END_EPSILON = 1
+
+function isScrollRootAtEnd(root: Element | null): boolean {
+  if (root) {
+    const maxScroll = root.scrollHeight - root.clientHeight
+    if (maxScroll <= SCROLL_END_EPSILON) return false
+    return root.scrollTop >= maxScroll - SCROLL_END_EPSILON
+  }
+  const scrolling = document.scrollingElement ?? document.documentElement
+  const maxScroll = scrolling.scrollHeight - window.innerHeight
+  if (maxScroll <= SCROLL_END_EPSILON) return false
+  const top = window.scrollY || scrolling.scrollTop || 0
+  return top >= maxScroll - SCROLL_END_EPSILON
+}
+
+function lastResolvedAnchor(links: string[], root: Element | null): string {
+  for (let i = links.length - 1; i >= 0; i--) {
+    const href = links[i]
+    const el = getAnchorTargetElement(href)
+    if (!el) continue
+    if (root && !root.contains(el)) continue
+    return href
+  }
+  return ''
+}
+
 /**
  * Create an IntersectionObserver-based active-anchor tracker.
  *
  * IO is the change trigger. The winner is the heading closest to
  * `rootTop + offsetTop + bounds`. Visibility / `isIntersecting` order does not
  * decide. A heading that never reaches the line can still become active when
- * it is the closest one.
+ * it is the closest one. When the scroll root is parked at the end, the last
+ * resolved heading wins: a short final section may never become the nearest
+ * heading to the top offset line.
  *
  * Returns a teardown function. Safe when `IntersectionObserver` is unavailable
  * (returns no-op) or no targets resolve.
@@ -558,6 +586,10 @@ export function createAnchorObserver(links: string[], options: AnchorObserverOpt
   const computeActive = (): string => {
     const rootTop = root ? root.getBoundingClientRect().top : 0
     const offsetLine = rootTop + offsetTop + bounds
+    if (isScrollRootAtEnd(root)) {
+      const last = lastResolvedAnchor(links, root)
+      if (last) return last
+    }
     return findNearestAnchorToOffsetLine(
       links,
       (href) => {

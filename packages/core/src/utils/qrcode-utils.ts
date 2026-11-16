@@ -114,10 +114,12 @@ function paintChannels(
   const variable = VAR_COLOR.exec(value)
   if (!variable) return null
   const token = variable[1]
-  const fromTheme = themePaint(scheme)[token]
-  if (fromTheme) return paintChannels(fromTheme, scheme, depth + 1)
+  // Diagnostics read the live documentElement token. The built-in theme is
+  // only the fallback when that value is empty, including SSR.
   const computed = readComputedToken(token)
   if (computed) return paintChannels(computed, scheme, depth + 1)
+  const fromTheme = themePaint(scheme)[token]
+  if (fromTheme) return paintChannels(fromTheme, scheme, depth + 1)
   const fallback = variable[2]?.trim()
   if (fallback) return paintChannels(fallback, scheme, depth + 1)
   return null
@@ -133,7 +135,8 @@ function relativeLuminance([r, g, b]: [number, number, number]): number {
 
 /**
  * WCAG contrast for the colors that will actually be painted.
- * CSS variables resolve through the theme (and computed style when present).
+ * CSS variables use the documentElement computed value when the browser has
+ * one, and the built-in theme only when that value is empty.
  * `null` only when a color still cannot be resolved.
  */
 export function qrColorContrast(
