@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, PropType } from 'vue'
+import { defineComponent, computed, h, Text, PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -18,6 +18,7 @@ import {
   type ResultHeadingLevel,
   type ResultStatus
 } from '@expcat/tigercat-core'
+import { flattenSlotVNodes } from '../utils/flatten-vnodes'
 import { createStatusIcon } from '../utils/icon-helpers'
 
 export interface VueResultProps {
@@ -69,7 +70,12 @@ export const Result = defineComponent({
     return () => {
       const attrsRecord = attrs as Record<string, unknown>
       const children = []
-      const hasTitle = Boolean(props.title || slots.title)
+      const titleSlot = slots.title?.()
+      const hasTitleSlot = flattenSlotVNodes(titleSlot).some(
+        (node) => node.type !== Text || String(node.children ?? '').trim().length > 0
+      )
+      const titleContent = hasTitleSlot ? titleSlot : props.title
+      const hasTitle = Boolean(titleContent)
 
       if (slots.icon) {
         children.push(
@@ -126,13 +132,7 @@ export const Result = defineComponent({
       }
 
       if (hasTitle) {
-        children.push(
-          h(
-            headingTag.value,
-            { class: resultTitleClasses },
-            slots.title ? slots.title() : props.title
-          )
-        )
+        children.push(h(headingTag.value, { class: resultTitleClasses }, titleContent))
       }
 
       if (props.subTitle || slots.subTitle) {

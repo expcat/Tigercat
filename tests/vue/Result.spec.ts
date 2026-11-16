@@ -129,6 +129,34 @@ describe('Result (Vue)', () => {
       expect(screen.getByRole('heading', { name: 'Slot Title' })).toBeInTheDocument()
     })
 
+    it('uses the current title slot content and falls back to the title prop', async () => {
+      const { container, rerender } = render({
+        components: { Result },
+        props: { show: Boolean, title: String },
+        template: `
+          <Result status="404" :title="title">
+            <template #title><span v-if="show">Not Found</span></template>
+          </Result>
+        `
+      })
+
+      await expectNoA11yViolationsIsolated(container)
+      expect(screen.queryByRole('heading')).not.toBeInTheDocument()
+      expect(screen.getByText('404')).not.toHaveAttribute('aria-hidden')
+
+      await rerender({ show: true, title: 'Fallback title' })
+      expect(screen.getByRole('heading', { name: 'Not Found' })).toBeInTheDocument()
+      expect(screen.getByText('404')).toHaveAttribute('aria-hidden', 'true')
+
+      await rerender({ show: false })
+      expect(screen.getByRole('heading', { name: 'Fallback title' })).toBeInTheDocument()
+      expect(screen.getByText('404')).toHaveAttribute('aria-hidden', 'true')
+
+      await rerender({ title: undefined })
+      expect(screen.queryByRole('heading')).not.toBeInTheDocument()
+      expect(screen.getByText('404')).not.toHaveAttribute('aria-hidden')
+    })
+
     it('renders subTitle slot', () => {
       render(Result, {
         props: { title: 'T' },

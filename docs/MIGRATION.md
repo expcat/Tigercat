@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+Vue Result 的空 title slot 现在回退到 title prop；未提供 title 时不生成空 heading，HTTP 数字不再带 `aria-hidden`。调用方式不用改，依赖旧空标题输出的断言需调整。
+
 双端 CropUpload 的文件输入现在通过 `aria-labelledby` 引用触发按钮，两端按钮保留显式 `aria-label`。Vue 的显式 `id="avatar-picker"` 现在保留在按钮上，文件输入为 `avatar-picker-input`，与 React 一致。调用方式不用改，依赖旧自动 id 或默认名称覆盖行为的断言需调整。
 
 Vue CopyButton 的 `aria-*`、`id`、`tabindex` 等原生属性现在落在真实 button，`class` / `style` 仍用于外层布局。双端复制完成后不再强制回焦，等待期间移到其他控件的焦点会保留。调用方式不用改，依赖旧属性落点或回焦行为的选择器与断言需调整。

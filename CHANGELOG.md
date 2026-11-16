@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Result 条件空标题（Vue，C027-F02）**：按本次 title slot 的实际内容决定标题，空 slot 回退到 title prop；没有标题时不生成空 heading，HTTP 数字保留可访问文本，条件切换时同步更新。
+
 - **Rate 只读说明、原生事件、悬停预览与空星对比（Core / React / Vue / Demo / 文档，C026-F01、C026-F02、C026-F03、C026-V02、C026-V03）**：生成笔记与 MCP 只承诺 `readOnly`。两端根节点先调用调用方的按键和 mouseleave，已取消的 ArrowRight 不改分。悬停后切到 readOnly 或 disabled 时结束预览，离开和解锁后只显示真实分。启用空星改用 `--tiger-text-secondary`，禁用仍用 `--tiger-text-disabled`。Demo03 心形改为随颜色变化的文本 ♥。
 
 - **QRCode 图像名称、对比与页尾章节（Core / React / Vue，C025-F01、C025-F02、C025-F04、C025-F05）**：expired 且有刷新时，图像角色只包住二维码，刷新按钮与之并列，两端 a11y 不再报 nested-interactive。显式 aria-label 保留，expired 仍在名称后带状态；locale 与 aria-labelledby 仍可用。--tiger-text 与 --tiger-surface 同为白色时对比诊断为 1:1 并预警。滚动容器到底时，章节导航高亮最后一节。
