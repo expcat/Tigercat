@@ -47,7 +47,7 @@ describe('Carousel', () => {
   })
 
   describe('Rendering', () => {
-    it('renders real tabs and does not mint a landmark without a name', () => {
+    it('renders dot buttons with aria-current and does not mint a landmark without a name', () => {
       const { container } = render(<Carousel>{slides()}</Carousel>)
       const root = container.querySelector('[data-tiger-carousel]') as HTMLElement
       expect(root).toHaveAttribute('role', 'group')
@@ -116,6 +116,26 @@ describe('Carousel', () => {
       expect(
         container.querySelectorAll('[data-tiger-carousel-slide]:not([data-tiger-carousel-clone])')
       ).toHaveLength(2)
+    })
+
+    it('refreshes slides and dot buttons when the parent replaces its content', () => {
+      function Harness({ items }: { items: string[] }) {
+        const content = items.map((item) => <div key={item}>{item}</div>)
+        return <Carousel speed={0}>{content}</Carousel>
+      }
+      const { container, rerender } = render(<Harness items={['Original 1', 'Original 2']} />)
+      expect(screen.getAllByRole('button', { name: /Go to slide/ })).toHaveLength(2)
+
+      rerender(<Harness items={['Updated 1', 'Updated 2', 'Added 3']} />)
+
+      expect(
+        Array.from(
+          container.querySelectorAll('[data-tiger-carousel-slide]'),
+          (slide) => slide.textContent
+        )
+      ).toEqual(['Updated 1', 'Updated 2', 'Added 3'])
+      expect(screen.getAllByRole('button', { name: /Go to slide/ })).toHaveLength(3)
+      expect(screen.getByRole('status')).toHaveTextContent('Slide 1 of 3')
     })
   })
 
@@ -417,16 +437,26 @@ describe('Carousel', () => {
           </div>
         )
       }
-      render(<Harness />)
-      expect(screen.getByRole('button', { name: 'Go to slide 2' })).toHaveAttribute(
-        'aria-current',
-        'true'
-      )
+      const { container } = render(<Harness />)
+      const expectSecondSlide = () => {
+        const rendered = container.querySelectorAll('[data-tiger-carousel-slide]')
+        expect(Array.from(rendered, (slide) => slide.getAttribute('aria-label'))).toEqual([
+          'Slide 2 of 3',
+          'Slide 3 of 3',
+          'Slide 1 of 3'
+        ])
+        expect(rendered[0]).toHaveAttribute('data-tiger-carousel-slide', 'active')
+        expect(screen.getByRole('button', { name: 'Go to slide 2' })).toHaveAttribute(
+          'aria-current',
+          'true'
+        )
+        expect(
+          (container.querySelector('[data-tiger-carousel-track]') as HTMLElement).style.transform
+        ).toBe('translate3d(0%, 0, 0)')
+      }
+      expectSecondSlide()
       fireEvent.click(screen.getByRole('button', { name: 'Release' }))
-      expect(screen.getByRole('button', { name: 'Go to slide 2' })).toHaveAttribute(
-        'aria-current',
-        'true'
-      )
+      expectSecondSlide()
     })
   })
 

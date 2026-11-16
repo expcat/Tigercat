@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Carousel 圆点说明与 Vue 状态同步（Demo / 测试 / Vue，C035-F01、C035-F02、C035-F03）**：两端 Demo01 和 React 测试标题改述导航按钮与 aria-current。Vue 释放初始受控索引后保留当前页，每次 render 读取新 slot 内容，页数改变时同步窗口顺序与位移。
+
 - **Card 标题、内部控件与条件内容（React / Vue / 文档 / MCP，C034-F01、C034-F02、C034-F03、C034-F05、C034-F06）**：文档区分 title 可见标题与 htmlTitle 原生提示；独立链接保留标题级别，Vue header 链接有名称。库内 Input 独立交互，卡片键盘激活限根节点；空 actions / cover 不留壳，数字 0 保留；Vue 横向封面链接保留内容列和 padding。
 
 - **AspectRatio 示例说明与选中态（Demo，C033-F01、C033-F02）**：两端 Demo01 写明显式 fit=cover 才铺满并裁切媒体；Vue Demo03 的蓝色选中类与灰色未选中类互斥，亮暗主题均保留可辨的选中态。

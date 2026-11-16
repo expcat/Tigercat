@@ -117,6 +117,31 @@ describe('Carousel', () => {
         container.querySelectorAll('[data-tiger-carousel-slide]:not([data-tiger-carousel-clone])')
       ).toHaveLength(2)
     })
+
+    it('refreshes slides and dot buttons when the parent replaces its content', async () => {
+      const items = ref(['Original 1', 'Original 2'])
+      const { container } = render({
+        setup() {
+          return () => {
+            const content = items.value.map((item) => h('div', { key: item }, item))
+            return h(Carousel, { speed: 0 }, () => content)
+          }
+        }
+      })
+      expect(screen.getAllByRole('button', { name: /Go to slide/ })).toHaveLength(2)
+
+      items.value = ['Updated 1', 'Updated 2', 'Added 3']
+      await nextTick()
+
+      expect(
+        Array.from(
+          container.querySelectorAll('[data-tiger-carousel-slide]'),
+          (slide) => slide.textContent
+        )
+      ).toEqual(['Updated 1', 'Updated 2', 'Added 3'])
+      expect(screen.getAllByRole('button', { name: /Go to slide/ })).toHaveLength(3)
+      expect(screen.getByRole('status')).toHaveTextContent('Slide 1 of 3')
+    })
   })
 
   describe('Navigation', () => {
@@ -362,6 +387,32 @@ describe('Carousel', () => {
         'aria-current',
         'true'
       )
+    })
+
+    it('keeps the last value after dropping the controlled prop', async () => {
+      const { container, rerender } = render(Carousel, {
+        props: { currentIndex: 1, arrows: true },
+        slots: { default: () => slideNodes() }
+      })
+      const expectSecondSlide = () => {
+        const rendered = container.querySelectorAll('[data-tiger-carousel-slide]')
+        expect(Array.from(rendered, (slide) => slide.getAttribute('aria-label'))).toEqual([
+          'Slide 2 of 3',
+          'Slide 3 of 3',
+          'Slide 1 of 3'
+        ])
+        expect(rendered[0]).toHaveAttribute('data-tiger-carousel-slide', 'active')
+        expect(screen.getByRole('button', { name: 'Go to slide 2' })).toHaveAttribute(
+          'aria-current',
+          'true'
+        )
+        expect(
+          (container.querySelector('[data-tiger-carousel-track]') as HTMLElement).style.transform
+        ).toBe('translate3d(0%, 0, 0)')
+      }
+      expectSecondSlide()
+      await rerender({ currentIndex: undefined })
+      expectSecondSlide()
     })
   })
 

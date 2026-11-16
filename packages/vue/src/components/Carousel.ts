@@ -178,7 +178,7 @@ export const Carousel = defineComponent({
   setup(props, { slots, emit, attrs, expose }) {
     const config = useTigerConfig()
     const instanceId = useId()
-    const internalCurrentIndex = ref(props.defaultCurrentIndex)
+    const internalCurrentIndex = ref(props.currentIndex ?? props.defaultCurrentIndex)
     const hovered = ref(false)
     const focused = ref(false)
     const userPaused = ref(false)
@@ -205,8 +205,7 @@ export const Carousel = defineComponent({
     } | null = null
     let viewportNode: HTMLElement | null = null
 
-    const slides = computed(() => flattenElementVNodes(slots.default?.()))
-    const slideCount = computed(() => slides.value.length)
+    const slideCount = ref(0)
     const isControlled = computed(() => props.currentIndex !== undefined)
     const currentIndex = computed(() =>
       clampSlideIndex(
@@ -311,8 +310,6 @@ export const Carousel = defineComponent({
         })
       )
     }
-
-    baseIndex.value = windowStart.value
 
     const goTo = (index: number, source: 'step' | 'goto' = 'goto') => {
       const count = slideCount.value
@@ -440,22 +437,28 @@ export const Carousel = defineComponent({
       applyWindowPlan(pendingTransition)
     })
 
-    watch(slideCount, (count) => {
-      const requested = isControlled.value ? (props.currentIndex as number) : requestedIndex.value
-      const clamped = clampSlideIndex(requested, count)
-      if (clamped !== requested) {
-        requestedIndex.value = clamped
-        goTo(clamped, 'goto')
-      } else if (!wrapping.value) {
-        baseIndex.value = getCarouselWindowStart(
-          currentIndex.value,
-          count,
-          perView.value,
-          looping.value
-        )
-        trackOffset.value = 0
-      }
-    })
+    // Render refreshes the count, so settle the window before building its DOM.
+    watch(
+      slideCount,
+      (count) => {
+        const requested = isControlled.value ? (props.currentIndex as number) : requestedIndex.value
+        const clamped = clampSlideIndex(requested, count)
+        if (clamped !== requested) {
+          requestedIndex.value = clamped
+          goTo(clamped, 'goto')
+        }
+        if (!wrapping.value) {
+          baseIndex.value = getCarouselWindowStart(
+            currentIndex.value,
+            count,
+            perView.value,
+            looping.value
+          )
+          trackOffset.value = 0
+        }
+      },
+      { flush: 'sync' }
+    )
 
     watch([autoplayEnabled, () => props.autoplaySpeed, paused], syncAutoplay)
 
@@ -499,8 +502,9 @@ export const Carousel = defineComponent({
         ariaLabel: attrAriaLabel ?? props.labels?.ariaLabel,
         labelledBy: attrLabelledBy
       })
-      const currentSlides = slides.value
+      const currentSlides = flattenElementVNodes(slots.default?.())
       const count = currentSlides.length
+      slideCount.value = count
       const current = currentIndex.value
       const isLooping = looping.value
 
