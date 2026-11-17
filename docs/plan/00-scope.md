@@ -12,7 +12,7 @@
 - 范围：185 个公开组件（9 组）、841 个 Demo（Vue 420、React 421）、7 份项目专题（X01–X07）。
 - 入口：`RESULTS-ENTRY.md`。组件报告在 `groups/<组>/<组件>.md`，专题在 `project/`，总验收在 `project/final-acceptance.md`。
 - 结果：564 条发现。已完成条目见 [CHANGELOG.md](../../CHANGELOG.md)，剩 0 条：P1 0、P2 0、P3 0。
-- 审查总状态是 needs-evidence，不是 complete。证据缺口见 [13](13-evidence.md)。
+- 审查不再等待证据。E06 已于 2026-11-17 关闭：用户接受读屏缺口，不是 complete。缺口见 [13](13-evidence.md)。
 
 W10-G1 已将 `FINDINGS.md` 补齐为 564 个唯一编号并验证主报告锚点。本目录按原编号登记，合并报告不重复计数。
 
@@ -65,7 +65,7 @@ W10-G1 已将 `FINDINGS.md` 补齐为 564 个唯一编号并验证主报告锚�
 | [10 高级组件](10-advanced.md)                      | C159–C169              |    0 |   0 |   0 |   0 |
 | [11 组合组件](11-composite.md)                     | C170–C185              |    0 |   0 |   0 |   0 |
 | [12 工具链、文档与示例平台](12-tooling-docs.md)    | X03–X07                |    0 |   0 |   0 |   0 |
-| [13 证据补采与复验](13-evidence.md)                | E06                    |    1 |   — |   — |   — |
+| [13 证据补采与复验](13-evidence.md)                | E06 已关闭             |    0 |   — |   — |   — |
 | [14 波次与执行顺序](14-waves.md)                   | 顺序、硬依赖、待定方向 |    — |   — |   — |   — |
 
 ## 验收总则
