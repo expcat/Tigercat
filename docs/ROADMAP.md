@@ -4,7 +4,7 @@
 type: active-roadmap
 scope: 3.0.0 之后的修复阶段；本文件是入口，任务表在 docs/plan/
 input: .local/review/2026-11-05（全项目 Review，不进 git）
-tasks: 24 条 Review 发现 + 3 条证据任务
+tasks: 14 条 Review 发现 + 3 条证据任务
 verified-date: 2026-11-17
 -->
 
@@ -14,7 +14,7 @@ verified-date: 2026-11-17
 
 ## 现状
 
-- Review 覆盖 185 个公开组件、841 个 Demo 和 7 份项目专题，共 564 条发现。已完成条目移入 [CHANGELOG.md](../CHANGELOG.md)，剩 24 条：P1 0、P2 14、P3 10。W10-FIX1 已补齐 React SplitButton 与 Vue TimePicker 的键盘修复，定向自动门禁与双端无头 Chromium 复验通过。
+- Review 覆盖 185 个公开组件、841 个 Demo 和 7 份项目专题，共 564 条发现。已完成条目移入 [CHANGELOG.md](../CHANGELOG.md)，剩 14 条：P1 0、P2 8、P3 6。W10-FIX1 已补齐 React SplitButton 与 Vue TimePicker 的键盘修复，定向自动门禁与双端无头 Chromium 复验通过。W10-FIX2 已关闭 T05、T06、T07、T08、T14、T15、T19、T21、T22、T25。
 - 审查的总状态是 needs-evidence。3364 个视口格里，视觉 2756 格、键盘 2816 格没有浏览器证据。很多条目的依据只有源码和 happy-dom，动手前要先复现。
 
 ## 计划
@@ -26,12 +26,12 @@ verified-date: 2026-11-17
 | [00 范围与口径](plan/00-scope.md)                       | 输入、目标与非目标、编号、验收总则、证据口径                  |    — |
 | [02 共享 Core、主题与 i18n](plan/02-core-theme-i18n.md) | X01、X02：表单引擎、浮层触发器、工作流权限、菜单 schema、文案 |    0 |
 | [03 基础组件](plan/03-basic.md)                         | C001–C032                                                     |    2 |
-| [04 布局组件](plan/04-layout.md)                        | C033–C051                                                     |    1 |
+| [04 布局组件](plan/04-layout.md)                        | C033–C051                                                     |    0 |
 | [05 表单组件](plan/05-form.md)                          | C052–C081                                                     |    1 |
 | [06 导航组件](plan/06-navigation.md)                    | C082–C116                                                     |    3 |
 | [07 反馈组件](plan/07-feedback.md)                      | C117–C130                                                     |    0 |
-| [08 数据展示组件](plan/08-data.md)                      | C131–C137                                                     |    1 |
-| [09 图表组件](plan/09-charts.md)                        | C138–C158                                                     |    8 |
+| [08 数据展示组件](plan/08-data.md)                      | C131–C137                                                     |    0 |
+| [09 图表组件](plan/09-charts.md)                        | C138–C158                                                     |    0 |
 | [10 高级组件](plan/10-advanced.md)                      | C159–C169                                                     |    4 |
 | [11 组合组件](plan/11-composite.md)                     | C170–C185                                                     |    4 |
 | [12 工具链、文档与示例平台](plan/12-tooling-docs.md)    | X03–X07：CLI、MCP、生成器、Example、发布配置、项目文档        |    0 |
@@ -49,10 +49,10 @@ verified-date: 2026-11-17
 | W3   | 表单的 P2                        |    1 | 05                     |
 | W4   | 导航与反馈的 P2                  |    2 | 06、07                 |
 | W5   | 基础与布局的 P2                  |    1 | 03、04                 |
-| W6   | 数据、图表与高级的 P2            |    7 | 08、09、10             |
+| W6   | 数据、图表与高级的 P2            |    1 | 08、09、10             |
 | W7   | 组合组件的 P2                    |    3 | 11                     |
 | W8   | 工具链、文档与示例平台的 P2      |    0 | 12                     |
-| W9   | 各篇的 P3                        |   10 | 03、04、06、09、10、11 |
+| W9   | 各篇的 P3                        |    6 | 03、04、06、09、10、11 |
 | W10  | 证据补采与复验，随浏览器环境并行 |    3 | 13                     |
 
 ## 边界

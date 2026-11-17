@@ -4,6 +4,17 @@
 
 ## v3.0.1（未发布）
 
+- **折叠根样式（Vue，T05）**：不传 style prop、只在根上传入 style 时，根节点保留这份样式。attrs.style 不再被默认 undefined 的 props.style 盖掉。
+- **组织图方向键（React / Vue，T06）**：可交互节点改为 roving tabindex。聚焦 Ada 后按 ArrowDown，焦点到 Lin，其余节点 tabindex 为 -1。
+- **组织图横向方向（React / Vue，T07）**：横向布局把 ConfigProvider 的书写方向传给 computeOrgChartLayout。rtl 时节点从右向左，根节点 x 大于子节点。
+- **瀑布图默认名称（React / Vue，T08）**：不传 title 时使用 waterfallChartAriaLabel。zh-CN 下 svg 的 aria-label 是「瀑布图」。
+- **仪表空标签（React / Vue，T14）**：meter 名称跳过空字符串。label 为空且 title 为「压力」时，名称是「压力」。
+- **图表提示 id（Vue，T15）**：VueChartTooltipProps 包含 id。把 id 传给 ChartTooltip 时类型检查通过。
+- **滚动条双轴滑块（Core / React / Vue，T19）**：双轴 lg 下 thumb 的长度和偏移按缩短 14px 后的轨道计算。视口 200px 时轨道 186、thumb 93、偏移 46.5。拖动仍用真实 client 尺寸换算滚动位置。
+- **组织图 bind（Vue，T21）**：VueOrgChartProps 包含 bind。
+- **仪表 bind（Vue，T22）**：VueGaugeChartProps 包含 bind。
+- **桑基图默认尺寸（Core / 文档 / MCP，T25）**：SankeyChart 的 width、height 注释和生成笔记改为 480 和 280。共享 BaseChartProps 仍是 320 和 200。
+
 - **未立项观察复核（审查文档，E11）**：78 条观察里，a 2 行已覆盖不立案（C141 随 C141-F04，C181 重复键横幅随 X02-F004），b 57 行不立项，c 19 行登记为 T03–T26 共 24 条，只登记不修。P2 为 T03–T09、T11–T14、T16、T25、T26；P3 为 T10、T15、T17–T24。证据任务剩 E01、E06、E09。
 
 - **Anchor 视觉与键盘证据（审查文档，E02、C083）**：IAB unavailable 后使用 Playwright 1.61.1 内置 headless Chromium 149，加载当前生产构建。24 格均有原始视口截图和原生 Shift+Tab、Tab、Enter、End、Home 记录；活动链接与滚动同步，焦点可离开。真实 RTL、读屏、hydration 与 E2E 仍未测。

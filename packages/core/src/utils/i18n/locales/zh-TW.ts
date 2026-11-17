@@ -697,7 +697,8 @@ export const zhTW: TigerLocale = {
     funnelChartAriaLabel: '漏斗圖',
     sunburstChartAriaLabel: '旭日圖',
     treemapChartAriaLabel: '矩形樹圖',
-    gaugeChartAriaLabel: '儀表板'
+    gaugeChartAriaLabel: '儀表板',
+    waterfallChartAriaLabel: '瀑布圖'
   },
   codeEditor: {
     findText: '尋找',

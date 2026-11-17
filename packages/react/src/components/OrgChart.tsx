@@ -7,6 +7,10 @@ import {
   getChartLabels,
   mergeTigerLocale,
   normalizeChartPadding,
+  nextOrgChartNodeIndex,
+  resolveChartWritingDirection,
+  readPageWritingDirection,
+  isChartNavigationKey,
   getOrgChartNodeAriaLabel,
   getOrgChartNodeClipId,
   getOrgChartNodeMarkerGeometry,
@@ -77,6 +81,10 @@ export function OrgChart({
   ...rest
 }: OrgChartProps): React.ReactElement {
   const config = useTigerConfig()
+  const direction = useMemo(
+    () => resolveChartWritingDirection(config.direction, readPageWritingDirection()),
+    [config.direction]
+  )
   const markerClipPrefix = getOrgChartNodeClipId(useId())
   const [orgZoom, setOrgZoom] = useState(1)
   const mergedLocale = useMemo(
@@ -89,6 +97,7 @@ export function OrgChart({
   )
   const [innerSelectedId, setInnerSelectedId] = useState<string | number | null>(null)
   const [hoveredId, setHoveredId] = useState<string | number | null>(null)
+  const [focusedIndex, setFocusedIndex] = useState<number | null>(null)
   const resolvedSelectedId = selectedId === undefined ? innerSelectedId : selectedId
   const layout = useMemo(
     () =>
@@ -98,9 +107,10 @@ export function OrgChart({
         levelGap,
         siblingGap,
         orientation,
-        colors
+        colors,
+        direction
       }),
-    [colors, data, orientation, levelGap, nodeHeight, nodeWidth, siblingGap]
+    [colors, data, direction, orientation, levelGap, nodeHeight, nodeWidth, siblingGap]
   )
   const resolvedPadding = normalizeChartPadding(padding)
   const plotWidth = Math.max(width, layout.width + resolvedPadding.left + resolvedPadding.right)
@@ -136,6 +146,34 @@ export function OrgChart({
   const getNodeOpacity = (node: OrgChartLayoutNode) => {
     if (activeId === null) return activeOpacity
     return activeId === node.id ? activeOpacity : inactiveOpacity
+  }
+
+  const isInteractiveNode = (node: OrgChartLayoutNode) => canClick && !node.node.disabled
+  const tabStop = (() => {
+    if (
+      focusedIndex !== null &&
+      layout.nodes[focusedIndex] &&
+      isInteractiveNode(layout.nodes[focusedIndex])
+    ) {
+      return focusedIndex
+    }
+    const first = layout.nodes.findIndex((node) => isInteractiveNode(node))
+    return first < 0 ? null : first
+  })()
+  const handleNodeKeyDown = (event: React.KeyboardEvent, node: OrgChartLayoutNode) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      selectNode(node)
+      return
+    }
+    if (!isChartNavigationKey(event.key)) return
+    const next = nextOrgChartNodeIndex(node.index, event.key, layout.nodes, orientation, direction)
+    const target = layout.nodes[next]
+    if (next === node.index || !target || !isInteractiveNode(target)) return
+    event.preventDefault()
+    setFocusedIndex(next)
+    const nextEl = (event.currentTarget as Element | null)?.parentElement?.children[next]
+    if (nextEl instanceof HTMLElement || nextEl instanceof SVGElement) nextEl.focus()
   }
 
   return (
@@ -180,17 +218,15 @@ export function OrgChart({
                   className={getOrgChartNodeClasses(interactive, selected)}
                   opacity={getNodeOpacity(node)}
                   role={interactive ? 'button' : 'group'}
-                  tabIndex={interactive ? 0 : undefined}
+                  tabIndex={interactive ? (node.index === tabStop ? 0 : -1) : undefined}
                   aria-label={getOrgChartNodeAriaLabel(node.node)}
                   onMouseEnter={() => setHoveredNode(node)}
                   onMouseLeave={() => setHoveredNode(null)}
+                  onFocus={() => {
+                    if (interactive) setFocusedIndex(node.index)
+                  }}
                   onClick={() => selectNode(node)}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter' || event.key === ' ') {
-                      event.preventDefault()
-                      selectNode(node)
-                    }
-                  }}>
+                  onKeyDown={(event) => handleNodeKeyDown(event, node)}>
                   <defs>
                     <clipPath id={clipId} clipPathUnits="userSpaceOnUse">
                       <rect

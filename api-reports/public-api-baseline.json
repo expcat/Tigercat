@@ -4554,6 +4554,7 @@
       "scrollAreaThumbBaseClasses",
       "scrollAreaThumbDraggingClasses",
       "ScrollAreaThumbStyle",
+      "scrollAreaTrackLength",
       "scrollAreaViewportBaseClasses",
       "scrollAreaViewportMeasuredClasses",
       "ScrollAreaViewportMetrics",
@@ -8275,7 +8276,7 @@
     },
     "SankeyChartProps": {
       "extends": ["BaseChartProps"],
-      "props": ["height", "links", "nodes", "responsive"]
+      "props": ["height", "links", "nodes", "responsive", "width"]
     },
     "ScatterChartProps": {
       "extends": [

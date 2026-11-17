@@ -697,7 +697,8 @@ export const koKR: TigerLocale = {
     funnelChartAriaLabel: '깔때기 차트',
     sunburstChartAriaLabel: '선버스트',
     treemapChartAriaLabel: '트리맵',
-    gaugeChartAriaLabel: '게이지'
+    gaugeChartAriaLabel: '게이지',
+    waterfallChartAriaLabel: '폭포 차트'
   },
   codeEditor: {
     findText: '찾기',

@@ -2,6 +2,7 @@ import { defineComponent, h, ref, type PropType } from 'vue'
 import {
   downloadChartSvg,
   getW9DataLabels,
+  getChartLabels,
   resolveButtonClasses,
   layoutWaterfall,
   type ChartPadding,
@@ -45,6 +46,7 @@ export const WaterfallChart = defineComponent({
       if (svg instanceof SVGSVGElement) downloadChartSvg(svg, 'waterfall')
     }
     return () => {
+      const labels = getChartLabels(config.value.locale)
       const laid = layoutWaterfall(props.data)
       const samples = laid.flatMap((bar) => [bar.y0, bar.y1])
       const min = Math.min(0, ...samples, 0)
@@ -67,6 +69,7 @@ export const WaterfallChart = defineComponent({
             height: props.height,
             title: props.title,
             desc: props.desc,
+            'aria-label': props.title ? undefined : labels.waterfallChartAriaLabel,
             responsive: props.responsive,
             padding: props.padding
           },

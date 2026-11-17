@@ -697,7 +697,8 @@ export const viVN: TigerLocale = {
     funnelChartAriaLabel: 'Biểu đồ phễu',
     sunburstChartAriaLabel: 'Biểu đồ sunburst',
     treemapChartAriaLabel: 'Biểu đồ cây',
-    gaugeChartAriaLabel: 'Đồng hồ đo'
+    gaugeChartAriaLabel: 'Đồng hồ đo',
+    waterfallChartAriaLabel: 'Biểu đồ thác nước'
   },
   codeEditor: {
     findText: 'Tìm',

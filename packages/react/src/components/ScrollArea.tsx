@@ -17,6 +17,7 @@ import {
   createDocumentDragSession,
   createEmptyScrollAreaState,
   detectRtlScrollLeftModel,
+  scrollAreaTrackLength,
   getScrollAreaBoxStyle,
   getScrollAreaContentClasses,
   getScrollAreaGutterStyle,
@@ -123,16 +124,24 @@ export const ScrollArea = forwardRef<ScrollAreaInstance, ScrollAreaProps>(functi
   const syncState = useCallback(() => {
     const viewport = viewportRef.current
     if (!viewport) return
-    const next = computeScrollAreaState(
-      readScrollAreaMetrics(viewport),
-      minThumbSize,
-      readInlineDirection(viewport),
-      readInlineScrollModel(viewport)
-    )
+    const metrics = readScrollAreaMetrics(viewport)
+    const inlineDirection = readInlineDirection(viewport)
+    const inlineModel = readInlineScrollModel(viewport)
+    const base = computeScrollAreaState(metrics, minThumbSize, inlineDirection, inlineModel)
+    const visibleY = !nativeBars && shouldRenderScrollAreaScrollbar(scrollbar, axis, 'y', base.y)
+    const visibleX = !nativeBars && shouldRenderScrollAreaScrollbar(scrollbar, axis, 'x', base.x)
+    const next =
+      visibleX && visibleY
+        ? computeScrollAreaState(metrics, minThumbSize, inlineDirection, inlineModel, {
+            size: scrollbarSize,
+            x: true,
+            y: true
+          })
+        : base
     stateRef.current = next
     setState(next)
     setMeasured(true)
-  }, [minThumbSize])
+  }, [axis, minThumbSize, nativeBars, scrollbar, scrollbarSize])
 
   const handleScroll = useCallback(() => {
     const viewport = viewportRef.current
@@ -168,6 +177,20 @@ export const ScrollArea = forwardRef<ScrollAreaInstance, ScrollAreaProps>(functi
     [handleScroll]
   )
 
+  const axisTrackLength = useCallback(
+    (barAxis: ScrollAreaAxis) => {
+      const viewport = viewportRef.current
+      if (!viewport) return 0
+      const client = barAxis === 'y' ? viewport.clientHeight : viewport.clientWidth
+      const other = barAxis === 'y' ? stateRef.current.x : stateRef.current.y
+      const otherVisible =
+        !nativeBars &&
+        shouldRenderScrollAreaScrollbar(scrollbar, axis, barAxis === 'y' ? 'x' : 'y', other)
+      return scrollAreaTrackLength(client, scrollbarSize, otherVisible)
+    },
+    [axis, nativeBars, scrollbar, scrollbarSize]
+  )
+
   const startThumbDrag = useCallback(
     (axis: ScrollAreaAxis, event: React.PointerEvent) => {
       const viewport = viewportRef.current
@@ -190,15 +213,15 @@ export const ScrollArea = forwardRef<ScrollAreaInstance, ScrollAreaProps>(functi
         onMove: ({ currentX, currentY }) => {
           const current = axis === 'y' ? currentY : currentX
           const delta = rtl ? startPoint - current : current - startPoint
-          const trackSize = axis === 'y' ? viewport.clientHeight : viewport.clientWidth
+          const clientSize = axis === 'y' ? viewport.clientHeight : viewport.clientWidth
           applyScroll(
             axis,
             computeScrollFromThumbOffset(
               startOffset + delta,
-              trackSize,
+              axisTrackLength(axis),
               axisState.thumbSize,
               axis === 'y' ? viewport.scrollHeight : viewport.scrollWidth,
-              trackSize
+              clientSize
             )
           )
         },
@@ -208,7 +231,7 @@ export const ScrollArea = forwardRef<ScrollAreaInstance, ScrollAreaProps>(functi
         }
       })
     },
-    [applyScroll]
+    [applyScroll, axisTrackLength]
   )
 
   const handleTrackPointerDown = useCallback(
@@ -229,19 +252,19 @@ export const ScrollArea = forwardRef<ScrollAreaInstance, ScrollAreaProps>(functi
             ? rect.right - event.clientX
             : event.clientX - rect.left
       const axisState = axis === 'y' ? stateRef.current.y : stateRef.current.x
-      const trackSize = axis === 'y' ? viewport.clientHeight : viewport.clientWidth
+      const clientSize = axis === 'y' ? viewport.clientHeight : viewport.clientWidth
       applyScroll(
         axis,
         computeScrollFromTrackPoint(
           point,
-          trackSize,
+          axisTrackLength(axis),
           axisState.thumbSize,
           axis === 'y' ? viewport.scrollHeight : viewport.scrollWidth,
-          trackSize
+          clientSize
         )
       )
     },
-    [applyScroll, startThumbDrag]
+    [applyScroll, axisTrackLength, startThumbDrag]
   )
 
   const scrollTo = useCallback(

@@ -23,6 +23,7 @@ import {
   computeScrollFromTrackPoint,
   createDocumentDragSession,
   createEmptyScrollAreaState,
+  scrollAreaTrackLength,
   getScrollAreaBoxStyle,
   getScrollAreaContentClasses,
   getScrollAreaGutterStyle,
@@ -131,13 +132,41 @@ export const ScrollArea = defineComponent({
     function syncState(): void {
       const viewport = viewportRef.value
       if (!viewport) return
-      scrollState.value = computeScrollAreaState(
-        readScrollAreaMetrics(viewport),
-        props.minThumbSize,
-        readInlineDirection(viewport),
-        readInlineScrollModel(viewport)
-      )
+      const metrics = readScrollAreaMetrics(viewport)
+      const inlineDirection = readInlineDirection(viewport)
+      const inlineModel = readInlineScrollModel(viewport)
+      const base = computeScrollAreaState(metrics, props.minThumbSize, inlineDirection, inlineModel)
+      const visibleY =
+        !props.nativeBars &&
+        shouldRenderScrollAreaScrollbar(props.scrollbar, props.axis, 'y', base.y)
+      const visibleX =
+        !props.nativeBars &&
+        shouldRenderScrollAreaScrollbar(props.scrollbar, props.axis, 'x', base.x)
+      scrollState.value =
+        visibleX && visibleY
+          ? computeScrollAreaState(metrics, props.minThumbSize, inlineDirection, inlineModel, {
+              size: props.scrollbarSize,
+              x: true,
+              y: true
+            })
+          : base
       measured.value = true
+    }
+
+    function axisTrackLength(axis: ScrollAreaAxis): number {
+      const viewport = viewportRef.value
+      if (!viewport) return 0
+      const client = axis === 'y' ? viewport.clientHeight : viewport.clientWidth
+      const other = axis === 'y' ? scrollState.value.x : scrollState.value.y
+      const otherVisible =
+        !props.nativeBars &&
+        shouldRenderScrollAreaScrollbar(
+          props.scrollbar,
+          props.axis,
+          axis === 'y' ? 'x' : 'y',
+          other
+        )
+      return scrollAreaTrackLength(client, props.scrollbarSize, otherVisible)
     }
 
     function handleScroll(): void {
@@ -194,15 +223,15 @@ export const ScrollArea = defineComponent({
         onMove: ({ currentX, currentY }) => {
           const current = axis === 'y' ? currentY : currentX
           const delta = rtl ? startPoint - current : current - startPoint
-          const trackSize = axis === 'y' ? viewport.clientHeight : viewport.clientWidth
+          const clientSize = axis === 'y' ? viewport.clientHeight : viewport.clientWidth
           applyScroll(
             axis,
             computeScrollFromThumbOffset(
               startOffset + delta,
-              trackSize,
+              axisTrackLength(axis),
               axisState.thumbSize,
               axis === 'y' ? viewport.scrollHeight : viewport.scrollWidth,
-              trackSize
+              clientSize
             )
           )
         },
@@ -231,15 +260,15 @@ export const ScrollArea = defineComponent({
             ? rect.right - event.clientX
             : event.clientX - rect.left
       const axisState = axis === 'y' ? scrollState.value.y : scrollState.value.x
-      const trackSize = axis === 'y' ? viewport.clientHeight : viewport.clientWidth
+      const clientSize = axis === 'y' ? viewport.clientHeight : viewport.clientWidth
       applyScroll(
         axis,
         computeScrollFromTrackPoint(
           point,
-          trackSize,
+          axisTrackLength(axis),
           axisState.thumbSize,
           axis === 'y' ? viewport.scrollHeight : viewport.scrollWidth,
-          trackSize
+          clientSize
         )
       )
     }

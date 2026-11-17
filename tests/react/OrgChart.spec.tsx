@@ -3,6 +3,7 @@ import { fireEvent, render } from '@testing-library/react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 import { OrgChart } from '@expcat/tigercat-react/OrgChart'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { getOrgChartNodeMarkerGeometry, type OrgChartNode } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 import OrgChartAvatarDemo from '../../examples/example/react/src/examples/org-chart/02/App'
@@ -103,6 +104,47 @@ describe('OrgChart', () => {
     fireEvent.keyDown(getByRole('button', { name: 'Mira, Operations' }), { key: 'Enter' })
 
     expect(onSelectedIdChange).toHaveBeenCalledWith('ops')
+  })
+
+  it('moves focus to the geometric neighbor with a roving tabindex', () => {
+    const { getByRole } = render(<OrgChart data={data} selectable />)
+    const root = getByRole('button', { name: 'Ada, CEO, Platform' })
+    const child = getByRole('button', { name: 'Lin, Engineering' })
+    const sibling = getByRole('button', { name: 'Mira, Operations' })
+
+    root.focus()
+    fireEvent.keyDown(root, { key: 'ArrowDown' })
+
+    expect(document.activeElement).toBe(child)
+    expect(root).toHaveAttribute('tabindex', '-1')
+    expect(child).toHaveAttribute('tabindex', '0')
+    expect(sibling).toHaveAttribute('tabindex', '-1')
+  })
+
+  it('lays horizontal nodes from right to left when ConfigProvider is rtl', () => {
+    const nodeX = (container: HTMLElement, name: string) => {
+      const node = [...container.querySelectorAll('[data-org-chart-nodes="true"] > g')].find(
+        (item) => item.getAttribute('aria-label') === name
+      )
+      const match = /translate\(\s*(-?\d+(?:\.\d+)?)/.exec(node?.getAttribute('transform') ?? '')
+      return Number(match?.[1])
+    }
+    const ltr = render(<OrgChart data={data} orientation="horizontal" />)
+    const rtl = render(
+      <ConfigProvider dir="rtl">
+        <OrgChart data={data} orientation="horizontal" />
+      </ConfigProvider>
+    )
+
+    expect(nodeX(ltr.container, 'Ada, CEO, Platform')).toBeLessThan(
+      nodeX(ltr.container, 'Lin, Engineering')
+    )
+    expect(nodeX(rtl.container, 'Ada, CEO, Platform')).toBeGreaterThan(
+      nodeX(rtl.container, 'Lin, Engineering')
+    )
+    expect(nodeX(rtl.container, 'Ada, CEO, Platform')).toBeGreaterThan(
+      nodeX(rtl.container, 'Mira, Operations')
+    )
   })
 
   it.each([

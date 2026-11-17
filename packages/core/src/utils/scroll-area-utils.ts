@@ -90,10 +90,12 @@ export function computeScrollAreaAxisState(
   scrollPos: number,
   scrollSize: number,
   clientSize: number,
-  minThumbSize: number = SCROLL_AREA_MIN_THUMB_SIZE
+  minThumbSize: number = SCROLL_AREA_MIN_THUMB_SIZE,
+  trackSize: number = clientSize
 ): ScrollAreaAxisState {
   const maxScroll = scrollSize - clientSize
   const scrollable = clientSize > 0 && maxScroll > SCROLL_AREA_EPSILON
+  const track = Number.isFinite(trackSize) ? Math.max(0, trackSize) : 0
 
   if (!scrollable) {
     return {
@@ -106,10 +108,10 @@ export function computeScrollAreaAxisState(
     }
   }
 
-  const thumbSize = clamp((clientSize / scrollSize) * clientSize, minThumbSize, clientSize)
+  const thumbSize = clamp((clientSize / scrollSize) * track, minThumbSize, track)
   const position = clamp(scrollPos, 0, maxScroll)
   const progress = position / maxScroll
-  const thumbOffset = (clientSize - thumbSize) * progress
+  const thumbOffset = (track - thumbSize) * progress
 
   return {
     scrollable: true,
@@ -119,6 +121,17 @@ export function computeScrollAreaAxisState(
     atStart: position <= SCROLL_AREA_EPSILON,
     atEnd: maxScroll - position <= SCROLL_AREA_EPSILON
   }
+}
+
+/** Visible track length after the other scrollbar reserves its thickness. */
+export function scrollAreaTrackLength(
+  clientSize: number,
+  size: ScrollAreaScrollbarSize,
+  otherAxisVisible: boolean
+): number {
+  const client = Number.isFinite(clientSize) ? Math.max(0, clientSize) : 0
+  if (!otherAxisVisible) return client
+  return Math.max(0, client - SCROLL_AREA_THICKNESS_PX[size])
 }
 
 /**
@@ -202,8 +215,10 @@ export function computeScrollAreaState(
   metrics: ScrollAreaViewportMetrics,
   minThumbSize: number = SCROLL_AREA_MIN_THUMB_SIZE,
   inlineDirection: 'ltr' | 'rtl' = 'ltr',
-  inlineModel?: RtlScrollLeftModel
+  inlineModel?: RtlScrollLeftModel,
+  corner?: { size: ScrollAreaScrollbarSize; x: boolean; y: boolean }
 ): ScrollAreaState {
+  const size = corner?.size ?? 'md'
   return {
     x: computeScrollAreaAxisState(
       logicalInlineScrollPosition(
@@ -215,13 +230,15 @@ export function computeScrollAreaState(
       ),
       metrics.scrollWidth,
       metrics.clientWidth,
-      minThumbSize
+      minThumbSize,
+      scrollAreaTrackLength(metrics.clientWidth, size, Boolean(corner?.y))
     ),
     y: computeScrollAreaAxisState(
       metrics.scrollTop,
       metrics.scrollHeight,
       metrics.clientHeight,
-      minThumbSize
+      minThumbSize,
+      scrollAreaTrackLength(metrics.clientHeight, size, Boolean(corner?.x))
     )
   }
 }

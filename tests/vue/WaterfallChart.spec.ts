@@ -3,6 +3,8 @@ import { h } from 'vue'
 import { renderToString } from 'vue/server-renderer'
 import { describe, expect, it } from 'vitest'
 import { WaterfallChart } from '@expcat/tigercat-vue/WaterfallChart'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import type { WaterfallChartProps } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
@@ -40,5 +42,13 @@ describe('WaterfallChart', () => {
       expect(root.querySelector('[data-waterfall-bar="total"]')).toHaveAttribute('y', '50')
       expect(root.querySelector('svg > desc')).toHaveTextContent(desc)
     }
+  })
+
+  it('names an untitled waterfall from the zh-CN locale', () => {
+    const { container } = render({
+      render: () =>
+        h(ConfigProvider, { locale: zhCN }, () => h(WaterfallChart, { ...props, title: undefined }))
+    })
+    expect(container.querySelector('svg')).toHaveAttribute('aria-label', '瀑布图')
   })
 })

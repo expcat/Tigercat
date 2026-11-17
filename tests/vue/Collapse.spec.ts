@@ -105,6 +105,19 @@ describe('Collapse', () => {
       const collapse = container.firstElementChild
       expect(collapse).toHaveClass('bg-transparent')
     })
+
+    it('keeps a root style when the style prop is omitted', () => {
+      const { container } = render(Collapse, {
+        attrs: { style: { color: 'rgb(1, 2, 3)' } },
+        slots: {
+          default: () => [h(CollapsePanel, { panelKey: '1', header: 'Panel 1' }, () => 'Content 1')]
+        }
+      })
+
+      expect(container.querySelector('[data-tiger-collapse]')).toHaveStyle({
+        color: 'rgb(1, 2, 3)'
+      })
+    })
   })
 
   describe('Props - Controlled Mode', () => {

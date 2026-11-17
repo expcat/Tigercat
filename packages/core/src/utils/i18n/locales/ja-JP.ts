@@ -697,7 +697,8 @@ export const jaJP: TigerLocale = {
     funnelChartAriaLabel: 'ファネルチャート',
     sunburstChartAriaLabel: 'サンバースト',
     treemapChartAriaLabel: 'ツリーマップ',
-    gaugeChartAriaLabel: 'ゲージ'
+    gaugeChartAriaLabel: 'ゲージ',
+    waterfallChartAriaLabel: 'ウォーターフォール'
   },
   codeEditor: {
     findText: '検索',

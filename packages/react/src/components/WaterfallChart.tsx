@@ -2,6 +2,7 @@ import { useRef } from 'react'
 import {
   downloadChartSvg,
   getW9DataLabels,
+  getChartLabels,
   resolveButtonClasses,
   layoutWaterfall,
   type WaterfallChartProps as CoreWaterfallChartProps,
@@ -30,6 +31,7 @@ export function WaterfallChart({
   responsive = true
 }: WaterfallChartProps) {
   const config = useTigerConfig()
+  const labels = getChartLabels(config.locale)
   const hostRef = useRef<HTMLDivElement>(null)
   const laid = layoutWaterfall(data)
   const samples = laid.flatMap((bar) => [bar.y0, bar.y1])
@@ -53,6 +55,7 @@ export function WaterfallChart({
         height={height}
         title={title}
         desc={desc}
+        aria-label={title ? undefined : labels.waterfallChartAriaLabel}
         responsive={responsive}
         padding={padding}>
         {(ctx) => {

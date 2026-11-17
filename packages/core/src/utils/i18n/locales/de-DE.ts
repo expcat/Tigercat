@@ -698,7 +698,8 @@ export const deDE: TigerLocale = {
     funnelChartAriaLabel: 'Trichterdiagramm',
     sunburstChartAriaLabel: 'Sunburst-Diagramm',
     treemapChartAriaLabel: 'Treemap-Diagramm',
-    gaugeChartAriaLabel: 'Messgerät'
+    gaugeChartAriaLabel: 'Messgerät',
+    waterfallChartAriaLabel: 'Wasserfalldiagramm'
   },
   codeEditor: {
     findText: 'Suchen',

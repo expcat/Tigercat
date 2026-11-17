@@ -697,7 +697,8 @@ export const ptBR: TigerLocale = {
     funnelChartAriaLabel: 'Gráfico de funil',
     sunburstChartAriaLabel: 'Gráfico sunburst',
     treemapChartAriaLabel: 'Mapa de árvore',
-    gaugeChartAriaLabel: 'Medidor'
+    gaugeChartAriaLabel: 'Medidor',
+    waterfallChartAriaLabel: 'Gráfico de cascata'
   },
   codeEditor: {
     findText: 'Localizar',

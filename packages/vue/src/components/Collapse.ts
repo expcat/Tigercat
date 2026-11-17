@@ -2,6 +2,7 @@ import { computed, defineComponent, h, inject, provide, reactive, ref, PropType 
 import {
   classNames,
   coerceClassValue,
+  mergeStyleValues,
   getCollapseContainerClasses,
   getCollapseHeaderTarget,
   normalizeActiveKeys,
@@ -198,7 +199,7 @@ export const Collapse = defineComponent({
           ...attrs,
           ref: rootRef,
           class: containerClasses.value,
-          style: props.style,
+          style: mergeStyleValues(attrs.style, props.style),
           'data-tiger-collapse': ''
         },
         children

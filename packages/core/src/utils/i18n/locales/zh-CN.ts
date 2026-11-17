@@ -697,7 +697,8 @@ export const zhCN: TigerLocale = {
     funnelChartAriaLabel: '漏斗图',
     sunburstChartAriaLabel: '旭日图',
     treemapChartAriaLabel: '矩形树图',
-    gaugeChartAriaLabel: '仪表盘'
+    gaugeChartAriaLabel: '仪表盘',
+    waterfallChartAriaLabel: '瀑布图'
   },
   codeEditor: {
     findText: '查找',

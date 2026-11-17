@@ -7,6 +7,7 @@ import { describe, expect, it } from 'vitest'
 import { h } from 'vue'
 import { renderToString } from 'vue/server-renderer'
 import { OrgChart } from '@expcat/tigercat-vue/OrgChart'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { getOrgChartNodeMarkerGeometry, type OrgChartNode } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils'
 import OrgChartAvatarDemo from '../../examples/example/vue3/src/examples/org-chart/02/App.vue'
@@ -80,6 +81,46 @@ describe('OrgChart', () => {
     await fireEvent.keyDown(getByRole('button', { name: 'Mira, Operations' }), { key: 'Enter' })
 
     expect(emitted()['update:selectedId']).toEqual([['ops']])
+  })
+
+  it('moves focus to the geometric neighbor with a roving tabindex', async () => {
+    const { getByRole } = render(OrgChart, { props: { data, selectable: true } })
+    const root = getByRole('button', { name: 'Ada, CEO, Platform' })
+    const child = getByRole('button', { name: 'Lin, Engineering' })
+    const sibling = getByRole('button', { name: 'Mira, Operations' })
+
+    root.focus()
+    await fireEvent.keyDown(root, { key: 'ArrowDown' })
+
+    expect(document.activeElement).toBe(child)
+    expect(root).toHaveAttribute('tabindex', '-1')
+    expect(child).toHaveAttribute('tabindex', '0')
+    expect(sibling).toHaveAttribute('tabindex', '-1')
+  })
+
+  it('lays horizontal nodes from right to left when ConfigProvider is rtl', () => {
+    const nodeX = (container: HTMLElement, name: string) => {
+      const node = [...container.querySelectorAll('[data-org-chart-nodes="true"] > g')].find(
+        (item) => item.getAttribute('aria-label') === name
+      )
+      const match = /translate\(\s*(-?\d+(?:\.\d+)?)/.exec(node?.getAttribute('transform') ?? '')
+      return Number(match?.[1])
+    }
+    const ltr = render(OrgChart, { props: { data, orientation: 'horizontal' } })
+    const rtl = render({
+      render: () =>
+        h(ConfigProvider, { dir: 'rtl' }, () => h(OrgChart, { data, orientation: 'horizontal' }))
+    })
+
+    expect(nodeX(ltr.container as HTMLElement, 'Ada, CEO, Platform')).toBeLessThan(
+      nodeX(ltr.container as HTMLElement, 'Lin, Engineering')
+    )
+    expect(nodeX(rtl.container as HTMLElement, 'Ada, CEO, Platform')).toBeGreaterThan(
+      nodeX(rtl.container as HTMLElement, 'Lin, Engineering')
+    )
+    expect(nodeX(rtl.container as HTMLElement, 'Ada, CEO, Platform')).toBeGreaterThan(
+      nodeX(rtl.container as HTMLElement, 'Mira, Operations')
+    )
   })
 
   it.each([

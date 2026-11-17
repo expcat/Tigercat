@@ -9,6 +9,10 @@ import {
   getChartLabels,
   mergeTigerLocale,
   normalizeChartPadding,
+  nextOrgChartNodeIndex,
+  resolveChartWritingDirection,
+  readPageWritingDirection,
+  isChartNavigationKey,
   getOrgChartNodeAriaLabel,
   getOrgChartNodeClipId,
   getOrgChartNodeMarkerGeometry,
@@ -35,6 +39,12 @@ import { useTigerConfig } from './tiger-config'
 export interface VueOrgChartProps extends CoreOrgChartProps {
   padding?: ChartPadding
   onNodeClick?: (node: OrgChartNode) => void
+  bind?: {
+    nodes?: { id: string; label: string; children?: { id: string; label: string }[] }[]
+    collapsed?: string[]
+    query?: string
+    zoom?: number
+  }
 }
 
 export type OrgChartProps = VueOrgChartProps
@@ -83,6 +93,10 @@ export const OrgChart = defineComponent({
   emits: ['update:selectedId', 'node-click', 'node-hover'],
   setup(props, { emit, attrs }) {
     const config = useTigerConfig()
+    const direction = computed(() =>
+      resolveChartWritingDirection(config.value.direction, readPageWritingDirection())
+    )
+    const focusedIndex = ref<number | null>(null)
     const markerClipPrefix = getOrgChartNodeClipId(useId())
     const orgZoom = ref(1)
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
@@ -99,7 +113,8 @@ export const OrgChart = defineComponent({
         levelGap: props.levelGap,
         siblingGap: props.siblingGap,
         orientation: props.orientation,
-        colors: props.colors
+        colors: props.colors,
+        direction: direction.value
       })
     )
     const resolvedPadding = computed(() => normalizeChartPadding(props.padding))
@@ -156,6 +171,40 @@ export const OrgChart = defineComponent({
     const getNodeOpacity = (node: OrgChartLayoutNode) => {
       if (activeId.value === null) return props.activeOpacity
       return activeId.value === node.id ? props.activeOpacity : props.inactiveOpacity
+    }
+
+    const isInteractiveNode = (node: OrgChartLayoutNode) =>
+      (props.hoverable || props.selectable || typeof props.onNodeClick === 'function') &&
+      !node.node.disabled
+
+    const rovingIndex = () => {
+      const nodes = layout.value.nodes
+      const current = focusedIndex.value
+      if (current !== null && nodes[current] && isInteractiveNode(nodes[current])) return current
+      const first = nodes.findIndex((node) => isInteractiveNode(node))
+      return first < 0 ? null : first
+    }
+
+    const handleNodeKeyDown = (event: KeyboardEvent, node: OrgChartLayoutNode) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault()
+        selectNode(node)
+        return
+      }
+      if (!isChartNavigationKey(event.key)) return
+      const next = nextOrgChartNodeIndex(
+        node.index,
+        event.key,
+        layout.value.nodes,
+        props.orientation,
+        direction.value
+      )
+      const target = layout.value.nodes[next]
+      if (next === node.index || !target || !isInteractiveNode(target)) return
+      event.preventDefault()
+      focusedIndex.value = next
+      const nextEl = (event.currentTarget as Element | null)?.parentElement?.children[next]
+      if (nextEl instanceof HTMLElement || nextEl instanceof SVGElement) nextEl.focus()
     }
 
     return () =>
@@ -232,17 +281,19 @@ export const OrgChart = defineComponent({
                             class: getOrgChartNodeClasses(interactive, selected),
                             opacity: getNodeOpacity(node),
                             role: interactive ? 'button' : 'group',
-                            tabindex: interactive ? 0 : undefined,
+                            tabindex: interactive
+                              ? node.index === rovingIndex()
+                                ? 0
+                                : -1
+                              : undefined,
                             'aria-label': getOrgChartNodeAriaLabel(node.node),
                             onMouseenter: () => setHoveredNode(node),
                             onMouseleave: () => setHoveredNode(null),
+                            onFocus: () => {
+                              if (interactive) focusedIndex.value = node.index
+                            },
                             onClick: () => selectNode(node),
-                            onKeydown: (event: KeyboardEvent) => {
-                              if (event.key === 'Enter' || event.key === ' ') {
-                                event.preventDefault()
-                                selectNode(node)
-                              }
-                            }
+                            onKeydown: (event: KeyboardEvent) => handleNodeKeyDown(event, node)
                           },
                           [
                             h('defs', [

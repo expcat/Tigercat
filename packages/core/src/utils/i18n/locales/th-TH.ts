@@ -697,7 +697,8 @@ export const thTH: TigerLocale = {
     funnelChartAriaLabel: 'แผนภูมิกรวย',
     sunburstChartAriaLabel: 'แผนภูมิซันเบิร์สต์',
     treemapChartAriaLabel: 'ทรีแมป',
-    gaugeChartAriaLabel: 'เกจ'
+    gaugeChartAriaLabel: 'เกจ',
+    waterfallChartAriaLabel: 'แผนภูมิน้ำตก'
   },
   codeEditor: {
     findText: 'ค้นหา',

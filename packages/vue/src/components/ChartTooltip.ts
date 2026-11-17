@@ -31,6 +31,7 @@ export interface VueChartTooltipProps {
   x?: number
   y?: number
   className?: string
+  id?: string
 }
 
 export const ChartTooltip = defineComponent({

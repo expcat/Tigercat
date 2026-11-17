@@ -8,6 +8,7 @@ import {
   computeScrollAreaState,
   computeScrollFromThumbOffset,
   computeScrollFromTrackPoint,
+  scrollAreaTrackLength,
   createEmptyScrollAreaState,
   getScrollAreaBoxStyle,
   getScrollAreaContentClasses,
@@ -47,6 +48,14 @@ describe('scroll-area-utils', () => {
       // halfway scrolled → thumb sits halfway down the remaining track
       expect(state.progress).toBeCloseTo(0.5)
       expect(state.thumbOffset).toBe(50)
+    })
+
+    it('sizes the thumb on the shortened dual-axis lg track', () => {
+      const track = scrollAreaTrackLength(200, 'lg', true)
+      expect(track).toBe(186)
+      const state = computeScrollAreaAxisState(100, 400, 200, SCROLL_AREA_MIN_THUMB_SIZE, track)
+      expect(state.thumbSize).toBe(93)
+      expect(state.thumbOffset).toBe(46.5)
     })
 
     it('reports a non-scrollable axis when the content fits', () => {
@@ -90,6 +99,27 @@ describe('scroll-area-utils', () => {
       const state = computeScrollAreaState(metrics)
       expect(state.y.scrollable).toBe(true)
       expect(state.x.scrollable).toBe(false)
+    })
+
+    it('uses the shortened lg track for both thumbs when both scrollbars reserve the corner', () => {
+      const state = computeScrollAreaState(
+        {
+          scrollTop: 100,
+          scrollLeft: 100,
+          scrollHeight: 400,
+          scrollWidth: 400,
+          clientHeight: 200,
+          clientWidth: 200
+        },
+        SCROLL_AREA_MIN_THUMB_SIZE,
+        'ltr',
+        undefined,
+        { size: 'lg', x: true, y: true }
+      )
+      expect(state.y.thumbSize).toBe(93)
+      expect(state.y.thumbOffset).toBe(46.5)
+      expect(state.x.thumbSize).toBe(93)
+      expect(state.x.thumbOffset).toBe(46.5)
     })
 
     it('maps RTL negative, RTL 0=physical-left, and LTR onto the same logical progress', () => {

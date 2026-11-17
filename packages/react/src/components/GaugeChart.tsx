@@ -179,7 +179,9 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
       aria-valuemin={Math.min(min, max)}
       aria-valuemax={Math.max(min, max)}
       aria-valuetext={formattedValue}
-      aria-label={label ?? chartTitle ?? formattedValue}
+      aria-label={[label, chartTitle, formattedValue].find(
+        (value) => typeof value === 'string' && value.trim()
+      )}
       onMouseMove={handleTooltipMove}
       onMouseLeave={() => setTooltip((current) => ({ ...current, open: false }))}>
       <ChartCanvas

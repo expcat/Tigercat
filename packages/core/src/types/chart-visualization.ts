@@ -419,6 +419,15 @@ export interface SankeyLink {
 export interface SankeyChartProps extends BaseChartProps {
   nodes: SankeyNode[]
   links: SankeyLink[]
+  /**
+   * Chart width.
+   * @default 480
+   */
+  width?: number
+  /**
+   * Chart height.
+   * @default 280
+   */
   height?: number
 
   /**

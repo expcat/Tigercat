@@ -3,6 +3,8 @@ import { render } from '@testing-library/react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { WaterfallChart } from '@expcat/tigercat-react/WaterfallChart'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import type { WaterfallChartProps } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
@@ -41,5 +43,14 @@ describe('WaterfallChart', () => {
       expect(root.querySelector('[data-waterfall-bar="total"]')).toHaveAttribute('y', '50')
       expect(root.querySelector('svg > desc')).toHaveTextContent(desc)
     }
+  })
+
+  it('names an untitled waterfall from the zh-CN locale', () => {
+    const { container } = render(
+      <ConfigProvider locale={zhCN}>
+        <WaterfallChart {...props} title={undefined} />
+      </ConfigProvider>
+    )
+    expect(container.querySelector('svg')).toHaveAttribute('aria-label', '瀑布图')
   })
 })

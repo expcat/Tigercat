@@ -698,7 +698,8 @@ export const esES: TigerLocale = {
     funnelChartAriaLabel: 'Gráfico de embudo',
     sunburstChartAriaLabel: 'Gráfico de sunburst',
     treemapChartAriaLabel: 'Mapa de árbol',
-    gaugeChartAriaLabel: 'Medidor'
+    gaugeChartAriaLabel: 'Medidor',
+    waterfallChartAriaLabel: 'Gráfico de cascada'
   },
   codeEditor: {
     findText: 'Buscar',

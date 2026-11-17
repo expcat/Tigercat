@@ -697,7 +697,8 @@ export const arSA: TigerLocale = {
     funnelChartAriaLabel: 'مخطط قمعي',
     sunburstChartAriaLabel: 'مخطط شروق',
     treemapChartAriaLabel: 'خريطة شجرية',
-    gaugeChartAriaLabel: 'مقياس'
+    gaugeChartAriaLabel: 'مقياس',
+    waterfallChartAriaLabel: 'مخطط الشلال'
   },
   codeEditor: {
     findText: 'بحث',

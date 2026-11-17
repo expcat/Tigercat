@@ -1111,6 +1111,7 @@ export interface TigerLocaleChart {
   sunburstChartAriaLabel?: string
   treemapChartAriaLabel?: string
   gaugeChartAriaLabel?: string
+  waterfallChartAriaLabel?: string
 }
 
 export interface TigerLocaleCodeEditor {

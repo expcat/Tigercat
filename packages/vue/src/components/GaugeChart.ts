@@ -30,6 +30,7 @@ import { useTigerConfig } from './tiger-config'
 
 export interface VueGaugeChartProps extends CoreGaugeChartProps {
   padding?: ChartPadding
+  bind?: { display?: 'pointer' | 'arc' }
 }
 
 export type GaugeChartProps = VueGaugeChartProps
@@ -171,7 +172,9 @@ export const GaugeChart = defineComponent({
           'aria-valuemin': Math.min(props.min, props.max),
           'aria-valuemax': Math.max(props.min, props.max),
           'aria-valuetext': formattedValue.value,
-          'aria-label': props.label ?? props.title ?? formattedValue.value,
+          'aria-label': [props.label, props.title, formattedValue.value].find(
+            (value) => typeof value === 'string' && value.trim()
+          ),
           onMousemove: (e: MouseEvent) => {
             if (!props.showTooltip) return
             tooltip.value = { open: true, x: e.clientX, y: e.clientY }

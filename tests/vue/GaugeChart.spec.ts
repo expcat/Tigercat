@@ -159,4 +159,14 @@ describe('GaugeChart (Vue)', () => {
     expect(valueArc).toBeTruthy()
     expect(valueArc?.getAttribute('fill')?.startsWith('url(#')).toBe(false)
   })
+
+  it('uses the title when the meter label is an empty string', () => {
+    const { container } = renderWithProps(GaugeChart, {
+      value: 40,
+      label: '',
+      title: '压力',
+      ...defaultSize
+    })
+    expect(container.querySelector('[role="meter"]')).toHaveAttribute('aria-label', '压力')
+  })
 })

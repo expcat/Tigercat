@@ -697,7 +697,8 @@ export const idID: TigerLocale = {
     funnelChartAriaLabel: 'Diagram corong',
     sunburstChartAriaLabel: 'Diagram sunburst',
     treemapChartAriaLabel: 'Peta pohon',
-    gaugeChartAriaLabel: 'Pengukur'
+    gaugeChartAriaLabel: 'Pengukur',
+    waterfallChartAriaLabel: 'Diagram air terjun'
   },
   codeEditor: {
     findText: 'Cari',
