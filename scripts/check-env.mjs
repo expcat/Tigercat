@@ -76,6 +76,21 @@ function resolveCatalogRange(packageName, value) {
   return readCatalogRange(packageName)
 }
 
+function artifactEntries(manifest) {
+  const exported = manifest?.exports
+  if (exported && typeof exported === 'object' && Object.keys(exported).length > 0) return exported
+  const entries = {}
+  if (typeof manifest?.main === 'string') entries.main = manifest.main
+  const bin = manifest?.bin
+  if (typeof bin === 'string') entries.bin = bin
+  else if (bin && typeof bin === 'object') {
+    for (const [name, file] of Object.entries(bin)) {
+      if (typeof file === 'string') entries['bin:' + name] = file
+    }
+  }
+  return entries
+}
+
 function main() {
   console.log('🐯 Tigercat Development Environment Check')
   console.log('==========================================')
@@ -165,12 +180,15 @@ function main() {
     'packages/mcp/package.json'
   ]
   const missingArtifacts = []
+  const seenArtifacts = new Set()
   for (const packageFile of packageExportRoots) {
     const manifest = readJson(packageFile)
-    for (const [key, value] of Object.entries(manifest?.exports ?? {})) {
+    for (const [key, value] of Object.entries(artifactEntries(manifest))) {
       const spec = typeof value === 'string' ? value : value?.import || value?.default
       if (typeof spec !== 'string' || spec.endsWith('.css') || spec.endsWith('.json')) continue
       const file = join(packageFile, '..', spec)
+      if (seenArtifacts.has(file)) continue
+      seenArtifacts.add(file)
       if (!existsSync(file)) missingArtifacts.push(`${key} -> ${file}`)
     }
   }

@@ -366,6 +366,12 @@ function DesignerNode({
   )
 }
 
+function workflowDesignerCountFromInput(raw: string): number {
+  if (raw.trim() === '') return 1
+  const parsed = Number(raw)
+  return Number.isFinite(parsed) ? parsed : 1
+}
+
 function DesignerEditPanel({
   node,
   steps,
@@ -531,7 +537,10 @@ function DesignerEditPanel({
               disabled={locked}
               aria-label={labels.sourceLevelLabel}
               onChange={(event) =>
-                patchSource({ type: 'dept_leader', level: Number(event.target.value) || 1 })
+                patchSource({
+                  type: 'dept_leader',
+                  level: workflowDesignerCountFromInput(event.target.value)
+                })
               }
             />
           </label>
@@ -546,7 +555,10 @@ function DesignerEditPanel({
               disabled={locked}
               aria-label={labels.sourceUpToLabel}
               onChange={(event) =>
-                patchSource({ type: 'manager_chain', upTo: Number(event.target.value) || 1 })
+                patchSource({
+                  type: 'manager_chain',
+                  upTo: workflowDesignerCountFromInput(event.target.value)
+                })
               }
             />
           </label>

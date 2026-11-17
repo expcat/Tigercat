@@ -4,6 +4,14 @@
 
 ## v3.0.1（未发布）
 
+- **流程设计数字 0（React / Vue，C181-F03）**：部门领导 level 和上级链 upTo 从 2 改成 0 后发出 0。空输入仍回落 1。
+- **流程设计审批人 0（Core，C181-F04）**：审批人只有 `{ id: 0 }` 时不再报 empty_approvers。id 为 `"0"` 和带名字的 0 仍通过。
+- **操作条权限（Core，C184-F02）**：permission 数组里的码必须全部等于当前 viewerRole 才可见。`['approver', 'finance']` 对 approver 不可见，单独 `approver` 仍可见。
+- **CLI dry-run（CLI，X03-F01）**：没有可移植示例时 `add --dry-run` 打印 Skipped。Button 仍预告 Would create。
+- **MCP 示例描述（MCP，X03-F02）**：`tigercat_example` 改为返回文档小节，不再称与 `tigercat add` 使用同一文本。
+- **环境检查入口（工具链，X06-F04）**：CLI 与 MCP 没有 exports 时检查 main 和 bin。`dist/index.js` 缺失时 `pnpm dev:check` 报缺产物，产物在时仍通过。
+- **发布检查临时目录（工具链，X06-F05）**：`publish:check --published` 返回后删除外层 `tigercat-publish-check-` 目录。
+
 - **通知铃开关（Vue，C177-F04）**：去掉半成品的 update:open，不补受控 open。点开后父级收不到 update:open，根节点上也没有 open。
 - **通知中心全部已读（React / Vue，C178-F03）**：分组时回调首参是当前分组键，条目只含该组未读。平铺列表仍传 undefined。
 - **Schema 表单重置（React / Vue，C179-F03）**：Reset 不再多发一次模型更新。默认 Ada 改成 Grace 后再重置，update:modelValue 与 onChange 各只收到一次 Ada。

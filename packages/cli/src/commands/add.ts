@@ -245,17 +245,16 @@ export async function runAdd(components: string[], options: AddOptions = {}) {
       continue
     }
 
-    if (dryRun) {
-      logInfo(`Would create ${sampleFile}`)
-      continue
-    }
-
     const examplePath = componentExamplePath(comp, framework)
     const content = examplePath ? readFileSafe(examplePath) : null
     if (!content || !isPortableExample(content)) {
       logInfo(
         `Skipped ${sampleFile}: no standalone ${comp} example is bundled with the CLI. Use the printed import line as the starting point.`
       )
+      continue
+    }
+    if (dryRun) {
+      logInfo(`Would create ${sampleFile}`)
       continue
     }
     writeFileSafe(sampleFile, content)

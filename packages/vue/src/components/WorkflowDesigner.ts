@@ -126,6 +126,12 @@ export interface VueWorkflowDesignerProps extends Omit<
 
 export type WorkflowDesignerProps = VueWorkflowDesignerProps
 
+function workflowDesignerCountFromInput(raw: string): number {
+  if (raw.trim() === '') return 1
+  const parsed = Number(raw)
+  return Number.isFinite(parsed) ? parsed : 1
+}
+
 function renderActionButton(
   label: string,
   disabled: boolean,
@@ -444,7 +450,7 @@ export const WorkflowDesigner = defineComponent({
                 onInput: (event: Event) => {
                   patchSource({
                     type: 'dept_leader',
-                    level: Number((event.target as HTMLInputElement).value) || 1
+                    level: workflowDesignerCountFromInput((event.target as HTMLInputElement).value)
                   })
                 }
               })
@@ -462,7 +468,7 @@ export const WorkflowDesigner = defineComponent({
                 onInput: (event: Event) => {
                   patchSource({
                     type: 'manager_chain',
-                    upTo: Number((event.target as HTMLInputElement).value) || 1
+                    upTo: workflowDesignerCountFromInput((event.target as HTMLInputElement).value)
                   })
                 }
               })

@@ -113,6 +113,45 @@ describe('WorkflowDesigner (React)', () => {
     expect(next.find((step) => step.key === 'manager')?.fieldPermissions?.amount).toBe('hidden')
   })
 
+  it('emits department leader level 0 instead of storing 1', () => {
+    const onChange = vi.fn()
+    render(
+      <WorkflowDesigner
+        defaultValue={[
+          { key: 'start', kind: 'start', title: 'Submit' },
+          {
+            key: 'manager',
+            kind: 'approve',
+            title: 'Manager',
+            approverPolicy: { type: 'dept_leader', level: 2 }
+          }
+        ]}
+        onChange={onChange}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('group', { name: 'Manager' }))
+    const panel = screen.getByRole('region', { name: 'Node settings' })
+    fireEvent.change(within(panel).getByLabelText('Level'), { target: { value: '0' } })
+
+    const next = onChange.mock.calls.at(-1)?.[0] as WorkflowTimelineStep[]
+    expect(next.find((step) => step.key === 'manager')?.approverPolicy).toEqual({
+      type: 'dept_leader',
+      level: 0
+    })
+
+    fireEvent.change(within(panel).getByLabelText('Approver source'), {
+      target: { value: 'manager_chain' }
+    })
+    fireEvent.change(within(panel).getByLabelText('Levels up'), { target: { value: '2' } })
+    fireEvent.change(within(panel).getByLabelText('Levels up'), { target: { value: '0' } })
+    const chain = onChange.mock.calls.at(-1)?.[0] as WorkflowTimelineStep[]
+    expect(chain.find((step) => step.key === 'manager')?.approverPolicy).toEqual({
+      type: 'manager_chain',
+      upTo: 0
+    })
+  })
+
   it('copies a node and shows publish validation', () => {
     const onChange = vi.fn()
     render(<WorkflowDesigner defaultValue={treeSteps} onChange={onChange} />)

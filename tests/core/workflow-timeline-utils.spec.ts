@@ -877,6 +877,21 @@ describe('workflow action confirm recipe', () => {
     expect(isWorkflowActionVisible('approve', { viewerRole: 'cc' })).toBe(false)
   })
 
+  it('hides an action unless every permission code matches the viewer role', () => {
+    expect(
+      isWorkflowActionVisible('approve', {
+        viewerRole: 'approver',
+        permission: ['approver', 'finance']
+      })
+    ).toBe(false)
+    expect(
+      isWorkflowActionVisible('approve', {
+        viewerRole: 'approver',
+        permission: 'approver'
+      })
+    ).toBe(true)
+  })
+
   it('disables return without a picker and addsign without an assignee slot', () => {
     expect(
       isWorkflowActionBarItemDisabled(

@@ -90,19 +90,23 @@ main().catch((error) => {
 
 async function main() {
   if (publishedOnly) {
-    const tag = version ? `@${version}` : '@latest'
-    await runPublishedPackageSmoke({
-      rootDir,
-      version,
-      label: `Tigercat ${tag}`,
-      installTargets: [
-        `@expcat/tigercat-core${tag}`,
-        `@expcat/tigercat-vue${tag}`,
-        `@expcat/tigercat-react${tag}`,
-        `@expcat/tigercat-cli${tag}`,
-        `@expcat/tigercat-mcp${tag}`
-      ]
-    })
+    try {
+      const tag = version ? `@${version}` : '@latest'
+      await runPublishedPackageSmoke({
+        rootDir,
+        version,
+        label: `Tigercat ${tag}`,
+        installTargets: [
+          `@expcat/tigercat-core${tag}`,
+          `@expcat/tigercat-vue${tag}`,
+          `@expcat/tigercat-react${tag}`,
+          `@expcat/tigercat-cli${tag}`,
+          `@expcat/tigercat-mcp${tag}`
+        ]
+      })
+    } finally {
+      removeDirWithRetry(tempDir)
+    }
     return
   }
 

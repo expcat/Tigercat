@@ -164,7 +164,7 @@ export const TIGERCAT_TOOLS = [
   {
     name: 'tigercat_example',
     description:
-      'Read-only example snippet for one component. Same text the docs page and `tigercat add` use. ' +
+      'Read-only example snippet for one component. Returns that component section from the docs, not the demo file `tigercat add` writes. ' +
       'Does not install packages or write files. Includes the installed package version.',
     inputSchema: {
       type: 'object',

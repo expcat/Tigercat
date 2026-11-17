@@ -1150,7 +1150,7 @@ export function isWorkflowActionVisible(
     const codes = (Array.isArray(options.permission) ? options.permission : [options.permission])
       .map((code) => code.trim())
       .filter((code) => code !== '')
-    if (codes.length > 0 && !codes.includes(role)) return false
+    if (codes.length > 0 && !codes.every((code) => code === role)) return false
   }
   if (action === 'cancel') return role === 'starter' || options?.isStarter === true
   if (role === 'readonly') return false

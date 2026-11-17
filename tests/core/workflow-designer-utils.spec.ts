@@ -278,6 +278,29 @@ describe('workflow-designer helpers', () => {
     expect(issues.some((issue) => issue.code === 'empty_approvers')).toBe(false)
   })
 
+  it('accepts an approver whose only identity is id 0', () => {
+    const treeFor = (approve: WorkflowTimelineStep): WorkflowTimelineStep[] => [
+      { key: 'start', kind: 'start' },
+      approve,
+      { key: 'end', kind: 'end' }
+    ]
+    const blocks = (approve: WorkflowTimelineStep) =>
+      validateWorkflowDesigner(treeFor(approve)).some((issue) => issue.code === 'empty_approvers')
+
+    expect(blocks({ key: 'approve', kind: 'approve', actors: [{ id: 0 }] })).toBe(false)
+    expect(blocks({ key: 'approve', kind: 'approve', actors: [{ id: '0', name: '' }] })).toBe(false)
+    expect(blocks({ key: 'approve', kind: 'approve', actors: [{ id: 0, name: 'Zero' }] })).toBe(
+      false
+    )
+    expect(
+      blocks({
+        key: 'approve',
+        kind: 'approve',
+        approverPolicy: { type: 'fixed', actors: [{ id: 0 as unknown as string }] }
+      })
+    ).toBe(false)
+  })
+
   it('blocks when every button is disabled', () => {
     const issues = validateWorkflowDesigner([
       { key: 'start', kind: 'start' },

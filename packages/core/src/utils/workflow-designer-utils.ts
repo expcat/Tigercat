@@ -837,9 +837,14 @@ export function insertWorkflowDesignerPaletteStep(
   return { steps: next, path: [...path.slice(0, -1), created.key] }
 }
 
+function actorHasIdentity(actor: { id?: string | number; name?: string }): boolean {
+  if (actor.id != null && String(actor.id) !== '') return true
+  return Boolean(actor.name)
+}
+
 function approverSourceIsResolvable(source: ApproverSource): boolean {
   if (source.type === 'fixed') {
-    return source.actors.some((actor) => Boolean(actor.id || actor.name))
+    return source.actors.some((actor) => actorHasIdentity(actor))
   }
   if (source.type === 'role' || source.type === 'group') return Boolean(source.key)
   return true
@@ -848,7 +853,7 @@ function approverSourceIsResolvable(source: ApproverSource): boolean {
 function workflowDesignerHasApprovers(step: WorkflowTimelineStep): boolean {
   const sources = listApproverSources(step.approverPolicy)
   if (sources.some(approverSourceIsResolvable)) return true
-  return resolveWorkflowStepActors(step).some((actor) => Boolean(actor.id || actor.name))
+  return resolveWorkflowStepActors(step).some((actor) => actorHasIdentity(actor))
 }
 
 function workflowDesignerEmptyApproverBlocks(step: WorkflowTimelineStep): boolean {
