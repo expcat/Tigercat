@@ -826,6 +826,10 @@ export interface TigerLocaleCommentThread {
   duplicateIdText?: string
   /** Cycle error. Supports {id}. */
   cycleText?: string
+  /** Edit control shown when editable is on. */
+  editText?: string
+  /** Delete control shown when editable is on. */
+  deleteText?: string
 }
 
 export interface TigerLocaleActivityFeed {

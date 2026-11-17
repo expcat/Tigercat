@@ -18,7 +18,7 @@ import {
   type TigerLocale,
   nextListboxIndex,
   toggleAssignee,
-  type AssigneeOption
+  type AssigneePickerOption
 } from '@expcat/tigercat-core'
 
 import { useTigerConfig } from './tiger-config'
@@ -32,7 +32,7 @@ export interface AssigneePickerProps extends Omit<
   React.HTMLAttributes<HTMLDivElement>,
   'onChange'
 > {
-  options?: AssigneeOption[]
+  options?: AssigneePickerOption[]
   selectedIds?: string[]
   locale?: Partial<TigerLocale>
   onChange?: (ids: string[]) => void

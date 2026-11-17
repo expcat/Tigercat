@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { AssigneePicker } from '@expcat/tigercat-vue/AssigneePicker'
-import type { AssigneeOption } from '@expcat/tigercat-core'
+import type { AssigneePickerOption } from '@expcat/tigercat-core'
 
-const options: AssigneeOption[] = [
+const options: AssigneePickerOption[] = [
   { id: 'ada', name: 'Ada', department: 'Ops' },
   { id: 'bea', name: 'Bea', department: 'Design' }
 ]

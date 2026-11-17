@@ -550,7 +550,9 @@ export const zhCN: TigerLocale = {
     remainingRepliesText: '显示剩余 {count} 条',
     duplicateIdText: '评论 id {id} 重复',
     cycleText: '评论在 {id} 处成环',
-    maxDepthReachedText: '已到最大回复层'
+    maxDepthReachedText: '已到最大回复层',
+    editText: '编辑',
+    deleteText: '删除'
   },
   activityFeed: {
     emptyText: '暂无动态',

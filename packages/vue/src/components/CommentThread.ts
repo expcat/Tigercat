@@ -86,6 +86,8 @@ import { emitWithReturn, hasEmitHandler } from '../utils/emit-with-return'
 export interface VueCommentThreadProps extends Omit<CoreCommentThreadProps, 'onExpandedChange'> {
   className?: string
   style?: Record<string, string | number>
+  editable?: boolean
+  rich?: boolean
 }
 
 export const CommentThread = defineComponent({
@@ -988,7 +990,7 @@ export const CommentThread = defineComponent({
                           emit('edit', commentEditRequest(comment.id, props.rich ? sanitized : raw))
                         }
                       },
-                      'edit'
+                      labels.value.editText
                     ),
                     h(
                       'button',
@@ -997,7 +999,7 @@ export const CommentThread = defineComponent({
                         'data-comment-delete': String(comment.id),
                         onClick: () => emit('delete', comment.id)
                       },
-                      'delete'
+                      labels.value.deleteText
                     )
                   ])
                 })

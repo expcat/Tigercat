@@ -550,7 +550,9 @@ export const thTH: TigerLocale = {
     remainingRepliesText: 'แสดงที่เหลือ {count} รายการ',
     duplicateIdText: 'รหัสความคิดเห็นซ้ำ {id}',
     cycleText: 'ความคิดเห็นวนที่ {id}',
-    maxDepthReachedText: 'ถึงความลึกสูงสุดของการตอบกลับแล้ว'
+    maxDepthReachedText: 'ถึงความลึกสูงสุดของการตอบกลับแล้ว',
+    editText: 'แก้ไข',
+    deleteText: 'ลบ'
   },
   activityFeed: {
     emptyText: 'ไม่มีกิจกรรม',

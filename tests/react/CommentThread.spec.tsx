@@ -420,6 +420,18 @@ describe('CommentThread (React)', () => {
       )
       expect(screen.getByRole('button', { name: /收起回复/ })).toBeInTheDocument()
     })
+
+    it('uses zh-CN labels for editable manage buttons', () => {
+      render(
+        <ConfigProvider locale={zhCN}>
+          <CommentThread editable items={[{ id: 1, content: 'Hello' }]} />
+        </ConfigProvider>
+      )
+      expect(screen.getByRole('button', { name: '编辑' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: '删除' })).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'edit' })).not.toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'delete' })).not.toBeInTheDocument()
+    })
   })
 
   it('names the inline reply box with replyPlaceholder', async () => {

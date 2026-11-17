@@ -18,7 +18,7 @@ import {
   type TigerLocale,
   nextListboxIndex,
   toggleAssignee,
-  type AssigneeOption
+  type AssigneePickerOption
 } from '@expcat/tigercat-core'
 
 import { useTigerConfig } from './tiger-config'
@@ -33,7 +33,7 @@ export type VueAssigneePickerProps = InstanceType<typeof AssigneePicker>['$props
 export const AssigneePicker = defineComponent({
   name: 'TigerAssigneePicker',
   props: {
-    options: { type: Array as PropType<AssigneeOption[]>, default: () => [] },
+    options: { type: Array as PropType<AssigneePickerOption[]>, default: () => [] },
     selectedIds: { type: Array as PropType<string[]>, default: () => [] },
     locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined }
   },

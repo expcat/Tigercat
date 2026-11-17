@@ -9,5 +9,5 @@
       "react/jsx-runtime": ["../../packages/react/node_modules/@types/react/jsx-runtime.d.ts"]
     }
   },
-  "include": ["./select.tsx", "./float-button.tsx", "./text.tsx"]
+  "include": ["./select.tsx", "./float-button.tsx", "./text.tsx", "./comment-thread.ts"]
 }

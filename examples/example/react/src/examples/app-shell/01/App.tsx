@@ -13,6 +13,7 @@ export default function App() {
     <AppShell
       title="Home"
       defaultCollapsed={isBrowser() && window.matchMedia('(max-width: 639px)').matches}
+      fullHeight={false}
       headerSticky
       tabs={routes}
       activeTab={active}

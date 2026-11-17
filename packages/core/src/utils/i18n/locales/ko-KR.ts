@@ -550,7 +550,9 @@ export const koKR: TigerLocale = {
     remainingRepliesText: '남은 {count}개 보기',
     duplicateIdText: '댓글 id {id}가 중복되었습니다',
     cycleText: '댓글이 {id}에서 순환합니다',
-    maxDepthReachedText: '최대 답글 깊이에 도달했습니다'
+    maxDepthReachedText: '최대 답글 깊이에 도달했습니다',
+    editText: '편집',
+    deleteText: '삭제'
   },
   activityFeed: {
     emptyText: '활동이 없습니다',

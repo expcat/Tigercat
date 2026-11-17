@@ -15,6 +15,7 @@ const defaultCollapsed = isBrowser() && window.matchMedia('(max-width: 639px)').
   <AppShell
     title="Home"
     :default-collapsed="defaultCollapsed"
+    :full-height="false"
     header-sticky
     :tabs="routes"
     :active-tab="active"

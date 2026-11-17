@@ -550,7 +550,9 @@ export const enUS: TigerLocale = {
     remainingRepliesText: 'Show remaining {count}',
     duplicateIdText: 'Duplicate comment id {id}',
     cycleText: 'Comment cycle at {id}',
-    maxDepthReachedText: 'Maximum reply depth reached'
+    maxDepthReachedText: 'Maximum reply depth reached',
+    editText: 'Edit',
+    deleteText: 'Delete'
   },
   activityFeed: {
     emptyText: 'No activity',

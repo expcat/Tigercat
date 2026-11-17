@@ -334,15 +334,19 @@ export const FormWizard = forwardRef<FormWizardHandle, FormWizardProps>(function
     [clickable, currentIndex, labels.skippedText, steps]
   )
 
+  const callerLabel = props['aria-label']
+  const ariaLabel =
+    typeof callerLabel === 'string' && callerLabel.length > 0 ? callerLabel : labels.ariaLabel
+
   if (totalCount === 0) {
     return (
       <div
         className={getFormWizardWrapperClasses({ bordered, className })}
         style={style}
         data-tiger-form-wizard
-        role="group"
-        aria-label={labels.ariaLabel}
         {...props}
+        role="group"
+        aria-label={ariaLabel}
       />
     )
   }
@@ -352,9 +356,9 @@ export const FormWizard = forwardRef<FormWizardHandle, FormWizardProps>(function
       className={getFormWizardWrapperClasses({ bordered, className })}
       style={style}
       data-tiger-form-wizard
+      {...props}
       role="group"
-      aria-label={labels.ariaLabel}
-      {...props}>
+      aria-label={ariaLabel}>
       {showSteps ? (
         <div className={getFormWizardHeaderClasses(bordered)}>
           <Steps

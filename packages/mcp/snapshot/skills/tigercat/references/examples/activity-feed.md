@@ -15,88 +15,12 @@ description: Compact Tigercat Composite Vue and React usage routes
 
 Runnable modules: `examples/example/vue3/src/examples/activity-feed/01/`, `examples/example/vue3/src/examples/activity-feed/02/`, `examples/example/react/src/examples/activity-feed/01/`, `examples/example/react/src/examples/activity-feed/02/`.
 
-Uses: `Timeline`, `Avatar`, `Tag`, `Card`, `Text`, `Link`, `Loading`.
+Uses: `Timeline`, `Avatar`, `Tag`, `Card`, `Text`, `Link`, `Loading`, `VirtualList`, `Button`.
 
-Note: `groups` 一旦传入（含 `[]`）不再回落 `items`。根是 `region`，短列表时间线是 `list`；满 40 行后改为可聚焦的虚拟列表，方向键滚动后可用 Tab 进入后续动作。空态和加载态不自称 feed。已有条目时加载保留列表并写出加载说明。新的一条用组件自己的礼貌区域。`content` 只在标题和描述都空时当正文。默认显示时间时，首屏等客户端时区稳定后再写钟点。Vue 状态点走 `#dot`，React 走 `renderDot`。无 `href` 的动作是 Button。与命令式 toast 无关。
+Note: `groups` 一旦传入（含 `[]`）不再回落 `items`。根是 `region`，短列表时间线是 `list`；满 40 行后改为可聚焦的虚拟列表，方向键滚动后可用 Tab 进入后续动作。空态和加载态不自称 feed。已有条目时加载保留列表并写出加载说明。新的一条用组件自己的礼貌区域。`content` 只在标题和描述都空时当正文。默认显示时间时，首屏等客户端时区稳定后再写钟点。无 `href` 的动作是 Button。与命令式 toast 无关。
 
 Vue: `<ActivityFeed :items="items" />`
 
 React: `<ActivityFeed items={items} />`
 
 Imports: use PascalCase subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`. Hooks and `notification` use the same subpath rule. Shared types and helpers come from `@expcat/tigercat-core`.
-
-## DataTableWithToolbar Custom Filters
-
-Use `toolbar.filters[].render(context)` when the custom control belongs to a filter definition. Use the extra area when app code already owns the control state or needs to append several controls after configured Select filters.
-
-Vue `filters-extra` age range:
-
-```vue
-<script setup lang="ts">
-const getAgeRange = (value: unknown) =>
-  value && typeof value === 'object' ? (value as { min?: string; max?: string }) : {}
-</script>
-
-<DataTableWithToolbar
-  :columns="columns"
-  :data-source="rows"
-  :toolbar="{
-    filters: [{ key: 'status', label: '状态', options: statusOptions }]
-  }"
-  @filters-change="filters = $event">
-  <template #filters-extra="{ filters, setFilter }">
-    <div class="flex items-center gap-2">
-      <span>年龄段</span>
-      <Input
-        :model-value="getAgeRange(filters.ageRange).min ?? ''"
-        placeholder="最小"
-        @update:model-value="(min) =>
-          setFilter('ageRange', { ...getAgeRange(filters.ageRange), min })" />
-      <span>-</span>
-      <Input
-        :model-value="getAgeRange(filters.ageRange).max ?? ''"
-        placeholder="最大"
-        @update:model-value="(max) =>
-          setFilter('ageRange', { ...getAgeRange(filters.ageRange), max })" />
-    </div>
-  </template>
-</DataTableWithToolbar>
-```
-
-React `filtersExtra` age range:
-
-```tsx
-<DataTableWithToolbar
-  columns={columns}
-  dataSource={rows}
-  toolbar={{
-    filters: [{ key: 'status', label: '状态', options: statusOptions }],
-    filtersExtra: ({ filters, setFilter }) => {
-      const ageRange =
-        filters.ageRange && typeof filters.ageRange === 'object'
-          ? (filters.ageRange as { min?: string; max?: string })
-          : {}
-
-      return (
-        <div className="flex items-center gap-2">
-          <span>年龄段</span>
-          <Input
-            value={ageRange.min ?? ''}
-            placeholder="最小"
-            onChange={(value) => setFilter('ageRange', { ...ageRange, min: value })}
-          />
-          <span>-</span>
-          <Input
-            value={ageRange.max ?? ''}
-            placeholder="最大"
-            onChange={(value) => setFilter('ageRange', { ...ageRange, max: value })}
-          />
-        </div>
-      )
-    },
-    onFiltersChange: setFilters
-  }}
-/>
-```
-
-`filters[].render` receives `{ filter, value, filters, setValue, setFilter }`; call `setValue({ min, max })` to emit an object value for the current filter key.

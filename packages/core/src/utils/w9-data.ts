@@ -6,6 +6,7 @@
 import type { TableColumn, TableFixedPosition } from '../types/table'
 import type { ExclusiveVirtualRange } from '../types/virtual-list'
 import type { WaterfallDatum, WaterfallKind } from '../types/chart-visualization'
+import type { AssigneePickerOption } from '../types/assignee-picker'
 import { calculateVirtualColumnRange, type VirtualColumnRange } from './virtual-table-utils'
 import { calculateVirtualRange } from './virtual-list-utils'
 import { tableRowKeyId } from './table-utils'
@@ -1389,16 +1390,10 @@ export function commentDisplayHtml(
   return mode === 'rich' ? 'fragment' : 'text'
 }
 
-export interface AssigneeOption {
-  id: string
-  name: string
-  department?: string
-}
-
 export function filterAssignees(
-  options: readonly AssigneeOption[],
+  options: readonly AssigneePickerOption[],
   query: string
-): AssigneeOption[] {
+): AssigneePickerOption[] {
   const needle = query.trim().toLowerCase()
   if (!needle) return [...options]
   return options.filter((option) => {

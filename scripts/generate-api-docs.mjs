@@ -337,7 +337,7 @@ const COMPONENT_USAGE_NOTES = {
   AppShell: {
     uses: ['Layout', 'Sidebar', 'Header', 'Content', 'Breadcrumb', 'Tabs', 'PageHeader'],
     notes:
-      '一页应用壳。侧栏、菜单、面包屑、页签和页头仍是原来的组件。主内容是 Layout 的那一个 `main`，跳转链接也是布局层那一条。`tabs` 只记住调用方给出的标题，不读路由表。折叠用 Sidebar 自己的 `collapsible`。`headerSticky` 只传给 Header，不和表面绑在一起。'
+      '一页应用壳。侧栏、菜单、面包屑、页签和页头仍是原来的组件。主内容是 Layout 的那一个 `main`，跳转链接也是布局层那一条。`tabs` 只记住调用方给出的标题，不读路由表。折叠用 Sidebar 自己的 `collapsible`。`headerSticky` 只传给 Header，且只有 `fullHeight=false` 时 Header 才会带上 sticky；默认整页高度下不生效。不和表面绑在一起。'
   },
   WorkflowDetailShell: {
     uses: ['SchemaForm', 'Tabs', 'WorkflowTimeline', 'WorkflowViewer', 'WorkflowActionBar'],
@@ -539,9 +539,9 @@ const COMPONENT_USAGE_NOTES = {
       '`messages` 全受控，`onSend` 不 push。不绑发送时发送钮禁用。贴底才跟最新；不传 `virtual` 时满 40 条自动开窗，传 `false` 关闭。`virtual` 时 VirtualList 是唯一 scroller，行高动态量。时间 `0` 合法。Vue `v-model` 只走 `update:modelValue`。'
   },
   ActivityFeed: {
-    uses: ['Timeline', 'Avatar', 'Tag', 'Card', 'Text', 'Link', 'Loading'],
+    uses: ['Timeline', 'Avatar', 'Tag', 'Card', 'Text', 'Link', 'Loading', 'VirtualList', 'Button'],
     notes:
-      '`groups` 一旦传入（含 `[]`）不再回落 `items`。根是 `region`，短列表时间线是 `list`；满 40 行后改为可聚焦的虚拟列表，方向键滚动后可用 Tab 进入后续动作。空态和加载态不自称 feed。已有条目时加载保留列表并写出加载说明。新的一条用组件自己的礼貌区域。`content` 只在标题和描述都空时当正文。默认显示时间时，首屏等客户端时区稳定后再写钟点。Vue 状态点走 `#dot`，React 走 `renderDot`。无 `href` 的动作是 Button。与命令式 toast 无关。'
+      '`groups` 一旦传入（含 `[]`）不再回落 `items`。根是 `region`，短列表时间线是 `list`；满 40 行后改为可聚焦的虚拟列表，方向键滚动后可用 Tab 进入后续动作。空态和加载态不自称 feed。已有条目时加载保留列表并写出加载说明。新的一条用组件自己的礼貌区域。`content` 只在标题和描述都空时当正文。默认显示时间时，首屏等客户端时区稳定后再写钟点。无 `href` 的动作是 Button。与命令式 toast 无关。'
   },
   CommentThread: {
     uses: ['Avatar', 'Tag', 'Button', 'Textarea', 'Text'],
@@ -579,7 +579,7 @@ const COMPONENT_USAGE_NOTES = {
   FormWizard: {
     uses: ['Steps/StepsItem', 'Button', 'Form', 'ConfigProvider'],
     notes:
-      '包在 Form 里时，当前步 `fields` 会交给 `validateFields`，没写 `fields` 就校验当前步挂上的项。Finish 再 `validate` + `submit`。`submit()` 返回 false 时不发 `finish`，也不跑 `autoSave`。父级直接改 `current` 时，`step-change` 的第三参 `{ skippedValidation: true }`。`beforeNext` 返回字符串会显示在内容区 `role="alert"`。`isLast` 是后面没有未跳过步，不是数组尾巴。`clickable` 只能回已走过的步。Vue 用 `v-model:current`。Vue 听 `step-change`，React 听 `onStepChange`。`size` 是 Steps 的 `small|default`，不是 Form 的 `sm|md|lg`。'
+      '包在 Form 里时，当前步 `fields` 会交给 `validateFields`，没写 `fields` 就校验当前步挂上的项。Finish 再 `validate` + `submit`。`submit()` 返回 false 时不发 `finish`，也不跑 `autoSave`。父级直接改 `current` 时，`step-change` 的第三参 `{ skippedValidation: true }`。`beforeNext` 返回字符串会显示在内容区 `role="alert"`。`isLast` 是后面没有未跳过步，不是数组尾巴。`clickable` 只能回已走过的步。Vue 用 `v-model:current`。Vue 听 `step-change`，React 听 `onStepChange`。`size` 是 `sm|md|lg`，默认 `md`。'
   },
   SchemaForm: {
     uses: ['Form', 'FormItem', 'Input', 'Select', 'Button'],
@@ -1507,8 +1507,12 @@ function generateExamples(
 
   markdownText +=
     'Imports: use PascalCase subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`. Hooks and `notification` use the same subpath rule. Shared types and helpers come from `@expcat/tigercat-core`.\n'
-  if (COMPONENT_EXAMPLE_EXTRA[category]) {
-    markdownText += `\n${COMPONENT_EXAMPLE_EXTRA[category].trim()}\n`
+  const exampleExtra =
+    components.length === 1 && components[0] === 'ActivityFeed'
+      ? undefined
+      : COMPONENT_EXAMPLE_EXTRA[category]
+  if (exampleExtra) {
+    markdownText += `\n${exampleExtra.trim()}\n`
   }
   return markdownText
 }

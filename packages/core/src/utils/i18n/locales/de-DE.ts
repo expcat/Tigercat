@@ -551,7 +551,9 @@ export const deDE: TigerLocale = {
     remainingRepliesText: '{count} weitere anzeigen',
     duplicateIdText: 'Doppelte Kommentar-ID {id}',
     cycleText: 'Kommentarkreis bei {id}',
-    maxDepthReachedText: 'Maximale Antworttiefe erreicht'
+    maxDepthReachedText: 'Maximale Antworttiefe erreicht',
+    editText: 'Bearbeiten',
+    deleteText: 'Löschen'
   },
   activityFeed: {
     emptyText: 'Keine Aktivität',

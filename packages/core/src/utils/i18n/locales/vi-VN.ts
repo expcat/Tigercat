@@ -550,7 +550,9 @@ export const viVN: TigerLocale = {
     remainingRepliesText: 'Hiện {count} còn lại',
     duplicateIdText: 'Id bình luận trùng {id}',
     cycleText: 'Vòng bình luận tại {id}',
-    maxDepthReachedText: 'Đã đến độ sâu trả lời tối đa'
+    maxDepthReachedText: 'Đã đến độ sâu trả lời tối đa',
+    editText: 'Sửa',
+    deleteText: 'Xóa'
   },
   activityFeed: {
     emptyText: 'Không có hoạt động',

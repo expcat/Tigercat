@@ -550,7 +550,9 @@ export const zhTW: TigerLocale = {
     remainingRepliesText: '顯示剩餘 {count} 則',
     duplicateIdText: '評論 id {id} 重複',
     cycleText: '評論在 {id} 處成環',
-    maxDepthReachedText: '已到最大回覆層'
+    maxDepthReachedText: '已到最大回覆層',
+    editText: '編輯',
+    deleteText: '刪除'
   },
   activityFeed: {
     emptyText: '暫無動態',

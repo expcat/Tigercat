@@ -327,6 +327,19 @@ describe('FormWizard (Vue)', () => {
     expect(onFinish).not.toHaveBeenCalled()
   })
 
+  it('uses a caller aria-label and keeps the wizard role', () => {
+    const { container } = render(FormWizard, {
+      props: {
+        steps,
+        role: 'region',
+        'aria-label': 'Custom name'
+      }
+    })
+    const root = container.querySelector('[data-tiger-form-wizard]')
+    expect(root).toHaveAttribute('role', 'group')
+    expect(root).toHaveAttribute('aria-label', 'Custom name')
+  })
+
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(FormWizard, {

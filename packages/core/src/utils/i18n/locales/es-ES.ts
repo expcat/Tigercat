@@ -551,7 +551,9 @@ export const esES: TigerLocale = {
     remainingRepliesText: 'Mostrar {count} restantes',
     duplicateIdText: 'Id de comentario duplicado {id}',
     cycleText: 'Ciclo de comentarios en {id}',
-    maxDepthReachedText: 'Profundidad máxima de respuesta alcanzada'
+    maxDepthReachedText: 'Profundidad máxima de respuesta alcanzada',
+    editText: 'Editar',
+    deleteText: 'Eliminar'
   },
   activityFeed: {
     emptyText: 'No hay actividad',

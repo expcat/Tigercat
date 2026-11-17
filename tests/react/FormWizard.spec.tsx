@@ -394,6 +394,23 @@ describe('FormWizard (React)', () => {
     expect(onFinish).not.toHaveBeenCalled()
   })
 
+  it('uses a caller aria-label and keeps the wizard role', () => {
+    const { container } = render(
+      <FormWizard steps={steps} aria-label="Custom name" role="region" />
+    )
+    const root = container.querySelector('[data-tiger-form-wizard]')
+    expect(root).toHaveAttribute('role', 'group')
+    expect(root).toHaveAttribute('aria-label', 'Custom name')
+  })
+
+  it('keeps the locale wizard name when aria-label is undefined', () => {
+    const { container } = render(<FormWizard steps={steps} aria-label={undefined} />)
+    expect(container.querySelector('[data-tiger-form-wizard]')).toHaveAttribute(
+      'aria-label',
+      'Form wizard'
+    )
+  })
+
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(

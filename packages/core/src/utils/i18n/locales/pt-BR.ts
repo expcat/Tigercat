@@ -550,7 +550,9 @@ export const ptBR: TigerLocale = {
     remainingRepliesText: 'Mostrar {count} restantes',
     duplicateIdText: 'Id de comentário duplicado {id}',
     cycleText: 'Ciclo de comentários em {id}',
-    maxDepthReachedText: 'Profundidade máxima de resposta atingida'
+    maxDepthReachedText: 'Profundidade máxima de resposta atingida',
+    editText: 'Editar',
+    deleteText: 'Excluir'
   },
   activityFeed: {
     emptyText: 'Nenhuma atividade',

@@ -550,7 +550,9 @@ export const idID: TigerLocale = {
     remainingRepliesText: 'Tampilkan sisa {count}',
     duplicateIdText: 'Id komentar duplikat {id}',
     cycleText: 'Siklus komentar di {id}',
-    maxDepthReachedText: 'Kedalaman balasan maksimum tercapai'
+    maxDepthReachedText: 'Kedalaman balasan maksimum tercapai',
+    editText: 'Sunting',
+    deleteText: 'Hapus'
   },
   activityFeed: {
     emptyText: 'Tidak ada aktivitas',

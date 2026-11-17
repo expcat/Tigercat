@@ -523,7 +523,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
       className={getDataTableToolbarWrapperClasses({ bordered, className })}
       data-tiger-data-table-with-toolbar
       {...hostAttrs}>
-      {query?.fields?.length || query ? (
+      {query?.fields?.length ? (
         <div className="tiger-table-query flex flex-col gap-2" data-tiger-table-query="">
           {(query.collapsed ?? queryCollapsed) ? (
             <p data-tiger-query-summary="">

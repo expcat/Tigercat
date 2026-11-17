@@ -666,13 +666,13 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
                   type="button"
                   data-comment-edit={String(comment.id)}
                   onClick={() => onEdit?.(commentEditRequest(comment.id, rich ? sanitized : raw))}>
-                  edit
+                  {labels.editText}
                 </button>
                 <button
                   type="button"
                   data-comment-delete={String(comment.id)}
                   onClick={() => onDelete?.(comment.id)}>
-                  delete
+                  {labels.deleteText}
                 </button>
               </div>
             )

@@ -15,7 +15,7 @@ description: Compact generated Tigercat Composite props reference
 
 Uses: `Layout`, `Sidebar`, `Header`, `Content`, `Breadcrumb`, `Tabs`, `PageHeader`.
 
-Note: 一页应用壳。侧栏、菜单、面包屑、页签和页头仍是原来的组件。主内容是 Layout 的那一个 `main`，跳转链接也是布局层那一条。`tabs` 只记住调用方给出的标题，不读路由表。折叠用 Sidebar 自己的 `collapsible`。`headerSticky` 只传给 Header，不和表面绑在一起。
+Note: 一页应用壳。侧栏、菜单、面包屑、页签和页头仍是原来的组件。主内容是 Layout 的那一个 `main`，跳转链接也是布局层那一条。`tabs` 只记住调用方给出的标题，不读路由表。折叠用 Sidebar 自己的 `collapsible`。`headerSticky` 只传给 Header，且只有 `fullHeight=false` 时 Header 才会带上 sticky；默认整页高度下不生效。不和表面绑在一起。
 
 | Prop                | Type      | Default | Notes |
 | ------------------- | --------- | ------- | ----- |

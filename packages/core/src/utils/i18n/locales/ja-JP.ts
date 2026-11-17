@@ -550,7 +550,9 @@ export const jaJP: TigerLocale = {
     remainingRepliesText: '残り {count} 件を表示',
     duplicateIdText: 'コメント id {id} が重複しています',
     cycleText: 'コメントが {id} で循環しています',
-    maxDepthReachedText: '返信の最大階層です'
+    maxDepthReachedText: '返信の最大階層です',
+    editText: '編集',
+    deleteText: '削除'
   },
   activityFeed: {
     emptyText: 'アクティビティはありません',

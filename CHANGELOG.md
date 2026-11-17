@@ -4,6 +4,15 @@
 
 ## v3.0.1（未发布）
 
+- **动态流生成说明（文档 / MCP，C170-F05）**：说明不再提 #dot、renderDot，Uses 含 VirtualList 与 Button。ActivityFeed 示例不再附数据表 Custom Filters。
+- **应用壳粘性页头（文档 / Demo，C171-F03）**：说明写明 headerSticky 只有 fullHeight=false 才让 Header 带上 sticky。两端 Demo 01 传 fullHeight=false，并保留 headerSticky。
+- **受理人选项类型（Core / React / Vue，C172-F07）**：删除 AssigneeOption。文档、Demo、组件和 filterAssignees 只用 AssigneePickerOption，id、name、department 只定义一次。
+- **聊天窗虚拟行高说明（Demo，C173-F04）**：两端 chat-window/02 不再写「固定行高」，改为按估计高度开窗、行高动态量。
+- **评论管理按钮文案（Core / React / Vue，C174-F06）**：editable 的编辑和删除按钮走 locale。zh-CN 为「编辑」「删除」，不再是 edit、delete。Vue 导出类型含 editable 与 rich。
+- **空查询对象（React，C175-F04）**：query 为 {} 时不画查询区，也没有 Reset，与 Vue 一致。
+- **向导尺寸说明（文档 / MCP，C176-F02）**：FormWizard 的 size 写成 sm|md|lg，默认 md，不再写 small|default。
+- **向导根名称与角色（React / Vue，C176-F06）**：非空 aria-label 用作根名称，undefined 或空串仍是 Form wizard。调用方 role 不覆盖，根保持 group。
+
 - **代码编辑器描述（Vue，C159-F02）**：不包 FormItem 时保留调用方 aria-describedby。传 hint 时 textarea 仍是 hint；与 FormItem extra 并存时同时包含 hint 和 extra 的 id。
 - **拖拽列表子节点（React / Vue，C160-F05）**：实时区域和拖拽预览移出 ul。渲染和拖拽过程中，ul 的直接子节点只有 li，悬停仍播报 from item 1 to item 2。
 - **文件管理器空文案（React / Vue，C161-F03）**：不再把英文 Empty folder、No data 当成未设置。zh-CN 下把 fileManager.emptyText 设成 Empty folder 时，空列表显示 Empty folder。

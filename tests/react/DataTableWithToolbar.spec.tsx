@@ -396,6 +396,19 @@ describe('DataTableWithToolbar (React)', () => {
     expect(names).toEqual(['搜索', '重置', '收起'])
   })
 
+  it('does not render a query region for an empty query object', () => {
+    const { container } = render(
+      <DataTableWithToolbar<RowData>
+        columns={columns}
+        dataSource={[]}
+        query={{}}
+        pagination={false}
+      />
+    )
+    expect(container.querySelector('[data-tiger-table-query]')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Reset' })).not.toBeInTheDocument()
+  })
+
   it('keeps a controlled query value in the input, reset payload, and rows', async () => {
     const onReset = vi.fn()
     render(

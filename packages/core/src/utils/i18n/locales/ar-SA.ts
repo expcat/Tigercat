@@ -550,7 +550,9 @@ export const arSA: TigerLocale = {
     remainingRepliesText: 'عرض المتبقي ({count})',
     duplicateIdText: 'معرّف تعليق مكرر {id}',
     cycleText: 'حلقة تعليقات عند {id}',
-    maxDepthReachedText: 'تم بلوغ أقصى عمق للرد'
+    maxDepthReachedText: 'تم بلوغ أقصى عمق للرد',
+    editText: 'تحرير',
+    deleteText: 'حذف'
   },
   activityFeed: {
     emptyText: 'لا يوجد نشاط',

@@ -379,6 +379,11 @@ export const FormWizard = defineComponent({
       }))
 
       const { class: _class, style: _style, ...hostAttrs } = attrs as Record<string, unknown>
+      const callerLabel = hostAttrs['aria-label']
+      const ariaLabel =
+        typeof callerLabel === 'string' && callerLabel.length > 0
+          ? callerLabel
+          : labels.value.ariaLabel
 
       if (totalCount.value === 0) {
         return h('div', {
@@ -387,7 +392,7 @@ export const FormWizard = defineComponent({
           style: wrapperStyle.value,
           'data-tiger-form-wizard': '',
           role: 'group',
-          'aria-label': labels.value.ariaLabel
+          'aria-label': ariaLabel
         })
       }
 
@@ -399,7 +404,7 @@ export const FormWizard = defineComponent({
           style: wrapperStyle.value,
           'data-tiger-form-wizard': '',
           role: 'group',
-          'aria-label': labels.value.ariaLabel
+          'aria-label': ariaLabel
         },
         [
           props.showSteps
