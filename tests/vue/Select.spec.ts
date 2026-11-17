@@ -5,6 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { defineComponent, h, ref } from 'vue'
 import { render, fireEvent, waitFor } from '@testing-library/vue'
+import userEvent from '@testing-library/user-event'
 import { Select } from '@expcat/tigercat-vue/Select'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { Form } from '@expcat/tigercat-vue/Form'
@@ -87,6 +88,34 @@ describe('Select', () => {
     await fireEvent.keyDown(trigger, { key: 'Enter' })
     expect(onChange).toHaveBeenCalledWith('1')
   })
+
+  it.each([false, true])(
+    'keeps native Tab focus after closing (searchable=%s)',
+    async (searchable) => {
+      const user = userEvent.setup()
+      const Wrapper = defineComponent({
+        setup() {
+          return () =>
+            h('div', [
+              h(Select, { options: testOptions, searchable, 'aria-label': 'Tab select' }),
+              h('button', { type: 'button' }, 'After')
+            ])
+        }
+      })
+      const { getByRole, queryByRole } = render(Wrapper)
+      await user.click(getByRole('combobox'))
+      expect(getByRole('listbox', { hidden: true })).toBeInTheDocument()
+      await waitFor(() => expect(getByRole('combobox')).toHaveFocus())
+      await user.tab()
+      expect(getByRole('button', { name: 'After' })).toHaveFocus()
+      await waitFor(() => expect(queryByRole('listbox', { hidden: true })).not.toBeInTheDocument())
+      await new Promise<void>((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
+      })
+      expect(getByRole('button', { name: 'After' })).toHaveFocus()
+      expect(getByRole('combobox')).not.toHaveFocus()
+    }
+  )
 
   it('creates from the search query on a virtual list', async () => {
     const onCreate = vi.fn()

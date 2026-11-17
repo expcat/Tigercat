@@ -527,9 +527,14 @@ export const Select = defineComponent({
           openDropdown()
           return
         case 'close':
-          if (event.key !== 'Tab') event.preventDefault()
-          closeDropdown()
-          focusAfterPaint(() => triggerRef.value)
+          if (event.key === 'Tab') {
+            // Let native Tab move focus before closing unmounts a searchable input.
+            setTimeout(closeDropdown, 0)
+          } else {
+            event.preventDefault()
+            closeDropdown()
+            focusAfterPaint(() => triggerRef.value)
+          }
           return
         case 'clear':
           event.preventDefault()
