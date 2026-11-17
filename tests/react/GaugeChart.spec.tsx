@@ -1,12 +1,33 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import React from 'react'
 import { GaugeChart } from '@expcat/tigercat-react/GaugeChart'
 import { renderWithProps, expectNoA11yViolations } from '../utils/render-helpers-react'
-import { render } from '@testing-library/react'
+import { fireEvent, render } from '@testing-library/react'
 
 const defaultSize = { width: 280, height: 200 }
 
 describe('GaugeChart (React)', () => {
+  it('chains root mouse listeners with and without tooltips', () => {
+    const onMouseMove = vi.fn()
+    const onMouseLeave = vi.fn()
+    const props = { value: 50, ...defaultSize, onMouseMove, onMouseLeave }
+    const { getByRole, rerender } = render(<GaugeChart {...props} />)
+    const meter = getByRole('meter')
+    fireEvent.mouseMove(meter, { clientX: 100, clientY: 80 })
+    expect(document.querySelector('[role="tooltip"]')).toHaveTextContent('50')
+    expect(onMouseMove).toHaveBeenCalledTimes(1)
+    fireEvent.mouseLeave(meter)
+    expect(document.querySelector('[role="tooltip"]')).toBeNull()
+    expect(onMouseLeave).toHaveBeenCalledTimes(1)
+
+    rerender(<GaugeChart {...props} showTooltip={false} />)
+    fireEvent.mouseMove(meter, { clientX: 120, clientY: 90 })
+    fireEvent.mouseLeave(meter)
+    expect(document.querySelector('[role="tooltip"]')).toBeNull()
+    expect(onMouseMove).toHaveBeenCalledTimes(2)
+    expect(onMouseLeave).toHaveBeenCalledTimes(2)
+  })
+
   it('renders SVG with track and value arcs', () => {
     const { container } = renderWithProps(GaugeChart, {
       value: 50,

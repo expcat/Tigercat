@@ -565,10 +565,22 @@ export const NavigationMenuContent: React.FC<NavigationMenuContentProps> = ({
         style={style}
         role="menu"
         data-tiger-navigation-menu-content=""
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        onBlur={handleFocusOut}
-        onKeyDown={handleKeyDown}>
+        onMouseEnter={(event) => {
+          handleMouseEnter()
+          divProps.onMouseEnter?.(event)
+        }}
+        onMouseLeave={(event) => {
+          handleMouseLeave()
+          divProps.onMouseLeave?.(event)
+        }}
+        onBlur={(event) => {
+          handleFocusOut(event)
+          divProps.onBlur?.(event)
+        }}
+        onKeyDown={(event) => {
+          handleKeyDown(event)
+          divProps.onKeyDown?.(event)
+        }}>
         {panelChildren}
       </div>
     )

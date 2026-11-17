@@ -375,6 +375,53 @@ describe('NavigationMenu', () => {
     expect(trigger).toHaveFocus()
   })
 
+  it('chains viewport listeners while preserving hover, focus and keyboard handling', () => {
+    vi.useFakeTimers()
+    const onMouseEnter = vi.fn()
+    const onMouseLeave = vi.fn()
+    const onBlur = vi.fn()
+    const onKeyDown = vi.fn((event: React.KeyboardEvent) => event.nativeEvent.defaultPrevented)
+    render(
+      <NavigationMenu viewport openOnHover defaultValue="products" skipDelayDuration={200}>
+        <NavigationMenuItem value="products">
+          <NavigationMenuTrigger>Products</NavigationMenuTrigger>
+          <NavigationMenuContent
+            onMouseEnter={onMouseEnter}
+            onMouseLeave={onMouseLeave}
+            onBlur={onBlur}
+            onKeyDown={onKeyDown}>
+            <NavigationMenuLink href="/overview">Overview</NavigationMenuLink>
+          </NavigationMenuContent>
+        </NavigationMenuItem>
+      </NavigationMenu>
+    )
+    const trigger = screen.getByRole('menuitem', { name: 'Products' })
+    const panel = screen.getByRole('menu')
+    fireEvent.mouseLeave(panel)
+    fireEvent.mouseEnter(panel)
+    act(() => vi.advanceTimersByTime(200))
+    expect(trigger).toHaveAttribute('aria-expanded', 'true')
+    expect(onMouseEnter).toHaveBeenCalledTimes(1)
+    expect(onMouseLeave).toHaveBeenCalledTimes(1)
+
+    fireEvent.mouseLeave(panel)
+    act(() => vi.advanceTimersByTime(200))
+    expect(trigger).toHaveAttribute('aria-expanded', 'false')
+    expect(onMouseLeave).toHaveBeenCalledTimes(2)
+
+    fireEvent.click(trigger)
+    fireEvent.blur(screen.getByRole('menu'), { relatedTarget: document.body })
+    expect(trigger).toHaveAttribute('aria-expanded', 'false')
+    expect(onBlur).toHaveBeenCalledTimes(1)
+
+    fireEvent.click(trigger)
+    fireEvent.keyDown(screen.getByRole('menu'), { key: 'Escape' })
+    expect(trigger).toHaveAttribute('aria-expanded', 'false')
+    expect(trigger).toHaveFocus()
+    expect(onKeyDown).toHaveBeenCalledTimes(1)
+    expect(onKeyDown).toHaveReturnedWith(true)
+  })
+
   it('keeps pointer focus on the trigger so a panel link click can run', () => {
     render(<Demo defaultValue="products" />)
     const overview = screen.getByRole('menuitem', { name: 'Overview' })

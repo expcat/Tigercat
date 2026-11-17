@@ -334,16 +334,21 @@ export const ContextMenuSub: React.FC<ContextMenuSubProps> = ({
         onClick={(event) => {
           event.preventDefault()
           event.stopPropagation()
-          if (disabled) return
-          if (isExpanded) {
-            setIsOpenByKeyboard(false)
-            setIsHovered(false)
-            return
+          if (!disabled) {
+            if (isExpanded) {
+              setIsOpenByKeyboard(false)
+              setIsHovered(false)
+            } else {
+              setIsOpenByKeyboard(true)
+              setIsHovered(true)
+            }
           }
-          setIsOpenByKeyboard(true)
-          setIsHovered(true)
+          rest.onClick?.(event)
         }}
-        onKeyDown={handleTitleKeyDown}>
+        onKeyDown={(event) => {
+          handleTitleKeyDown(event)
+          rest.onKeyDown?.(event)
+        }}>
         <span className="flex-1 text-start">{title}</span>
         <svg
           className={getContextMenuSubChevronClasses()}

@@ -94,8 +94,14 @@ export const ChartLegend: React.FC<ChartLegendProps> = ({
       aria-label={resolvedAriaLabel}
       style={{ gap: `${gap}px`, ...style }}
       data-chart-legend="true"
-      onMouseLeave={interactive ? handleLeave : undefined}
-      onBlur={interactive ? handleLeave : undefined}>
+      onMouseLeave={(event) => {
+        handleLeave(event)
+        rest.onMouseLeave?.(event)
+      }}
+      onBlur={(event) => {
+        handleLeave(event)
+        rest.onBlur?.(event)
+      }}>
       {items.map((item) => {
         const ItemComponent = interactive ? 'button' : 'div'
         const highlighted = Boolean(item.active && items.some((entry) => entry.active === false))

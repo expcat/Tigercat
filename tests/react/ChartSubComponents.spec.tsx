@@ -233,6 +233,31 @@ const legendItems = [
 ]
 
 describe('ChartLegend', () => {
+  it('chains root leave and blur listeners even when interaction is disabled', () => {
+    const calls: string[] = []
+    const onItemLeave = vi.fn(() => calls.push('internal'))
+    const onMouseLeave = vi.fn(() => calls.push('mouseleave'))
+    const onBlur = vi.fn(() => calls.push('blur'))
+    const props = { items: legendItems, onItemLeave, onMouseLeave, onBlur }
+    const { getByRole, rerender } = render(<ChartLegend {...props} interactive />)
+    const legend = getByRole('group')
+    fireEvent.mouseLeave(legend)
+    fireEvent.blur(legend)
+    expect(calls).toEqual(['internal', 'mouseleave', 'internal', 'blur'])
+
+    fireEvent.blur(legend, { relatedTarget: getByRole('button', { name: 'Series B' }) })
+    expect(onItemLeave).toHaveBeenCalledTimes(2)
+    expect(onBlur).toHaveBeenCalledTimes(2)
+
+    rerender(<ChartLegend {...props} interactive={false} />)
+    fireEvent.mouseLeave(getByRole('list'))
+    fireEvent.blur(getByRole('list'))
+    expect(onItemLeave).toHaveBeenCalledTimes(2)
+    expect(onMouseLeave).toHaveBeenCalledTimes(2)
+    expect(onBlur).toHaveBeenCalledTimes(3)
+    expect(calls.slice(-2)).toEqual(['mouseleave', 'blur'])
+  })
+
   it('renders legend items with labels and markers', () => {
     const { container } = renderWithProps(ChartLegend, { items: legendItems })
 

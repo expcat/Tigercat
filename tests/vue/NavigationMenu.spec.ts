@@ -347,6 +347,58 @@ describe('NavigationMenu', () => {
     expect(trigger).toHaveFocus()
   })
 
+  it('chains viewport listeners while preserving hover, focus and keyboard handling', async () => {
+    vi.useFakeTimers()
+    const onMouseenter = vi.fn()
+    const onMouseleave = vi.fn()
+    const onFocusout = vi.fn()
+    const onKeydown = vi.fn((event: KeyboardEvent) => event.defaultPrevented)
+    render(NavigationMenu, {
+      props: {
+        viewport: true,
+        openOnHover: true,
+        defaultValue: 'products',
+        skipDelayDuration: 200
+      },
+      slots: {
+        default: () => [
+          h(NavigationMenuItem, { value: 'products' }, () => [
+            h(NavigationMenuTrigger, null, () => 'Products'),
+            h(NavigationMenuContent, { onMouseenter, onMouseleave, onFocusout, onKeydown }, () => [
+              h(NavigationMenuLink, { href: '/overview' }, () => 'Overview')
+            ])
+          ])
+        ]
+      }
+    })
+    await nextTick()
+    const trigger = screen.getByRole('menuitem', { name: 'Products' })
+    const panel = screen.getByRole('menu')
+    await fireEvent.mouseLeave(panel)
+    await fireEvent.mouseEnter(panel)
+    await vi.advanceTimersByTimeAsync(200)
+    expect(trigger).toHaveAttribute('aria-expanded', 'true')
+    expect(onMouseenter).toHaveBeenCalledTimes(1)
+    expect(onMouseleave).toHaveBeenCalledTimes(1)
+
+    await fireEvent.mouseLeave(panel)
+    await vi.advanceTimersByTimeAsync(200)
+    expect(trigger).toHaveAttribute('aria-expanded', 'false')
+    expect(onMouseleave).toHaveBeenCalledTimes(2)
+
+    await fireEvent.click(trigger)
+    await fireEvent.focusOut(screen.getByRole('menu'), { relatedTarget: document.body })
+    expect(trigger).toHaveAttribute('aria-expanded', 'false')
+    expect(onFocusout).toHaveBeenCalledTimes(1)
+
+    await fireEvent.click(trigger)
+    await fireEvent.keyDown(screen.getByRole('menu'), { key: 'Escape' })
+    expect(trigger).toHaveAttribute('aria-expanded', 'false')
+    expect(trigger).toHaveFocus()
+    expect(onKeydown).toHaveBeenCalledTimes(1)
+    expect(onKeydown).toHaveReturnedWith(true)
+  })
+
   it('keeps pointer focus on the trigger so a panel link click can run', () => {
     renderNav({ defaultValue: 'products' })
     const overview = screen.getByRole('menuitem', { name: 'Overview' })

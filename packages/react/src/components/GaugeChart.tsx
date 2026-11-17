@@ -182,8 +182,14 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
       aria-label={[label, chartTitle, formattedValue].find(
         (value) => typeof value === 'string' && value.trim()
       )}
-      onMouseMove={handleTooltipMove}
-      onMouseLeave={() => setTooltip((current) => ({ ...current, open: false }))}>
+      onMouseMove={(event) => {
+        handleTooltipMove(event)
+        rest.onMouseMove?.(event)
+      }}
+      onMouseLeave={(event) => {
+        setTooltip((current) => ({ ...current, open: false }))
+        rest.onMouseLeave?.(event)
+      }}>
       <ChartCanvas
         width={width}
         height={height}

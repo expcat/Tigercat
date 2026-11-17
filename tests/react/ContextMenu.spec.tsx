@@ -261,6 +261,35 @@ describe('ContextMenu', () => {
       expect(document.activeElement).toHaveTextContent('Delete')
     })
 
+    it('chains submenu click and keydown listeners after internal handling', () => {
+      const onClick = vi.fn((event: React.MouseEvent) => event.defaultPrevented)
+      const onKeyDown = vi.fn((event: React.KeyboardEvent) => event.defaultPrevented)
+      render(
+        <Demo
+          defaultOpen
+          portal={false}
+          extra={
+            <ContextMenuSub title="More" onClick={onClick} onKeyDown={onKeyDown}>
+              <ContextMenuItem>Mail</ContextMenuItem>
+            </ContextMenuSub>
+          }
+        />
+      )
+
+      const trigger = screen.getByRole('menuitem', { name: 'More' })
+      fireEvent.click(trigger)
+      expect(trigger).toHaveAttribute('aria-expanded', 'true')
+      expect(screen.getByText('Mail')).toBeInTheDocument()
+      expect(onClick).toHaveBeenCalledTimes(1)
+      expect(onClick).toHaveReturnedWith(true)
+
+      fireEvent.keyDown(trigger, { key: 'ArrowLeft' })
+      expect(trigger).toHaveAttribute('aria-expanded', 'false')
+      expect(trigger).toHaveFocus()
+      expect(onKeyDown).toHaveBeenCalledTimes(1)
+      expect(onKeyDown).toHaveReturnedWith(true)
+    })
+
     it('keeps ArrowDown inside an open submenu and opens a nested submenu with ArrowRight and closes it with Escape', async () => {
       render(
         <Demo

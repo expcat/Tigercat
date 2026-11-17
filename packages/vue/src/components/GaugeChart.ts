@@ -1,5 +1,6 @@
 import { defineComponent, computed, h, ref, watch, onBeforeUnmount, PropType, useId } from 'vue'
 import {
+  callUnknownEventHandler,
   coerceClassValue,
   classNames,
   layoutGauge,
@@ -176,11 +177,14 @@ export const GaugeChart = defineComponent({
             (value) => typeof value === 'string' && value.trim()
           ),
           onMousemove: (e: MouseEvent) => {
-            if (!props.showTooltip) return
-            tooltip.value = { open: true, x: e.clientX, y: e.clientY }
+            if (props.showTooltip) {
+              tooltip.value = { open: true, x: e.clientX, y: e.clientY }
+            }
+            callUnknownEventHandler(attrs.onMousemove, e)
           },
-          onMouseleave: () => {
+          onMouseleave: (e: MouseEvent) => {
             tooltip.value = { ...tooltip.value, open: false }
+            callUnknownEventHandler(attrs.onMouseleave, e)
           }
         },
         [

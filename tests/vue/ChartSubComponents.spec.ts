@@ -7,7 +7,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { createSSRApp, h, nextTick } from 'vue'
 import { renderToString } from '@vue/server-renderer'
-import { waitFor } from '@testing-library/vue'
+import { fireEvent, waitFor } from '@testing-library/vue'
 import { ChartAxis } from '@expcat/tigercat-vue/ChartAxis'
 import { ChartCanvas } from '@expcat/tigercat-vue/ChartCanvas'
 import { ChartGrid } from '@expcat/tigercat-vue/ChartGrid'
@@ -214,6 +214,34 @@ const legendItems = [
 ]
 
 describe('ChartLegend', () => {
+  it('chains root leave and focusout listeners even when interaction is disabled', async () => {
+    const calls: string[] = []
+    const onItemLeave = vi.fn(() => calls.push('internal'))
+    const onMouseleave = vi.fn(() => calls.push('mouseleave'))
+    const onFocusout = vi.fn(() => calls.push('focusout'))
+    const { getByRole, rerender } = renderWithProps(
+      ChartLegend,
+      { items: legendItems, interactive: true, onItemLeave },
+      { attrs: { onMouseleave, onFocusout } }
+    )
+    const legend = getByRole('group')
+    await fireEvent.mouseLeave(legend)
+    await fireEvent.focusOut(legend)
+    expect(calls).toEqual(['internal', 'mouseleave', 'internal', 'focusout'])
+
+    await fireEvent.focusOut(legend, { relatedTarget: getByRole('button', { name: 'Series B' }) })
+    expect(onItemLeave).toHaveBeenCalledTimes(2)
+    expect(onFocusout).toHaveBeenCalledTimes(2)
+
+    await rerender({ interactive: false })
+    await fireEvent.mouseLeave(getByRole('list'))
+    await fireEvent.focusOut(getByRole('list'))
+    expect(onItemLeave).toHaveBeenCalledTimes(2)
+    expect(onMouseleave).toHaveBeenCalledTimes(2)
+    expect(onFocusout).toHaveBeenCalledTimes(3)
+    expect(calls.slice(-2)).toEqual(['mouseleave', 'focusout'])
+  })
+
   it('renders legend items with labels and markers', () => {
     const { container } = renderWithProps(ChartLegend, { items: legendItems })
 

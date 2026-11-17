@@ -7,11 +7,35 @@ import { createSSRApp, h } from 'vue'
 import { renderToString } from '@vue/server-renderer'
 import { GaugeChart } from '@expcat/tigercat-vue/GaugeChart'
 import { renderWithProps, expectNoA11yViolations } from '../utils'
-import { render } from '@testing-library/vue'
+import { fireEvent, render } from '@testing-library/vue'
 
 const defaultSize = { width: 280, height: 200 }
 
 describe('GaugeChart (Vue)', () => {
+  it('chains root mouse listeners with and without tooltips', async () => {
+    const onMousemove = vi.fn()
+    const onMouseleave = vi.fn()
+    const { getByRole, rerender } = renderWithProps(
+      GaugeChart,
+      { value: 50, ...defaultSize },
+      { attrs: { onMousemove, onMouseleave } }
+    )
+    const meter = getByRole('meter')
+    await fireEvent.mouseMove(meter, { clientX: 100, clientY: 80 })
+    expect(document.querySelector('[role="tooltip"]')).toHaveTextContent('50')
+    expect(onMousemove).toHaveBeenCalledTimes(1)
+    await fireEvent.mouseLeave(meter)
+    expect(document.querySelector('[role="tooltip"]')).toBeNull()
+    expect(onMouseleave).toHaveBeenCalledTimes(1)
+
+    await rerender({ showTooltip: false })
+    await fireEvent.mouseMove(meter, { clientX: 120, clientY: 90 })
+    await fireEvent.mouseLeave(meter)
+    expect(document.querySelector('[role="tooltip"]')).toBeNull()
+    expect(onMousemove).toHaveBeenCalledTimes(2)
+    expect(onMouseleave).toHaveBeenCalledTimes(2)
+  })
+
   it('renders SVG with track and value arcs', () => {
     const { container } = renderWithProps(GaugeChart, {
       value: 50,

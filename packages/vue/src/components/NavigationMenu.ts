@@ -697,10 +697,22 @@ export const NavigationMenuContent = defineComponent({
               style: mergedStyle.value,
               role: 'menu',
               'data-tiger-navigation-menu-content': '',
-              onMouseenter: handleMouseEnter,
-              onMouseleave: handleMouseLeave,
-              onFocusout: handleFocusOut,
-              onKeydown: handleKeyDown
+              onMouseenter: (event: MouseEvent) => {
+                handleMouseEnter()
+                callUnknownEventHandler(restAttrs.onMouseenter, event)
+              },
+              onMouseleave: (event: MouseEvent) => {
+                handleMouseLeave()
+                callUnknownEventHandler(restAttrs.onMouseleave, event)
+              },
+              onFocusout: (event: FocusEvent) => {
+                handleFocusOut(event)
+                callUnknownEventHandler(restAttrs.onFocusout, event)
+              },
+              onKeydown: (event: KeyboardEvent) => {
+                handleKeyDown(event)
+                callUnknownEventHandler(restAttrs.onKeydown, event)
+              }
             },
             slots.default?.()
           )

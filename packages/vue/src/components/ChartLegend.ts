@@ -1,5 +1,6 @@
 import { defineComponent, h, PropType, computed } from 'vue'
 import {
+  callUnknownEventHandler,
   classNames,
   mergeStyleValues,
   coerceClassValue,
@@ -101,8 +102,14 @@ export const ChartLegend = defineComponent({
           role: props.interactive ? 'group' : 'list',
           'aria-label': resolvedAriaLabel.value,
           'data-chart-legend': 'true',
-          onMouseleave: props.interactive ? (event: MouseEvent) => handleLeave(event) : undefined,
-          onFocusout: props.interactive ? (event: FocusEvent) => handleLeave(event) : undefined
+          onMouseleave: (event: MouseEvent) => {
+            handleLeave(event)
+            callUnknownEventHandler(attrs.onMouseleave, event)
+          },
+          onFocusout: (event: FocusEvent) => {
+            handleLeave(event)
+            callUnknownEventHandler(attrs.onFocusout, event)
+          }
         },
         props.items.map((item) => {
           const highlighted = Boolean(
