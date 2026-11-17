@@ -145,7 +145,7 @@ export const WorkflowDetailShell = forwardRef<WorkflowDetailShellHandle, Workflo
         className={classNames(getWorkflowDetailShellRootClasses(className))}
         style={style}
         role="region"
-        aria-label={ariaLabel || labels.ariaLabel}
+        aria-label={ariaLabel || rest['aria-label'] || labels.ariaLabel}
         data-tiger-workflow-detail-shell="">
         <div className={workflowDetailShellHeaderClasses} data-slot="header">
           {hasNode(header) ? (

@@ -285,4 +285,41 @@ describe('WorkflowDesigner (Vue)', () => {
       expect(next[0]?.kind).toBe('start')
     })
   })
+
+  it('selects a start node once from its summary button', async () => {
+    const onSelect = vi.fn()
+    render(WorkflowDesigner, {
+      props: {
+        modelValue: [{ key: 'start', kind: 'start', title: 'Submit' }],
+        onSelect
+      }
+    })
+    await fireEvent.click(screen.getByRole('button', { name: 'Submit' }))
+    expect(onSelect).toHaveBeenCalledTimes(1)
+    expect(onSelect.mock.calls[0]?.[0]).toEqual(['start'])
+  })
+
+  it('uses branchOperatorLabel on the operator select', async () => {
+    render(WorkflowDesigner, {
+      props: {
+        modelValue: [
+          {
+            key: 'gate',
+            kind: 'condition',
+            title: 'Gate',
+            children: [
+              {
+                key: 'branch',
+                title: 'Amount',
+                condition: { field: 'amount', operator: 'gt', value: '1' }
+              }
+            ]
+          }
+        ],
+        labels: { branchOperatorLabel: '比较符' }
+      }
+    })
+    await fireEvent.click(screen.getByRole('button', { name: 'Gate' }))
+    expect(screen.getByRole('combobox', { name: /比较符/ })).toBeInTheDocument()
+  })
 })

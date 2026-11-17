@@ -398,9 +398,8 @@ export const SchemaForm = forwardRef<FormHandle, SchemaFormProps>(function Schem
     formRef.current?.setInitialValues(seed)
     if (!controlled) setInnerModel(seed)
     formRef.current?.resetFields()
-    onChange?.(seed)
     onReset?.()
-  }, [controlled, defaultValue, onChange, onReset, schema, source])
+  }, [controlled, defaultValue, onReset, schema, source])
 
   useImperativeHandle(ref, () => ({
     validate: () => formRef.current?.validate() ?? Promise.resolve(false),
@@ -452,7 +451,7 @@ export const SchemaForm = forwardRef<FormHandle, SchemaFormProps>(function Schem
       locale={locale}
       className={classNames(schemaFormRootClasses, className)}
       style={style}
-      aria-label={ariaLabel ?? chromeLabels.ariaLabel}
+      aria-label={ariaLabel ?? rest['aria-label'] ?? chromeLabels.ariaLabel}
       data-tiger-schema-form=""
       onChange={handleChange}
       onSubmit={handleSubmit}>

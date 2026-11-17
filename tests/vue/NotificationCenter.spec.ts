@@ -303,4 +303,21 @@ describe('NotificationCenter (Vue)', () => {
       await expectNoA11yViolationsIsolated(container)
     })
   })
+
+  it('marks only the active group when marking all as read', async () => {
+    const onMarkAllRead = vi.fn()
+    render(NotificationCenter, {
+      props: {
+        groups: [
+          { key: 'alpha', title: 'Alpha', items: [{ id: 'a1', title: 'A1', read: false }] },
+          { key: 'beta', title: 'Beta', items: [{ id: 'b1', title: 'B1', read: false }] }
+        ]
+      },
+      attrs: { onMarkAllRead }
+    })
+    await fireEvent.click(screen.getByRole('button', { name: 'Mark all as read' }))
+    expect(onMarkAllRead).toHaveBeenCalledTimes(1)
+    expect(onMarkAllRead.mock.calls[0]?.[0]).toBe('alpha')
+    expect(onMarkAllRead.mock.calls[0]?.[1].map((item) => item.title)).toEqual(['A1'])
+  })
 })

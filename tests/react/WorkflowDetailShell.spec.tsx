@@ -96,4 +96,12 @@ describe('WorkflowDetailShell (React)', () => {
     )
     await expectNoA11yViolations(container)
   })
+
+  it('keeps a caller aria-label and lets ariaLabel win', () => {
+    const fromAttr = render(<WorkflowDetailShell aria-label="From attr" />)
+    expect(fromAttr.container.firstElementChild).toHaveAttribute('aria-label', 'From attr')
+    fromAttr.unmount()
+    const named = render(<WorkflowDetailShell ariaLabel="Named shell" />)
+    expect(named.container.firstElementChild).toHaveAttribute('aria-label', 'Named shell')
+  })
 })

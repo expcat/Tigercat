@@ -27,7 +27,7 @@ export const NotificationBell = defineComponent({
       default: undefined
     }
   },
-  emits: ['item-read-change', 'update:open'],
+  emits: ['item-read-change'],
   setup(props, { emit }) {
     const open = ref(false)
     const buttonRef = ref<HTMLButtonElement | null>(null)
@@ -41,7 +41,6 @@ export const NotificationBell = defineComponent({
     )
 
     watch(open, (value) => {
-      emit('update:open', value)
       void nextTick(() => {
         if (value) {
           const panel = panelRef.value

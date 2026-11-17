@@ -48,6 +48,7 @@ import {
   appendDefaultTaskBoardColumn,
   createTaskBoardDragController,
   createDefaultDragSnapshot,
+  treeKeyId,
   resolveTaskBoardView,
   type TaskBoardColumn,
   type TaskBoardCard,
@@ -235,7 +236,7 @@ export const TaskBoard = defineComponent({
 
     const toggleSwimlane = (laneId: string | number, collapsed: boolean) => {
       emit('swimlane-collapse', laneId, collapsed)
-      collapsedOverride.value = { ...collapsedOverride.value, [String(laneId)]: collapsed }
+      collapsedOverride.value = { ...collapsedOverride.value, [treeKeyId(laneId)]: collapsed }
     }
 
     const dragSnap = ref<TaskBoardDragSnapshot>(createDefaultDragSnapshot())
@@ -330,7 +331,8 @@ export const TaskBoard = defineComponent({
       visibleCards: readonly TaskBoardCard[]
     ) => {
       const isDragging = dragSnap.value.drag?.type === 'card' && dragSnap.value.drag.id === card.id
-      const isKbGrabbed = dragSnap.value.kbDrag?.id === card.id
+      const isKbGrabbed =
+        dragSnap.value.kbDrag?.type === 'card' && dragSnap.value.kbDrag.id === card.id
       const cardClasses = classNames(
         taskBoardCardClasses,
         isDragging && taskBoardCardDraggingClasses,
@@ -417,7 +419,8 @@ export const TaskBoard = defineComponent({
         (dragSnap.value.drag?.type === 'card' || kbGrabbing) &&
         dragSnap.value.dropTargetColumnId === column.id
       const isColDragging =
-        dragSnap.value.drag?.type === 'column' && dragSnap.value.drag.id === column.id
+        (dragSnap.value.drag?.type === 'column' && dragSnap.value.drag.id === column.id) ||
+        (dragSnap.value.kbDrag?.type === 'column' && dragSnap.value.kbDrag.id === column.id)
       const dropIdx = isDropTarget ? dragSnap.value.dropIndex : -1
       const wipOver = isWipExceeded(column)
       const cardCount = getColumnCardCount(column)
@@ -528,7 +531,7 @@ export const TaskBoard = defineComponent({
           return h(
             'div',
             {
-              key: String(group.swimlane.id),
+              key: treeKeyId(group.swimlane.id),
               class: kanbanSwimlaneClasses,
               'data-tiger-kanban-swimlane': '',
               'data-tiger-kanban-swimlane-id': String(group.swimlane.id)

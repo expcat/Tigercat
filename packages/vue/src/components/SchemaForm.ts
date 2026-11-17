@@ -421,7 +421,6 @@ export const SchemaForm = defineComponent({
         applyingSeed = false
       }
       formRef.value?.resetFields()
-      emit('update:modelValue', seed)
       emit('reset')
     }
 

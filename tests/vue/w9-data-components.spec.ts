@@ -295,4 +295,15 @@ describe('W9 vue data components', () => {
     expect(seen.at(-1)).toBe(last)
     spy.mockRestore()
   })
+
+  it('does not emit update:open or leave open on the root', async () => {
+    const onUpdateOpen = vi.fn()
+    const view = render(NotificationBell, {
+      props: { items: [{ id: '1', title: 'One', read: false }] },
+      attrs: { 'onUpdate:open': onUpdateOpen }
+    })
+    await fireEvent.click(view.getByRole('button'))
+    expect(onUpdateOpen).not.toHaveBeenCalled()
+    expect(view.container.firstElementChild?.hasAttribute('open')).toBe(false)
+  })
 })

@@ -5,6 +5,7 @@
 import React from 'react'
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { TaskBoard } from '@expcat/tigercat-react/TaskBoard'
 import type { TaskBoardColumn } from '@expcat/tigercat-core'
 import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
@@ -755,5 +756,58 @@ describe('TaskBoard (React)', () => {
 
       expect(screen.getByText('Done')).toBeInTheDocument()
     })
+  })
+
+  it('collapses only the numeric swimlane when ids are 1 and "1"', async () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const user = userEvent.setup()
+    render(
+      <TaskBoard
+        columns={[
+          {
+            id: 'todo',
+            title: 'To Do',
+            cards: [
+              { id: 'a', title: 'Alpha', lane: 1 },
+              { id: 'b', title: 'Beta', lane: '1' }
+            ]
+          }
+        ]}
+        swimlanes={[
+          { id: 1, label: 'Num' },
+          { id: '1', label: 'Str' }
+        ]}
+        swimlaneField="lane"
+      />
+    )
+    expect(screen.getByText('Alpha')).toBeInTheDocument()
+    expect(screen.getByText('Beta')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /Num/ }))
+    expect(screen.queryByText('Alpha')).not.toBeInTheDocument()
+    expect(screen.getByText('Beta')).toBeInTheDocument()
+    const text = error.mock.calls.map((call) => call.map(String).join(' ')).join('\n')
+    expect(text).not.toMatch(/same key/)
+    error.mockRestore()
+  })
+
+  it('shows a keyboard column grab without ringing a card that shares the id', () => {
+    render(
+      <TaskBoard
+        columns={[
+          {
+            id: 'same',
+            title: 'Col',
+            cards: [{ id: 'same', title: 'Alpha' }]
+          }
+        ]}
+      />
+    )
+    fireEvent.keyDown(screen.getByRole('button', { name: /Col/ }), { key: 'Enter' })
+    expect(document.querySelector('[data-tiger-taskboard-column-id="same"]')?.className).toContain(
+      'opacity-50'
+    )
+    expect(
+      document.querySelector('[data-tiger-taskboard-card-id="same"]')?.className ?? ''
+    ).not.toContain('ring-2')
   })
 })

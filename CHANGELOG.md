@@ -4,6 +4,15 @@
 
 ## v3.0.1（未发布）
 
+- **通知铃开关（Vue，C177-F04）**：去掉半成品的 update:open，不补受控 open。点开后父级收不到 update:open，根节点上也没有 open。
+- **通知中心全部已读（React / Vue，C178-F03）**：分组时回调首参是当前分组键，条目只含该组未读。平铺列表仍传 undefined。
+- **Schema 表单重置（React / Vue，C179-F03）**：Reset 不再多发一次模型更新。默认 Ada 改成 Grace 后再重置，update:modelValue 与 onChange 各只收到一次 Ada。
+- **Schema 表单名称（React，C179-F04）**：根上先保留调用方 aria-label，ariaLabel 仍优先。WorkflowDesigner 与 WorkflowDetailShell 同样先留调用方名称。
+- **任务板泳道（Core / React / Vue，C180-F02）**：折叠状态和列表 key 改用 treeKeyId。泳道 id 为 1 与字符串 1 时，收起 Num 只藏 Alpha，Beta 还在，React 不再报重复 key。
+- **任务板键盘抓列（React / Vue，C180-F03）**：列头 Enter 后列带 opacity-50。列和卡片 id 同为 same 时，卡片不出现 ring-2。
+- **流程设计摘要（React / Vue，C181-F01）**：摘要按钮点击不再冒泡到卡片。点 Submit 的开始节点，select 只收到一次 start。
+- **流程设计运算符（React / Vue，C181-F02）**：分支运算符 aria-label 使用 labels.branchOperatorLabel，缺省仍是 Operator。传入「比较符」时 select 名称含「比较符」。
+
 - **动态流生成说明（文档 / MCP，C170-F05）**：说明不再提 #dot、renderDot，Uses 含 VirtualList 与 Button。ActivityFeed 示例不再附数据表 Custom Filters。
 - **应用壳粘性页头（文档 / Demo，C171-F03）**：说明写明 headerSticky 只有 fullHeight=false 才让 Header 带上 sticky。两端 Demo 01 传 fullHeight=false，并保留 headerSticky。
 - **受理人选项类型（Core / React / Vue，C172-F07）**：删除 AssigneeOption。文档、Demo、组件和 filterAssignees 只用 AssigneePickerOption，id、name、department 只定义一次。

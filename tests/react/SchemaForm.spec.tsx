@@ -293,4 +293,29 @@ describe('SchemaForm (React)', () => {
     const { container } = render(<SchemaForm schema={groupSchema} showActions={false} />)
     await expectNoA11yViolations(container)
   })
+
+  it('emits the default model once after reset', async () => {
+    const onChange = vi.fn()
+    const user = userEvent.setup()
+    render(
+      <SchemaForm
+        schema={basicSchema}
+        defaultValue={{ name: 'Ada', bio: '' }}
+        onChange={onChange}
+      />
+    )
+    await user.clear(screen.getByPlaceholderText('Your name'))
+    await user.type(screen.getByPlaceholderText('Your name'), 'Grace')
+    onChange.mockClear()
+    await user.click(screen.getByRole('button', { name: 'Reset' }))
+    expect(onChange.mock.calls.filter((call) => call[0]?.name === 'Ada')).toHaveLength(1)
+  })
+
+  it('keeps a caller aria-label and lets ariaLabel win', () => {
+    const fromAttr = render(<SchemaForm schema={basicSchema} aria-label="From attr" />)
+    expect(fromAttr.container.firstElementChild).toHaveAttribute('aria-label', 'From attr')
+    fromAttr.unmount()
+    const named = render(<SchemaForm schema={basicSchema} ariaLabel="Named form" />)
+    expect(named.container.firstElementChild).toHaveAttribute('aria-label', 'Named form')
+  })
 })

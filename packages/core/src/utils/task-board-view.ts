@@ -175,7 +175,7 @@ export function resolveTaskBoardView(options: ResolveTaskBoardViewOptions): Task
         options.swimlaneField,
         options.unassignedLabel
       ).map((group) => {
-        const override = options.collapsedLaneState?.[String(group.swimlane.id)]
+        const override = options.collapsedLaneState?.[treeKeyId(group.swimlane.id)]
         const collapsed = override ?? Boolean(group.swimlane.collapsed)
         return collapsed === group.swimlane.collapsed
           ? group

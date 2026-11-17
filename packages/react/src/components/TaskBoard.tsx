@@ -35,6 +35,7 @@ import {
   appendDefaultTaskBoardColumn,
   createTaskBoardDragController,
   createDefaultDragSnapshot,
+  treeKeyId,
   resolveTaskBoardView,
   type TaskBoardProps as CoreTaskBoardProps,
   type TaskBoardColumn,
@@ -255,7 +256,7 @@ const ColumnItem: React.FC<ColumnItemProps> = ({
       if (!group.swimlane.collapsed) offset += group.cards.length
       return (
         <div
-          key={String(group.swimlane.id)}
+          key={treeKeyId(group.swimlane.id)}
           className={kanbanSwimlaneClasses}
           data-tiger-kanban-swimlane=""
           data-tiger-kanban-swimlane-id={String(group.swimlane.id)}>
@@ -563,7 +564,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
   const handleToggleSwimlane = useCallback(
     (laneId: string | number, collapsed: boolean) => {
       onSwimlaneCollapse?.(laneId, collapsed)
-      setCollapsedOverride((prev) => ({ ...prev, [String(laneId)]: collapsed }))
+      setCollapsedOverride((prev) => ({ ...prev, [treeKeyId(laneId)]: collapsed }))
     },
     [onSwimlaneCollapse]
   )
@@ -671,7 +672,8 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
   const dragType = dragSnap.drag?.type ?? null
   const dragStateId = (dragSnap.drag?.type === 'card' ? dragSnap.drag.id : null) as
     string | number | null
-  const kbDragStateId = (dragSnap.kbDrag?.id ?? null) as string | number | null
+  const kbDragStateId = (dragSnap.kbDrag?.type === 'card' ? dragSnap.kbDrag.id : null) as
+    string | number | null
   const kbGrabbing = dragSnap.kbDrag?.type === 'card'
   const liveMessage = describeTaskBoardGrabAnnouncement(dragSnap, view, labels.grabAnnouncementText)
 
@@ -691,7 +693,9 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
         const col = viewColumn.source
         const isDropTarget =
           (dragSnap.drag?.type === 'card' || kbGrabbing) && dragSnap.dropTargetColumnId === col.id
-        const isColDragging = dragSnap.drag?.type === 'column' && dragSnap.drag.id === col.id
+        const isColDragging =
+          (dragSnap.drag?.type === 'column' && dragSnap.drag.id === col.id) ||
+          (dragSnap.kbDrag?.type === 'column' && dragSnap.kbDrag.id === col.id)
         const atWip =
           enforceWipLimit &&
           col.wipLimit != null &&

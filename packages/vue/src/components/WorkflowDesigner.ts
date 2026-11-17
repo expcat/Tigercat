@@ -297,7 +297,10 @@ export const WorkflowDesigner = defineComponent({
         {
           type: 'button',
           class: classNames(workflowDesignerSummaryClasses, 'w-full bg-transparent text-start'),
-          onClick: () => selectNode(node)
+          onClick: (event: Event) => {
+            event.stopPropagation()
+            selectNode(node)
+          }
         },
         [
           h('div', { class: workflowDesignerSummaryRowClasses }, [
@@ -825,7 +828,7 @@ export const WorkflowDesigner = defineComponent({
                       class: workflowDesignerControlClasses,
                       value: branch.condition?.operator ?? 'eq',
                       disabled: lockedNow,
-                      'aria-label': `Operator ${index + 1}`,
+                      'aria-label': `${labels.branchOperatorLabel || 'Operator'} ${index + 1}`,
                       onChange: (event: Event) => {
                         patchNode([...node.path, branch.key], {
                           condition: {

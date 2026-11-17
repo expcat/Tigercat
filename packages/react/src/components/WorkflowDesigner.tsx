@@ -293,7 +293,10 @@ function DesignerNode({
         <button
           type="button"
           className={classNames(workflowDesignerSummaryClasses, 'w-full bg-transparent text-start')}
-          onClick={() => onSelect(node)}>
+          onClick={(event) => {
+            event.stopPropagation()
+            onSelect(node)
+          }}>
           <div className={workflowDesignerSummaryRowClasses}>
             <span
               className={workflowDesignerKindDotClasses}
@@ -871,7 +874,7 @@ function DesignerEditPanel({
                   className={workflowDesignerControlClasses}
                   value={branch.condition?.operator ?? 'eq'}
                   disabled={locked}
-                  aria-label={`Operator ${index + 1}`}
+                  aria-label={`${labels.branchOperatorLabel || 'Operator'} ${index + 1}`}
                   onChange={(event) =>
                     onPatch([...node.path, branch.key], {
                       condition: {
@@ -1241,7 +1244,7 @@ export const WorkflowDesigner: React.FC<WorkflowDesignerProps> = ({
       className={rootClasses}
       style={style}
       role="region"
-      aria-label={ariaLabel ?? designerLabels.ariaLabel}>
+      aria-label={ariaLabel ?? rest['aria-label'] ?? designerLabels.ariaLabel}>
       {issues.length > 0 ? (
         <div
           className={workflowDesignerIssueBannerClasses}

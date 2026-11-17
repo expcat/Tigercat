@@ -318,4 +318,23 @@ describe('SchemaForm (Vue)', () => {
     })
     await expectNoA11yViolations(container)
   })
+
+  it('emits the default model once after reset', async () => {
+    const onUpdate = vi.fn()
+    const onChange = vi.fn()
+    render(SchemaForm, {
+      props: {
+        schema: basicSchema,
+        defaultValue: { name: 'Ada', bio: '' },
+        'onUpdate:modelValue': onUpdate,
+        onChange
+      }
+    })
+    await fireEvent.update(screen.getByPlaceholderText('Your name'), 'Grace')
+    onUpdate.mockClear()
+    onChange.mockClear()
+    await fireEvent.click(screen.getByRole('button', { name: 'Reset' }))
+    expect(onUpdate.mock.calls.filter((call) => call[0]?.name === 'Ada')).toHaveLength(1)
+    expect(onChange.mock.calls.filter((call) => call[0]?.name === 'Ada')).toHaveLength(1)
+  })
 })

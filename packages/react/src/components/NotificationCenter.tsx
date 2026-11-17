@@ -283,7 +283,11 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   }
 
   const handleMarkAllRead = () => {
-    const pending = notificationItemsPendingRead(allManagedItems)
+    const items = groupedMode
+      ? (effectiveGroups.find((group, index) => getGroupKey(group, index) === currentGroupKey)
+          ?.items ?? [])
+      : allManagedItems
+    const pending = notificationItemsPendingRead(items)
     if (manageReadState) {
       setReadStateOverrides((prev) => {
         const next = new Map(prev)
@@ -292,7 +296,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
       })
     }
     setPoliteText(labels.markedReadText.split('{count}').join(String(pending.length)))
-    onMarkAllRead?.(undefined, pending)
+    onMarkAllRead?.(groupedMode ? currentGroupKey : undefined, pending)
   }
 
   const renderItem = (item: NotificationItem, _index: number) => {

@@ -711,4 +711,52 @@ describe('TaskBoard (Vue)', () => {
       expect(screen.getByText('Done')).toBeInTheDocument()
     })
   })
+
+  it('collapses only the numeric swimlane when ids are 1 and "1"', async () => {
+    render(TaskBoard, {
+      props: {
+        columns: [
+          {
+            id: 'todo',
+            title: 'To Do',
+            cards: [
+              { id: 'a', title: 'Alpha', lane: 1 },
+              { id: 'b', title: 'Beta', lane: '1' }
+            ]
+          }
+        ],
+        swimlanes: [
+          { id: 1, label: 'Num' },
+          { id: '1', label: 'Str' }
+        ],
+        swimlaneField: 'lane'
+      }
+    })
+    expect(screen.getByText('Alpha')).toBeInTheDocument()
+    expect(screen.getByText('Beta')).toBeInTheDocument()
+    await fireEvent.click(screen.getByRole('button', { name: /Num/ }))
+    expect(screen.queryByText('Alpha')).not.toBeInTheDocument()
+    expect(screen.getByText('Beta')).toBeInTheDocument()
+  })
+
+  it('shows a keyboard column grab without ringing a card that shares the id', async () => {
+    render(TaskBoard, {
+      props: {
+        columns: [
+          {
+            id: 'same',
+            title: 'Col',
+            cards: [{ id: 'same', title: 'Alpha' }]
+          }
+        ]
+      }
+    })
+    await fireEvent.keyDown(screen.getByRole('button', { name: /Col/ }), { key: 'Enter' })
+    expect(document.querySelector('[data-tiger-taskboard-column-id="same"]')?.className).toContain(
+      'opacity-50'
+    )
+    expect(
+      document.querySelector('[data-tiger-taskboard-card-id="same"]')?.className ?? ''
+    ).not.toContain('ring-2')
+  })
 })

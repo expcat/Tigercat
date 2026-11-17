@@ -269,4 +269,49 @@ describe('WorkflowDesigner (React)', () => {
       expect(next[0]?.kind).toBe('start')
     })
   })
+
+  it('selects a start node once from its summary button', () => {
+    const onSelect = vi.fn()
+    render(
+      <WorkflowDesigner
+        value={[{ key: 'start', kind: 'start', title: 'Submit' }]}
+        onSelect={onSelect}
+      />
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Submit' }))
+    expect(onSelect).toHaveBeenCalledTimes(1)
+    expect(onSelect.mock.calls[0]?.[0]).toEqual(['start'])
+  })
+
+  it('uses branchOperatorLabel on the operator select', () => {
+    render(
+      <WorkflowDesigner
+        value={[
+          {
+            key: 'gate',
+            kind: 'condition',
+            title: 'Gate',
+            children: [
+              {
+                key: 'branch',
+                title: 'Amount',
+                condition: { field: 'amount', operator: 'gt', value: '1' }
+              }
+            ]
+          }
+        ]}
+        labels={{ branchOperatorLabel: '比较符' }}
+      />
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Gate' }))
+    expect(screen.getByRole('combobox', { name: /比较符/ })).toBeInTheDocument()
+  })
+
+  it('keeps a caller aria-label and lets ariaLabel win', () => {
+    const fromAttr = render(<WorkflowDesigner aria-label="From attr" />)
+    expect(fromAttr.container.firstElementChild).toHaveAttribute('aria-label', 'From attr')
+    fromAttr.unmount()
+    const named = render(<WorkflowDesigner ariaLabel="Named designer" />)
+    expect(named.container.firstElementChild).toHaveAttribute('aria-label', 'Named designer')
+  })
 })

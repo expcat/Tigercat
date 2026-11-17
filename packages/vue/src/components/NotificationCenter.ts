@@ -370,19 +370,20 @@ export const NotificationCenter = defineComponent({
     }
 
     const handleMarkAllRead = () => {
-      const items = allManagedItems.value
+      const grouped = groupedMode.value
+      const items = grouped
+        ? (effectiveGroups.value.find(
+            (group, index) => getGroupKey(group, index) === currentGroupKey.value
+          )?.items ?? [])
+        : allManagedItems.value
+      const pending = notificationItemsPendingRead(items)
       if (props.manageReadState) {
         const next = new Map(readStateOverrides.value)
-        const pending = notificationItemsPendingRead(items)
         pending.forEach((item) => next.set(notificationItemKey(item.id), true))
         readStateOverrides.value = next
-        politeText.value = labels.value.markedReadText.split('{count}').join(String(pending.length))
-        emit('mark-all-read', undefined, pending)
-        return
       }
-      const pending = notificationItemsPendingRead(items)
       politeText.value = labels.value.markedReadText.split('{count}').join(String(pending.length))
-      emit('mark-all-read', undefined, pending)
+      emit('mark-all-read', grouped ? currentGroupKey.value : undefined, pending)
     }
 
     const handleItemClick = (item: NotificationItem, index: number) => {
