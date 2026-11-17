@@ -282,15 +282,19 @@ export const Mentions = defineComponent({
         liveText.value = next
         localValue.value = next
         if (textareaRef.value) textareaRef.value.value = next
-      } else if (next === '') {
-        liveText.value = currentValue.value
-        if (textareaRef.value && textareaRef.value.value !== currentValue.value) {
-          textareaRef.value.value = currentValue.value
-        }
       }
       if (changed) {
         emit('update:modelValue', next)
         formItemControl?.onChange(next)
+      }
+      if (controlled) {
+        nextTick(() => {
+          const shown = currentValue.value
+          liveText.value = shown
+          if (textareaRef.value && textareaRef.value.value !== shown) {
+            textareaRef.value.value = shown
+          }
+        })
       }
       if (caret !== undefined) {
         nextTick(() => {

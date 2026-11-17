@@ -64,6 +64,18 @@ describe('Mentions', () => {
     expect(textarea).toHaveValue('hello')
   })
 
+  it('keeps the controlled value when the parent rejects non-empty input', async () => {
+    const { getByRole, emitted, rerender } = render(Mentions, {
+      props: { modelValue: 'keep', options: defaultOptions }
+    })
+    const textarea = getByRole('textbox') as HTMLTextAreaElement
+    await fireEvent.update(textarea, 'keep-more')
+    expect(textarea).toHaveValue('keep')
+    expect(emitted()['update:modelValue']).toEqual([['keep-more']])
+    await rerender({ modelValue: 'keep-more' })
+    expect(textarea).toHaveValue('keep-more')
+  })
+
   it('does not reset to defaultValue on rerender', async () => {
     const { getByRole, rerender } = render(Mentions, {
       props: { options: defaultOptions, defaultValue: 'start ' }
