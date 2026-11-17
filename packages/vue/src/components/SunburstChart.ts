@@ -216,6 +216,7 @@ export const SunburstChart = defineComponent({
           responsive: props.responsive,
           title: props.title,
           desc: props.desc,
+          'aria-label': props.title ? undefined : labels.value.sunburstChartAriaLabel,
           onResolvedSizeChange
         },
         {

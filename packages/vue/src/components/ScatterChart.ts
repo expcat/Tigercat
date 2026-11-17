@@ -326,6 +326,7 @@ export const ScatterChart = defineComponent({
           responsive: props.responsive,
           title: props.title,
           desc: props.desc,
+          'aria-label': props.title ? undefined : labels.value.scatterChartAriaLabel,
           onResolvedSizeChange
         },
         {

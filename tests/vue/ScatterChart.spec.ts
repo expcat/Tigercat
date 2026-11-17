@@ -206,6 +206,42 @@ describe('ScatterChart', () => {
     expect(hidden).toHaveAttribute('pointer-events', 'none')
     expect(hidden).not.toHaveAttribute('tabindex')
   })
+
+  it('names the svg from the title or the zh-CN scatter label', () => {
+    const untitled = renderWithProps(ScatterChart, {
+      data: [{ x: 10, y: 20 }],
+      locale: zhCN,
+      ...defaultSize
+    })
+    expect(untitled.container.querySelector('svg')).toHaveAttribute('aria-label', '散点图')
+    untitled.unmount()
+
+    const titled = renderWithProps(ScatterChart, {
+      data: [{ x: 10, y: 20 }],
+      locale: zhCN,
+      title: '季度',
+      ...defaultSize
+    })
+    expect(titled.container.querySelector('svg')).toHaveAttribute('aria-label', '季度')
+  })
+
+  it('keeps legend items as divs when only a point click handler is set', async () => {
+    const onPointClick = vi.fn()
+    const { container } = renderWithProps(ScatterChart, {
+      data: [
+        { x: 10, y: 20 },
+        { x: 30, y: 40 }
+      ],
+      showLegend: true,
+      onPointClick,
+      ...defaultSize
+    })
+    const items = [...container.querySelectorAll('[data-legend-item]')]
+    expect(items.length).toBeGreaterThan(0)
+    items.forEach((item) => expect(item.tagName).toBe('DIV'))
+    await fireEvent.click(container.querySelector('[data-point-index="0"]')!)
+    expect(onPointClick).toHaveBeenCalledTimes(1)
+  })
 })
 
 function readPointTranslate(el: Element): [number, number] {

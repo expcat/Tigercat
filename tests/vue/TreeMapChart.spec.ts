@@ -5,6 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { fireEvent } from '@testing-library/vue'
 import { TreeMapChart } from '@expcat/tigercat-vue/TreeMapChart'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { renderWithProps, expectNoA11yViolations } from '../utils'
 
 const defaultSize = { width: 400, height: 300 }
@@ -132,5 +133,42 @@ describe('TreeMapChart (Vue)', () => {
     expect(onClick).not.toHaveBeenCalled()
     expect(hidden).toHaveAttribute('pointer-events', 'none')
     expect(hidden).not.toHaveAttribute('tabindex')
+  })
+
+  it('names the svg from the title or the zh-CN treemap label', () => {
+    const untitled = renderWithProps(TreeMapChart, {
+      data: sampleData,
+      locale: zhCN,
+      ...defaultSize
+    })
+    expect(untitled.container.querySelector('svg')).toHaveAttribute('aria-label', '矩形树图')
+    untitled.unmount()
+
+    const titled = renderWithProps(TreeMapChart, {
+      data: sampleData,
+      locale: zhCN,
+      title: '份额',
+      ...defaultSize
+    })
+    expect(titled.container.querySelector('svg')).toHaveAttribute('aria-label', '份额')
+  })
+
+  it('keeps focus on the first side-by-side leaf for ArrowDown', async () => {
+    const { container } = renderWithProps(TreeMapChart, {
+      ...defaultSize,
+      data: [
+        { label: 'A', value: 40 },
+        { label: 'B', value: 30 }
+      ],
+      onNodeClick: vi.fn()
+    })
+    const [first, second] = container.querySelectorAll<SVGElement>('[data-treemap-node]')
+    expect(Number(second.getAttribute('x'))).toBeGreaterThan(Number(first.getAttribute('x')))
+    expect(second.getAttribute('y')).toBe(first.getAttribute('y'))
+    first.focus()
+    await fireEvent.keyDown(first, { key: 'ArrowDown' })
+    expect(document.activeElement).toBe(first)
+    await fireEvent.keyDown(first, { key: 'ArrowRight' })
+    expect(document.activeElement).toBe(second)
   })
 })

@@ -10,7 +10,7 @@ import {
   chartLegendOrientationFromPosition,
   getCartesianChartShellClasses,
   chartMarkTabIndex,
-  nextChartRovingIndex,
+  nextTreeMapNodeIndex,
   isChartNavigationKey,
   getChartLabels,
   mergeTigerLocale,
@@ -186,7 +186,7 @@ export const TreeMapChart = defineComponent({
       const current = nodes.value
       if (isChartNavigationKey(event.key)) {
         event.preventDefault()
-        const nextVisual = nextChartRovingIndex(visualIndex, event.key, current.length)
+        const nextVisual = nextTreeMapNodeIndex(visualIndex, event.key, current)
         const next = current[nextVisual]
         focusedIndex.value = next.index
         const node = (event.currentTarget as Element | null)?.parentElement?.querySelector(
@@ -214,6 +214,7 @@ export const TreeMapChart = defineComponent({
           responsive: props.responsive,
           title: props.title,
           desc: props.desc,
+          'aria-label': props.title ? undefined : labels.value.treemapChartAriaLabel,
           onResolvedSizeChange
         },
         {

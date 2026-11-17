@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { SunburstChart } from '@expcat/tigercat-react/SunburstChart'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { renderWithProps, expectNoA11yViolations } from '../utils/render-helpers-react'
 import { act, fireEvent } from '@testing-library/react'
 
@@ -172,5 +173,23 @@ describe('SunburstChart (React)', () => {
     expect(onClick).not.toHaveBeenCalled()
     expect(hidden).toHaveAttribute('pointer-events', 'none')
     expect(hidden).not.toHaveAttribute('tabindex')
+  })
+
+  it('names the svg from the title or the zh-CN sunburst label', () => {
+    const untitled = renderWithProps(SunburstChart, {
+      data: sampleData,
+      locale: zhCN,
+      ...defaultSize
+    })
+    expect(untitled.container.querySelector('svg')).toHaveAttribute('aria-label', '旭日图')
+    untitled.unmount()
+
+    const titled = renderWithProps(SunburstChart, {
+      data: sampleData,
+      locale: zhCN,
+      title: '区域',
+      ...defaultSize
+    })
+    expect(titled.container.querySelector('svg')).toHaveAttribute('aria-label', '区域')
   })
 })

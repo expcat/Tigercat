@@ -214,6 +214,7 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
       responsive={responsive}
       title={title}
       desc={desc}
+      aria-label={title ? undefined : labels.sunburstChartAriaLabel}
       onResolvedSizeChange={onResolvedSizeChange}>
       {gradient && (
         <defs>

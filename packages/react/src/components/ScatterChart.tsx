@@ -302,6 +302,7 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
       responsive={responsive}
       title={title}
       desc={desc}
+      aria-label={title ? undefined : labels.scatterChartAriaLabel}
       onResolvedSizeChange={onResolvedSizeChange}>
       {gradient && (
         <defs>
@@ -463,7 +464,7 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
           markerSize={legendMarkerSize}
           gap={legendGap}
           ariaLabel={labels.legendAriaLabel}
-          interactive={interactive}
+          interactive={hoverable || selectable}
           onItemClick={handleLegendClick}
           onItemHover={handleLegendHover}
           onItemLeave={handleLegendLeave}

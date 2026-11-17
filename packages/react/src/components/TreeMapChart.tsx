@@ -9,7 +9,7 @@ import {
   chartLegendOrientationFromPosition,
   getCartesianChartShellClasses,
   chartMarkTabIndex,
-  nextChartRovingIndex,
+  nextTreeMapNodeIndex,
   isChartNavigationKey,
   getChartLabels,
   mergeTigerLocale,
@@ -198,7 +198,7 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
   const handleNodeKeyDown = (event: React.KeyboardEvent<SVGRectElement>, visualIndex: number) => {
     if (isChartNavigationKey(event.key)) {
       event.preventDefault()
-      const nextVisual = nextChartRovingIndex(visualIndex, event.key, nodes.length)
+      const nextVisual = nextTreeMapNodeIndex(visualIndex, event.key, nodes)
       const next = nodes[nextVisual]
       setFocusedIndex(next.index)
       const node = event.currentTarget.parentElement?.querySelector(
@@ -219,6 +219,7 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
       responsive={responsive}
       title={title}
       desc={desc}
+      aria-label={title ? undefined : labels.treemapChartAriaLabel}
       onResolvedSizeChange={onResolvedSizeChange}>
       <defs>
         {gradient &&

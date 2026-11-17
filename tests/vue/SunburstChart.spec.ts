@@ -6,6 +6,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { fireEvent } from '@testing-library/vue'
 import { nextTick } from 'vue'
 import { SunburstChart } from '@expcat/tigercat-vue/SunburstChart'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { renderWithProps, expectNoA11yViolations } from '../utils'
 
 const defaultSize = { width: 320, height: 320 }
@@ -168,5 +169,23 @@ describe('SunburstChart (Vue)', () => {
     expect(onClick).not.toHaveBeenCalled()
     expect(hidden).toHaveAttribute('pointer-events', 'none')
     expect(hidden).not.toHaveAttribute('tabindex')
+  })
+
+  it('names the svg from the title or the zh-CN sunburst label', () => {
+    const untitled = renderWithProps(SunburstChart, {
+      data: sampleData,
+      locale: zhCN,
+      ...defaultSize
+    })
+    expect(untitled.container.querySelector('svg')).toHaveAttribute('aria-label', '旭日图')
+    untitled.unmount()
+
+    const titled = renderWithProps(SunburstChart, {
+      data: sampleData,
+      locale: zhCN,
+      title: '区域',
+      ...defaultSize
+    })
+    expect(titled.container.querySelector('svg')).toHaveAttribute('aria-label', '区域')
   })
 })

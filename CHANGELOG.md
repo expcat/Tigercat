@@ -4,6 +4,11 @@
 
 ## v3.0.1（未发布）
 
+- **散点图默认名称（React / Vue，C155-F01）**：不传 title 时使用 scatterChartAriaLabel。zh-CN 下 svg 的 aria-label 是「散点图」；title 为「季度」时名称是「季度」。
+- **散点图图例标签（React，C155-F04）**：showLegend 且只传 onPointClick 时图例项是 DIV，与 Vue 一致。点击第一点 onPointClick 只调用一次。
+- **旭日图默认名称（React / Vue，C156-F01）**：不传 title 时使用 sunburstChartAriaLabel。zh-CN 下 svg 的 aria-label 是「旭日图」；title 为「区域」时名称是「区域」。
+- **矩形树图默认名称（React / Vue，C157-F01）**：不传 title 时使用 treemapChartAriaLabel。zh-CN 下 svg 的 aria-label 是「矩形树图」；title 为「份额」时名称是「份额」。
+- **矩形树图方向键（React / Vue，C157-F02）**：方向键改走几何邻居。两片叶子并排且只传 onNodeClick 时，聚焦第一块按 ArrowDown 焦点留在第一块，按 ArrowRight 才到第二块。
 - **组织图节点文字（Core / React / Vue，C151-F02）**：文字基线按 72px 设计高度缩放到 nodeHeight。nodeHeight 为 48 且节点有 label、title、subtitle 时，画出的每行 y 都小于 48，放不下的行不画。
 - **雷达图默认名称（React / Vue，C153-F01）**：不传 title 时使用 radarChartAriaLabel。zh-CN 下 svg 的 aria-label 是「雷达图」；title 为「能力」时名称是「能力」。
 - **雷达图系列类名（React / Vue，C153-F03）**：系列 className 写到该系列的 g 上。className 为 series-extra 时两端 class 都含 series-extra。
