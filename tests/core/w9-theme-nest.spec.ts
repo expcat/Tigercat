@@ -8,7 +8,7 @@ import {
   createTigerThemeScope,
   nearestThemeRoot,
   themeConfigOwnCssVars,
-  THEME_TRANSITION_PROPERTIES
+  themeTransitionValue
 } from '../../packages/core/src/themes/manager'
 import { minimalTheme } from '../../packages/core/src/themes/minimal/theme'
 import { modernTheme } from '../../packages/core/src/themes/modern/theme'
@@ -55,13 +55,13 @@ describe('nested theme roots', () => {
     parentScope.dispose()
   })
 
-  it('derives nested transition shorthands for the motion durations a layer sets', () => {
+  it('assigns nested transition timing to every property a layer sets', () => {
     const vars = themeConfigOwnCssVars(modernTheme.light)
     expect(vars['--tiger-transition-quick']).toBe(
-      `${THEME_TRANSITION_PROPERTIES} 150ms cubic-bezier(0.2, 0, 0, 1)`
+      themeTransitionValue('150ms', 'cubic-bezier(0.2, 0, 0, 1)')
     )
     expect(vars['--tiger-transition-base']).toBe(
-      `${THEME_TRANSITION_PROPERTIES} 200ms cubic-bezier(0.2, 0, 0, 1)`
+      themeTransitionValue('200ms', 'cubic-bezier(0.2, 0, 0, 1)')
     )
     // Unset duration keys keep inheriting the parent shorthand.
     expect(themeConfigOwnCssVars({ motion: { durationBase: '240ms' } })).not.toHaveProperty(
@@ -70,7 +70,7 @@ describe('nested theme roots', () => {
     // A layer without its own easing composes against the inherited easing variable.
     expect(
       themeConfigOwnCssVars({ motion: { durationBase: '240ms' } })['--tiger-transition-base']
-    ).toBe(`${THEME_TRANSITION_PROPERTIES} 240ms var(--tiger-motion-ease-standard)`)
+    ).toBe(themeTransitionValue('240ms', 'var(--tiger-motion-ease-standard)'))
   })
 
   it('sends a portal to the nearest theme root instead of documentElement', () => {
