@@ -80,7 +80,10 @@ const testAliases = {
   '@expcat/tigercat-vue': resolve(__dirname, './packages/vue/src'),
   '@expcat/tigercat-react': resolve(__dirname, './packages/react/src'),
   '@expcat/tigercat-cli': resolve(__dirname, './packages/cli/src'),
-  '@expcat/tigercat-mcp': resolve(__dirname, './packages/mcp/src')
+  '@expcat/tigercat-mcp': resolve(__dirname, './packages/mcp/src'),
+  // Example apps resolve this in their own Vite config. Specs that render
+  // those SFCs need the same prefix.
+  '@demo-shared': resolve(__dirname, './examples/example/shared')
 }
 
 // Specs that must run in the `forks` pool, i.e. their own process.
