@@ -125,6 +125,28 @@ export function getOrgChartNodeMarkerGeometry(
   }
 }
 
+const ORG_CHART_NODE_TEXT_BASELINE = {
+  label: 26,
+  title: 44,
+  subtitle: 60
+} as const
+
+const ORG_CHART_NODE_TEXT_DESIGN_HEIGHT = 72
+
+/** Baseline for one card line. Designed for 72px and scaled into shorter cards. */
+export function getOrgChartNodeTextY(
+  line: keyof typeof ORG_CHART_NODE_TEXT_BASELINE,
+  nodeHeight: number
+): number | undefined {
+  if (!(nodeHeight > 0)) return undefined
+  const designed = ORG_CHART_NODE_TEXT_BASELINE[line]
+  const y =
+    nodeHeight === ORG_CHART_NODE_TEXT_DESIGN_HEIGHT
+      ? designed
+      : Math.round((designed / ORG_CHART_NODE_TEXT_DESIGN_HEIGHT) * nodeHeight)
+  return y < nodeHeight ? y : undefined
+}
+
 export function getOrgChartNodeClipId(instanceId: string): string {
   const normalized = instanceId.replace(/[^A-Za-z0-9_-]/g, '-').replace(/^-+|-+$/g, '')
   return `tiger-org-node-${normalized || '0'}`

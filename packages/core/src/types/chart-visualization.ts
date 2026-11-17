@@ -420,4 +420,10 @@ export interface SankeyChartProps extends BaseChartProps {
   nodes: SankeyNode[]
   links: SankeyLink[]
   height?: number
+
+  /**
+   * Whether the SVG should observe its container and resize responsively.
+   * @default true
+   */
+  responsive?: boolean
 }

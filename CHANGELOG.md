@@ -4,6 +4,13 @@
 
 ## v3.0.1（未发布）
 
+- **组织图节点文字（Core / React / Vue，C151-F02）**：文字基线按 72px 设计高度缩放到 nodeHeight。nodeHeight 为 48 且节点有 label、title、subtitle 时，画出的每行 y 都小于 48，放不下的行不画。
+- **雷达图默认名称（React / Vue，C153-F01）**：不传 title 时使用 radarChartAriaLabel。zh-CN 下 svg 的 aria-label 是「雷达图」；title 为「能力」时名称是「能力」。
+- **雷达图系列类名（React / Vue，C153-F03）**：系列 className 写到该系列的 g 上。className 为 series-extra 时两端 class 都含 series-extra。
+- **雷达图负值提示（Core / React / Vue，C153-F04）**：负值保留原 datum，不再合成 0，半径仍为 0。默认提示在点缺失且值为负时返回空，不再显示「速度: 0」。自定义 tooltipFormatter 仍收到原 datum。
+- **桑基图 responsive 默认（Core / React / Vue / 文档 / MCP，C154-F03）**：SankeyChartProps 单独声明 responsive，默认 true。省略该 prop 时外壳带跟随容器宽度的 class。共享 BaseChartProps 仍是 false。
+- **桑基图 Vue 类名（Vue，C154-F04）**：根节点先展开 attrs，再合并 attrs.class 与 className。className 为 prop-class、class 为 attr-class 时根 class 同时含两者。
+
 - **仪表非法区间（Core / React / Vue，C148-F03）**：min 不小于 max 时只画一个刻度。min 100、max 0、tickCount 4 时刻度标签只有 100，aria-valuemin 不大于 aria-valuemax。
 - **仪表装饰节点（Vue，C148-F04）**：轨道、弧、刻度、针、圆心和文字都带 aria-hidden="true"，DOM 与 SSR 字符串一致。
 - **仪表分段渐变（React / Vue，C148-F05）**：segments 存在时 value 弧使用纯色，不再引用 url(# 渐变。注释里的 Ignored when segments is set 保持不变。

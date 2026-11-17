@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import {
   downloadChartSvg,
+  getCartesianChartShellClasses,
   getW9DataLabels,
   resolveButtonClasses,
   layoutSankey,
@@ -31,7 +32,13 @@ export function SankeyChart({
     if (svg instanceof SVGSVGElement) downloadChartSvg(svg, 'sankey')
   }
   return (
-    <div ref={hostRef} className={className}>
+    <div
+      ref={hostRef}
+      className={getCartesianChartShellClasses({
+        showLegend: false,
+        responsive,
+        className
+      })}>
       <button
         type="button"
         className={resolveButtonClasses({ variant: 'outline', size: 'sm' })}

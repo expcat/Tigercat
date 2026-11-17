@@ -183,6 +183,20 @@ describe('OrgChart', () => {
     await expectNoA11yViolationsIsolated(container)
   })
 
+  it('keeps every text baseline inside a 48px node', () => {
+    const { container } = render(
+      <OrgChart
+        data={{ id: 'ceo', label: 'Ada', title: 'CEO', subtitle: 'Platform' }}
+        nodeHeight={48}
+      />
+    )
+    const texts = [...container.querySelectorAll('[data-org-chart-nodes="true"] text')]
+    expect(texts.length).toBeGreaterThan(0)
+    for (const text of texts) {
+      expect(Number(text.getAttribute('y'))).toBeLessThan(48)
+    }
+  })
+
   describe('Edge Cases and Boundary', () => {
     it('prevents disabled nodes from becoming selectable', () => {
       const onSelectedIdChange = vi.fn()

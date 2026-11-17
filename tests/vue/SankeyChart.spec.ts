@@ -41,4 +41,21 @@ describe('SankeyChart', () => {
       expect(root.querySelector('svg > desc')).toHaveTextContent(desc)
     }
   })
+
+  it('follows the container width when responsive is omitted', () => {
+    const { container } = render(SankeyChart, {
+      props: { nodes: props.nodes, links: props.links }
+    })
+    expect(container.firstElementChild).toHaveClass('w-full')
+  })
+
+  it('merges className with the attrs class', () => {
+    const { container } = render(SankeyChart, {
+      props: { ...props, className: 'prop-class' },
+      attrs: { class: 'attr-class' }
+    })
+    const root = container.firstElementChild as HTMLElement
+    expect(root).toHaveClass('prop-class')
+    expect(root).toHaveClass('attr-class')
+  })
 })

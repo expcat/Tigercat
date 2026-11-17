@@ -13,19 +13,19 @@ description: Compact generated Tigercat Charts props reference
 
 `packages/core/src/types/chart-visualization.ts` · `SankeyChartProps` · 4/11 compact props · [Complete props](#remaining-props-complete-public-api)
 
-| Prop      | Type                   | Default | Notes                                          |
-| --------- | ---------------------- | ------- | ---------------------------------------------- |
-| `nodes`   | `SankeyNode[]`         | `-`     | -                                              |
-| `links`   | `SankeyLink[]`         | `-`     | -                                              |
-| `height?` | `number`               | `-`     | -                                              |
-| `locale?` | `Partial<TigerLocale>` | `-`     | Locale object merged on top of ConfigProvider. |
+| Prop          | Type           | Default | Notes                                                                 |
+| ------------- | -------------- | ------- | --------------------------------------------------------------------- |
+| `nodes`       | `SankeyNode[]` | `-`     | -                                                                     |
+| `links`       | `SankeyLink[]` | `-`     | -                                                                     |
+| `height?`     | `number`       | `-`     | -                                                                     |
+| `responsive?` | `boolean`      | `true`  | Whether the SVG should observe its container and resize responsively. |
 
 ### Remaining props (complete public API)
 
 - `width?`: `number`; default `320`. Chart width
 - `padding?`: `ChartPadding`; default `{ top: 24, right: 24, bottom: 52, left: 52 }`. Chart padding. Default leaves room for ChartAxis labels (`labelOffset` 28 + tick + dy).
-- `responsive?`: `boolean`; default `false`. Whether the SVG should observe its container and resize responsively.
 - `title?`: `string`; default `-`. Accessible title for the SVG
 - `desc?`: `string`; default `-`. Accessible description for the SVG
 - `className?`: `string`; default `-`. Additional CSS classes
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale object merged on top of ConfigProvider.
 - `labels?`: `Partial<TigerLocaleChart>`; default `-`. Chart copy overlay. Dedicated aria props win, then `labels`, then `locale.chart`.

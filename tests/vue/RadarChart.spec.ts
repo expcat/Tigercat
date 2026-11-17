@@ -3,9 +3,12 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { fireEvent } from '@testing-library/vue'
+import { h } from 'vue'
+import { fireEvent, render } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
 import { RadarChart } from '@expcat/tigercat-vue/RadarChart'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { renderWithProps, expectNoA11yViolations } from '../utils'
 
 const singleSeriesData = [
@@ -297,5 +300,48 @@ describe('RadarChart', () => {
     expect(hidden).toHaveAttribute('pointer-events', 'none')
     expect(hidden).not.toHaveAttribute('tabindex')
     expect(point).not.toHaveAttribute('tabindex')
+  })
+
+  it('names the svg from the title or the zh-CN radar label', () => {
+    const untitled = render({
+      render: () =>
+        h(ConfigProvider, { locale: zhCN }, () => h(RadarChart, { data: singleSeriesData }))
+    })
+    expect(untitled.container.querySelector('svg')).toHaveAttribute('aria-label', '雷达图')
+    untitled.unmount()
+
+    const titled = render({
+      render: () =>
+        h(ConfigProvider, { locale: zhCN }, () =>
+          h(RadarChart, { data: singleSeriesData, title: '能力' })
+        )
+    })
+    expect(titled.container.querySelector('svg')).toHaveAttribute('aria-label', '能力')
+  })
+
+  it('applies series className on the series group', () => {
+    const { container } = renderWithProps(RadarChart, {
+      series: [{ name: 'A', className: 'series-extra', data: singleSeriesData }]
+    })
+    expect(container.querySelector('g[data-series-type="radar"]')).toHaveClass('series-extra')
+  })
+
+  it('does not publish a synthetic zero for a negative indicator', async () => {
+    const { container } = renderWithProps(RadarChart, {
+      series: [
+        {
+          name: '表现',
+          data: [
+            { label: '速度', value: -5 },
+            { label: '力量', value: 40 }
+          ]
+        }
+      ],
+      showTooltip: true
+    })
+    const point = container.querySelector('[data-radar-point][data-point-index="0"]')!
+    await fireEvent.mouseEnter(point)
+    const tooltip = document.body.querySelector('[data-chart-tooltip]')
+    expect(tooltip?.textContent ?? '').not.toContain('速度: 0')
   })
 })

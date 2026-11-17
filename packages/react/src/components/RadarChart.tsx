@@ -374,6 +374,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
         seriesItem.series
       )
     }
+    if (point.missing && point.datum.value < 0) return ''
     return defaultRadarTooltipFormatter(
       point.datum,
       hoveredPoint.seriesIndex,
@@ -434,6 +435,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
       responsive={responsive}
       title={title}
       desc={desc}
+      aria-label={title ? undefined : labels.radarChartAriaLabel}
       onResolvedSizeChange={onResolvedSizeChange}>
       {(gradient || strokeGradient || pointGradient) && (
         <defs>
@@ -543,6 +545,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
         return (
           <g
             key={item.seriesKey}
+            className={item.series.className}
             data-series-type="radar"
             data-series-key={item.seriesKey}
             data-series-name={item.series.name}

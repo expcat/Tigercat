@@ -2295,6 +2295,7 @@
       "getOrgChartNodeClasses",
       "getOrgChartNodeClipId",
       "getOrgChartNodeMarkerGeometry",
+      "getOrgChartNodeTextY",
       "getOtpContainerClasses",
       "getOtpErrorClasses",
       "getOtpFocusIndex",
@@ -8275,7 +8276,7 @@
     },
     "SankeyChartProps": {
       "extends": ["BaseChartProps"],
-      "props": ["height", "links", "nodes"]
+      "props": ["height", "links", "nodes", "responsive"]
     },
     "ScatterChartProps": {
       "extends": [

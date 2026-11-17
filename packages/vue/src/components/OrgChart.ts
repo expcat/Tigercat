@@ -12,6 +12,7 @@ import {
   getOrgChartNodeAriaLabel,
   getOrgChartNodeClipId,
   getOrgChartNodeMarkerGeometry,
+  getOrgChartNodeTextY,
   resolveLinkHref,
   getOrgChartNodeClasses,
   orgChartLinkClasses,
@@ -215,6 +216,14 @@ export const OrgChart = defineComponent({
                         const textStart = avatarHref ? 58 : 16
                         const geometry = getOrgChartNodeMarkerGeometry(node.width, node.height)
                         const clipId = `${markerClipPrefix}-${node.index}`
+                        const labelY = getOrgChartNodeTextY('label', node.height)
+                        const titleY = node.node.title
+                          ? getOrgChartNodeTextY('title', node.height)
+                          : undefined
+                        const subtitleY =
+                          props.showSubtitles && node.node.subtitle
+                            ? getOrgChartNodeTextY('subtitle', node.height)
+                            : undefined
                         return h(
                           'g',
                           {
@@ -288,22 +297,28 @@ export const OrgChart = defineComponent({
                                   'aria-hidden': 'true'
                                 })
                               : undefined,
-                            h(
-                              'text',
-                              { x: textStart, y: 26, class: orgChartNodeLabelClasses },
-                              node.node.label
-                            ),
-                            node.node.title
+                            labelY != null
                               ? h(
                                   'text',
-                                  { x: textStart, y: 44, class: orgChartNodeTitleClasses },
+                                  { x: textStart, y: labelY, class: orgChartNodeLabelClasses },
+                                  node.node.label
+                                )
+                              : undefined,
+                            titleY != null
+                              ? h(
+                                  'text',
+                                  { x: textStart, y: titleY, class: orgChartNodeTitleClasses },
                                   node.node.title
                                 )
                               : undefined,
-                            props.showSubtitles && node.node.subtitle
+                            subtitleY != null
                               ? h(
                                   'text',
-                                  { x: textStart, y: 60, class: orgChartNodeSubtitleClasses },
+                                  {
+                                    x: textStart,
+                                    y: subtitleY,
+                                    class: orgChartNodeSubtitleClasses
+                                  },
                                   node.node.subtitle
                                 )
                               : undefined

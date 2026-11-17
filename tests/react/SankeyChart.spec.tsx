@@ -42,4 +42,9 @@ describe('SankeyChart', () => {
       expect(root.querySelector('svg > desc')).toHaveTextContent(desc)
     }
   })
+
+  it('follows the container width when responsive is omitted', () => {
+    const { container } = render(<SankeyChart nodes={props.nodes} links={props.links} />)
+    expect(container.firstElementChild).toHaveClass('w-full')
+  })
 })

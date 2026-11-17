@@ -10,6 +10,7 @@ import {
   getOrgChartNodeAriaLabel,
   getOrgChartNodeClipId,
   getOrgChartNodeMarkerGeometry,
+  getOrgChartNodeTextY,
   resolveLinkHref,
   getOrgChartNodeClasses,
   orgChartLinkClasses,
@@ -164,6 +165,14 @@ export function OrgChart({
               const textStart = avatarHref ? 58 : 16
               const geometry = getOrgChartNodeMarkerGeometry(node.width, node.height)
               const clipId = `${markerClipPrefix}-${node.index}`
+              const labelY = getOrgChartNodeTextY('label', node.height)
+              const titleY = node.node.title
+                ? getOrgChartNodeTextY('title', node.height)
+                : undefined
+              const subtitleY =
+                showSubtitles && node.node.subtitle
+                  ? getOrgChartNodeTextY('subtitle', node.height)
+                  : undefined
               return (
                 <g
                   key={node.id}
@@ -232,16 +241,18 @@ export function OrgChart({
                       aria-hidden="true"
                     />
                   ) : null}
-                  <text x={textStart} y={26} className={orgChartNodeLabelClasses}>
-                    {node.node.label}
-                  </text>
-                  {node.node.title ? (
-                    <text x={textStart} y={44} className={orgChartNodeTitleClasses}>
+                  {labelY != null ? (
+                    <text x={textStart} y={labelY} className={orgChartNodeLabelClasses}>
+                      {node.node.label}
+                    </text>
+                  ) : null}
+                  {titleY != null ? (
+                    <text x={textStart} y={titleY} className={orgChartNodeTitleClasses}>
                       {node.node.title}
                     </text>
                   ) : null}
-                  {showSubtitles && node.node.subtitle ? (
-                    <text x={textStart} y={60} className={orgChartNodeSubtitleClasses}>
+                  {subtitleY != null ? (
+                    <text x={textStart} y={subtitleY} className={orgChartNodeSubtitleClasses}>
                       {node.node.subtitle}
                     </text>
                   ) : null}

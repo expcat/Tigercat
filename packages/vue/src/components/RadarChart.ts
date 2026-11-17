@@ -297,6 +297,7 @@ export const RadarChart = defineComponent({
           seriesItem.series
         )
       }
+      if (point.missing && point.datum.value < 0) return ''
       return defaultRadarTooltipFormatter(
         point.datum,
         hovered.seriesIndex,
@@ -469,6 +470,7 @@ export const RadarChart = defineComponent({
           responsive: props.responsive,
           title: props.title,
           desc: props.desc,
+          'aria-label': props.title ? undefined : labels.value.radarChartAriaLabel,
           onResolvedSizeChange
         },
         {
@@ -615,6 +617,7 @@ export const RadarChart = defineComponent({
                 'g',
                 {
                   key: item.seriesKey,
+                  class: item.series.className,
                   'data-series-type': 'radar',
                   'data-series-key': item.seriesKey,
                   'data-series-name': item.series.name,

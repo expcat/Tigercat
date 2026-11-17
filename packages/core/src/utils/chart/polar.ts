@@ -515,18 +515,20 @@ export function layoutRadar(
     indicators.forEach((indicator, index) => {
       const angle = angles[index]
       if (!isFiniteNumber(angle)) return
+      const raw = radarDatumForIndicator(item.data, indicator)
       const matched = radarValueForIndicator(item.data, indicator)
       const missing = !matched
+      const negative = !!raw && isFiniteNumber(raw.value) && raw.value < 0
       const pointRadius = missing ? 0 : radius * (matched.value / maxValue)
       const pos = polarToCartesian(cx, cy, pointRadius, angle)
       if (!isFiniteNumber(pos.x) || !isFiniteNumber(pos.y)) return
       points.push({
         x: pos.x,
         y: pos.y,
-        value: matched?.value ?? 0,
+        value: matched ? matched.value : negative && raw ? raw.value : 0,
         index,
         angle,
-        datum: matched?.datum ?? { value: 0, label: indicator.label },
+        datum: matched?.datum ?? (negative && raw ? raw : { value: 0, label: indicator.label }),
         missing
       })
     })
