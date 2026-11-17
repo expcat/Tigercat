@@ -129,7 +129,7 @@ describe('Drawer', () => {
     expect(dialog).toHaveStyle({ width: '100px' })
     expect(separator).toHaveAttribute('aria-valuenow', '100')
     expect(separator).toHaveAttribute('aria-valuemin', '80')
-    expect(separator).toHaveAttribute('aria-valuemax', '100')
+    expect(separator).toHaveAttribute('aria-valuemax', String(window.innerWidth))
     await user.keyboard('{ArrowRight}{ArrowRight}{ArrowRight}')
     expect(dialog).toHaveStyle({ width: '80px' })
 
@@ -139,6 +139,45 @@ describe('Drawer', () => {
     expect(dialog).toHaveStyle({ height: '90px' })
     await user.keyboard('{ArrowDown}{ArrowDown}')
     expect(dialog).toHaveStyle({ height: '80px' })
+  })
+
+  it('keeps the available resize range while keyboard and pointer changes stay within it', async () => {
+    render(Drawer, {
+      props: {
+        open: true,
+        resizable: true,
+        width: 90,
+        placement: 'bottom',
+        fullscreenOnMobile: false
+      }
+    })
+    const dialog = screen.getByRole('dialog')
+    const root = dialog.closest('[data-tiger-drawer-root]')!
+    Object.defineProperty(root, 'clientHeight', { configurable: true, value: 110 })
+    Object.defineProperty(dialog, 'offsetHeight', { configurable: true, value: 90 })
+    const separator = screen.getByRole('separator')
+    await fireEvent.focus(separator)
+    expect(separator).toHaveAttribute('aria-valuemin', '80')
+    expect(separator).toHaveAttribute('aria-valuenow', '90')
+    expect(separator).toHaveAttribute('aria-valuemax', '110')
+
+    await fireEvent.keyDown(separator, { key: 'ArrowUp' })
+    expect(separator).toHaveAttribute('aria-valuenow', '100')
+    expect(separator).toHaveAttribute('aria-valuemax', '110')
+    await fireEvent.keyDown(separator, { key: 'ArrowUp' })
+    await fireEvent.keyDown(separator, { key: 'ArrowUp' })
+    expect(dialog).toHaveStyle({ height: '110px' })
+    expect(separator).toHaveAttribute('aria-valuenow', '110')
+
+    await fireEvent.pointerDown(separator, { button: 0, clientY: 100 })
+    await fireEvent.pointerMove(window, { clientY: 200 })
+    expect(dialog).toHaveStyle({ height: '80px' })
+    expect(separator).toHaveAttribute('aria-valuenow', '80')
+    await fireEvent.pointerMove(window, { clientY: 0 })
+    await fireEvent.pointerUp(window)
+    expect(dialog).toHaveStyle({ height: '110px' })
+    expect(separator).toHaveAttribute('aria-valuenow', '110')
+    expect(separator).toHaveAttribute('aria-valuemax', '110')
   })
 
   it('uses official locale objects for the close button', async () => {

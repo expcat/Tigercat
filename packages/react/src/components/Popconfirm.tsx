@@ -92,11 +92,10 @@ export const Popconfirm = forwardRef<HTMLElement, PopconfirmProps>(function Popc
   forwardedRef
 ) {
   const { locale } = useTigerConfig()
-  const resolvedTitle = resolveLocaleText(
-    'Are you sure you want to continue?',
-    title,
-    locale?.common?.confirmTitle
-  )
+  const resolvedTitle =
+    titleContent != null && titleContent !== false && titleContent !== ''
+      ? titleContent
+      : resolveLocaleText('Are you sure you want to continue?', title, locale?.common?.confirmTitle)
   const resolvedOkText = resolveLocaleText('OK', okText, locale?.common?.okText)
   const resolvedCancelText = resolveLocaleText('Cancel', cancelText, locale?.common?.cancelText)
 
@@ -246,7 +245,7 @@ export const Popconfirm = forwardRef<HTMLElement, PopconfirmProps>(function Popc
                 )}
                 <div className="flex-1">
                   <div id={titleId} className={titleClasses}>
-                    {titleContent ?? resolvedTitle}
+                    {resolvedTitle}
                   </div>
                   {hasDescription && (
                     <div id={descriptionId} className={descriptionClasses}>

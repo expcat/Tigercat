@@ -356,16 +356,43 @@ export const Drawer = defineComponent({
     const sheetOffset = ref(0)
     const resizedLength = ref<number | null>(null)
     const measuredLength = ref(80)
+    const maxResizeLength = ref(80)
     const resizing = ref(false)
     const readResizeLength = () =>
       resizedLength.value ??
       (resolvedPlacement.value === 'left' || resolvedPlacement.value === 'right'
         ? (dialogRef.value?.offsetWidth ?? 320)
         : (dialogRef.value?.offsetHeight ?? 240))
+    const measureResizeRange = () => {
+      const root = rootRef.value
+      const viewport = root?.ownerDocument.defaultView
+      const isHorizontal = resolvedPlacement.value === 'left' || resolvedPlacement.value === 'right'
+      const maximum = Math.max(
+        80,
+        isHorizontal
+          ? root?.clientWidth || viewport?.innerWidth || 0
+          : root?.clientHeight || viewport?.innerHeight || 0
+      )
+      const current = Math.min(maximum, Math.max(80, readResizeLength()))
+      maxResizeLength.value = maximum
+      measuredLength.value = current
+      if (resizedLength.value != null) resizedLength.value = current
+    }
     watch(
-      [dialogRef, () => props.open, () => props.resizable, () => props.width, resolvedPlacement],
-      () => {
-        if (props.open && props.resizable) measuredLength.value = Math.max(80, readResizeLength())
+      [
+        rootRef,
+        dialogRef,
+        () => props.open,
+        () => props.resizable,
+        () => props.width,
+        resolvedPlacement
+      ],
+      (_next, _previous, onCleanup) => {
+        if (!props.open || !props.resizable) return
+        measureResizeRange()
+        const viewport = rootRef.value?.ownerDocument.defaultView
+        viewport?.addEventListener('resize', measureResizeRange)
+        onCleanup(() => viewport?.removeEventListener('resize', measureResizeRange))
       },
       { flush: 'post' }
     )
@@ -700,19 +727,20 @@ export const Drawer = defineComponent({
                 tabindex: 0,
                 'aria-valuemin': 80,
                 'aria-valuenow': Math.round(resizedLength.value ?? measuredLength.value),
-                'aria-valuemax': Math.round(resizedLength.value ?? measuredLength.value),
+                'aria-valuemax': Math.round(maxResizeLength.value),
                 'aria-orientation': isHorizontal ? 'vertical' : 'horizontal',
                 'aria-label': drawerLabels.value.resizeAriaLabel,
-                onFocus: () => {
-                  measuredLength.value = Math.max(80, readResizeLength())
-                },
+                onFocus: measureResizeRange,
                 onKeydown: (event: KeyboardEvent) => {
                   const step = getResizeKeyboardDelta(event.key)
                   if (!step) return
                   const delta = drawerResizeDelta(resolvedPlacement.value, step.deltaX, step.deltaY)
                   if (!delta) return
                   event.preventDefault()
-                  resizedLength.value = Math.max(80, readResizeLength() + delta)
+                  resizedLength.value = Math.min(
+                    maxResizeLength.value,
+                    Math.max(80, readResizeLength() + delta)
+                  )
                 },
                 style: {
                   position: 'absolute',
@@ -744,7 +772,10 @@ export const Drawer = defineComponent({
                       pointer.clientX - startX,
                       pointer.clientY - startY
                     )
-                    resizedLength.value = Math.max(80, start + delta)
+                    resizedLength.value = Math.min(
+                      maxResizeLength.value,
+                      Math.max(80, start + delta)
+                    )
                   }
                   const end = () => {
                     resizing.value = false

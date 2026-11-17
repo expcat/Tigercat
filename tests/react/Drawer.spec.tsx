@@ -50,7 +50,7 @@ describe('Drawer', () => {
     expect(dialog).toHaveStyle({ width: '100px' })
     expect(separator).toHaveAttribute('aria-valuenow', '100')
     expect(separator).toHaveAttribute('aria-valuemin', '80')
-    expect(separator).toHaveAttribute('aria-valuemax', '100')
+    expect(separator).toHaveAttribute('aria-valuemax', String(window.innerWidth))
     await user.keyboard('{ArrowRight}{ArrowRight}{ArrowRight}')
     expect(dialog).toHaveStyle({ width: '80px' })
 
@@ -60,6 +60,55 @@ describe('Drawer', () => {
     expect(dialog).toHaveStyle({ height: '90px' })
     await user.keyboard('{ArrowDown}{ArrowDown}')
     expect(dialog).toHaveStyle({ height: '80px' })
+  })
+
+  it('keeps the available resize range while keyboard and pointer changes stay within it', () => {
+    render(<Drawer open resizable width={90} fullscreenOnMobile={false} />)
+    const dialog = screen.getByRole('dialog')
+    const root = dialog.closest('[data-tiger-drawer-root]')!
+    Object.defineProperty(root, 'clientWidth', { configurable: true, value: 110 })
+    Object.defineProperty(dialog, 'offsetWidth', { configurable: true, value: 90 })
+    const separator = screen.getByRole('separator')
+    fireEvent.focus(separator)
+    expect(separator).toHaveAttribute('aria-valuemin', '80')
+    expect(separator).toHaveAttribute('aria-valuenow', '90')
+    expect(separator).toHaveAttribute('aria-valuemax', '110')
+
+    fireEvent.keyDown(separator, { key: 'ArrowLeft' })
+    expect(separator).toHaveAttribute('aria-valuenow', '100')
+    expect(separator).toHaveAttribute('aria-valuemax', '110')
+    fireEvent.keyDown(separator, { key: 'ArrowLeft' })
+    fireEvent.keyDown(separator, { key: 'ArrowLeft' })
+    expect(dialog).toHaveStyle({ width: '110px' })
+    expect(separator).toHaveAttribute('aria-valuenow', '110')
+
+    fireEvent.pointerDown(separator, { button: 0, clientX: 100 })
+    fireEvent.pointerMove(window, { clientX: 200 })
+    expect(dialog).toHaveStyle({ width: '80px' })
+    expect(separator).toHaveAttribute('aria-valuenow', '80')
+    fireEvent.pointerMove(window, { clientX: 0 })
+    fireEvent.pointerUp(window)
+    expect(dialog).toHaveStyle({ width: '110px' })
+    expect(separator).toHaveAttribute('aria-valuenow', '110')
+    expect(separator).toHaveAttribute('aria-valuemax', '110')
+  })
+
+  it('falls back from false or empty headers and keeps numeric zero as the title', () => {
+    const { rerender } = render(<Drawer open title="Fallback title" header={false} />)
+    const dialog = screen.getByRole('dialog', { name: 'Fallback title' })
+    expect(document.getElementById(dialog.getAttribute('aria-labelledby')!)).toHaveTextContent(
+      'Fallback title'
+    )
+    rerender(<Drawer open title="Fallback title" header="" />)
+    expect(dialog).toHaveAccessibleName('Fallback title')
+    rerender(<Drawer open header={false} />)
+    expect(dialog).not.toHaveAttribute('aria-labelledby')
+    expect(dialog).toHaveAttribute('aria-label', 'Drawer')
+    rerender(<Drawer open title="Fallback title" header={0} />)
+    expect(dialog).toHaveAccessibleName('0')
+    expect(dialog).not.toHaveAttribute('aria-label')
+    expect(screen.queryByText('Fallback title')).not.toBeInTheDocument()
+    expect(screen.getByText('0')).toBeInTheDocument()
   })
 
   it('should link aria-labelledby to an existing title element', async () => {

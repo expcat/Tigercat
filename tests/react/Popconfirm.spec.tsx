@@ -40,6 +40,32 @@ describe('Popconfirm', () => {
     await waitFor(() => expect(queryByText('Confirm?')).not.toBeVisible())
   })
 
+  it('falls back from false or empty title content and keeps numeric zero', async () => {
+    const { rerender } = render(
+      <Popconfirm open title="Fallback title" titleContent={false}>
+        <button>Action</button>
+      </Popconfirm>
+    )
+    const dialog = await screen.findByRole('dialog', { name: 'Fallback title' })
+    expect(document.getElementById(dialog.getAttribute('aria-labelledby')!)).toHaveTextContent(
+      'Fallback title'
+    )
+    rerender(
+      <Popconfirm open title="Fallback title" titleContent="">
+        <button>Action</button>
+      </Popconfirm>
+    )
+    expect(dialog).toHaveAccessibleName('Fallback title')
+    rerender(
+      <Popconfirm open title="Fallback title" titleContent={0}>
+        <button>Action</button>
+      </Popconfirm>
+    )
+    expect(dialog).toHaveAccessibleName('0')
+    expect(screen.queryByText('Fallback title')).not.toBeInTheDocument()
+    expect(screen.getByText('0')).toBeVisible()
+  })
+
   it('exposes data-state on the trigger reflecting open state', async () => {
     const user = userEvent.setup()
     const { getByText } = renderWithChildren(Popconfirm, <button>Action</button>, {

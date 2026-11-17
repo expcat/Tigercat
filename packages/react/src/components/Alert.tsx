@@ -193,8 +193,11 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
 
   const iconPath = getAlertIconPath(type)
 
-  const hasTitle = title != null || titleSlot != null
-  const hasDescription = description != null || descriptionSlot != null
+  const hasTitleSlot = titleSlot != null && titleSlot !== false && titleSlot !== ''
+  const hasDescriptionSlot =
+    descriptionSlot != null && descriptionSlot !== false && descriptionSlot !== ''
+  const hasTitle = hasTitleSlot || (title != null && title !== '')
+  const hasDescription = hasDescriptionSlot || (description != null && description !== '')
   const hasChildren = children != null && children !== false
   const hasContent = hasTitle || hasDescription || hasChildren || action != null
   const live = resolveAlertLive(type, hasContent, inserted)
@@ -240,9 +243,11 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
 
       {hasContent && (
         <div className={getAlertContentClasses(showIcon)}>
-          {hasTitle && <div className={titleClasses}>{titleSlot ?? title}</div>}
+          {hasTitle && <div className={titleClasses}>{hasTitleSlot ? titleSlot : title}</div>}
           {hasDescription && (
-            <div className={descriptionClasses}>{descriptionSlot ?? description}</div>
+            <div className={descriptionClasses}>
+              {hasDescriptionSlot ? descriptionSlot : description}
+            </div>
           )}
           {action != null ? (
             <div data-tiger-alert-action="" className={descriptionClasses}>

@@ -107,6 +107,43 @@ describe('Alert', () => {
     expect(screen.queryByText('prop desc')).not.toBeInTheDocument()
   })
 
+  it('falls back from false or empty slots and keeps numeric zero content', () => {
+    const { container, rerender } = render(
+      <Alert
+        title="Fallback title"
+        description="Fallback description"
+        titleSlot={false}
+        descriptionSlot={false}
+      />
+    )
+    expect(screen.getByText('Fallback title')).toBeInTheDocument()
+    expect(screen.getByText('Fallback description')).toBeInTheDocument()
+    rerender(
+      <Alert
+        title="Fallback title"
+        description="Fallback description"
+        titleSlot=""
+        descriptionSlot=""
+      />
+    )
+    expect(screen.getByText('Fallback title')).toBeInTheDocument()
+    expect(screen.getByText('Fallback description')).toBeInTheDocument()
+    rerender(<Alert type="error" showIcon={false} titleSlot={false} descriptionSlot={false} />)
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    expect(container.firstElementChild).toBeEmptyDOMElement()
+    rerender(
+      <Alert
+        title="Fallback title"
+        description="Fallback description"
+        titleSlot={0}
+        descriptionSlot={0}
+      />
+    )
+    expect(screen.queryByText('Fallback title')).not.toBeInTheDocument()
+    expect(screen.queryByText('Fallback description')).not.toBeInTheDocument()
+    expect(screen.getAllByText('0')).toHaveLength(2)
+  })
+
   it('hides icon when showIcon is false', () => {
     const { container } = render(<Alert title="Alert" showIcon={false} />)
     expect(container.querySelector('svg')).not.toBeInTheDocument()

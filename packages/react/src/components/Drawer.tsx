@@ -200,7 +200,8 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
     ...labels,
     ...(closeAriaLabel ? { closeAriaLabel } : {})
   })
-  const hasTitle = title != null || header != null
+  const hasHeader = header != null && header !== false && header !== ''
+  const hasTitle = hasHeader || (title != null && title !== '')
   const ariaLabelledby =
     (rest as React.AriaAttributes)['aria-labelledby'] ?? (hasTitle ? titleId : undefined)
   const ariaLabel = ariaLabelFromRest ?? (hasTitle ? undefined : drawerLabels.dialogAriaLabel)
@@ -217,6 +218,7 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
   const [sheetOffset, setSheetOffset] = useState(0)
   const [resizedLength, setResizedLength] = useState<number | null>(null)
   const [measuredLength, setMeasuredLength] = useState(80)
+  const [maxResizeLength, setMaxResizeLength] = useState(80)
   const [resizing, setResizing] = useState(false)
   const [layerId, setLayerId] = useState<number | null>(null)
   const [stackedZ, setStackedZ] = useState<number | undefined>(undefined)
@@ -232,9 +234,27 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
         : (dialogRef.current?.offsetHeight ?? 240)),
     [isHorizontal, resizedLength]
   )
+  const measureResizeRange = useCallback(() => {
+    const root = rootRef.current
+    const viewport = root?.ownerDocument.defaultView
+    const maximum = Math.max(
+      80,
+      isHorizontal
+        ? root?.clientWidth || viewport?.innerWidth || 0
+        : root?.clientHeight || viewport?.innerHeight || 0
+    )
+    const current = Math.min(maximum, Math.max(80, readResizeLength()))
+    setMaxResizeLength(maximum)
+    setMeasuredLength(current)
+    if (resizedLength != null) setResizedLength(current)
+  }, [isHorizontal, readResizeLength, resizedLength])
   useLayoutEffect(() => {
-    if (open && resizable) setMeasuredLength(Math.max(80, readResizeLength()))
-  }, [open, resizable, readResizeLength, width, size, panelStyle, style, portalTarget])
+    if (!open || !resizable) return
+    measureResizeRange()
+    const viewport = rootRef.current?.ownerDocument.defaultView
+    viewport?.addEventListener('resize', measureResizeRange)
+    return () => viewport?.removeEventListener('resize', measureResizeRange)
+  }, [open, resizable, measureResizeRange, width, size, panelStyle, style, portalTarget])
   const swipeFollowOptions = useCallback(
     () => ({
       direction: writingDirection,
@@ -476,11 +496,11 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
         data-tiger-drawer="">
         {(hasTitle || closable) && (
           <div className={headerClasses} {...{ [OVERLAY_SWIPE_HANDLE_ATTR]: '' }}>
-            {header != null ? (
+            {hasHeader ? (
               <div className={titleClasses} id={titleId}>
                 {header}
               </div>
-            ) : title != null ? (
+            ) : hasTitle ? (
               <h3 className={titleClasses} id={titleId}>
                 {title}
               </h3>
@@ -511,21 +531,21 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
             tabIndex={0}
             aria-valuemin={80}
             aria-valuenow={Math.round(resizedLength ?? measuredLength)}
-            aria-valuemax={Math.round(resizedLength ?? measuredLength)}
+            aria-valuemax={Math.round(maxResizeLength)}
             aria-orientation={
               resolvedPlacement === 'left' || resolvedPlacement === 'right'
                 ? 'vertical'
                 : 'horizontal'
             }
             aria-label={drawerLabels.resizeAriaLabel}
-            onFocus={() => setMeasuredLength(Math.max(80, readResizeLength()))}
+            onFocus={measureResizeRange}
             onKeyDown={(event) => {
               const step = getResizeKeyboardDelta(event.key)
               if (!step) return
               const delta = drawerResizeDelta(resolvedPlacement, step.deltaX, step.deltaY)
               if (!delta) return
               event.preventDefault()
-              setResizedLength(Math.max(80, readResizeLength() + delta))
+              setResizedLength(Math.min(maxResizeLength, Math.max(80, readResizeLength() + delta)))
             }}
             style={{
               position: 'absolute',
@@ -551,7 +571,7 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
                   pointer.clientX - startX,
                   pointer.clientY - startY
                 )
-                setResizedLength(Math.max(80, start + delta))
+                setResizedLength(Math.min(maxResizeLength, Math.max(80, start + delta)))
               }
               const end = () => {
                 setResizing(false)
