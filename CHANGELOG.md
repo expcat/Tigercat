@@ -4,6 +4,14 @@
 
 ## v3.0.1（未发布）
 
+- **右键子菜单焦点（Vue，T03）**：ArrowRight、Enter 和 Space 等浮层定位完成后再把焦点送进第一个子项。从已获焦的「分享到」按 ArrowRight，子菜单可见，焦点进入「邮件」。
+- **下拉 schema 子菜单（Vue，T04）**：递归子菜单触发器是 menuitem。ArrowRight 展开子菜单；外层 portal 为 false 时，子菜单留在菜单内。
+- **无限滚动禁用重试（React / Vue，T09）**：错误态的 Retry 在 disabled 时不再请求。disabled 为 true 时点击不调用 onLoadMore，改回 false 后再点才请求一次。
+- **页头空返回名（Core，T17）**：labels.backAriaLabel 为空串时不再盖住 locale。zh-CN 下返回按钮的名称仍是「返回」。
+- **代码编辑器类型（Vue，T20）**：VueCodeEditorProps 的 theme 包含 auto，并包含 bind。
+- **富文本编辑器类型（Vue，T23）**：VueRichTextEditorProps 包含 bind。
+- **取色器命令式 ref（React，T26）**：ref 类型改为 ColorPickerRef。可以调用 focus、open 和 close。
+
 - **折叠根样式（Vue，T05）**：不传 style prop、只在根上传入 style 时，根节点保留这份样式。attrs.style 不再被默认 undefined 的 props.style 盖掉。
 - **组织图方向键（React / Vue，T06）**：可交互节点改为 roving tabindex。聚焦 Ada 后按 ArrowDown，焦点到 Lin，其余节点 tabindex 为 -1。
 - **组织图横向方向（React / Vue，T07）**：横向布局把 ConfigProvider 的书写方向传给 computeOrgChartLayout。rtl 时节点从右向左，根节点 x 大于子节点。

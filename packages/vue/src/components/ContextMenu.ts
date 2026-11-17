@@ -323,10 +323,27 @@ export const ContextMenuSub = defineComponent({
       close()
     }
 
+    const focusChildOnOpen = ref(false)
+
+    const focusOpenChild = () => {
+      const popup = popupRef.value
+      if (!focusChildOnOpen.value || !popup) return
+      if (!overlay.positioned.value || overlay.referenceHidden.value) return
+      focusChildOnOpen.value = false
+      focusFirstMenuItem(popup)
+    }
+
+    watch(
+      [() => overlay.positioned.value, () => overlay.referenceHidden.value],
+      () => {
+        focusOpenChild()
+      },
+      { flush: 'post' }
+    )
+
     const focusPopupFirstItem = () => {
-      nextTick(() => {
-        if (popupRef.value) focusFirstMenuItem(popupRef.value)
-      })
+      focusChildOnOpen.value = true
+      nextTick(focusOpenChild)
     }
 
     const handleTitleKeyDown = (event: KeyboardEvent) => {

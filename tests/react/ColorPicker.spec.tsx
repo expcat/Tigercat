@@ -4,9 +4,9 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import React from 'react'
+import React, { act, createRef } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { ColorPicker } from '@expcat/tigercat-react/ColorPicker'
+import { ColorPicker, type ColorPickerRef } from '@expcat/tigercat-react/ColorPicker'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { Form } from '@expcat/tigercat-react/Form'
 import { FormItem } from '@expcat/tigercat-react/FormItem'
@@ -295,6 +295,25 @@ describe('ColorPicker', () => {
     fireEvent.click(screen.getByRole('slider', { name: /Saturation/ }))
     clickSv(70, 70)
     await waitFor(() => expect(validator).toHaveBeenCalled())
+  })
+
+  it('opens, closes, and focuses through the imperative ref (T26)', () => {
+    const ref = createRef<ColorPickerRef>()
+    const { container } = render(<ColorPicker ref={ref} />)
+    const button = trigger(container)
+    expect(typeof ref.current?.open).toBe('function')
+    act(() => {
+      ref.current?.open()
+    })
+    expect(button).toHaveAttribute('aria-expanded', 'true')
+    act(() => {
+      ref.current?.close()
+    })
+    expect(button).toHaveAttribute('aria-expanded', 'false')
+    act(() => {
+      ref.current?.focus()
+    })
+    expect(button).toHaveFocus()
   })
 
   it('has no accessibility violations when open', async () => {

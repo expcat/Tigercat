@@ -715,6 +715,7 @@ export function useVueAnchoredOverlay(options: UseVueAnchoredOverlayOptions) {
     floatingStyles,
     floatingClasses,
     positioned: floating.isPositioned,
+    referenceHidden: floating.referenceHidden,
     placement: floating.placement,
     x: floating.x,
     y: floating.y,

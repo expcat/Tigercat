@@ -112,11 +112,11 @@ function isPlainObject(value: unknown): value is PlainObject {
  *
  * - Plain-object branches are merged key-by-key (deep)
  * - Arrays and non-plain objects from `override` replace the base value
- * - `undefined` values in `override` are skipped (don't blank out the base)
+ * - `undefined` and `''` in `override` are skipped (don't blank out the base)
  * - `null` in `override` is preserved as an explicit reset
  */
 export function deepMergeLocale(base: unknown, override: unknown): unknown {
-  if (override === undefined) return base
+  if (override === undefined || override === '') return base
   if (!isPlainObject(base) || !isPlainObject(override)) return override
 
   const out: PlainObject = { ...base }

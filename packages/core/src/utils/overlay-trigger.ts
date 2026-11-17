@@ -77,7 +77,13 @@ export function getOverlayTriggerKeyboardAction(
     metaKey?: boolean
     ctrlKey?: boolean
   },
-  options: { kind: OverlayTriggerKind; open: boolean; disabled?: boolean }
+  options: {
+    kind: OverlayTriggerKind
+    open: boolean
+    disabled?: boolean
+    submenu?: boolean
+    dir?: string | null
+  }
 ): OverlayTriggerKeyboardAction {
   if (options.disabled) return null
   if (event.altKey || event.metaKey || event.ctrlKey) return null
@@ -96,6 +102,10 @@ export function getOverlayTriggerKeyboardAction(
   if (options.kind === 'menu') {
     if (event.key === 'ArrowDown') return 'open-first'
     if (event.key === 'ArrowUp') return 'open-last'
+    if (options.submenu) {
+      const openKey = options.dir === 'rtl' ? 'ArrowLeft' : 'ArrowRight'
+      if (event.key === openKey) return 'open-first'
+    }
   }
 
   return null

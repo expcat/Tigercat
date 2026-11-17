@@ -1,4 +1,13 @@
-import React, { forwardRef, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
+import React, {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useId,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState
+} from 'react'
 import type {
   ColorFormat,
   ColorPickerProps as CoreColorPickerProps,
@@ -78,7 +87,7 @@ export interface ColorPickerProps
 
 export type { ColorPickerRef, ColorFormat }
 
-export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
+export const ColorPicker = forwardRef<ColorPickerRef, ColorPickerProps>(
   function ColorPicker(props, ref) {
     const {
       value,
@@ -194,8 +203,6 @@ export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
 
     const setTriggerRef = (node: HTMLButtonElement | null) => {
       triggerRef.current = node
-      if (typeof ref === 'function') ref(node)
-      else if (ref) ref.current = node
     }
 
     useEffect(() => {
@@ -242,6 +249,16 @@ export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
         setOpen(next)
       },
       [effectiveDisabled, setOpen]
+    )
+
+    useImperativeHandle(
+      ref,
+      () => ({
+        focus: () => triggerRef.current?.focus(),
+        open: () => setOpenSafe(true),
+        close: () => setOpenSafe(false)
+      }),
+      [setOpenSafe]
     )
 
     const writeCommitted = useCallback(

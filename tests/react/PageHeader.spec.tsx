@@ -7,6 +7,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { PageHeader } from '@expcat/tigercat-react/PageHeader'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { Breadcrumb, BreadcrumbItem } from '@expcat/tigercat-react/Breadcrumb'
 import { Button } from '@expcat/tigercat-react/Button'
 import { Link } from '@expcat/tigercat-react/Link'
@@ -54,6 +55,11 @@ describe('PageHeader', () => {
   })
 
   describe('Back control', () => {
+    it('keeps the zh-CN back name when labels.backAriaLabel is empty (T17)', () => {
+      render(<PageHeader title="详情" showBack locale={zhCN} labels={{ backAriaLabel: '' }} />)
+      expect(screen.getByRole('button', { name: '返回' })).toBeInTheDocument()
+    })
+
     it('renders an accessible button when showBack is true', async () => {
       const onBack = vi.fn()
       render(<PageHeader title="详情" showBack onBack={onBack} />)

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render } from '@testing-library/vue'
+import { render, screen, fireEvent } from '@testing-library/vue'
 import { InfiniteScroll } from '@expcat/tigercat-vue/InfiniteScroll'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
@@ -220,6 +220,19 @@ describe('InfiniteScroll (Vue)', () => {
     await rerender({ hasMore: true, loading: false, height: 288, root: 'container', onLoadMore })
     await Promise.resolve()
     expect(onLoadMore).not.toHaveBeenCalled()
+  })
+
+  it('does not retry while disabled, then loads once when enabled (T09)', async () => {
+    const onLoadMore = vi.fn()
+    const { rerender } = render(InfiniteScroll, {
+      props: { error: true, hasMore: true, disabled: true, onLoadMore },
+      slots: { default: () => h('div', {}, 'one') }
+    })
+    await fireEvent.click(screen.getByRole('button', { name: 'Retry' }))
+    expect(onLoadMore).not.toHaveBeenCalled()
+    await rerender({ error: true, hasMore: true, disabled: false, onLoadMore })
+    await fireEvent.click(screen.getByRole('button', { name: 'Retry' }))
+    expect(onLoadMore).toHaveBeenCalledTimes(1)
   })
 
   it('does not emit load-more when disabled or exhausted', async () => {

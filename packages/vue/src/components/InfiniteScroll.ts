@@ -294,7 +294,9 @@ export const InfiniteScroll = defineComponent({
                 'button',
                 {
                   type: 'button',
+                  disabled: props.disabled || undefined,
                   onClick: () => {
+                    if (props.disabled) return
                     flight.reset()
                     beginLoad()
                   }

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import React from 'react'
 import { InfiniteScroll } from '@expcat/tigercat-react/InfiniteScroll'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
@@ -204,6 +204,24 @@ describe('InfiniteScroll (React)', () => {
     )
     await Promise.resolve()
     expect(onLoadMore).not.toHaveBeenCalled()
+  })
+
+  it('does not retry while disabled, then loads once when enabled (T09)', async () => {
+    const onLoadMore = vi.fn()
+    const { rerender } = render(
+      <InfiniteScroll error hasMore disabled onLoadMore={onLoadMore}>
+        <div>one</div>
+      </InfiniteScroll>
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Retry' }))
+    expect(onLoadMore).not.toHaveBeenCalled()
+    rerender(
+      <InfiniteScroll error hasMore disabled={false} onLoadMore={onLoadMore}>
+        <div>one</div>
+      </InfiniteScroll>
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Retry' }))
+    expect(onLoadMore).toHaveBeenCalledTimes(1)
   })
 
   it('does not load when disabled or exhausted', async () => {

@@ -42,7 +42,7 @@ export interface VueCodeEditorProps {
   modelValue?: string
   defaultValue?: string
   language?: CodeLanguage
-  theme?: CodeEditorTheme
+  theme?: CodeEditorTheme | 'auto'
   readOnly?: boolean
   lineNumbers?: boolean
   highlightActiveLine?: boolean
@@ -61,6 +61,16 @@ export interface VueCodeEditorProps {
   ariaLabel?: string
   name?: string
   id?: string
+  bind?: {
+    query?: string
+    replacement?: string
+    caret?: number
+    scrollTop?: number
+    viewportHeight?: number
+    lineHeight?: number
+    lineCount?: number
+    language?: { id: string; keywords?: string[] }
+  }
 }
 
 export const CodeEditor = defineComponent({

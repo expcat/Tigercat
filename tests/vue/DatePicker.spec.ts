@@ -29,6 +29,7 @@ describe('DatePicker', () => {
     await userEvent.click(screen.getByLabelText('Toggle calendar'))
     const panel = await screen.findByRole('dialog')
     const day = panel.querySelector<HTMLElement>('[role="gridcell"][tabindex="0"]')!
+    await waitFor(() => expect(panel).toHaveAttribute('data-positioned', 'true'))
     day.focus()
     expect(day).toHaveFocus()
     await userEvent.keyboard('{Escape}')

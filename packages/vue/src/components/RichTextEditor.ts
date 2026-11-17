@@ -64,6 +64,7 @@ export interface VueRichTextEditorProps {
   ariaLabel?: string
   name?: string
   id?: string
+  bind?: boolean
   /**
    * Optional pluggable editor engine. Custom engines are TRUSTED and
    * must sanitise untrusted HTML themselves.

@@ -577,6 +577,33 @@ describe('Dropdown', () => {
       expect(emitted()['open-change']).toBeUndefined()
     })
 
+    it('opens a schema submenu with ArrowRight and keeps it inside the menu when portal is false (T04)', async () => {
+      render(Dropdown, {
+        props: {
+          defaultOpen: true,
+          portal: false,
+          items: [
+            { key: 'share', label: 'Share' },
+            {
+              key: 'more',
+              label: 'More',
+              children: [{ key: 'mail', label: 'Mail' }]
+            }
+          ]
+        },
+        slots: { default: () => 'Trigger' }
+      })
+
+      const more = screen.getByRole('menuitem', { name: 'More' })
+      expect(more).toHaveAttribute('aria-expanded', 'false')
+      more.focus()
+      await fireEvent.keyDown(more, { key: 'ArrowRight' })
+      expect(more).toHaveAttribute('aria-expanded', 'true')
+      const mail = screen.getByRole('menuitem', { name: 'Mail' })
+      const rootMenu = screen.getAllByRole('menu')[0]
+      expect(rootMenu.contains(mail)).toBe(true)
+    })
+
     it('keeps disabled schema submenus disabled and closed', async () => {
       render(Dropdown, {
         props: {
@@ -594,7 +621,7 @@ describe('Dropdown', () => {
         slots: { default: () => 'Trigger' }
       })
 
-      const more = screen.getByRole('button', { name: 'More' })
+      const more = screen.getByRole('menuitem', { name: 'More' })
       expect(more).toBeDisabled()
       await fireEvent.click(more)
       expect(screen.queryByText('Nested')).not.toBeInTheDocument()
@@ -620,7 +647,7 @@ describe('Dropdown', () => {
           slots: { default: () => 'Trigger' }
         })
 
-        await fireEvent.click(screen.getByRole('button', { name: 'More' }))
+        await fireEvent.click(screen.getByRole('menuitem', { name: 'More' }))
         await fireEvent.click(screen.getByText('Nested'))
         expect(emitted().select).toEqual([[nested]])
         if (type === 'item' && closeOnClick) {

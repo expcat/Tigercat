@@ -235,6 +235,49 @@ describe('ContextMenu', () => {
       await fireEvent.keyDown(popup, { key: 'Escape' })
       expect(subTrigger).toHaveAttribute('aria-expanded', 'false')
     })
+
+    it('moves focus into the first submenu item after the overlay is positioned (T03)', async () => {
+      const rect = {
+        x: 8,
+        y: 8,
+        left: 8,
+        top: 8,
+        right: 120,
+        bottom: 36,
+        width: 112,
+        height: 28,
+        toJSON() {
+          return this
+        }
+      } as DOMRect
+      const originalRect = Element.prototype.getBoundingClientRect
+      Element.prototype.getBoundingClientRect = function () {
+        return rect
+      }
+      const originalFocus = HTMLElement.prototype.focus
+      HTMLElement.prototype.focus = function (this: HTMLElement, ...args: []) {
+        const sub = this.closest('[data-tiger-context-menu-sub]')
+        if (sub && sub.style.visibility === 'hidden') return
+        return originalFocus.apply(this, args)
+      }
+      try {
+        renderMenu({}, [
+          h(ContextMenuSub, { title: '分享到' }, () => [
+            h(ContextMenuItem, null, () => '邮件'),
+            h(ContextMenuItem, null, () => '链接')
+          ])
+        ])
+        await openMenu()
+        const share = screen.getByRole('menuitem', { name: '分享到' })
+        share.focus()
+        await fireEvent.keyDown(share, { key: 'ArrowRight' })
+        expect(share).toHaveAttribute('aria-expanded', 'true')
+        await waitFor(() => expect(screen.getByRole('menuitem', { name: '邮件' })).toHaveFocus())
+      } finally {
+        Element.prototype.getBoundingClientRect = originalRect
+        HTMLElement.prototype.focus = originalFocus
+      }
+    })
   })
 
   describe('a11y', () => {

@@ -117,6 +117,7 @@ export const DropdownContextKey = Symbol('DropdownContext')
 export interface DropdownContext {
   closeOnClick: boolean
   handleItemClick: () => void
+  portal: boolean
 }
 
 export type VueDropdownItemProps = CoreDropdownItemProps
@@ -291,6 +292,7 @@ function renderPopupItems(
           items: item.children,
           disabled: item.disabled,
           closeOnClick: context.closeOnClick,
+          portal: context.portal,
           onCheck: emitCheck,
           onSelect: (selected: PopupMenuItem) => {
             emitSelect?.(selected)
@@ -387,6 +389,7 @@ export const Dropdown = defineComponent({
   setup(props, { slots, emit, attrs }) {
     const attrsRecord = attrs as Record<string, unknown>
     const attrsStyle = (attrsRecord as { style?: unknown }).style
+    const parentMenu = inject<DropdownContext | null>(DropdownContextKey, null)
 
     const menuId = `tiger-dropdown-menu-${useId()}`
     const previousActiveElement = ref<HTMLElement | null>(null)
@@ -474,10 +477,16 @@ export const Dropdown = defineComponent({
     const handleTriggerKeyDown = (event: Event) => {
       const keyboardEvent = event as KeyboardEvent
       if (isTextEditingTarget(keyboardEvent.target)) return
+      const host = keyboardEvent.currentTarget as HTMLElement | null
+      const dir =
+        host?.closest('[dir]')?.getAttribute('dir') ??
+        (typeof document === 'undefined' ? null : document.documentElement.getAttribute('dir'))
       const action = getOverlayTriggerKeyboardAction(keyboardEvent, {
         kind: 'menu',
         open: currentVisible.value,
-        disabled: props.disabled
+        disabled: props.disabled,
+        submenu: parentMenu != null,
+        dir
       })
       if (!action) return
       keyboardEvent.preventDefault()
@@ -564,12 +573,14 @@ export const Dropdown = defineComponent({
 
     const dropdownContext = reactive<DropdownContext>({
       closeOnClick: props.closeOnClick,
-      handleItemClick
+      handleItemClick,
+      portal: props.portal
     })
     watch(
-      () => props.closeOnClick,
-      (closeOnClick) => {
+      () => [props.closeOnClick, props.portal] as const,
+      ([closeOnClick, portal]) => {
         dropdownContext.closeOnClick = closeOnClick
+        dropdownContext.portal = portal
       }
     )
     provide(DropdownContextKey, dropdownContext)
@@ -645,6 +656,9 @@ export const Dropdown = defineComponent({
         controlsId: menuId,
         disabled: props.disabled
       })
+      const triggerProps = parentMenu
+        ? { ...triggerAria, role: 'menuitem', tabindex: '-1' }
+        : triggerAria
 
       const trigger = renderOverlayTrigger({
         asChild: props.asChild,
@@ -653,7 +667,7 @@ export const Dropdown = defineComponent({
         className: props.asChild ? undefined : triggerClasses.value,
         disabled: props.disabled,
         extraChildren: chevronNode,
-        aria: triggerAria,
+        aria: triggerProps,
         handlers: {
           onClick: handleClick,
           onFocus: handleFocus,

@@ -221,7 +221,9 @@ export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
       <span>{errorName}</span>
       <button
         type="button"
+        disabled={disabled || undefined}
         onClick={() => {
+          if (disabled) return
           flightRef.current.reset()
           const result = onLoadMoreRef.current?.()
           flightRef.current.begin(result)

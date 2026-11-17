@@ -14,6 +14,7 @@
     "./float-button.tsx",
     "./text.tsx",
     "./comment-thread.ts",
-    "./chart-vue-props.ts"
+    "./chart-vue-props.ts",
+    "./w10-fix3.tsx"
   ]
 }
