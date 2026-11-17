@@ -415,9 +415,16 @@ export const FileManager: React.FC<FileManagerProps> = ({
   }, [fileWindow, gridColumns, viewMode])
 
   const emptyLabel =
+    // Merged en-US defaults are not a caller override. An explicit
+    // fileManager.emptyText, including the words "Empty folder", is applied first.
     emptyText ??
-    mergedLocale?.fileManager?.emptyText ??
-    mergedLocale?.common?.emptyText ??
+    locale?.fileManager?.emptyText ??
+    (mergedLocale?.fileManager?.emptyText && mergedLocale.fileManager.emptyText !== 'Empty folder'
+      ? mergedLocale.fileManager.emptyText
+      : undefined) ??
+    (mergedLocale?.common?.emptyText && mergedLocale.common.emptyText !== 'No data'
+      ? mergedLocale.common.emptyText
+      : undefined) ??
     labels.emptyText
   const explicitHeight =
     style?.height != null || (className ? /\b(?:h|min-h|max-h)-/.test(className) : false)

@@ -639,8 +639,17 @@ export const FileManager = defineComponent({
                 'span',
                 {},
                 props.emptyText ??
-                  mergedLocale.value?.fileManager?.emptyText ??
-                  mergedLocale.value?.common?.emptyText ??
+                  // Merged en-US defaults are not a caller override. An explicit
+                  // fileManager.emptyText, including the words "Empty folder", is applied first.
+                  props.locale?.fileManager?.emptyText ??
+                  (mergedLocale.value?.fileManager?.emptyText &&
+                  mergedLocale.value.fileManager.emptyText !== 'Empty folder'
+                    ? mergedLocale.value.fileManager.emptyText
+                    : undefined) ??
+                  (mergedLocale.value?.common?.emptyText &&
+                  mergedLocale.value.common.emptyText !== 'No data'
+                    ? mergedLocale.value.common.emptyText
+                    : undefined) ??
                   labels.value.emptyText
               ),
               h('span', { class: 'ms-2' }, countText)
