@@ -5,7 +5,7 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import { join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { enUS } from '@expcat/tigercat-core/locales/en-US'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
@@ -58,25 +58,44 @@ describe('example shell locale', () => {
     expect(enUS.tabs).toBeTruthy()
   })
 
-  it('maps locale subpaths onto the shared sandbox runtime', () => {
-    const html = createSandboxDocument({
-      framework: 'vue',
-      meta: { id: 'select-01', title: 'Select', entry: 'App.vue', order: 1 },
-      js: 'export default {}',
-      css: '',
-      imports: ['@expcat/tigercat-core/locales/zh-CN'],
-      runtimeUrls,
-      stylesheetUrl: 'https://example.test/sandbox.css',
-      channelId: 'locale-test',
-      lang: 'en-US',
-      theme: 'default',
-      colorScheme: 'light',
-      cssVars: ''
-    })
+  it('maps locale subpaths onto the shared sandbox runtime', async () => {
+    const sources: Record<string, string> = {
+      '/framework.js': 'export const framework = true',
+      '/tigercat.js': 'export const tigercat = true',
+      '/shared.js': 'export const shared = true',
+      '/sandbox.css': 'body { color: red }'
+    }
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string) => {
+        const source = sources[new URL(url).pathname]
+        return new Response(source ?? 'Not found', { status: source === undefined ? 404 : 200 })
+      })
+    )
+    try {
+      const html = await createSandboxDocument({
+        framework: 'vue',
+        meta: { id: 'select-01', title: 'Select', entry: 'App.vue', order: 1 },
+        js: 'export default {}',
+        css: '',
+        imports: ['@expcat/tigercat-core/locales/zh-CN'],
+        runtimeUrls,
+        stylesheetUrl: 'https://example.test/sandbox.css',
+        channelId: 'locale-test',
+        lang: 'en-US',
+        theme: 'default',
+        colorScheme: 'light',
+        cssVars: ''
+      })
 
-    expect(html).toContain('"@expcat/tigercat-core/locales/zh-CN":"https://example.test/shared.js"')
-    expect(html).toContain('locale: Shared.getDemoTigerLocale(lang), theme, colorScheme')
-    expect(html).not.toContain('document: false')
+      expect(html).toContain('"@expcat/tigercat-core/locales/zh-CN"')
+      expect(html).toContain('export const shared = true')
+      expect(html).not.toContain('https://example.test/')
+      expect(html).toContain('locale: Shared.getDemoTigerLocale(lang), theme, colorScheme')
+      expect(html).not.toContain('document: false')
+    } finally {
+      vi.unstubAllGlobals()
+    }
   })
 
   it('gives Simplified copy to a zh-CN page, and Traditional only to zhTW', () => {

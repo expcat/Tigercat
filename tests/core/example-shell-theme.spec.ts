@@ -2,7 +2,7 @@
  * @vitest-environment node
  */
 
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { createSandboxDocument } from '../../examples/example/shared/playground/sandbox'
 import { DEMO_THEME_PRESETS, resolveDemoTheme } from '../../examples/example/shared/themes'
@@ -34,26 +34,46 @@ describe('example shell theme', () => {
     ])
   })
 
-  it('copies computed tokens and product theme into the sandbox document', () => {
-    const html = createSandboxDocument({
-      framework: 'react',
-      meta: { id: 'button-01', title: 'Button', entry: 'App.tsx', order: 1 },
-      js: 'export default function App(){return null}',
-      css: '',
-      imports: [],
-      runtimeUrls,
-      stylesheetUrl: 'https://example.test/sandbox.css',
-      channelId: 'theme-test',
-      lang: 'zh-CN',
-      theme: 'natural',
-      colorScheme: 'light',
-      cssVars: '--tiger-primary:#059669;--tiger-primary-hover:#047857'
-    })
+  it('copies computed tokens and product theme into the sandbox document', async () => {
+    const sources: Record<string, string> = {
+      '/framework.js': 'export const framework = true',
+      '/renderer.js': 'export const renderer = true',
+      '/jsx.js': 'export const jsx = true',
+      '/tigercat.js': 'export const tigercat = true',
+      '/shared.js': 'export const shared = true',
+      '/sandbox.css': 'body { color: red }'
+    }
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string) => {
+        const source = sources[new URL(url).pathname]
+        return new Response(source ?? 'Not found', { status: source === undefined ? 404 : 200 })
+      })
+    )
+    try {
+      const html = await createSandboxDocument({
+        framework: 'react',
+        meta: { id: 'button-01', title: 'Button', entry: 'App.tsx', order: 1 },
+        js: 'export default function App(){return null}',
+        css: '',
+        imports: [],
+        runtimeUrls,
+        stylesheetUrl: 'https://example.test/sandbox.css',
+        channelId: 'theme-test',
+        lang: 'zh-CN',
+        theme: 'natural',
+        colorScheme: 'light',
+        cssVars: '--tiger-primary:#059669;--tiger-primary-hover:#047857'
+      })
 
-    expect(html).toContain('style="--tiger-primary:#059669;--tiger-primary-hover:#047857"')
-    expect(html).toContain('const theme = "natural"')
-    expect(html).toContain('const colorScheme = "light"')
-    expect(html).toContain('locale: Shared.getDemoTigerLocale(lang), theme, colorScheme')
-    expect(html).not.toContain('document: false')
+      expect(html).not.toContain('https://example.test/')
+      expect(html).toContain('style="--tiger-primary:#059669;--tiger-primary-hover:#047857"')
+      expect(html).toContain('const theme = "natural"')
+      expect(html).toContain('const colorScheme = "light"')
+      expect(html).toContain('locale: Shared.getDemoTigerLocale(lang), theme, colorScheme')
+      expect(html).not.toContain('document: false')
+    } finally {
+      vi.unstubAllGlobals()
+    }
   })
 })
