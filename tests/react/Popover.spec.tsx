@@ -7,7 +7,8 @@ import { act, fireEvent, render, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {
   DEFAULT_FLOATING_HOVER_HIDE_DELAY_MS,
-  DEFAULT_FLOATING_HOVER_SHOW_DELAY_MS
+  DEFAULT_FLOATING_HOVER_SHOW_DELAY_MS,
+  resetDevWarnCache
 } from '@expcat/tigercat-core'
 import { Popover } from '@expcat/tigercat-react/Popover'
 import { Select } from '@expcat/tigercat-react/Select'
@@ -127,6 +128,21 @@ describe('Popover', () => {
         expect(getByText('Custom Title')).toBeVisible()
         expect(getByText('Content')).toBeVisible()
       })
+    })
+
+    it('renders a numeric zero title without a missing-name warning', () => {
+      resetDevWarnCache()
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+      const { getByText } = render(
+        <Popover defaultOpen titleContent={0} content="Content">
+          <button>Trigger</button>
+        </Popover>
+      )
+
+      expect(getByText('0')).toBeVisible()
+      expect(warn).not.toHaveBeenCalledWith(
+        expect.stringContaining('Popover has no title or aria-label')
+      )
     })
 
     it('should render floating content through body portal', async () => {

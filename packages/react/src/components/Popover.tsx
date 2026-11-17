@@ -104,6 +104,9 @@ export const Popover = forwardRef<HTMLElement, PopoverProps>(function Popover(
     return () => window.removeEventListener('scroll', onScroll, true)
   }, [closeOnScroll, currentVisible, setVisible])
 
+  const resolvedTitle = titleContent ?? title
+  const hasTitle = resolvedTitle != null && resolvedTitle !== false && resolvedTitle !== ''
+
   useEffect(() => {
     const resolved = resolvePopoverWidth(width)
     if (resolved.invalid) {
@@ -112,13 +115,13 @@ export const Popover = forwardRef<HTMLElement, PopoverProps>(function Popover(
         `[Tigercat] Popover width ${String(width)} is not a positive pixel count or a CSS length. The default max-width is used.`
       )
     }
-    if (!title && !titleContent && !ariaLabel) {
+    if (!hasTitle && !ariaLabel) {
       devWarn(
         'popover.name',
         '[Tigercat] Popover has no title or aria-label. Pass a short ariaLabel; the body is only the description.'
       )
     }
-  }, [width, title, titleContent, ariaLabel])
+  }, [width, hasTitle, ariaLabel])
 
   const containerClasses = useMemo(
     () => classNames(getPopoverContainerClasses(), className),
@@ -139,8 +142,6 @@ export const Popover = forwardRef<HTMLElement, PopoverProps>(function Popover(
   const resolvedChildren =
     typeof children === 'function' ? children({ open: Boolean(currentVisible) }) : children
 
-  const resolvedTitle = titleContent ?? title
-  const hasTitle = resolvedTitle != null && resolvedTitle !== false && resolvedTitle !== ''
   const hasContent = content != null && content !== false && content !== ''
   const triggerAria = getOverlayTriggerAria({
     kind: 'dialog',
