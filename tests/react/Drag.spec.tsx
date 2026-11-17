@@ -119,4 +119,22 @@ describe('Drag (React)', () => {
     const { container } = render(<Drag items={items} />)
     await expectNoA11yViolationsIsolated(container)
   })
+
+  it('keeps only li children under the ul while dragging', () => {
+    const { container } = render(<Drag items={items} />)
+    const list = container.querySelector('ul')
+    expect(list).toBeTruthy()
+    expect([...list!.children].every((node) => node.tagName === 'LI')).toBe(true)
+    expect(container.querySelector('[data-tiger-drag-live]')).toBeTruthy()
+
+    fireEvent.dragStart(screen.getByText('a'))
+    fireEvent.dragOver(screen.getByText('b'))
+    const dragging = container.querySelector('ul')!
+    expect([...dragging.children].every((node) => node.tagName === 'LI')).toBe(true)
+    expect(dragging.querySelector(':scope > div')).toBeNull()
+    expect(container.querySelector('[data-tiger-drag-preview]')).toBeTruthy()
+    expect(container.querySelector('[data-tiger-drag-live]')).toHaveTextContent(
+      'from item 1 to item 2'
+    )
+  })
 })

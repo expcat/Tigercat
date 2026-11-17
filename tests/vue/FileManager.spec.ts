@@ -209,6 +209,24 @@ describe('FileManager (Vue)', () => {
     expect(getByText('Empty folder')).toBeTruthy()
   })
 
+  it('keeps a caller Empty folder label under zh-CN', () => {
+    const { getByText, queryByText } = render(
+      defineComponent({
+        setup() {
+          return () =>
+            h(ConfigProvider, { locale: zhCN }, () =>
+              h(FileManager, {
+                files: [],
+                locale: { fileManager: { emptyText: 'Empty folder' } }
+              })
+            )
+        }
+      })
+    )
+    expect(getByText('Empty folder')).toBeTruthy()
+    expect(queryByText('暂无数据')).toBeNull()
+  })
+
   it('navigates to invalid path gracefully (empty result)', () => {
     const { getByText } = render(FileManager, {
       props: { files, currentPath: ['nonexistent'], emptyText: 'Nothing' }

@@ -639,14 +639,8 @@ export const FileManager = defineComponent({
                 'span',
                 {},
                 props.emptyText ??
-                  (mergedLocale.value?.fileManager?.emptyText &&
-                  mergedLocale.value.fileManager.emptyText !== 'Empty folder'
-                    ? mergedLocale.value.fileManager.emptyText
-                    : undefined) ??
-                  (mergedLocale.value?.common?.emptyText &&
-                  mergedLocale.value.common.emptyText !== 'No data'
-                    ? mergedLocale.value.common.emptyText
-                    : undefined) ??
+                  mergedLocale.value?.fileManager?.emptyText ??
+                  mergedLocale.value?.common?.emptyText ??
                   labels.value.emptyText
               ),
               h('span', { class: 'ms-2' }, countText)

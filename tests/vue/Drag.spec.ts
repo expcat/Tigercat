@@ -142,4 +142,22 @@ describe('Drag (Vue)', () => {
     expect(a.value.map((item) => item.id)).toEqual([])
     expect(b.value.map((item) => item.id)).toEqual(['A', 'B'])
   })
+
+  it('keeps only li children under the ul while dragging', async () => {
+    const { container } = render(Drag, { props: { items } })
+    const list = container.querySelector('ul')
+    expect(list).toBeTruthy()
+    expect([...list!.children].every((node) => node.tagName === 'LI')).toBe(true)
+    expect(container.querySelector('[data-tiger-drag-live]')).toBeTruthy()
+
+    await fireEvent.dragStart(screen.getByText('a'))
+    await fireEvent.dragOver(screen.getByText('b'))
+    const dragging = container.querySelector('ul')!
+    expect([...dragging.children].every((node) => node.tagName === 'LI')).toBe(true)
+    expect(dragging.querySelector(':scope > div')).toBeNull()
+    expect(container.querySelector('[data-tiger-drag-preview]')).toBeTruthy()
+    expect(container.querySelector('[data-tiger-drag-live]')).toHaveTextContent(
+      'from item 1 to item 2'
+    )
+  })
 })

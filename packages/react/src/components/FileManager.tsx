@@ -416,12 +416,8 @@ export const FileManager: React.FC<FileManagerProps> = ({
 
   const emptyLabel =
     emptyText ??
-    (mergedLocale?.fileManager?.emptyText && mergedLocale.fileManager.emptyText !== 'Empty folder'
-      ? mergedLocale.fileManager.emptyText
-      : undefined) ??
-    (mergedLocale?.common?.emptyText && mergedLocale.common.emptyText !== 'No data'
-      ? mergedLocale.common.emptyText
-      : undefined) ??
+    mergedLocale?.fileManager?.emptyText ??
+    mergedLocale?.common?.emptyText ??
     labels.emptyText
   const explicitHeight =
     style?.height != null || (className ? /\b(?:h|min-h|max-h)-/.test(className) : false)

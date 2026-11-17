@@ -4,6 +4,12 @@
 
 ## v3.0.1（未发布）
 
+- **代码编辑器描述（Vue，C159-F02）**：不包 FormItem 时保留调用方 aria-describedby。传 hint 时 textarea 仍是 hint；与 FormItem extra 并存时同时包含 hint 和 extra 的 id。
+- **拖拽列表子节点（React / Vue，C160-F05）**：实时区域和拖拽预览移出 ul。渲染和拖拽过程中，ul 的直接子节点只有 li，悬停仍播报 from item 1 to item 2。
+- **文件管理器空文案（React / Vue，C161-F03）**：不再把英文 Empty folder、No data 当成未设置。zh-CN 下把 fileManager.emptyText 设成 Empty folder 时，空列表显示 Empty folder。
+- **Markdown 粘贴标记（Core，C164-F04）**：htmlToMarkdown 把 b、i 映射成粗体和斜体。粘贴 `<b>bold</b><i>item</i><strong>s</strong>` 后保留 `**bold**` 和 `*item*`，不再只剩文字。
+- **虚拟表格行键说明（Core / 文档 / MCP，C169-F05）**：注释写明没有 id 的行仍参与选择，选择 key 是 `tiger-row:<index>` fallback。点击无 id 行仍发出 tiger-row:0。
+
 - **散点图默认名称（React / Vue，C155-F01）**：不传 title 时使用 scatterChartAriaLabel。zh-CN 下 svg 的 aria-label 是「散点图」；title 为「季度」时名称是「季度」。
 - **散点图图例标签（React，C155-F04）**：showLegend 且只传 onPointClick 时图例项是 DIV，与 Vue 一致。点击第一点 onPointClick 只调用一次。
 - **旭日图默认名称（React / Vue，C156-F01）**：不传 title 时使用 sunburstChartAriaLabel。zh-CN 下 svg 的 aria-label 是「旭日图」；title 为「区域」时名称是「区域」。

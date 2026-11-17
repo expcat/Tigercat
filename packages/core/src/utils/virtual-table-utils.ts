@@ -256,7 +256,7 @@ export function getVirtualTableSpacerHeights(
 }
 
 export interface VirtualTableRowIdentity {
-  /** Stable selection key; omitted when the row has no identity. */
+  /** Selection key. A row without an id uses the `tiger-row:<index>` fallback. */
   key: string | number | undefined
   /** React/Vue reconciliation key (falls back to the dataSource index). */
   domKey: string | number
@@ -320,7 +320,8 @@ export function nextEnabledRowIndex(
 
 /**
  * Get the row key for a virtual table data item.
- * Defaults to `id`. Missing identities fall back to the dataSource index for DOM only.
+ * Defaults to `id`. A missing id returns the `tiger-row:<index>` fallback,
+ * which is also the selection key.
  */
 export function getVirtualRowKey<T>(
   row: T,

@@ -3,8 +3,10 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
+import { defineComponent, h } from 'vue'
 import { render, fireEvent } from '@testing-library/vue'
 import { CodeEditor } from '@expcat/tigercat-vue/CodeEditor'
+import { FormItem } from '@expcat/tigercat-vue/FormItem'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 function renderCodeEditor(props: Record<string, unknown> = {}) {
@@ -192,6 +194,35 @@ describe('CodeEditor', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(CodeEditor)
       await expectNoA11yViolationsIsolated(container)
+    })
+
+    it('keeps a caller aria-describedby and merges a FormItem id', () => {
+      const plain = render(CodeEditor, {
+        props: { modelValue: 'const x = 1' },
+        attrs: { 'aria-describedby': 'hint' }
+      })
+      expect(plain.container.querySelector('textarea')?.getAttribute('aria-describedby')).toBe(
+        'hint'
+      )
+
+      const Host = defineComponent({
+        setup() {
+          return () =>
+            h(FormItem, { extra: 'More detail' }, () =>
+              h(CodeEditor, {
+                modelValue: 'const x = 1',
+                'aria-describedby': 'hint'
+              })
+            )
+        }
+      })
+      const wrapped = render(Host)
+      const describedBy =
+        wrapped.container.querySelector('textarea')?.getAttribute('aria-describedby') ?? ''
+      const ids = describedBy.split(' ').filter(Boolean)
+      expect(ids).toContain('hint')
+      expect(ids).toContain(wrapped.getByText('More detail').id)
+      expect(ids).toHaveLength(2)
     })
   })
 })

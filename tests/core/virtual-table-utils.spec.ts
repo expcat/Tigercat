@@ -1,4 +1,6 @@
 import { describe, it, expect } from 'vitest'
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import {
   calculateVirtualRange,
   calculateVirtualColumnRange,
@@ -164,6 +166,36 @@ describe('virtual-table-utils', () => {
     it('uses function key', () => {
       const fn = (row: { id: number }, idx: number) => `${row.id}-${idx}`
       expect(getVirtualRowKey({ id: 7 }, 3, fn)).toBe('7-3')
+    })
+
+    it('documents a missing id as a tiger-row index selection fallback', () => {
+      const typeSrc = readFileSync(
+        resolve(process.cwd(), 'packages/core/src/types/virtual-table.ts'),
+        'utf8'
+      )
+      const utilSrc = readFileSync(
+        resolve(process.cwd(), 'packages/core/src/utils/virtual-table-utils.ts'),
+        'utf8'
+      )
+      const rowKeyComment = typeSrc.slice(
+        typeSrc.lastIndexOf('/**', typeSrc.indexOf('rowKey?:')),
+        typeSrc.indexOf('rowKey?:')
+      )
+      const keyComment = utilSrc.slice(
+        utilSrc.lastIndexOf('/**', utilSrc.indexOf('key: string | number | undefined')),
+        utilSrc.indexOf('key: string | number | undefined')
+      )
+      const getterComment = utilSrc.slice(
+        utilSrc.lastIndexOf('/**', utilSrc.indexOf('export function getVirtualRowKey')),
+        utilSrc.indexOf('export function getVirtualRowKey')
+      )
+      for (const comment of [rowKeyComment, getterComment]) {
+        expect(comment).toContain('tiger-row:<index>')
+        expect(comment).not.toContain('not used for selection')
+        expect(comment).not.toContain('for DOM only')
+      }
+      expect(keyComment).toContain('tiger-row:<index>')
+      expect(keyComment).not.toContain('omitted when the row has no identity')
     })
   })
 

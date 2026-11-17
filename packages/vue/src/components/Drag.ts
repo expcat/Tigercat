@@ -108,7 +108,19 @@ export const Drag = defineComponent({
 
     return () => {
       const zone = drag.getDropZoneAttrs()
-      return h(
+      const preview = drag.draggedItem.value
+        ? h(
+            'div',
+            { class: 'sr-only', 'aria-hidden': 'true', 'data-tiger-drag-preview': '' },
+            String(drag.draggedItem.value.id)
+          )
+        : null
+      const live = h(
+        'div',
+        { role: 'status', class: 'sr-only', 'data-tiger-drag-live': '' },
+        announcement.value
+      )
+      const list = h(
         'ul',
         {
           ...attrs,
@@ -117,31 +129,18 @@ export const Drag = defineComponent({
           'data-tiger-drag': '',
           role: 'list'
         },
-        [
-          drag.draggedItem.value
-            ? h(
-                'div',
-                { class: 'sr-only', 'aria-hidden': 'true', 'data-tiger-drag-preview': '' },
-                String(drag.draggedItem.value.id)
-              )
-            : null,
-          h(
-            'div',
-            { role: 'status', class: 'sr-only', 'data-tiger-drag-live': '' },
-            announcement.value
-          ),
-          ...props.items.map((item) => {
-            const itemAttrs: Record<string, unknown> = {
-              ...drag.getDragItemAttrs(item),
-              tabindex: props.config?.disabled ? -1 : 0
-            }
-            const isDragging = itemAttrs['data-dragging'] === true
-            const custom = slots.item?.({ item, attrs: itemAttrs, isDragging })
-            if (custom) return custom
-            return h('li', { ...itemAttrs, key: item.id, role: 'listitem' }, String(item.id))
-          })
-        ]
+        props.items.map((item) => {
+          const itemAttrs: Record<string, unknown> = {
+            ...drag.getDragItemAttrs(item),
+            tabindex: props.config?.disabled ? -1 : 0
+          }
+          const isDragging = itemAttrs['data-dragging'] === true
+          const custom = slots.item?.({ item, attrs: itemAttrs, isDragging })
+          if (custom) return custom
+          return h('li', { ...itemAttrs, key: item.id, role: 'listitem' }, String(item.id))
+        })
       )
+      return [preview, live, list]
     }
   }
 })

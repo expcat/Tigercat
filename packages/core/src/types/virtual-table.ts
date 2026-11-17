@@ -48,7 +48,8 @@ export interface VirtualTableProps<T = Record<string, unknown>> {
   virtualizeColumns?: boolean
   /**
    * Unique row key field. Defaults to `id`, matching Table.
-   * Missing identities are not used for selection.
+   * A row without an id still selects. Its selection key is the
+   * `tiger-row:<index>` fallback.
    * @default 'id'
    */
   rowKey?: keyof T | ((row: T, index: number) => string | number)

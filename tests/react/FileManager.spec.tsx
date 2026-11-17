@@ -188,6 +188,16 @@ describe('FileManager (React)', () => {
     expect(getByText('Empty folder')).toBeTruthy()
   })
 
+  it('keeps a caller Empty folder label under zh-CN', () => {
+    const { getByText, queryByText } = render(
+      <ConfigProvider locale={zhCN}>
+        <FileManager files={[]} locale={{ fileManager: { emptyText: 'Empty folder' } }} />
+      </ConfigProvider>
+    )
+    expect(getByText('Empty folder')).toBeTruthy()
+    expect(queryByText('暂无数据')).toBeNull()
+  })
+
   it('navigates to invalid path gracefully (empty result)', () => {
     const { getByText } = render(
       <FileManager files={files} currentPath={['nonexistent']} emptyText="Nothing" />

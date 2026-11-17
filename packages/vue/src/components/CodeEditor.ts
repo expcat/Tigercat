@@ -28,6 +28,7 @@ import {
   resolveEditorTabAction,
   getCodeEditorLabels,
   mergeTigerLocale,
+  mergeAriaDescribedBy,
   type CodeLanguage,
   type CodeEditorTheme,
   type CodeHighlighter,
@@ -364,7 +365,12 @@ export const CodeEditor = defineComponent({
         'aria-labelledby':
           (restAttrs['aria-labelledby'] as string | undefined) ?? formItemControl?.labelId.value,
         'aria-multiline': 'true',
-        'aria-describedby': formItemControl?.describedBy.value
+        'aria-describedby': mergeAriaDescribedBy(
+          typeof restAttrs['aria-describedby'] === 'string'
+            ? restAttrs['aria-describedby']
+            : undefined,
+          formItemControl?.describedBy.value
+        )
       })
 
       return h(

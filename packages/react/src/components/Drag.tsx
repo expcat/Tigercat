@@ -85,12 +85,7 @@ export function Drag<T extends DragItem = DragItem>({
   const zoneProps = drag.getDropZoneProps()
 
   return (
-    <ul
-      {...restProps}
-      {...zoneProps}
-      className={classNames('m-0 list-none p-0', className)}
-      data-tiger-drag=""
-      role="list">
+    <>
       {drag.draggedItem ? (
         <div className="sr-only" aria-hidden="true" data-tiger-drag-preview="">
           {String(drag.draggedItem.id)}
@@ -99,26 +94,33 @@ export function Drag<T extends DragItem = DragItem>({
       <div role="status" className="sr-only" data-tiger-drag-live="">
         {announcement}
       </div>
-      {items.map((item) => {
-        const itemProps: Record<string, unknown> = {
-          ...drag.getDragItemProps(item),
-          tabIndex: config?.disabled ? -1 : 0
-        }
-        const node = render?.(item, {
-          dragItemProps: itemProps,
-          isDragging: itemProps['data-dragging'] === true
-        })
-        return (
-          <React.Fragment key={item.id}>
-            {node ?? (
-              <li {...itemProps} role="listitem">
-                {String(item.id)}
-              </li>
-            )}
-          </React.Fragment>
-        )
-      })}
-    </ul>
+      <ul
+        {...restProps}
+        {...zoneProps}
+        className={classNames('m-0 list-none p-0', className)}
+        data-tiger-drag=""
+        role="list">
+        {items.map((item) => {
+          const itemProps: Record<string, unknown> = {
+            ...drag.getDragItemProps(item),
+            tabIndex: config?.disabled ? -1 : 0
+          }
+          const node = render?.(item, {
+            dragItemProps: itemProps,
+            isDragging: itemProps['data-dragging'] === true
+          })
+          return (
+            <React.Fragment key={item.id}>
+              {node ?? (
+                <li {...itemProps} role="listitem">
+                  {String(item.id)}
+                </li>
+              )}
+            </React.Fragment>
+          )
+        })}
+      </ul>
+    </>
   )
 }
 

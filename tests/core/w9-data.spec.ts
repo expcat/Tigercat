@@ -2,10 +2,12 @@ import { describe, expect, it } from 'vitest'
 import {
   commitValidatedCellEdit,
   funnelLayerRatios,
+  htmlToMarkdown,
   layoutSankey,
   layoutWaterfall,
   narrowWidgetParams,
   resolveTableVirtualStrategy,
+  sanitizeHtml,
   toggleLegendHidden,
   virtualGridWindow,
   virtualizeMiddleColumns
@@ -145,5 +147,12 @@ describe('w9 data helpers', () => {
   it('drops unknown widget params', () => {
     const params = narrowWidgetParams('number', { min: 1, mystery: true })
     expect(params).toEqual({ min: 1 })
+  })
+
+  it('maps pasted b and i tags to markdown markers', () => {
+    const markdown = htmlToMarkdown(sanitizeHtml('<b>bold</b><i>item</i><strong>s</strong>'))
+    expect(markdown).toContain('**bold**')
+    expect(markdown).toContain('*item*')
+    expect(markdown).not.toBe('bolditem**s**')
   })
 })
