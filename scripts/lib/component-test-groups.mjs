@@ -26,7 +26,14 @@ const FRAMEWORKS = new Set(['react', 'vue'])
 
 const FRAMEWORK_EXTRAS = {
   basic: ['ButtonSpinnerLazy', 'ImagePreview.ssr', 'example-zh-cn-locale'],
-  form: ['custom-text', 'useFormController', 'w9-forms', 'w9-bind'],
+  form: [
+    'custom-text',
+    'useFormController',
+    'w9-forms',
+    'w9-bind',
+    'InputNumber.ssr',
+    'Textarea.ssr'
+  ],
   feedback: [
     'Notification',
     'focus-trap-rebind',
@@ -35,9 +42,11 @@ const FRAMEWORK_EXTRAS = {
     'overlay-ssr',
     'overlay-outlet-dismiss',
     'portaled-overlay-lifecycle',
-    'w9-confirm-modal'
+    'w9-confirm-modal',
+    'feedback-first-paint'
   ],
   layout: ['Grid', 'LayoutSections'],
+  navigation: ['Spotlight.ssr'],
   data: ['TableState', 'w9-data-components', 'w9-t02'],
   charts: ['ChartSubComponents', 'useChartInteraction', 'useResponsiveChartSize'],
   advanced: ['DragEnhancements', 'useDrag'],
