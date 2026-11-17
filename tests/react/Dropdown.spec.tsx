@@ -715,6 +715,52 @@ describe('Dropdown', () => {
     expect(screen.getByRole('menuitem', { name: 'Zulu' })).toHaveFocus()
   })
 
+  it('keeps schema submenu keyboard navigation in its own layer', () => {
+    render(
+      <Dropdown
+        defaultOpen
+        portal={false}
+        items={[
+          { key: 'first', label: 'First' },
+          {
+            key: 'more',
+            label: 'More',
+            children: [
+              { key: 'mail', label: 'Mail' },
+              { key: 'link', label: 'Link' }
+            ]
+          },
+          { key: 'last', label: 'Last' }
+        ]}>
+        <button type="button">Open</button>
+      </Dropdown>
+    )
+
+    const more = screen.getByRole('menuitem', { name: 'More' })
+    more.focus()
+    fireEvent.keyDown(more, { key: 'ArrowRight' })
+    const mail = screen.getByRole('menuitem', { name: 'Mail' })
+    const link = screen.getByRole('menuitem', { name: 'Link' })
+    expect(mail).toHaveFocus()
+
+    fireEvent.keyDown(mail, { key: 'ArrowDown' })
+    expect(link).toHaveFocus()
+    fireEvent.keyDown(link, { key: 'ArrowUp' })
+    expect(mail).toHaveFocus()
+
+    fireEvent.keyDown(mail, { key: 'ArrowLeft' })
+    expect(more).toHaveAttribute('aria-expanded', 'false')
+    expect(more).toHaveFocus()
+    expect(screen.queryByRole('menuitem', { name: 'Mail' })).not.toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: 'First' })).toBeInTheDocument()
+
+    fireEvent.keyDown(more, { key: 'ArrowRight' })
+    fireEvent.keyDown(screen.getByRole('menuitem', { name: 'Mail' }), { key: 'Escape' })
+    expect(more).toHaveAttribute('aria-expanded', 'false')
+    expect(more).toHaveFocus()
+    expect(screen.getByRole('menuitem', { name: 'First' })).toBeInTheDocument()
+  })
+
   it('opens an items submenu from More with ArrowRight or click', () => {
     const items = [
       {

@@ -604,6 +604,57 @@ describe('Dropdown', () => {
       expect(rootMenu.contains(mail)).toBe(true)
     })
 
+    it('keeps schema submenu keyboard navigation in its own layer', async () => {
+      render(Dropdown, {
+        props: {
+          defaultOpen: true,
+          portal: false,
+          items: [
+            { key: 'first', label: 'First' },
+            {
+              key: 'more',
+              label: 'More',
+              children: [
+                { key: 'mail', label: 'Mail' },
+                { key: 'link', label: 'Link' }
+              ]
+            },
+            { key: 'last', label: 'Last' }
+          ]
+        },
+        slots: { default: () => 'Trigger' }
+      })
+
+      screen.getByRole('button', { name: 'Trigger' }).getBoundingClientRect = () =>
+        new DOMRect(20, 20, 240, 32)
+      const more = screen.getByRole('menuitem', { name: 'More' })
+      more.getBoundingClientRect = () => new DOMRect(20, 52, 240, 32)
+      more.focus()
+      await fireEvent.keyDown(more, { key: 'ArrowRight' })
+      const mail = screen.getByRole('menuitem', { name: 'Mail' })
+      const link = screen.getByRole('menuitem', { name: 'Link' })
+      await waitFor(() => expect(mail).toHaveFocus())
+
+      await fireEvent.keyDown(mail, { key: 'ArrowDown' })
+      expect(link).toHaveFocus()
+      await fireEvent.keyDown(link, { key: 'ArrowUp' })
+      expect(mail).toHaveFocus()
+
+      await fireEvent.keyDown(mail, { key: 'ArrowLeft' })
+      expect(more).toHaveAttribute('aria-expanded', 'false')
+      expect(more).toHaveFocus()
+      expect(screen.queryByRole('menuitem', { name: 'Mail' })).not.toBeInTheDocument()
+      expect(screen.getByRole('menuitem', { name: 'First' })).toBeInTheDocument()
+
+      await fireEvent.keyDown(more, { key: 'ArrowRight' })
+      const reopenedMail = screen.getByRole('menuitem', { name: 'Mail' })
+      await waitFor(() => expect(reopenedMail).toHaveFocus())
+      await fireEvent.keyDown(reopenedMail, { key: 'Escape' })
+      expect(more).toHaveAttribute('aria-expanded', 'false')
+      expect(more).toHaveFocus()
+      expect(screen.getByRole('menuitem', { name: 'First' })).toBeInTheDocument()
+    })
+
     it('keeps disabled schema submenus disabled and closed', async () => {
       render(Dropdown, {
         props: {

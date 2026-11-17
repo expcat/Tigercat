@@ -32,6 +32,7 @@ import {
   popupMenuItemHref,
   resolvePopupMenuItemType,
   nextPopupMenuCheck,
+  getContextMenuSubKeys,
   getContextMenuSubPlacement,
   createTypeaheadHighlight,
   markTypeaheadMatch,
@@ -476,6 +477,7 @@ export const Dropdown = defineComponent({
 
     const handleTriggerKeyDown = (event: Event) => {
       const keyboardEvent = event as KeyboardEvent
+      if (keyboardEvent.defaultPrevented) return
       if (isTextEditingTarget(keyboardEvent.target)) return
       const host = keyboardEvent.currentTarget as HTMLElement | null
       const dir =
@@ -490,6 +492,7 @@ export const Dropdown = defineComponent({
       })
       if (!action) return
       keyboardEvent.preventDefault()
+      keyboardEvent.stopPropagation()
       hoverController.cancel()
       if (action === 'close') {
         setVisible(false)
@@ -507,12 +510,26 @@ export const Dropdown = defineComponent({
     const typeahead = createTypeaheadHighlight()
 
     const handleMenuKeyDown = (event: KeyboardEvent) => {
+      if (event.defaultPrevented) return
       if (event.key === 'Tab') {
         skipRestore.value = true
         setVisible(false)
         return
       }
       if (isTextEditingTarget(event.target)) return
+      if (parentMenu) {
+        const dir =
+          triggerRef.value?.closest('[dir]')?.getAttribute('dir') ??
+          (typeof document === 'undefined' ? null : document.documentElement.getAttribute('dir'))
+        const { closeKey } = getContextMenuSubKeys(dir)
+        if (event.key === closeKey || event.key === 'Escape') {
+          event.preventDefault()
+          event.stopPropagation()
+          skipRestore.value = false
+          setVisible(false)
+          return
+        }
+      }
       if (!floatingRef.value) return
       const nodes = Array.from(
         floatingRef.value.querySelectorAll<HTMLElement>('[role^="menuitem"]')
@@ -525,11 +542,14 @@ export const Dropdown = defineComponent({
       )
       if (highlight && highlight.index >= 0) {
         event.preventDefault()
+        event.stopPropagation()
         markTypeaheadMatch(nodes, highlight.index)
         nodes[highlight.index]?.focus()
         return
       }
-      handleMenuNavigation(floatingRef.value, event)
+      if (handleMenuNavigation(floatingRef.value, event)) {
+        event.stopPropagation()
+      }
     }
 
     const portalEnabled = computed(() => props.portal)

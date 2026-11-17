@@ -300,6 +300,7 @@ export const Dropdown = forwardRef<HTMLElement, DropdownProps>(function Dropdown
 
   const handleMenuKeyDown = useCallback(
     (event: React.KeyboardEvent) => {
+      if (event.defaultPrevented) return
       if (event.key === 'Tab') {
         skipRestoreRef.current = true
         setVisible(false)

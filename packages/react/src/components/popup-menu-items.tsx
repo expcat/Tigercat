@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import {
   createTypeaheadHighlight,
+  getContextMenuSubKeys,
   getDropdownSeparatorClasses,
   getMenuItems,
   getPopupMenuItemClasses,
@@ -8,6 +9,7 @@ import {
   POPUP_MENU_SUBMENU_SURFACE_CLASSES,
   markTypeaheadMatch,
   getNavLabels,
+  handleMenuNavigation,
   nextPopupMenuCheck,
   popupMenuAccessibleName,
   popupMenuItemCloses,
@@ -32,6 +34,7 @@ export function PopupMenuList({ items, onCheck, onSelect, onClose }: PopupMenuLi
   const typeaheadRef = useRef(createTypeaheadHighlight())
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.defaultPrevented) return
     const nodes = Array.from(
       listRef.current?.querySelectorAll<HTMLElement>('[data-tiger-popup-item]') ?? []
     )
@@ -49,6 +52,13 @@ export function PopupMenuList({ items, onCheck, onSelect, onClose }: PopupMenuLi
       event.stopPropagation()
       markTypeaheadMatch(nodes, hit.index)
       nodes[hit.index]?.focus()
+      return
+    }
+
+    const menu = listRef.current?.closest<HTMLElement>('[role="menu"]')
+    if (menu && handleMenuNavigation(menu, event.nativeEvent)) {
+      event.preventDefault()
+      event.stopPropagation()
       return
     }
 
@@ -99,6 +109,7 @@ function PopupMenuNode({
   const navLabels = getNavLabels(config.locale)
   const type = resolvePopupMenuItemType(item)
   const [submenuOpen, setSubmenuOpen] = useState(false)
+  const triggerRef = useRef<HTMLButtonElement>(null)
   const submenuRef = useRef<HTMLDivElement>(null)
   const focusSubmenuOnOpenRef = useRef(false)
 
@@ -116,8 +127,9 @@ function PopupMenuNode({
 
   if (type === 'submenu') {
     const expanded = submenuOpen && !item.disabled
-    const openKey =
-      (config.direction ?? config.locale?.direction) === 'rtl' ? 'ArrowLeft' : 'ArrowRight'
+    const { openKey, closeKey } = getContextMenuSubKeys(
+      config.direction ?? config.locale?.direction
+    )
     const openSubmenu = (focusChild: boolean) => {
       if (item.disabled) return
       if (!focusChild) {
@@ -140,6 +152,7 @@ function PopupMenuNode({
         }}
         onMouseLeave={() => setSubmenuOpen(false)}>
         <button
+          ref={triggerRef}
           type="button"
           role="menuitem"
           aria-haspopup="menu"
@@ -165,6 +178,14 @@ function PopupMenuNode({
             ref={submenuRef}
             role="menu"
             data-tiger-popup-submenu=""
+            onKeyDown={(event) => {
+              if (event.defaultPrevented) return
+              if (event.key !== closeKey && event.key !== 'Escape') return
+              event.preventDefault()
+              event.stopPropagation()
+              setSubmenuOpen(false)
+              triggerRef.current?.focus()
+            }}
             className={`absolute top-0 start-full z-10 min-w-40 ${POPUP_MENU_SUBMENU_SURFACE_CLASSES} p-1`}>
             <PopupMenuList
               items={item.children}

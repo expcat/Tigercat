@@ -571,10 +571,10 @@ const ContextMenuPopupBranch = defineComponent({
         }
         if (type === 'submenu') {
           const expanded = openKey.value === item.key && !item.disabled
-          const openDirection =
-            (tigerConfig.value.direction ?? tigerConfig.value.locale?.direction) === 'rtl'
-              ? 'ArrowLeft'
-              : 'ArrowRight'
+          const { openKey: openDirection, closeKey } = getContextMenuSubKeys(
+            tigerConfig.value.direction ?? tigerConfig.value.locale?.direction
+          )
+          let trigger: HTMLElement | null = null
           const openSubmenu = (focusChild: boolean) => {
             if (item.disabled) return
             if (focusChild) focusSubmenuOnOpen.value = true
@@ -596,6 +596,9 @@ const ContextMenuPopupBranch = defineComponent({
               h(
                 'button',
                 {
+                  ref: (el) => {
+                    trigger = el as HTMLElement | null
+                  },
                   type: 'button',
                   role: 'menuitem',
                   'aria-haspopup': 'menu',
@@ -625,6 +628,19 @@ const ContextMenuPopupBranch = defineComponent({
                       role: 'menu',
                       ref: submenuRef,
                       'data-tiger-popup-submenu': '',
+                      onKeydown: (event: KeyboardEvent) => {
+                        if (event.defaultPrevented) return
+                        if (event.key === closeKey || event.key === 'Escape') {
+                          event.preventDefault()
+                          event.stopPropagation()
+                          openKey.value = null
+                          trigger?.focus()
+                          return
+                        }
+                        if (handleMenuNavigation(event.currentTarget as HTMLElement, event)) {
+                          event.stopPropagation()
+                        }
+                      },
                       class: `absolute top-0 start-full z-10 min-w-40 ${POPUP_MENU_SUBMENU_SURFACE_CLASSES} p-1`
                     },
                     [
