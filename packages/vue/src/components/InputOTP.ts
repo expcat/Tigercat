@@ -184,8 +184,7 @@ export const InputOTP = defineComponent({
         ...charOptions.value,
         distributeFromStart: shouldDistributeOtpInput(index, inputType, sanitized.length)
       })
-      const controlled =
-        props.modelValue !== undefined || typeof formValue.value === 'string'
+      const controlled = props.modelValue !== undefined || typeof formValue.value === 'string'
       target.value = displayChar(controlled ? currentValue.value : result.value, index)
       emitValue(result.value)
       if (result.nextIndex !== index) focusSlot(result.nextIndex)

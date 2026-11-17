@@ -61,8 +61,7 @@ export const collapseExtraClasses = 'ms-auto shrink-0'
 /**
  * Collapse panel content wrapper classes
  */
-export const collapsePanelContentWrapperClasses =
-  'tiger-collapse-content overflow-hidden'
+export const collapsePanelContentWrapperClasses = 'tiger-collapse-content overflow-hidden'
 
 /**
  * Collapse panel content base classes
