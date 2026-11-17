@@ -50,7 +50,7 @@ const draggedTitle = computed(() => {
         class="flex cursor-grab items-center justify-between rounded-md border border-[var(--tiger-border)] bg-[var(--tiger-surface)] px-3 py-2 select-none">
         <span>{{ item.title }}</span>
         <span class="flex items-center gap-2">
-          <Tag color="blue">序号 {{ item.index + 1 }}</Tag>
+          <Tag>序号 {{ item.index + 1 }}</Tag>
           <button
             type="button"
             class="text-xs text-[var(--tiger-text-secondary)]"

@@ -4,6 +4,12 @@
 
 ## v3.0.1（未发布）
 
+键盘抓取 TaskBoard 列时，播报改用 `columnGrabAnnouncementText`，占位符是 `{column}`、`{position}`、`{count}`。en-US 为 `{column}. Position {position} of {count}.`，不再把列名填进卡片模板的 From / to。自定义 `grabAnnouncementText` 仍只用于卡片。
+
+RichTextEditor 在 bind 打开时，插入表格和图片的按钮改用 `insertTableText`、`insertImageText`。zh-CN 为「表格」「图片」。覆盖旧字面量 table、image 的调用方改为设置这两个 locale 键。
+
+React WorkflowDetailShell 的 title 为 0 时显示 0。空标题仍回退默认标题。Vue ImagePreview 在打开后卸载会解除本次 Escape 处理。React TaskBoard 与 Vue TaskBoard 保留调用方 role 和非空 aria-label。React FormItem 遇到未知 schema type 返回的 null 时，不再误报单个控件限制。use-drag/01 两端示例不再给 Tag 传 color。
+
 React SplitButton 首次 ArrowDown / ArrowUp 打开后直接进入首个 / 末个启用项；ConfigProvider 内的菜单 Tab 关闭后按 trigger 的后继顺序移动。Vue TimePicker 桌面选项可用 Enter / Space 写入草稿，再按确定提交；禁用选项仍不可选。调用方式不用改。
 
 双端 Tour 按合并后的 locale 方向定位气泡，组件上的 direction 或语言 id（如 ar-SA）盖过 ConfigProvider。Calendar 周次格为 rowheader。Collapse 内容壳去掉未使用的高度与透明度过渡。Vue Countdown 在挂载时播报一次，已经结束的计时也会播报。单格式 DataExport 保留调用方 aria-label，多种格式仍用触发器文案。Timeline 只在标签是日期或时间时写入 datetime。Table 卡片树忽略 virtual 只补了注释，开窗仍只看正数 cardItemHeight。调用方式不用改。

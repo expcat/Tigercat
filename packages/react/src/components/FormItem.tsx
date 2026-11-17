@@ -216,7 +216,7 @@ export const FormItem: React.FC<FormItemProps> = ({
     React.isValidElement<NativeFieldProps>(onlyChild) && typeof onlyChild.type === 'string'
   const nativeId = isNativeElement ? onlyChild.props.id : undefined
   const effectiveFieldId = nativeId ?? fieldId
-  const useGroup = childArray.length !== 1
+  const useGroup = childArray.length > 1
   const isGroupControl = React.isValidElement(onlyChild) && isFormItemGroupControl(onlyChild.type)
 
   const enhancedChild = useMemo(() => {

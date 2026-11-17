@@ -513,6 +513,7 @@ export const idID: TigerLocale = {
     wipLimitText: 'Batas WIP: {limit}',
     dragHintText: 'Seret untuk memindahkan',
     grabAnnouncementText: '{card}. Dari {from} ke {to}. Posisi {position} dari {count}.',
+    columnGrabAnnouncementText: '{column}. Kolom {position} dari {count}.',
     boardAriaLabel: 'Papan Tugas'
   },
   chatWindow: {
@@ -746,6 +747,8 @@ export const idID: TigerLocale = {
   richTextEditor: {
     previewText: 'Pratinjau',
     tableText: 'Tabel',
+    insertTableText: 'Tabel',
+    insertImageText: 'Gambar',
     formattingToolbarAriaLabel: 'Pemformatan teks',
     editorAriaLabel: 'Editor teks kaya',
     bold: 'Tebal',

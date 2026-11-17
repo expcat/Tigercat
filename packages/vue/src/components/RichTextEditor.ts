@@ -448,7 +448,7 @@ export const RichTextEditor = defineComponent({
                       blocks.value = [...blocks.value, slashInsertBlock('table')]
                     }
                   },
-                  'table'
+                  labels.value.insertTableText
                 ),
                 h(
                   'button',
@@ -462,7 +462,7 @@ export const RichTextEditor = defineComponent({
                       ]
                     }
                   },
-                  'image'
+                  labels.value.insertImageText
                 ),
                 h('pre', { 'data-tiger-rte-serial': '' }, serializeRichText(blocks.value)),
                 h(

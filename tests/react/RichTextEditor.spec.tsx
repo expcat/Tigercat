@@ -24,6 +24,13 @@ describe('RichTextEditor', () => {
       expect(container.querySelector('[role="textbox"]')).toBeTruthy()
     })
 
+    it('uses locale text for bind table and image buttons', () => {
+      const { container } = render(<RichTextEditor bind locale={zhCN} />)
+      const buttons = container.querySelectorAll('[data-tiger-rte-bind] button')
+      expect(buttons[0]?.textContent).toBe('表格')
+      expect(buttons[1]?.textContent).toBe('图片')
+    })
+
     it('seeds the engine from FormItem when value is omitted', () => {
       const { container } = render(
         <Form value={{ bio: '<p>From form</p>' }}>

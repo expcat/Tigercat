@@ -513,6 +513,7 @@ export const zhCN: TigerLocale = {
     wipLimitText: 'WIP 限制: {limit}',
     dragHintText: '拖拽以移动',
     grabAnnouncementText: '{card}。从{from}到{to}。第 {position} 位，共 {count} 位。',
+    columnGrabAnnouncementText: '{column}。第 {position} 列，共 {count} 列。',
     boardAriaLabel: '任务看板'
   },
   chatWindow: {
@@ -746,6 +747,8 @@ export const zhCN: TigerLocale = {
   richTextEditor: {
     previewText: '预览',
     tableText: '表格',
+    insertTableText: '表格',
+    insertImageText: '图片',
     formattingToolbarAriaLabel: '富文本格式工具栏',
     editorAriaLabel: '富文本编辑器',
     bold: '加粗',

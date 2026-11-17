@@ -57,7 +57,7 @@ export default function App() {
                 .join(' ')}>
               <span>{item.title}</span>
               <span className="flex items-center gap-2">
-                <Tag color="blue">序号 {item.index + 1}</Tag>
+                <Tag>序号 {item.index + 1}</Tag>
                 <button
                   type="button"
                   className="text-xs text-[var(--tiger-text-secondary)]"

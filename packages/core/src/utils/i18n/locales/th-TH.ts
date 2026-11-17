@@ -513,6 +513,7 @@ export const thTH: TigerLocale = {
     wipLimitText: 'จำกัด WIP: {limit}',
     dragHintText: 'ลากเพื่อย้าย',
     grabAnnouncementText: '{card}. จาก {from} ไป {to}. ตำแหน่ง {position} จาก {count}.',
+    columnGrabAnnouncementText: '{column}. คอลัมน์ที่ {position} จาก {count}.',
     boardAriaLabel: 'บอร์ดงาน'
   },
   chatWindow: {
@@ -746,6 +747,8 @@ export const thTH: TigerLocale = {
   richTextEditor: {
     previewText: 'ดูตัวอย่าง',
     tableText: 'ตาราง',
+    insertTableText: 'ตาราง',
+    insertImageText: 'รูปภาพ',
     formattingToolbarAriaLabel: 'จัดรูปแบบข้อความ',
     editorAriaLabel: 'ตัวแก้ไขข้อความแบบมีรูปแบบ',
     bold: 'ตัวหนา',

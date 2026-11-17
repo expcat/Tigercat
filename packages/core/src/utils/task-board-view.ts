@@ -316,22 +316,25 @@ export function describeTaskBoardGrabAnnouncement(
     dropIndex: number
   },
   view: TaskBoardView,
-  template: string
+  template: string,
+  columnTemplate = ''
 ): string {
   const grab = snapshot.kbDrag
-  if (!grab || template.trim() === '') return ''
+  if (!grab) return ''
   if (grab.type === 'column') {
+    if (columnTemplate.trim() === '') return ''
     const index = view.columns.findIndex((column) => column.source.id === grab.id)
     const column = index >= 0 ? view.columns[index] : undefined
     const title = column?.source.title || String(grab.id)
-    return formatTaskBoardGrabAnnouncement(template, {
-      card: title,
-      from: title,
-      to: title,
-      position: index >= 0 ? index + 1 : 1,
-      count: Math.max(1, view.columns.length)
-    })
+    return columnTemplate
+      .split('{column}')
+      .join(title)
+      .split('{position}')
+      .join(String(index >= 0 ? index + 1 : 1))
+      .split('{count}')
+      .join(String(Math.max(1, view.columns.length)))
   }
+  if (template.trim() === '') return ''
   const fromColumn = view.columns.find((column) => column.source.id === grab.fromColumnId)
   const toId = snapshot.dropTargetColumnId ?? grab.fromColumnId
   const toColumn = view.columns.find((column) => column.source.id === toId)

@@ -170,7 +170,7 @@ export const ImagePreview = defineComponent({
       emit('update:open', false)
     }
 
-    useVueEscapeKey({
+    const detachEscape = useVueEscapeKey({
       enabled: shouldRender,
       onEscape: handleClose,
       layerRef: rootRef
@@ -362,6 +362,7 @@ export const ImagePreview = defineComponent({
     )
 
     onBeforeUnmount(() => {
+      detachEscape()
       detachWheel?.()
       gestureSession?.dispose()
     })

@@ -513,6 +513,7 @@ export const viVN: TigerLocale = {
     wipLimitText: 'Giới hạn WIP: {limit}',
     dragHintText: 'Kéo để di chuyển',
     grabAnnouncementText: '{card}. Từ {from} đến {to}. Vị trí {position} trên {count}.',
+    columnGrabAnnouncementText: '{column}. Cột {position} trên {count}.',
     boardAriaLabel: 'Bảng nhiệm vụ'
   },
   chatWindow: {
@@ -746,6 +747,8 @@ export const viVN: TigerLocale = {
   richTextEditor: {
     previewText: 'Xem trước',
     tableText: 'Bảng',
+    insertTableText: 'Bảng',
+    insertImageText: 'Ảnh',
     formattingToolbarAriaLabel: 'Định dạng văn bản',
     editorAriaLabel: 'Trình soạn văn bản phong phú',
     bold: 'Đậm',

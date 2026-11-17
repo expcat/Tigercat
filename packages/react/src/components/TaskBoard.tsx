@@ -675,7 +675,16 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
   const kbDragStateId = (dragSnap.kbDrag?.type === 'card' ? dragSnap.kbDrag.id : null) as
     string | number | null
   const kbGrabbing = dragSnap.kbDrag?.type === 'card'
-  const liveMessage = describeTaskBoardGrabAnnouncement(dragSnap, view, labels.grabAnnouncementText)
+  const liveMessage = describeTaskBoardGrabAnnouncement(
+    dragSnap,
+    view,
+    labels.grabAnnouncementText,
+    labels.columnGrabAnnouncementText
+  )
+  const ariaLabel =
+    typeof rest['aria-label'] === 'string' && rest['aria-label'].trim()
+      ? rest['aria-label']
+      : resolveLocaleText(labels.boardAriaLabel)
 
   return (
     <div
@@ -683,8 +692,8 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
       ref={boardRef}
       className={wrapperClasses}
       style={style}
-      role="region"
-      aria-label={resolveLocaleText(labels.boardAriaLabel)}
+      role={rest.role ?? 'region'}
+      aria-label={ariaLabel}
       data-tiger-task-board="">
       <div className="sr-only" aria-live="assertive">
         {liveMessage}

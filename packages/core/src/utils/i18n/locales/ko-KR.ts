@@ -513,6 +513,7 @@ export const koKR: TigerLocale = {
     wipLimitText: 'WIP 제한: {limit}',
     dragHintText: '드래그하여 이동',
     grabAnnouncementText: '{card}. {from}에서 {to}로. {count}개 중 {position}번째.',
+    columnGrabAnnouncementText: '{column}. {count}개 열 중 {position}번째 열.',
     boardAriaLabel: '작업 보드'
   },
   chatWindow: {
@@ -746,6 +747,8 @@ export const koKR: TigerLocale = {
   richTextEditor: {
     previewText: '미리 보기',
     tableText: '표',
+    insertTableText: '표',
+    insertImageText: '이미지',
     formattingToolbarAriaLabel: '텍스트 서식',
     editorAriaLabel: '서식 있는 텍스트 편집기',
     bold: '굵게',

@@ -28,6 +28,13 @@ describe('RichTextEditor', () => {
       expect(container.querySelector('[role="textbox"]')).toBeTruthy()
     })
 
+    it('uses locale text for bind table and image buttons', () => {
+      const { container } = renderEditor({ bind: true, locale: zhCN })
+      const buttons = container.querySelectorAll('[data-tiger-rte-bind] button')
+      expect(buttons[0]?.textContent).toBe('表格')
+      expect(buttons[1]?.textContent).toBe('图片')
+    })
+
     it('should render toolbar', () => {
       const { container } = renderEditor()
       const toolbar = container.querySelector('[role="toolbar"]')

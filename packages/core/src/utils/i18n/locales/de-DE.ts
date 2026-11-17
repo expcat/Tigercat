@@ -514,6 +514,7 @@ export const deDE: TigerLocale = {
     wipLimitText: 'WIP-Limit: {limit}',
     dragHintText: 'Zum Verschieben ziehen',
     grabAnnouncementText: '{card}. Von {from} nach {to}. Position {position} von {count}.',
+    columnGrabAnnouncementText: '{column}. Spalte {position} von {count}.',
     boardAriaLabel: 'Aufgabenboard'
   },
   chatWindow: {
@@ -747,6 +748,8 @@ export const deDE: TigerLocale = {
   richTextEditor: {
     previewText: 'Vorschau',
     tableText: 'Tabelle',
+    insertTableText: 'Tabelle',
+    insertImageText: 'Bild',
     formattingToolbarAriaLabel: 'Textformatierung',
     editorAriaLabel: 'Rich-Text-Editor',
     bold: 'Fett',

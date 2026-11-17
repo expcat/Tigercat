@@ -513,6 +513,7 @@ export const jaJP: TigerLocale = {
     wipLimitText: 'WIP制限: {limit}',
     dragHintText: 'ドラッグして移動',
     grabAnnouncementText: '{card}。{from} から {to}。{count} 件中 {position} 番目。',
+    columnGrabAnnouncementText: '{column}。{count} 列中 {position} 列目。',
     boardAriaLabel: 'タスクボード'
   },
   chatWindow: {
@@ -746,6 +747,8 @@ export const jaJP: TigerLocale = {
   richTextEditor: {
     previewText: 'プレビュー',
     tableText: '表',
+    insertTableText: '表',
+    insertImageText: '画像',
     formattingToolbarAriaLabel: 'テキストの書式',
     editorAriaLabel: 'リッチテキストエディタ',
     bold: '太字',

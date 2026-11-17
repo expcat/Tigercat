@@ -318,7 +318,7 @@ export const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
               type="button"
               data-tiger-slash="table"
               onClick={() => setBlocks((current) => [...current, slashInsertBlock('table')])}>
-              table
+              {labels.insertTableText}
             </button>
             <button
               type="button"
@@ -329,7 +329,7 @@ export const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
                   setRichTextImageWidth(slashInsertBlock('image'), 120)
                 ])
               }>
-              image
+              {labels.insertImageText}
             </button>
             <pre data-tiger-rte-serial="">{serializeRichText(blocks)}</pre>
             <span data-shortcut={applyMarkdownShortcut('# Title')?.type ?? ''}>

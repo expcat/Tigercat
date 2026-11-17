@@ -761,6 +761,8 @@ export interface TigerLocaleTaskBoard {
    * Grab announcement. Supports {card}, {from}, {to}, {position}, {count}.
    */
   grabAnnouncementText?: string
+  /** Column grab announcement. Supports {column}, {position}, {count}. */
+  columnGrabAnnouncementText?: string
 }
 
 export interface TigerLocaleChatWindow {
@@ -1163,6 +1165,8 @@ export interface TigerLocaleMarkdownEditor {
 export interface TigerLocaleRichTextEditor {
   previewText?: string
   tableText?: string
+  insertTableText?: string
+  insertImageText?: string
   formattingToolbarAriaLabel?: string
   editorAriaLabel?: string
   bold?: string

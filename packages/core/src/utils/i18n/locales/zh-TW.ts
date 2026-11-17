@@ -513,6 +513,7 @@ export const zhTW: TigerLocale = {
     wipLimitText: 'WIP 限制: {limit}',
     dragHintText: '拖曳以移動',
     grabAnnouncementText: '{card}。從{from}到{to}。第 {position} 位，共 {count} 位。',
+    columnGrabAnnouncementText: '{column}。第 {position} 欄，共 {count} 欄。',
     boardAriaLabel: '任務看板'
   },
   chatWindow: {
@@ -746,6 +747,8 @@ export const zhTW: TigerLocale = {
   richTextEditor: {
     previewText: '預覽',
     tableText: '表格資料',
+    insertTableText: '表格資料',
+    insertImageText: '圖片',
     formattingToolbarAriaLabel: '富文本格式工具列',
     editorAriaLabel: '富文本編輯器',
     bold: '粗體',

@@ -513,6 +513,7 @@ export const arSA: TigerLocale = {
     wipLimitText: 'حد العمل الجاري: {limit}',
     dragHintText: 'اسحب للنقل',
     grabAnnouncementText: '{card}. من {from} إلى {to}. الموضع {position} من {count}.',
+    columnGrabAnnouncementText: '{column}. العمود {position} من {count}.',
     boardAriaLabel: 'لوحة المهام'
   },
   chatWindow: {
@@ -746,6 +747,8 @@ export const arSA: TigerLocale = {
   richTextEditor: {
     previewText: 'معاينة',
     tableText: 'جدول',
+    insertTableText: 'جدول',
+    insertImageText: 'صورة',
     formattingToolbarAriaLabel: 'تنسيق النص',
     editorAriaLabel: 'محرر نص منسق',
     bold: 'عريض',

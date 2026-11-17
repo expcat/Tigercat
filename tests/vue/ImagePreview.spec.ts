@@ -111,6 +111,18 @@ describe('ImagePreview', () => {
     expect(emitted()['update:open']?.length).toBeGreaterThan(2)
   })
 
+  it('does not close after the open preview is unmounted', async () => {
+    const onClose = vi.fn()
+    const { unmount } = render(ImagePreview, {
+      props: { open: true, images, 'onUpdate:open': onClose }
+    })
+    unmount()
+    const event = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true })
+    document.dispatchEvent(event)
+    expect(onClose).not.toHaveBeenCalled()
+    expect(event.defaultPrevented).toBe(false)
+  })
+
   it('requests the next index without leaving a controlled currentIndex', async () => {
     const { emitted } = render(ImagePreview, {
       props: { open: true, images, currentIndex: 1 }

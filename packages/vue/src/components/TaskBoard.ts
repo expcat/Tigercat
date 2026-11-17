@@ -689,8 +689,13 @@ export const TaskBoard = defineComponent({
       const liveMessage = describeTaskBoardGrabAnnouncement(
         dragSnap.value,
         view.value,
-        labels.value.grabAnnouncementText
+        labels.value.grabAnnouncementText,
+        labels.value.columnGrabAnnouncementText
       )
+      const ariaLabel =
+        typeof attrs['aria-label'] === 'string' && attrs['aria-label'].trim()
+          ? attrs['aria-label']
+          : resolveLocaleText(labels.value.boardAriaLabel)
 
       return h(
         'div',
@@ -699,8 +704,8 @@ export const TaskBoard = defineComponent({
           ref: boardRef,
           class: wrapperClasses.value,
           style: wrapperStyle.value,
-          role: 'region',
-          'aria-label': resolveLocaleText(labels.value.boardAriaLabel),
+          role: attrs.role ?? 'region',
+          'aria-label': ariaLabel,
           'data-tiger-task-board': ''
         },
         [h('div', { class: 'sr-only', 'aria-live': 'assertive' }, liveMessage), ...children]

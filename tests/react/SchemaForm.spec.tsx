@@ -318,4 +318,24 @@ describe('SchemaForm (React)', () => {
     const named = render(<SchemaForm schema={basicSchema} ariaLabel="Named form" />)
     expect(named.container.firstElementChild).toHaveAttribute('aria-label', 'Named form')
   })
+
+  it('does not warn about a single field control for an unknown type', () => {
+    resetDevWarnCache()
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const { container } = render(
+      <SchemaForm
+        schema={{
+          fields: [{ name: 'mystery', label: 'Mystery', type: 'nope' as 'input' }]
+        }}
+      />
+    )
+    expect(
+      container.querySelector(
+        '[data-schema-field="mystery"] input, [data-schema-field="mystery"] textarea, [data-schema-field="mystery"] select'
+      )
+    ).toBeNull()
+    const text = warn.mock.calls.map((call) => call.map(String).join(' ')).join('\n')
+    expect(text).not.toContain('FormItem supports a single field control')
+    warn.mockRestore()
+  })
 })

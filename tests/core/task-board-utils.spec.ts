@@ -16,6 +16,7 @@ import {
   type TaskBoardCard,
   type TaskBoardColumn
 } from '@expcat/tigercat-core'
+import { describeTaskBoardGrabAnnouncement, resolveTaskBoardView } from '@expcat/tigercat-core'
 import { createTaskBoardMoveGuard } from '../../packages/core/src/internal/task-board-move'
 
 // ---------------------------------------------------------------------------
@@ -605,5 +606,45 @@ describe('createTaskBoardMoveGuard', () => {
     expect(isCurrent(cols)).toBe(true)
     expect(isCurrent(cols.map((column) => ({ ...column })))).toBe(false)
     expect(isCurrent([cols[1], cols[0], cols[2]])).toBe(false)
+  })
+})
+
+describe('task board column grab announcement', () => {
+  const columns: TaskBoardColumn[] = [
+    { id: 'todo', title: 'To Do', cards: [{ id: 'c1', title: 'Alpha' }] },
+    { id: 'done', title: 'Done', cards: [] }
+  ]
+  const view = resolveTaskBoardView({ columns })
+  const cardTemplate = '{card}. From {from} to {to}. Position {position} of {count}.'
+  const columnTemplate = '{column}. Position {position} of {count}.'
+
+  it('names the column and its position instead of a card sentence', () => {
+    const line = describeTaskBoardGrabAnnouncement(
+      {
+        kbDrag: { type: 'column', id: 'todo', fromIndex: 0 },
+        dropTargetColumnId: null,
+        dropIndex: -1
+      },
+      view,
+      cardTemplate,
+      columnTemplate
+    )
+    expect(line).toBe('To Do. Position 1 of 2.')
+    expect(line).not.toContain('From')
+  })
+
+  it('still names a grabbed card, its source, and its target', () => {
+    expect(
+      describeTaskBoardGrabAnnouncement(
+        {
+          kbDrag: { type: 'card', id: 'c1', fromColumnId: 'todo', fromIndex: 0 },
+          dropTargetColumnId: 'done',
+          dropIndex: 0
+        },
+        view,
+        cardTemplate,
+        columnTemplate
+      )
+    ).toBe('Alpha. From To Do to Done. Position 1 of 1.')
   })
 })

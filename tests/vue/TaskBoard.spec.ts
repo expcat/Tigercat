@@ -759,4 +759,38 @@ describe('TaskBoard (Vue)', () => {
       document.querySelector('[data-tiger-taskboard-card-id="same"]')?.className ?? ''
     ).not.toContain('ring-2')
   })
+
+  it('announces a keyboard column grab by column name and position', async () => {
+    render(TaskBoard, {
+      props: {
+        columns: [
+          { id: 'todo', title: 'To Do', cards: [{ id: 'c1', title: 'Alpha' }] },
+          { id: 'done', title: 'Done', cards: [] }
+        ]
+      }
+    })
+    await fireEvent.keyDown(screen.getByRole('button', { name: /To Do/ }), { key: 'Enter' })
+    const live = document.querySelector('[aria-live="assertive"]')
+    expect(live?.textContent).toBe('To Do. Position 1 of 2.')
+    expect(live?.textContent).not.toContain('From')
+  })
+
+  it('keeps a caller role and a non-empty aria-label on the root', () => {
+    const named = render(TaskBoard, {
+      props: { columns: [{ id: 'todo', title: 'To Do', cards: [] }] },
+      attrs: { role: 'group', 'aria-label': 'Sprint' }
+    })
+    const root = named.container.querySelector('[data-tiger-task-board]')
+    expect(root).toHaveAttribute('role', 'group')
+    expect(root).toHaveAttribute('aria-label', 'Sprint')
+    named.unmount()
+
+    const blank = render(TaskBoard, {
+      props: { columns: [{ id: 'todo', title: 'To Do', cards: [] }] },
+      attrs: { 'aria-label': '  ' }
+    })
+    const fallback = blank.container.querySelector('[data-tiger-task-board]')
+    expect(fallback).toHaveAttribute('role', 'region')
+    expect(fallback).toHaveAttribute('aria-label', 'Task Board')
+  })
 })

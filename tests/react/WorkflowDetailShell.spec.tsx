@@ -104,4 +104,13 @@ describe('WorkflowDetailShell (React)', () => {
     const named = render(<WorkflowDetailShell ariaLabel="Named shell" />)
     expect(named.container.firstElementChild).toHaveAttribute('aria-label', 'Named shell')
   })
+
+  it('shows title 0 instead of the default title', () => {
+    const zero = render(<WorkflowDetailShell title={0 as unknown as string} />)
+    expect(zero.container.querySelector('h1')).toHaveTextContent('0')
+    expect(zero.container.querySelector('h1')).not.toHaveTextContent('Approval')
+    zero.unmount()
+    const empty = render(<WorkflowDetailShell title="" />)
+    expect(empty.container.querySelector('h1')).toHaveTextContent('Approval')
+  })
 })

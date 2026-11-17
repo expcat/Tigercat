@@ -4,6 +4,14 @@
 
 ## v3.0.1（未发布）
 
+- **表单项空子节点（React，T10）**：未知 schema type 返回 null 时，FormItem 不再把它算成多个控件。不出现 FormItem supports a single field control，也不渲染控件。
+- **任务板抓列播报（Core / React / Vue，T11）**：键盘抓取列时使用 columnGrabAnnouncementText。en-US 说出列名和 Position，不再套用卡片的 From / to 句子。
+- **任务板根名称（React / Vue，T12）**：调用方传入的 role 和非空 aria-label 留在根上。空 aria-label 仍回退看板 locale。
+- **流程详情数字标题（React，T13）**：title 为 0 时标题显示 0，不回退 labels.title。空标题仍用默认标题。
+- **图片预览卸载（Vue，T16）**：打开预览后卸载组件会解除 Escape 处理。再按 Escape，不再关闭这次已卸载的预览。
+- **拖拽示例标签（Demo，T18）**：use-drag/01 两端的 Tag 不再传 color。Tag 只使用现有 props。
+- **富文本插入文案（Core / React / Vue，T24）**：bind 打开时，插入表格和图片的按钮使用 locale。zh-CN 显示「表格」「图片」，不再显示 table 和 image。
+
 - **右键子菜单焦点（Vue，T03）**：ArrowRight、Enter 和 Space 等浮层定位完成后再把焦点送进第一个子项。从已获焦的「分享到」按 ArrowRight，子菜单可见，焦点进入「邮件」。
 - **下拉 schema 子菜单（Vue，T04）**：递归子菜单触发器是 menuitem。ArrowRight 展开子菜单；外层 portal 为 false 时，子菜单留在菜单内。
 - **无限滚动禁用重试（React / Vue，T09）**：错误态的 Retry 在 disabled 时不再请求。disabled 为 true 时点击不调用 onLoadMore，改回 false 后再点才请求一次。
