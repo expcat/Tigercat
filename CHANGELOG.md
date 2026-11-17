@@ -4,6 +4,10 @@
 
 ## v3.0.1（未发布）
 
+- **Affix 与 RTL 证据（审查文档，E03、E05）**：IAB unavailable 后，按授权使用 Playwright 1.61.1 内置 headless Chromium 149。Affix 16 格 / 64 张 Demo 图和 8 组 / 24 张回归图通过，覆盖尺寸同步与重绑通知；Card 8 格、Carousel 16 格 RTL 共 64 图通过，Carousel 的 rAF 位移为正 X。仅 Affix 主矩阵重计，全局视觉 / 键盘 blocked 为 2756 / 2816；证据任务剩 6 条。
+- **hover 与读屏缺口（审查文档，E06）**：12 组入口的双端、桌面 / 窄屏、亮 / 暗共 96 格补齐 248 图；17 个唯一 P1 ID 的 34 条双端 AX / 键盘场景及 4 次复核保留 91 图。无可调用的 VoiceOver / NVDA，AX 与 live DOM 不作为实际朗读；Text04 原生 title 气泡像素和系统剪贴板 payload、Card 外网图源 E04 仍缺证。临时壳的背景、错误浮层与滚动未稳定等无效尝试均保留披露。
+- **键盘复验重开（审查文档，C029-F02、C029-F03、X01-F015）**：React SplitButton 首次 ArrowDown 后焦点留在 trigger，进入菜单后 Tab 返回前锚点；Vue TimePicker 已聚焦选项的 Enter / Space 不写入草稿。沿用原编号登记 3 条 P1，未改组件、Demo 或测试；Vue SplitButton 稳定后的首次进入与 Tab 后继通过。
+
 - **证据链接整理（审查文档，E07）**：Upload / ConfigProvider 报告的 29 / 38 条证据链接逐条通过。Upload 未落盘的 verification.json 与收尾 429、ConfigProvider 找不到原件的旧 Vue 桌面截图均如实披露；旧截图缺失环节无法确认，保留历史统计与现存文字记录。
 - **发现索引补齐（审查文档，E08）**：FINDINGS 主表覆盖全部 564 个唯一编号，564 个主报告锚点逐条通过；C093 DropdownItem 主责数按 INVENTORY 与 FILE-COVERAGE 改为 0，保留原表误记 2 的说明。
 - **组级关联回填（审查文档，E10）**：九组 README 按已完成共性根因与原跨组件清单回填 93 条关联，873 条目录相对链接通过。组级验收由 pending 改为 needs-evidence，真实浏览器与读屏缺口保留；证据任务从 11 条减至 8 条。
