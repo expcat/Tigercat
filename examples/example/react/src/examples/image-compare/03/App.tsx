@@ -1,9 +1,7 @@
 import { useState } from 'react'
 import { ImageCompare } from '@expcat/tigercat-react/ImageCompare'
 import { Text } from '@expcat/tigercat-react/Text'
-
-const before = 'https://picsum.photos/seed/tiger-compare-slot-before/800/500'
-const after = 'https://picsum.photos/seed/tiger-compare-slot-after/800/500'
+import { demoImageBefore as before, demoImageAfter as after } from '@demo-shared/demo-images'
 
 export default function App() {
   const [position, setPosition] = useState(60)

@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { Card } from '@expcat/tigercat-vue/Card'
 import { Button } from '@expcat/tigercat-vue/Button'
-
-const cover = 'https://picsum.photos/seed/tiger-card/480/192'
+import { demoImageAfter as cover } from '@demo-shared/demo-images'
 </script>
 
 <template>

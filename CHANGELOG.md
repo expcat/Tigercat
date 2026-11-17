@@ -4,6 +4,9 @@
 
 ## v3.0.1（未发布）
 
+- **Anchor 视觉与键盘证据（审查文档，E02、C083）**：IAB unavailable 后使用 Playwright 1.61.1 内置 headless Chromium 149，加载当前生产构建。24 格均有原始视口截图和原生 Shift+Tab、Tab、Enter、End、Home 记录；活动链接与滚动同步，焦点可离开。真实 RTL、读屏、hydration 与 E2E 仍未测。
+- **离线示例图片（Example，E04、T02）**：Card 03/04、AspectRatio 01/03、ImageCompare 01–05 改用共享的仓库内 SVG。阻断外部 HTTP(S) 时，Card 16 格、AspectRatio 16 格和 ImageCompare 40 格的图片均为 complete，原始尺寸 800×500，渲染宽高大于 0。Card 与 AspectRatio 的对应视觉格改为 pass；ImageCompare 的历史 finding 保留。
+
 - **SplitButton 首次键盘进入（React，C029-F02）**：Dropdown 保留 ArrowDown / ArrowUp 的首项 / 末项请求，等浮层定位完成并提交到 outlet 后再送焦点；跳过禁用项。双端普通页与同源 iframe portal 的首次进入、2 秒稳定焦点通过无头 Chromium 复验。
 - **SplitButton Tab 后继（React，C029-F03）**：共享锚定浮层适配层在定位完成后绑定 Tab 监听，覆盖 ConfigProvider outlet 延迟挂载；菜单 Tab 关闭后到 trigger 后的 After，继续 Tab / Shift+Tab 顺序正确，双端及同源 iframe portal 复验通过。
 - **TimePicker 桌面键盘选择（Vue，X01-F015）**：为桌面选项补齐 Enter / Space 绑定，沿用现有草稿选择与禁用检查。双端已聚焦 10 时选项可写入草稿，确定后提交 10:00；禁用项不选中。定向组件测试与无头 Chromium 复验通过。

@@ -4,16 +4,17 @@
 
 审查的总状态是 needs-evidence。3364 个视口格（841 个 Demo × 桌面 / 窄屏 × 亮 / 暗）里，大部分没有浏览器证据。很多条目的依据只有源码和 happy-dom。这一篇排的是补证据的活，不改组件代码。
 
-| 状态    | 视觉 | 键盘 |
-| ------- | ---: | ---: |
-| pass    |  386 |  364 |
-| finding |  174 |  136 |
-| fail    |   12 |   24 |
-| partial |   12 |    0 |
-| blocked | 2756 | 2816 |
-| pending |   24 |   24 |
+| 状态           | 视觉 | 键盘 |
+| -------------- | ---: | ---: |
+| pass           |  622 |  580 |
+| finding        |  174 |  144 |
+| fail           |   19 |   24 |
+| partial        |    5 |    0 |
+| blocked        | 2544 | 2592 |
+| not-applicable |    0 |   24 |
+| pending        |    0 |    0 |
 
-数字来自 `project/final-acceptance.md`。W10-G2 只将 Affix 16 格视觉 / 键盘从 blocked 改为 pass，其余主矩阵沿用历史；队列里 35 项 complete、159 项 needs-evidence。
+2026-11-17 W10-G3 按 841 个主责 Demo 的当前主矩阵重新归一，覆盖 3364/3364 格，pending 为 0。旧表的视觉 / 键盘 pass 386 / 364、blocked 2756 / 2816、pending 各 24，来自未识别 Anchor 的 `visualStatus` / `keyboardStatus`，并把这 24 格默认成 pending；该次也未把 SplitButton 的 `demo_source` 归一进主责格。旧数字保留在 `evidence/FINAL/visual-3364-pre-w10-g3.json`。本轮只新增 Anchor 24 格视觉 / 键盘 pass，以及 Card 16 格、AspectRatio 16 格视觉 pass；ImageCompare 40 格的历史状态不改。其余差异是重聚合，不是本轮新采集。队列现为 36 项 complete、158 项 needs-evidence。
 
 ## 目标
 
@@ -33,14 +34,10 @@
 
 | 编号 | 波次 | 条目                                                                                                                                              | 验收                                                                                                                 |
 | ---- | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| E01  | W10  | 重跑 blocked 格：视觉 2756、键盘 2816。按当前可用的真实浏览器逐组件补                                                                             | 每个组件的 `matrix.csv` 里没有 blocked；补到的格要么 pass，要么关联到已有或新立的编号                                |
-| E02  | W10  | 清掉 24 格 pending（视觉、键盘各 24）                                                                                                             | `final-acceptance.md` 的 pending 行为 0                                                                              |
-| E04  | W10  | picsum.photos 被区域封锁：Card 03/04 封面 16 格 blocked（iframe 内 `naturalWidth=0`），AspectRatio 01/03、ImageCompare 的 Demo 也用这个图源       | 这些 Demo 在连不上外网图源时仍能出图，16 格有封面维度的结论                                                          |
+| E01  | W10  | 重跑 blocked 格：视觉 2544、键盘 2592。按当前可用的真实浏览器逐组件补                                                                             | 每个组件的 `matrix.csv` 里没有 blocked；补到的格要么 pass，要么关联到已有或新立的编号                                |
 | E06  | W10  | hover 96 格与 P1 的 17 个唯一 ID / 双端 34 条 AX、键盘及 live DOM 已补；真实 VoiceOver / NVDA 会话不可用                                          | 每个标了读屏未测的 P1 有实际 AT 输出；Text04 原生 title 气泡与系统剪贴板 payload 的缺口如实保留，AX / DOM 不代替朗读 |
 | E09  | W10  | 只有源码或 happy-dom 证据的条目在真实浏览器复验。form、navigation、feedback、data、charts、advanced、composite 七组和 layout 的大部分属于这种情况 | 每条在开工时附一次浏览器复现；复现不了的在这里登记原因，再决定撤回还是改判                                           |
 | E11  | W10  | 复核下面的未立项观察                                                                                                                              | 每条要么编号后登记到 02–12 对应的表，要么写明不立项的理由                                                            |
-
-E04 的出图方式（换本地图源还是别的办法）开工时定，改 Demo 属于 [12](12-tooling-docs.md) 的范围。
 
 ## 各组件证据现状
 
@@ -49,6 +46,8 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 2026-11-17。W10-G2：IAB unavailable，按授权改用 Playwright 1.61.1 内置 headless Chromium 149.0.7827.55。E03 的 Affix 16 格 / 64 图与 8 组回归 / 24 图通过；E05 的 Card 8 格、Carousel 16 格 RTL 共 64 图通过。E06 已补 hover 96 格 / 248 图及 P1 17 个唯一 ID 的双端 34 条 AX / 键盘场景、4 次复核 / 91 图；无真实 AT 输出，E06 保留。有效原图共 491 张，索引、逐 ID 台账及无效采集尝试保存在 `project/w10-g2-evidence.md`、`tools/w10-g2-artifact-verification.json`、`tools/w10-g2-e06-manifest.json`。组件源码、Demo 和测试均未改。
 
 W10-G2 只重计 Affix 主矩阵，其他组件新增定向证据附在历史统计之后。Card 的本地 RTL 封面不关闭 E04；Text04 使用原生 title，未取得 title 气泡像素和系统剪贴板 payload。Vue ContextMenu 自动进入子菜单的观察仍由 E11 复核。
+
+2026-11-17 W10-G3：IAB unavailable，使用 Playwright 1.61.1 内置 headless Chromium 149.0.7827.55，加载当前生产构建 Example。E02 的 Anchor 24 格各有原始视口截图与原生 Shift+Tab / Tab / Enter / End / Home 记录，活动链接和滚动容器同步，未陷焦；Anchor 主矩阵改为视觉 / 键盘 24 pass。E04 在阻断全部外部 HTTP(S) 的条件下验证 Card 16 格、AspectRatio 16 格和 ImageCompare 40 格：实际图片均为仓库内 SVG，complete=true、800×500、渲染宽高大于 0；Card 16 格封面与 AspectRatio 16 格视觉改为 pass，ImageCompare 保留历史 finding。未改组件源码或测试，没有真实 AT 输出。证据目录为 `w10-g3-20261117`，汇总见 `tools/w10-g3-artifact-verification.json`。
 
 2026-11-17 W10-FIX1：React SplitButton 与 Vue TimePicker 的三条重开问题已实现修复；15 个定向 spec、252 项（含 axe）及 types:check 通过。IAB unavailable 后使用 Playwright 1.61.1 内置 headless Chromium 149.0.7827.55，直接加载当前源码 Demo01；双端 SplitButton 普通 outlet / 同源 iframe portal 共 8 条场景、40 图，TimePicker 已聚焦选项的 Enter / Space、禁用项与确定提交共 4 条场景、16 图通过。首键进入、Tab 后继与提交值均保留 2 秒稳定采样。初次采集把自动送焦误作 TimePicker 入口前提，失败尝试保留，最终按登记前提明确聚焦后复验。证据见审查目录的 `project/w10-fix1-evidence.md`；历史主矩阵、实际读屏与 6 条证据任务仍保留。
 
@@ -83,7 +82,7 @@ W10-G2 只重计 Affix 主矩阵，其他组件新增定向证据附在历史统
 | C014 | Gallery        | complete       | C014-S01/V01 已通过本轮复验；历史主责 8 格：视觉 4 pass / 4 finding，键盘 4 pass / 4 finding，0 blocked；120 关联格 pending；历史测试 54 项通过；无 Gallery.spec/E2E；未跑 Gallery SSR；未切语言                                                                                                                           |
 | C015 | Highlight      | needs-evidence | 画面 20 pass / 4 finding；键盘 16 pass / 8 blocked（03 八格 Enter 后到 chrome-error，外站终态未验证）；52 测试通过；6 Demo SSR 完成；未跑 E2E                                                                                                                                                                              |
 | C016 | Image          | complete       | 历史主矩阵：主责 48 格：视觉 36 pass / 12 finding，键盘 28 pass / 20 finding，无 blocked；80 关联格 pending；193 测试通过；未跑 E2E、hydration；悬停、故障注入、切语言未测。W10-G2：Image03 双端 8 格已补真实 hover 与载图尺寸；当前 Demo 是显式预览入口。                                                                 |
-| C017 | ImageCompare   | complete       | C017-F02/F03/V01/V02 已通过本轮复验；历史 40 格：视觉 24 pass / 16 finding / 0 blocked；键盘 32 pass / 8 finding / 0 blocked；历史测试 67 项通过；F01 未浏览器复现；未跑 SSR、E2E、触控、真实读屏                                                                                                                          |
+| C017 | ImageCompare   | complete       | C017-F02/F03/V01/V02 已通过本轮复验；历史 40 格：视觉 24 pass / 16 finding / 0 blocked；键盘 32 pass / 8 finding / 0 blocked。W10-G3：40 格离线出图通过，历史状态不重判；F01 未浏览器复现，未跑 SSR、E2E、触控、真实读屏。                                                                                                 |
 | C018 | ImageCropper   | complete       | 32 格：视觉 24 pass / 8 finding，键盘 8 pass / 24 finding，0 blocked；181 项测试通过；F01–F04 未浏览器复现；未跑 E2E、SSR/hydration、读屏、导出像素比对                                                                                                                                                                    |
 | C019 | ImageGroup     | complete       | 普通 16 格视觉、键盘各 8 pass / 8 finding；r1 回退 8 格各 4 pass / 4 finding，0 blocked；37 项测试通过；未跑 E2E、SSR；组级固定索引未浏览器验证                                                                                                                                                                            |
 | C020 | ImagePreview   | complete       | 主责 24 格：视觉、键盘各 8 pass / 12 finding / 4 blocked；关联 48 格键盘 24 finding / 24 pending；156 项测试通过；无 E2E；Demo03 第二图与下载后路径缺证据                                                                                                                                                                  |
@@ -104,8 +103,8 @@ W10-G2 只重计 Affix 主矩阵，其他组件新增定向证据附在历史统
 
 | 任务 | 组件         | 队列           | 现状                                                                                                                                                                                                                                                                                                                                                                                                     |
 | ---- | ------------ | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| C033 | AspectRatio  | complete       | C033-F01/F02 已修复；47 项 spec（含 axe）通过，IAB 不可用待视觉复验。既有视觉 8 pass / 16 图片 blocked（picsum 封锁）、键盘 24/24 pass；hydration、E2E、读屏未测                                                                                                                                                                                                                                         |
-| C034 | Card         | complete       | 历史主矩阵：F01/F02/F03/F05/F06 已修复；F07 Enter/Space 发 click/MouseEvent，happy-dom 先红后绿；Card/Core 65 项（axe）、类型通过。旧 51 spec/SSR、文档/MCP 通过；IAB 空（Mac 锁定）。旧视觉16 pass/16封面blocked、键盘16组pass；hover/href Enter/RTL/读屏/hydration/E2E 未测。W10-G2：RTL 8 格 / 16 图、hover 8 格 / 16 图通过；RTL 本地封面不关闭 E04，真实读屏仍缺。                                  |
+| C033 | AspectRatio  | complete       | C033-F01/F02 已修复；47 项 spec（含 axe）通过。W10-G3：01/03 的 16 格离线图片视觉改为 pass，02 的 8 格和键盘 24 格沿用历史；hydration、E2E、读屏未测。                                                                                                                                                                                                                                                   |
+| C034 | Card         | complete       | F01/F02/F03/F05/F06 已修复；F07 Enter/Space 发 click/MouseEvent，happy-dom 先红后绿；Card/Core 65 项（axe）、类型通过。W10-G3：03/04 的 16 格封面视觉改为 pass，01/02 与键盘沿用历史；W10-G2 的 RTL / hover 证据保留。真实读屏、hydration、E2E 未测。                                                                                                                                                    |
 | C035 | Carousel     | complete       | 历史主矩阵：F01/F02/F03 已修复；45 spec（axe）、types:check 通过；happy-dom 验证受控释放与 slot 更新。IAB 不可用待复验；旧视觉 16/16、键盘 8/8 组 pass；RTL/hover/读屏/hydration/E2E 未测。W10-G2：RTL 16 格 / 48 图、hover 8 格 / 24 图通过；方向来自 rAF 正 X 位移与 Core oracle，真实读屏仍缺。                                                                                                       |
 | C036 | Col          | needs-evidence | F01 已修复；35 spec（双端 SSR）、types:check 通过；IAB 不可用，改用变量/CSS 断言。视觉/键盘 0/24 blocked（owner C046）；断点、offset/RTL/flex 几何及 hydration/E2E/读屏未测                                                                                                                                                                                                                              |
 | C037 | Container    | needs-evidence | 视觉 0/8 blocked、真实外壳键盘 0/8 blocked、截图 0（8 格 owner 均为 C042 Layout）；未跑 hydration、浏览器 E2E、读屏；Terra 运行时模型未独立核验                                                                                                                                                                                                                                                          |
@@ -166,7 +165,7 @@ W10-G2 只重计 Affix 主矩阵，其他组件新增定向证据附在历史统
 | 任务 | 组件                  | 队列           | 现状                                                                                                                                                                                                                                                                                                         |
 | ---- | --------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | C082 | Affix                 | complete       | W10-G2：16 格视觉 / 键盘均 pass，64 张 Demo 图与逐键记录；另 8 组 / 24 图覆盖固定尺寸 200×40→300×80 和重绑通知 [true,false]。E03 已闭环；读屏、hydration 未补。                                                                                                                                              |
-| C083 | Anchor                | needs-evidence | 视觉 24 格、键盘 24 格均 blocked，截图 0；定向 Vitest 102 passed、W9 E13 1 passed；源码 SSR 探针成功，未验 hydration；未跑 E2E、build；真实 RTL、读屏未测                                                                                                                                                    |
+| C083 | Anchor                | complete       | W10-G3：视觉 / 键盘 24/24 pass，168 张原图；Shift+Tab、Tab、Enter、End、Home 与活动链接、滚动同步，未陷焦。C083-F01/F02 已修复；真实 RTL、读屏、hydration、E2E 未测。                                                                                                                                        |
 | C084 | AnchorLink            | needs-evidence | 视觉/键盘各 24 格 blocked（owner 为 C083），截图 0；F01/F02 已修复，Anchor/Breadcrumb/Core 定向 166 passed、类型通过；E2E、build、hydration、读屏待补                                                                                                                                                        |
 | C085 | BackTop               | needs-evidence | F01 已修复：schedule→update→cancel 后 pending=0，Core 先红后绿。本组 314 pass（axe）、类型通过；原视觉/键盘各 16 格 blocked，完整矩阵、读屏与 hydration 待补。                                                                                                                                               |
 | C086 | Breadcrumb            | needs-evidence | 历史主矩阵：视觉 24 格、真实键盘 24 格均 blocked，截图 0；定向 Vitest 75 passed（axe 不覆盖打开的菜单）；SSR 与 happy-dom 探针；未跑 E2E、build、hydration；读屏未测。W10-G2：Demo03 双端折叠项保留 preventDefault，已存 AX / 按键；完整主矩阵与实际读屏仍缺。                                               |
@@ -312,7 +311,7 @@ Codex IAB 不可用，按授权使用 happy-dom / DOM；真实视觉与键盘仍
 | X05   | Example 平台与 SSR   | needs-evidence | 17 个 Demo 68 格视觉与键盘 68/68 blocked，截图 0；example:sources/index check exit 0；7 spec 22 项通过（主责 X06）；example:ssr:check 未跑                                                                                                                                                                                                                            |
 | X06   | 构建、测试与发布配置 | needs-evidence | F04、F05 已修复：CLI dist/index.js 缺失时 pnpm dev:check 报缺产物，还原后通过；publish:check --published 成功返回后不残留 tigercat-publish-check- 目录。无视觉矩阵；E2E 6 spec、benchmark 8 个未跑；release/types/dev check exit 0，14 项分组测试通过；未跑全量 test、a11y、coverage、size、publish:check                                                             |
 | X07   | 项目级文档           | needs-evidence | 无视觉矩阵，未启动 Example，截图 0；32 个 Markdown 相对链接与锚点 0 处失效；未跑 pnpm test、docs:api:check、bench、E2E，未查 npm registry；RC3 档案视觉结论未复核                                                                                                                                                                                                     |
-| FINAL | 全覆盖核对与目录验收 | needs-evidence | 3364 格（841 Demo×4）。视觉 pass 386、finding 174、fail 12、partial 12、blocked 2756、pending 24；键盘 364、136、24、0、2816、24（同序）。仅 Affix 重计；E03 / E05 已闭环，E06 实际读屏仍缺。                                                                                                                                                                         |
+| FINAL | 全覆盖核对与目录验收 | needs-evidence | 3364 格（841 Demo×4）。W10-G3 重聚合后视觉 pass 622、finding 174、fail 19、partial 5、blocked 2544、pending 0；键盘 580、144、24、0、2592、not-applicable 24、pending 0。E02 / E04 已闭环，E06 实际读屏仍缺。                                                                                                                                                         |
 
 ## 未立项观察
 

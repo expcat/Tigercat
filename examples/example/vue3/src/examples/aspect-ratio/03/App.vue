@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { AspectRatio } from '@expcat/tigercat-vue/AspectRatio'
+import { demoImageAfter as cover } from '@demo-shared/demo-images'
 
 const ratio = ref('16/9')
 const options = ['16/9', '4/3', '1/1'] as const
-const cover = 'https://picsum.photos/seed/tiger-overlay/640/360'
 </script>
 
 <template>

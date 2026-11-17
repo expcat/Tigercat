@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { AspectRatio } from '@expcat/tigercat-react/AspectRatio'
+import { demoImageAfter as cover } from '@demo-shared/demo-images'
 
 const options = ['16/9', '4/3', '1/1'] as const
-const cover = 'https://picsum.photos/seed/tiger-overlay/640/360'
 
 export default function App() {
   const [ratio, setRatio] = useState<string>('16/9')

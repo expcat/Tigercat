@@ -1,7 +1,6 @@
 import { Card } from '@expcat/tigercat-react/Card'
 import { Button } from '@expcat/tigercat-react/Button'
-
-const cover = 'https://picsum.photos/seed/tiger-card/480/192'
+import { demoImageAfter as cover } from '@demo-shared/demo-images'
 
 function Actions() {
   return (

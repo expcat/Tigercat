@@ -2,9 +2,8 @@
 import { ref } from 'vue'
 import { ImageCompare } from '@expcat/tigercat-vue/ImageCompare'
 import { Text } from '@expcat/tigercat-vue/Text'
+import { demoImageBefore as before, demoImageAfter as after } from '@demo-shared/demo-images'
 
-const before = 'https://picsum.photos/seed/tiger-compare-slot-before/800/500'
-const after = 'https://picsum.photos/seed/tiger-compare-slot-after/800/500'
 const position = ref(60)
 const clicked = ref(false)
 </script>

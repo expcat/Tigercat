@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ImageCompare } from '@expcat/tigercat-vue/ImageCompare'
-
-const before = 'https://picsum.photos/seed/tiger-compare-before/800/500'
-const after = 'https://picsum.photos/seed/tiger-compare-after/800/500'
+import { demoImageBefore as before, demoImageAfter as after } from '@demo-shared/demo-images'
 </script>
 
 <template>

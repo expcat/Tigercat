@@ -1,7 +1,7 @@
 import { Card } from '@expcat/tigercat-react/Card'
+import { demoImageAfter as cover } from '@demo-shared/demo-images'
 
 const sizes = ['sm', 'md', 'lg'] as const
-const cover = 'https://picsum.photos/seed/tiger-card-pad/480/192'
 
 export default function App() {
   return (

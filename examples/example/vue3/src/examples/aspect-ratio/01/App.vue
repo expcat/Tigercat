@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { AspectRatio } from '@expcat/tigercat-vue/AspectRatio'
-
-const cover = 'https://picsum.photos/seed/tiger-ratio/640/360'
+import { demoImageAfter as cover } from '@demo-shared/demo-images'
 </script>
 
 <template>

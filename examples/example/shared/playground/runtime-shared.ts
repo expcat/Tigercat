@@ -1,3 +1,4 @@
+export { demoImageBefore, demoImageAfter } from '../demo-images'
 export { countries } from '../constants'
 export { getDemoTigerLocale } from '../tiger-locale'
 export { DEMO_THEME_PRESETS } from '../themes'

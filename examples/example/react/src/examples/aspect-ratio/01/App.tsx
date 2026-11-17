@@ -1,6 +1,5 @@
 import { AspectRatio } from '@expcat/tigercat-react/AspectRatio'
-
-const cover = 'https://picsum.photos/seed/tiger-ratio/640/360'
+import { demoImageAfter as cover } from '@demo-shared/demo-images'
 
 export default function App() {
   return (
