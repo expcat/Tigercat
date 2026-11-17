@@ -104,6 +104,7 @@ export const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(function T
 
   const containerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement | null>(null)
+  const draggingRef = useRef(false)
   const mountedRef = useRef(false)
   const setInputRefs = (node: HTMLInputElement | null) => {
     inputRef.current = node
@@ -305,12 +306,21 @@ export const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(function T
             role="listitem"
             draggable={isInteractive}
             onDragStart={(event) => {
+              if (!isInteractive) return
+              draggingRef.current = true
               event.dataTransfer?.setData('text/plain', String(index))
+            }}
+            onDragEnd={() => {
+              draggingRef.current = false
             }}
             onDragOver={(event) => event.preventDefault()}
             onDrop={(event) => {
               event.preventDefault()
-              const from = Number(event.dataTransfer?.getData('text/plain'))
+              if (!draggingRef.current || !isInteractive) return
+              draggingRef.current = false
+              const fromText = event.dataTransfer?.getData('text/plain') ?? ''
+              if (!/^\d+$/.test(fromText)) return
+              const from = Number(fromText)
               if (!Number.isInteger(from)) return
               setTags(moveTag(tags, from, index))
             }}>

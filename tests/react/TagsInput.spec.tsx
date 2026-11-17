@@ -170,6 +170,33 @@ describe('TagsInput', () => {
       expect(onChange).toHaveBeenCalledExactlyOnceWith(['b', 'c', 'a'])
       expect(getAllByRole('listitem').map((item) => item.textContent)).toEqual(['b', 'c', 'a'])
     })
+
+    it('ignores external text drops, including empty and numeric text', () => {
+      const onChange = vi.fn()
+      const { getAllByRole } = render(
+        <TagsInput defaultValue={['a', 'b', 'c']} onChange={onChange} />
+      )
+      for (const text of ['', '0']) {
+        const dataTransfer = new DataTransfer()
+        dataTransfer.setData('text/plain', text)
+        fireEvent.drop(getAllByRole('listitem')[2], { dataTransfer })
+        expect(onChange).not.toHaveBeenCalled()
+        expect(getAllByRole('listitem').map((item) => item.textContent)).toEqual(['a', 'b', 'c'])
+      }
+    })
+
+    it('ignores drops when the instance becomes read-only during a drag', () => {
+      const onChange = vi.fn()
+      const { getAllByRole, rerender } = render(
+        <TagsInput defaultValue={['a', 'b', 'c']} onChange={onChange} />
+      )
+      const dataTransfer = new DataTransfer()
+      fireEvent.dragStart(getAllByRole('listitem')[0], { dataTransfer })
+      rerender(<TagsInput defaultValue={['a', 'b', 'c']} readOnly onChange={onChange} />)
+      fireEvent.drop(getAllByRole('listitem')[2], { dataTransfer })
+      expect(onChange).not.toHaveBeenCalled()
+      expect(getAllByRole('listitem').map((item) => item.textContent)).toEqual(['a', 'b', 'c'])
+    })
   })
 
   describe('Accessibility', () => {
