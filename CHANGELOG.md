@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **basic 与 layout 证据（审查文档，W10-G5）**：IAB unavailable 后使用 Playwright 1.61.1 内置 headless Chromium 149，补采 22 个组件、430 个原先 blocked 格。组件矩阵改为视觉 364 pass，键盘 416 pass、12 partial。主矩阵按 owner 最后一行重计，规范计数少掉视觉 252、键盘 300，剩余 blocked 为视觉 / 键盘各 2292。没有新缺陷。Text 04 的 title 气泡和剪贴板仍归 E06；Space 的 split 没有示例入口，E09 保留。证据任务剩 E01、E06、E09。
+
 - **表单项空子节点（React，T10）**：未知 schema type 返回 null 时，FormItem 不再把它算成多个控件。不出现 FormItem supports a single field control，也不渲染控件。
 - **任务板抓列播报（Core / React / Vue，T11）**：键盘抓取列时使用 columnGrabAnnouncementText。en-US 说出列名和 Position，不再套用卡片的 From / to 句子。
 - **任务板根名称（React / Vue，T12）**：调用方传入的 role 和非空 aria-label 留在根上。空 aria-label 仍回退看板 locale。
