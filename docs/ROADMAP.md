@@ -4,7 +4,7 @@
 type: active-roadmap
 scope: 3.0.0 之后的修复阶段；本文件是入口，任务表在 docs/plan/
 input: .local/review/2026-11-05（全项目 Review，不进 git）
-tasks: 3 条 Review 发现 + 6 条证据任务
+tasks: 0 条 Review 发现 + 6 条证据任务
 verified-date: 2026-11-17
 -->
 
@@ -14,7 +14,7 @@ verified-date: 2026-11-17
 
 ## 现状
 
-- Review 覆盖 185 个公开组件、841 个 Demo 和 7 份项目专题，共 564 条发现。已完成条目移入 [CHANGELOG.md](../CHANGELOG.md)，剩 3 条：P1 3、P2 0、P3 0。W10-G2 复验重开 React SplitButton 两条与 Vue TimePicker 一条，沿用原编号。
+- Review 覆盖 185 个公开组件、841 个 Demo 和 7 份项目专题，共 564 条发现。已完成条目移入 [CHANGELOG.md](../CHANGELOG.md)，剩 0 条：P1 0、P2 0、P3 0。W10-FIX1 已补齐 React SplitButton 与 Vue TimePicker 的键盘修复，定向自动门禁与双端无头 Chromium 复验通过。
 - 审查的总状态是 needs-evidence。3364 个视口格里，视觉 2756 格、键盘 2816 格没有浏览器证据。很多条目的依据只有源码和 happy-dom，动手前要先复现。
 
 ## 计划
@@ -24,8 +24,8 @@ verified-date: 2026-11-17
 | 文档                                                    | 内容                                                          | 条数 |
 | ------------------------------------------------------- | ------------------------------------------------------------- | ---: |
 | [00 范围与口径](plan/00-scope.md)                       | 输入、目标与非目标、编号、验收总则、证据口径                  |    — |
-| [02 共享 Core、主题与 i18n](plan/02-core-theme-i18n.md) | X01、X02：表单引擎、浮层触发器、工作流权限、菜单 schema、文案 |    1 |
-| [03 基础组件](plan/03-basic.md)                         | C001–C032                                                     |    2 |
+| [02 共享 Core、主题与 i18n](plan/02-core-theme-i18n.md) | X01、X02：表单引擎、浮层触发器、工作流权限、菜单 schema、文案 |    0 |
+| [03 基础组件](plan/03-basic.md)                         | C001–C032                                                     |    0 |
 | [04 布局组件](plan/04-layout.md)                        | C033–C051                                                     |    0 |
 | [05 表单组件](plan/05-form.md)                          | C052–C081                                                     |    0 |
 | [06 导航组件](plan/06-navigation.md)                    | C082–C116                                                     |    0 |
@@ -44,7 +44,7 @@ verified-date: 2026-11-17
 
 | 波次 | 内容                             | 条数 | 文档       |
 | ---- | -------------------------------- | ---: | ---------- |
-| W1   | P1 键盘修复                      |    3 | 02、03     |
+| W1   | P1 键盘修复                      |    0 | 02、03     |
 | W2   | 共享 Core、主题与 i18n 的 P2     |    0 | 02         |
 | W3   | 表单的 P2                        |    0 | 05         |
 | W4   | 导航与反馈的 P2                  |    0 | 06、07     |

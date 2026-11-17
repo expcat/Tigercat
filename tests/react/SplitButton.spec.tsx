@@ -10,6 +10,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { SplitButton } from '@expcat/tigercat-react/SplitButton'
 import { DropdownItem } from '@expcat/tigercat-react/DropdownItem'
 import { DropdownMenu } from '@expcat/tigercat-react/DropdownMenu'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 function getRoot(container: HTMLElement): HTMLElement {
@@ -176,6 +177,43 @@ describe('SplitButton', () => {
   })
 
   describe('keyboard focus', () => {
+    it.each([
+      ['ArrowDown', 'Save as draft'],
+      ['ArrowUp', 'Save and publish']
+    ])('focuses the menu edge after %s opens and positions the outlet menu', async (key, label) => {
+      // happy-dom does not reject focus on CSS-invisible, unpositioned overlays.
+      const nativeFocus = HTMLElement.prototype.focus
+      const focus = vi.spyOn(HTMLElement.prototype, 'focus').mockImplementation(function (
+        this: HTMLElement,
+        options?: FocusOptions
+      ) {
+        if (this.closest('[data-positioned="false"]')) return
+        nativeFocus.call(this, options)
+      })
+      try {
+        const { container } = render(
+          <ConfigProvider>
+            <SplitButton>
+              Save
+              <DropdownMenu>
+                <DropdownItem disabled>Unavailable</DropdownItem>
+                <DropdownItem>Save as draft</DropdownItem>
+                <DropdownItem>Save and publish</DropdownItem>
+                <DropdownItem disabled>Unavailable too</DropdownItem>
+              </DropdownMenu>
+            </SplitButton>
+          </ConfigProvider>
+        )
+        const trigger = getTrigger(container)
+        vi.spyOn(trigger, 'getBoundingClientRect').mockReturnValue(new DOMRect(20, 20, 32, 32))
+        trigger.focus()
+        fireEvent.keyDown(trigger, { key })
+        await waitFor(() => expect(screen.getByRole('menuitem', { name: label })).toHaveFocus())
+      } finally {
+        focus.mockRestore()
+      }
+    })
+
     it('shows the first keyboard focus ring until pointer interaction', async () => {
       const { container } = renderSplitButton()
       const trigger = getTrigger(container)
@@ -204,22 +242,47 @@ describe('SplitButton', () => {
       )
     })
 
-    it('closes the menu on Tab and focuses the successor after the trigger', async () => {
-      const { container } = renderSplitButton()
-      const next = document.createElement('button')
-      next.textContent = 'Next action'
-      container.appendChild(next)
+    it('closes the outlet menu on Tab and preserves forward and backward focus order', async () => {
+      const { container } = render(
+        <ConfigProvider>
+          <button>Before</button>
+          <SplitButton>
+            Save
+            <DropdownMenu>
+              <DropdownItem>Save as draft</DropdownItem>
+              <DropdownItem>Save and publish</DropdownItem>
+            </DropdownMenu>
+          </SplitButton>
+          <button>After</button>
+          <button>Next action</button>
+        </ConfigProvider>
+      )
+      const after = screen.getByRole('button', { name: 'After' })
+      const next = screen.getByRole('button', { name: 'Next action' })
       const trigger = getTrigger(container)
       vi.spyOn(trigger, 'getBoundingClientRect').mockReturnValue(new DOMRect(20, 20, 32, 32))
       await userEvent.click(trigger)
       const first = await screen.findByRole('menuitem', { name: 'Save as draft' })
+      await waitFor(() =>
+        expect(first.closest('[data-positioned]')).toHaveAttribute('data-positioned', 'true')
+      )
       first.focus()
       expect(first).toHaveFocus()
 
       await userEvent.tab()
 
       expect(trigger).toHaveAttribute('aria-expanded', 'false')
-      await waitFor(() => expect(next).toHaveFocus())
+      await waitFor(() => expect(after).toHaveFocus())
+      await userEvent.tab()
+      expect(next).toHaveFocus()
+      await userEvent.tab({ shift: true })
+      expect(after).toHaveFocus()
+      await userEvent.tab({ shift: true })
+      expect(trigger).toHaveFocus()
+      await userEvent.tab({ shift: true })
+      expect(getPrimary(container)).toHaveFocus()
+      await userEvent.tab({ shift: true })
+      expect(screen.getByRole('button', { name: 'Before' })).toHaveFocus()
     })
   })
 

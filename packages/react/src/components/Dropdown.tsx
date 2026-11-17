@@ -237,17 +237,6 @@ export const Dropdown = forwardRef<HTMLElement, DropdownProps>(function Dropdown
   )
   setVisibleRef.current = setVisible
 
-  useEffect(() => {
-    if (!visible) return
-    const edge = focusEdgeRef.current
-    if (!edge) return
-    focusEdgeRef.current = null
-    const frame = requestAnimationFrame(() => {
-      if (floatingRef.current) focusMenuItem(floatingRef.current, edge, true)
-    })
-    return () => cancelAnimationFrame(frame)
-  }, [visible])
-
   const handleItemClick = useCallback(() => {
     skipRestoreRef.current = false
     setVisible(false)
@@ -340,6 +329,20 @@ export const Dropdown = forwardRef<HTMLElement, DropdownProps>(function Dropdown
       setVisible(false)
     }
   })
+
+  useEffect(() => {
+    if (!visible) {
+      focusEdgeRef.current = null
+      return
+    }
+    const edge = focusEdgeRef.current
+    if (!overlay.positioned || !edge || !floatingRef.current) return
+    focusEdgeRef.current = null
+    const frame = requestAnimationFrame(() => {
+      if (floatingRef.current) focusMenuItem(floatingRef.current, edge, true)
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [visible, overlay.positioned])
 
   useEffect(() => () => hoverController.dispose(), [hoverController])
 

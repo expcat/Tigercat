@@ -4,6 +4,10 @@
 
 ## v3.0.1（未发布）
 
+- **SplitButton 首次键盘进入（React，C029-F02）**：Dropdown 保留 ArrowDown / ArrowUp 的首项 / 末项请求，等浮层定位完成并提交到 outlet 后再送焦点；跳过禁用项。双端普通页与同源 iframe portal 的首次进入、2 秒稳定焦点通过无头 Chromium 复验。
+- **SplitButton Tab 后继（React，C029-F03）**：共享锚定浮层适配层在定位完成后绑定 Tab 监听，覆盖 ConfigProvider outlet 延迟挂载；菜单 Tab 关闭后到 trigger 后的 After，继续 Tab / Shift+Tab 顺序正确，双端及同源 iframe portal 复验通过。
+- **TimePicker 桌面键盘选择（Vue，X01-F015）**：为桌面选项补齐 Enter / Space 绑定，沿用现有草稿选择与禁用检查。双端已聚焦 10 时选项可写入草稿，确定后提交 10:00；禁用项不选中。定向组件测试与无头 Chromium 复验通过。
+
 - **Affix 与 RTL 证据（审查文档，E03、E05）**：IAB unavailable 后，按授权使用 Playwright 1.61.1 内置 headless Chromium 149。Affix 16 格 / 64 张 Demo 图和 8 组 / 24 张回归图通过，覆盖尺寸同步与重绑通知；Card 8 格、Carousel 16 格 RTL 共 64 图通过，Carousel 的 rAF 位移为正 X。仅 Affix 主矩阵重计，全局视觉 / 键盘 blocked 为 2756 / 2816；证据任务剩 6 条。
 - **hover 与读屏缺口（审查文档，E06）**：12 组入口的双端、桌面 / 窄屏、亮 / 暗共 96 格补齐 248 图；17 个唯一 P1 ID 的 34 条双端 AX / 键盘场景及 4 次复核保留 91 图。无可调用的 VoiceOver / NVDA，AX 与 live DOM 不作为实际朗读；Text04 原生 title 气泡像素和系统剪贴板 payload、Card 外网图源 E04 仍缺证。临时壳的背景、错误浮层与滚动未稳定等无效尝试均保留披露。
 - **键盘复验重开（审查文档，C029-F02、C029-F03、X01-F015）**：React SplitButton 首次 ArrowDown 后焦点留在 trigger，进入菜单后 Tab 返回前锚点；Vue TimePicker 已聚焦选项的 Enter / Space 不写入草稿。沿用原编号登记 3 条 P1，未改组件、Demo 或测试；Vue SplitButton 稳定后的首次进入与 Tab 后继通过。

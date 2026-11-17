@@ -707,6 +707,11 @@ export const TimePicker = defineComponent({
                     class: getTimePickerItemClasses(selected, option.disabled),
                     onClick: () => {
                       if (!option.disabled) selectColumn(column.unit, option.value)
+                    },
+                    onKeydown: (event: KeyboardEvent) => {
+                      if (event.key !== 'Enter' && event.key !== ' ') return
+                      event.preventDefault()
+                      if (!option.disabled) selectColumn(column.unit, option.value)
                     }
                   },
                   option.label

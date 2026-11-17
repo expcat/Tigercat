@@ -124,6 +124,32 @@ describe('TimePicker', () => {
     expect(emitted()['update:modelValue']?.at(-1)?.[0]).toBe('09:00')
   })
 
+  it.each(['{Enter}', ' '])(
+    'selects a focused enabled desktop option with %s before OK',
+    async (key) => {
+      const { emitted } = render(TimePicker, { props: { defaultOpen: true, minTime: '09:00' } })
+      const first = screen.getByRole('option', { name: '09 Hour' })
+      await waitFor(() => expect(first).toHaveFocus())
+      const disabled = screen.getByRole('option', { name: '08 Hour' })
+      await fireEvent.keyDown(disabled, { key: key === '{Enter}' ? 'Enter' : ' ' })
+      expect(disabled).toHaveAttribute('aria-selected', 'false')
+      expect(screen.getByRole('textbox')).toHaveValue('')
+
+      first.focus()
+      await userEvent.keyboard('{ArrowDown}')
+      const hour = screen.getByRole('option', { name: '10 Hour' })
+      expect(hour).toHaveFocus()
+      expect(hour).toHaveAttribute('aria-selected', 'false')
+      await userEvent.keyboard(key)
+      expect(hour).toHaveAttribute('aria-selected', 'true')
+      expect(screen.getByRole('textbox')).toHaveValue('10:00')
+      expect(emitted()['update:modelValue']).toBeUndefined()
+      await userEvent.click(screen.getByRole('button', { name: 'OK' }))
+      expect(emitted()['update:modelValue']).toEqual([['10:00']])
+      expect(screen.getByRole('textbox')).toHaveValue('10:00')
+    }
+  )
+
   it('supports v-model:open', async () => {
     const onOpen = vi.fn()
     render(TimePicker, {

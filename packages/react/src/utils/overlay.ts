@@ -708,7 +708,7 @@ export function useAnchoredOverlay({
 
   useEffect(() => {
     const floating = floatingRef.current
-    if (!enabled || !floating) return
+    if (!enabled || !isPositioned || !floating) return
 
     const handleTab = (event: KeyboardEvent) => {
       if (event.key !== 'Tab') return
@@ -725,7 +725,7 @@ export function useAnchoredOverlay({
 
     floating.addEventListener('keydown', handleTab, true)
     return () => floating.removeEventListener('keydown', handleTab, true)
-  }, [enabled, floatingRef, referenceRef])
+  }, [enabled, isPositioned, floatingRef, referenceRef])
 
   const floatingStyles = useMemo<React.CSSProperties>(
     () =>
