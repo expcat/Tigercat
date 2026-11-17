@@ -4,6 +4,10 @@
 
 ## v3.0.1（未发布）
 
+- **证据链接整理（审查文档，E07）**：Upload / ConfigProvider 报告的 29 / 38 条证据链接逐条通过。Upload 未落盘的 verification.json 与收尾 429、ConfigProvider 找不到原件的旧 Vue 桌面截图均如实披露；旧截图缺失环节无法确认，保留历史统计与现存文字记录。
+- **发现索引补齐（审查文档，E08）**：FINDINGS 主表覆盖全部 564 个唯一编号，564 个主报告锚点逐条通过；C093 DropdownItem 主责数按 INVENTORY 与 FILE-COVERAGE 改为 0，保留原表误记 2 的说明。
+- **组级关联回填（审查文档，E10）**：九组 README 按已完成共性根因与原跨组件清单回填 93 条关联，873 条目录相对链接通过。组级验收由 pending 改为 needs-evidence，真实浏览器与读屏缺口保留；证据任务从 11 条减至 8 条。
+
 - **流程设计数字 0（React / Vue，C181-F03）**：部门领导 level 和上级链 upTo 从 2 改成 0 后发出 0。空输入仍回落 1。
 - **流程设计审批人 0（Core，C181-F04）**：审批人只有 `{ id: 0 }` 时不再报 empty_approvers。id 为 `"0"` 和带名字的 0 仍通过。
 - **操作条权限（Core，C184-F02）**：permission 数组里的码必须全部等于当前 viewerRole 才可见。`['approver', 'finance']` 对 approver 不可见，单独 `approver` 仍可见。

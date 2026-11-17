@@ -4,7 +4,7 @@
 type: active-roadmap
 scope: 3.0.0 之后的修复阶段；本文件是入口，任务表在 docs/plan/
 input: .local/review/2026-11-05（全项目 Review，不进 git）
-tasks: 0 条 Review 发现 + 11 条证据任务
+tasks: 0 条 Review 发现 + 8 条证据任务
 verified-date: 2026-11-17
 -->
 
@@ -35,7 +35,7 @@ verified-date: 2026-11-17
 | [10 高级组件](plan/10-advanced.md)                      | C159–C169                                                     |    0 |
 | [11 组合组件](plan/11-composite.md)                     | C170–C185                                                     |    0 |
 | [12 工具链、文档与示例平台](plan/12-tooling-docs.md)    | X03–X07：CLI、MCP、生成器、Example、发布配置、项目文档        |    0 |
-| [13 证据补采与复验](plan/13-evidence.md)                | E01–E11：blocked 格重跑、RTL、图源、断链、未立项观察          |   11 |
+| [13 证据补采与复验](plan/13-evidence.md)                | E01–E06、E09、E11：补采、复验、未立项观察                     |    8 |
 | [14 波次与执行顺序](plan/14-waves.md)                   | 各波条数、硬依赖、开工前要先定方向的条目                      |    — |
 
 ## 波次
@@ -53,7 +53,7 @@ verified-date: 2026-11-17
 | W7   | 组合组件的 P2                    |    0 | 11         |
 | W8   | 工具链、文档与示例平台的 P2      |    0 | 12         |
 | W9   | 各篇的 P3                        |    0 | 11、12     |
-| W10  | 证据补采与复验，随浏览器环境并行 |   11 | 13         |
+| W10  | 证据补采与复验，随浏览器环境并行 |    8 | 13         |
 
 ## 边界
 
