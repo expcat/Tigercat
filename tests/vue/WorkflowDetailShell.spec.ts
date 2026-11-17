@@ -31,6 +31,15 @@ describe('WorkflowDetailShell (Vue)', () => {
     )
   })
 
+  it('uses the caller native aria-label as the region name', () => {
+    render(WorkflowDetailShell, {
+      attrs: { 'aria-label': 'Request detail' }
+    })
+
+    expect(screen.getByRole('region', { name: 'Request detail' })).toBeInTheDocument()
+    expect(screen.queryByRole('region', { name: 'Workflow detail' })).not.toBeInTheDocument()
+  })
+
   it('keeps the action footer inside a bounded-height host', () => {
     const { container } = render({
       render: () =>

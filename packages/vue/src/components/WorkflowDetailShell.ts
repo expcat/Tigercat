@@ -159,7 +159,7 @@ export const WorkflowDetailShell = defineComponent({
           class: rootClasses.value,
           style: rootStyle.value,
           role: 'region',
-          'aria-label': props.ariaLabel || labels.value.ariaLabel,
+          'aria-label': props.ariaLabel || attrs['aria-label'] || labels.value.ariaLabel,
           'data-tiger-workflow-detail-shell': ''
         },
         [
