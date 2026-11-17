@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **form、navigation 与 feedback 证据（审查文档，W10-G6）**：IAB unavailable 后使用 Playwright 1.61.1 内置 headless Chromium 149，补采 77 个组件、1936 个原先 blocked 格。组件矩阵 W10-G6 标记为 pass 1730、partial 206、finding 0。主矩阵按 owner 最后一行重计，剩余 blocked 为视觉 / 键盘各 948，位于 data、charts、advanced、composite 与专题 X05。没有新缺陷。Affix 与 Anchor 不重采。读屏仍归 E06。证据任务剩 E01、E06、E09。
+
 - **basic 与 layout 证据（审查文档，W10-G5）**：IAB unavailable 后使用 Playwright 1.61.1 内置 headless Chromium 149，补采 22 个组件、430 个原先 blocked 格。组件矩阵改为视觉 364 pass，键盘 416 pass、12 partial。主矩阵按 owner 最后一行重计，规范计数少掉视觉 252、键盘 300，剩余 blocked 为视觉 / 键盘各 2292。没有新缺陷。Text 04 的 title 气泡和剪贴板仍归 E06；Space 的 split 没有示例入口，E09 保留。证据任务剩 E01、E06、E09。
 
 - **表单项空子节点（React，T10）**：未知 schema type 返回 null 时，FormItem 不再把它算成多个控件。不出现 FormItem supports a single field control，也不渲染控件。
