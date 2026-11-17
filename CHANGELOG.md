@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **未立项观察复核（审查文档，E11）**：78 条观察里，a 2 行已覆盖不立案（C141 随 C141-F04，C181 重复键横幅随 X02-F004），b 57 行不立项，c 19 行登记为 T03–T26 共 24 条，只登记不修。P2 为 T03–T09、T11–T14、T16、T25、T26；P3 为 T10、T15、T17–T24。证据任务剩 E01、E06、E09。
+
 - **Anchor 视觉与键盘证据（审查文档，E02、C083）**：IAB unavailable 后使用 Playwright 1.61.1 内置 headless Chromium 149，加载当前生产构建。24 格均有原始视口截图和原生 Shift+Tab、Tab、Enter、End、Home 记录；活动链接与滚动同步，焦点可离开。真实 RTL、读屏、hydration 与 E2E 仍未测。
 - **离线示例图片（Example，E04、T02）**：Card 03/04、AspectRatio 01/03、ImageCompare 01–05 改用共享的仓库内 SVG。阻断外部 HTTP(S) 时，Card 16 格、AspectRatio 16 格和 ImageCompare 40 格的图片均为 complete，原始尺寸 800×500，渲染宽高大于 0。Card 与 AspectRatio 的对应视觉格改为 pass；ImageCompare 的历史 finding 保留。
 
