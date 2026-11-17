@@ -322,7 +322,15 @@ export const NotificationCenter = defineComponent({
       { immediate: true }
     )
 
-    const hasUnread = computed(() => allManagedItems.value.some((item) => !item.read))
+    const pendingReadItems = computed(() => {
+      const items = groupedMode.value
+        ? (effectiveGroups.value.find(
+            (group, index) => getGroupKey(group, index) === currentGroupKey.value
+          )?.items ?? [])
+        : allManagedItems.value
+      return notificationItemsPendingRead(items)
+    })
+    const hasUnread = computed(() => pendingReadItems.value.length > 0)
 
     const groupTabData = computed(() =>
       resolvedGroups.value.map((group, index) => {
@@ -371,12 +379,8 @@ export const NotificationCenter = defineComponent({
 
     const handleMarkAllRead = () => {
       const grouped = groupedMode.value
-      const items = grouped
-        ? (effectiveGroups.value.find(
-            (group, index) => getGroupKey(group, index) === currentGroupKey.value
-          )?.items ?? [])
-        : allManagedItems.value
-      const pending = notificationItemsPendingRead(items)
+      const pending = pendingReadItems.value
+      if (pending.length === 0) return
       if (props.manageReadState) {
         const next = new Map(readStateOverrides.value)
         pending.forEach((item) => next.set(notificationItemKey(item.id), true))

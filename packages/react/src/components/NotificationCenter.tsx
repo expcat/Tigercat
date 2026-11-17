@@ -226,7 +226,14 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     setPoliteText(labels.newItemText.split('{title}').join(newest.title ?? ''))
   }, [allManagedItems, labels.newItemText])
 
-  const hasUnread = useMemo(() => allManagedItems.some((item) => !item.read), [allManagedItems])
+  const pendingReadItems = useMemo(() => {
+    const items = groupedMode
+      ? (effectiveGroups.find((group, index) => getGroupKey(group, index) === currentGroupKey)
+          ?.items ?? [])
+      : allManagedItems
+    return notificationItemsPendingRead(items)
+  }, [groupedMode, effectiveGroups, currentGroupKey, allManagedItems])
+  const hasUnread = pendingReadItems.length > 0
 
   const totalUnread = useMemo(() => {
     const source = groupedMode ? groupedItems : effectiveItems
@@ -283,11 +290,8 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   }
 
   const handleMarkAllRead = () => {
-    const items = groupedMode
-      ? (effectiveGroups.find((group, index) => getGroupKey(group, index) === currentGroupKey)
-          ?.items ?? [])
-      : allManagedItems
-    const pending = notificationItemsPendingRead(items)
+    const pending = pendingReadItems
+    if (pending.length === 0) return
     if (manageReadState) {
       setReadStateOverrides((prev) => {
         const next = new Map(prev)

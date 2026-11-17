@@ -320,4 +320,24 @@ describe('NotificationCenter (Vue)', () => {
     expect(onMarkAllRead.mock.calls[0]?.[0]).toBe('alpha')
     expect(onMarkAllRead.mock.calls[0]?.[1].map((item) => item.title)).toEqual(['A1'])
   })
+
+  it('disables mark-all when only other groups have unread items', async () => {
+    const onMarkAllRead = vi.fn()
+    const { container } = render(NotificationCenter, {
+      props: {
+        groups: [
+          { key: 'alpha', title: 'Alpha', items: [{ id: 'a1', title: 'A1', read: true }] },
+          { key: 'beta', title: 'Beta', items: [{ id: 'b1', title: 'B1', read: false }] }
+        ]
+      },
+      attrs: { onMarkAllRead }
+    })
+    const button = screen.getByRole('button', { name: 'Mark all as read' })
+    expect(button).toBeDisabled()
+
+    await fireEvent.click(button)
+
+    expect(onMarkAllRead).not.toHaveBeenCalled()
+    expect(container.querySelector('[aria-live="polite"]')?.textContent).toBe('')
+  })
 })
