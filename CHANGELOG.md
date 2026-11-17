@@ -2,7 +2,7 @@
 
 本文档记录 Tigercat UI 组件库的所有版本变更。
 
-## v3.0.1（未发布）
+## v3.0.1（2026-11-17）
 
 - **data、charts、advanced、composite 与 X05 证据（审查文档，W10-G7）**：IAB unavailable 后使用 Playwright 1.61.1 内置 headless Chromium 149，补采 50 个组件矩阵、988 行。主矩阵按 owner 最后一行重计，原先 blocked 的 948 格改为 pass 916、partial 32、finding 0。视觉 blocked 0，键盘 blocked 0。X05 notification 01–04 的 32 格 partial 是 srcdoc 无法解析命令式模块。没有新缺陷。E01 与 E09 闭环。证据任务剩 E06，缺真实 VoiceOver / NVDA 输出。
 

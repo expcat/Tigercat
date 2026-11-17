@@ -8,7 +8,7 @@ tasks: 0 条 Review 发现 + 1 条证据任务
 verified-date: 2026-11-17
 -->
 
-当前正式版本是 `3.0.0`。这一阶段不加新组件，只做两件事：修掉 2026-11-05 全项目 Review 查出的问题，补上当时没采到的浏览器证据。
+当前正式版本是 `3.0.1`。这一阶段不加新组件，只做两件事：修掉 2026-11-05 全项目 Review 查出的问题，补上当时没采到的浏览器证据。
 
 本文件是目录和入口，任务在 [plan/](plan/00-scope.md) 下。完成记录在 [CHANGELOG.md](../CHANGELOG.md)。从 2.x 改到 3.0 的调用点在 [MIGRATION-3.0.md](MIGRATION-3.0.md)，预览版间迁移与历史档案在 [MIGRATION.md](MIGRATION.md)。组件维护规则见 [Tigercat Skill](../skills/tigercat/SKILL.md)。
 
