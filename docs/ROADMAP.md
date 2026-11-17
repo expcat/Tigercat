@@ -4,7 +4,7 @@
 type: active-roadmap
 scope: 3.0.0 之后的修复阶段；本文件是入口，任务表在 docs/plan/
 input: .local/review/2026-11-05（全项目 Review，不进 git）
-tasks: 0 条 Review 发现 + 3 条证据任务
+tasks: 0 条 Review 发现 + 1 条证据任务
 verified-date: 2026-11-17
 -->
 
@@ -15,7 +15,7 @@ verified-date: 2026-11-17
 ## 现状
 
 - Review 覆盖 185 个公开组件、841 个 Demo 和 7 份项目专题，共 564 条发现。已完成条目移入 [CHANGELOG.md](../CHANGELOG.md)，剩 0 条：P1 0、P2 0、P3 0。W10-FIX1 已补齐 React SplitButton 与 Vue TimePicker 的键盘修复，定向自动门禁与双端无头 Chromium 复验通过。W10-FIX2 已关闭 T05、T06、T07、T08、T14、T15、T19、T21、T22、T25。W10-FIX3 已关闭 T03、T04、T09、T17、T20、T23、T26。W10-FIX4 已关闭 T10、T11、T12、T13、T16、T18、T24。
-- 审查的总状态是 needs-evidence。3364 个视口格里，W10-G5 改判 basic 与 layout 的 22 个组件后，视觉 2292 格、键盘 2292 格没有浏览器证据。很多条目的依据只有源码和 happy-dom，动手前要先复现。
+- 审查的总状态是 needs-evidence。3364 个视口格在 W10-G7 后没有 blocked。视觉 pass 3070、finding 174、fail 19、partial 101；键盘 pass 3042、finding 144、fail 24、partial 130、not-applicable 24。剩下的证据任务是 E06，缺真实 VoiceOver / NVDA 输出。
 
 ## 计划
 
@@ -35,7 +35,7 @@ verified-date: 2026-11-17
 | [10 高级组件](plan/10-advanced.md)                      | C159–C169                                                     |    0 |
 | [11 组合组件](plan/11-composite.md)                     | C170–C185                                                     |    0 |
 | [12 工具链、文档与示例平台](plan/12-tooling-docs.md)    | X03–X07：CLI、MCP、生成器、Example、发布配置、项目文档        |    0 |
-| [13 证据补采与复验](plan/13-evidence.md)                | E01、E06、E09：补采与复验                                     |    3 |
+| [13 证据补采与复验](plan/13-evidence.md)                | E06：真实读屏缺口                                             |    1 |
 | [14 波次与执行顺序](plan/14-waves.md)                   | 各波条数、硬依赖、开工前要先定方向的条目                      |    — |
 
 ## 波次
@@ -53,7 +53,7 @@ verified-date: 2026-11-17
 | W7   | 组合组件的 P2                    |    0 | 11                     |
 | W8   | 工具链、文档与示例平台的 P2      |    0 | 12                     |
 | W9   | 各篇的 P3                        |    0 | 03、04、06、09、10、11 |
-| W10  | 证据补采与复验，随浏览器环境并行 |    3 | 13                     |
+| W10  | 证据补采与复验，随浏览器环境并行 |    1 | 13                     |
 
 ## 边界
 
