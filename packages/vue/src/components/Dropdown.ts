@@ -547,9 +547,7 @@ export const Dropdown = defineComponent({
         nodes[highlight.index]?.focus()
         return
       }
-      if (handleMenuNavigation(floatingRef.value, event)) {
-        event.stopPropagation()
-      }
+      handleMenuNavigation(floatingRef.value, event)
     }
 
     const portalEnabled = computed(() => props.portal)

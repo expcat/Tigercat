@@ -511,6 +511,33 @@ describe('Dropdown', () => {
       expect(wrapper).toBeInTheDocument()
       expect(wrapper).not.toHaveAttribute('hidden')
     })
+
+    it('lets End reach the root keydown listener after moving focus in place', async () => {
+      const onKeydown = vi.fn(() => document.activeElement)
+      render(Dropdown, {
+        props: {
+          defaultOpen: true,
+          portal: false,
+          items: [
+            { key: 'first', label: 'First' },
+            { key: 'last', label: 'Last' }
+          ]
+        },
+        attrs: { onKeydown },
+        slots: { default: () => 'Trigger' }
+      })
+
+      const first = screen.getByRole('menuitem', { name: 'First' })
+      const last = screen.getByRole('menuitem', { name: 'Last' })
+      first.focus()
+      await fireEvent.keyDown(first, { key: 'End' })
+
+      expect(last).toHaveFocus()
+      expect(onKeydown).toHaveBeenCalledExactlyOnceWith(
+        expect.objectContaining({ key: 'End', defaultPrevented: true })
+      )
+      expect(onKeydown).toHaveReturnedWith(last)
+    })
   })
 
   describe('Edge Cases', () => {
