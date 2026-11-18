@@ -8,7 +8,7 @@
 
 基于 Tailwind CSS v4 的 Vue 3 / React UI 组件库。两套框架共享设计 token、类型与交互约定。公开组件权威清单见 [skills/tigercat/references/component-index.md](./skills/tigercat/references/component-index.md)（生成物）。
 
-五个官方包版本对齐，遵循 SemVer。这份文档与仓库当前版本是 **3.0.1**。下方安装、CLI 与 MCP 命令对应这一版本，不带 `@next`。预览通道 `@next` 不是这份 3.0.1 文档。使用的 Tigercat 包应保持同一版本。
+五个官方包版本对齐，遵循 SemVer。这份文档与仓库当前版本是 **3.0.2**。下方安装、CLI 与 MCP 命令对应这一版本，不带 `@next`。预览通道 `@next` 不是这份 3.0.2 文档。使用的 Tigercat 包应保持同一版本。
 
 > **🚀 在线示例**：<https://expcat.github.io/Tigercat/> — Vue 3 与 React 组件示例、主题切换与暗色模式实时预览。
 
@@ -28,7 +28,7 @@
 
 ### 使用 CLI 创建项目（推荐）
 
-CLI 会生成已配置 Tailwind CSS v4 的 Vue 3 或 React Vite 项目。下方命令对应这份 3.0.1 文档。预览通道 `@next` 不是这份文档。
+CLI 会生成已配置 Tailwind CSS v4 的 Vue 3 或 React Vite 项目。下方命令对应这份 3.0.2 文档。预览通道 `@next` 不是这份文档。
 
 ```bash
 pnpm dlx @expcat/tigercat-cli create my-app --template vue3
@@ -118,7 +118,7 @@ export function App() {
 `@expcat/tigercat-mcp` 是只读 stdio MCP 服务。接入后 Agent 可按任务路由到导入子路径、props/事件与 React/Vue 绑定差异（支持中文别名，如 表单、日期选择、表格），单次只内联所需小节：
 
 ```bash
-# 仓库当前版本 3.0.1，与这份文档一致。预览通道 @next 不是这份文档。
+# 仓库当前版本 3.0.2，与这份文档一致。预览通道 @next 不是这份文档。
 claude mcp add tigercat -- npx -y @expcat/tigercat-mcp
 ```
 

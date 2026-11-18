@@ -2,7 +2,7 @@
 
 本文档记录 Tigercat UI 组件库的所有版本变更。
 
-## Unreleased
+## v3.0.2（2026-11-18）
 
 - **Mentions 受控输入（Vue）**：父组件拒绝更新时，输入框恢复显示 `modelValue`，后续编辑仍发出 `update:modelValue`。
 - **Select Tab 焦点（Vue）**：按 Tab 关闭选项列表后，焦点留在下一个控件。

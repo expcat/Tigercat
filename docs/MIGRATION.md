@@ -2,6 +2,10 @@
 
 从 2.x 升级到 3.0 请先读 [3.0 迁移指南](MIGRATION-3.0.md)，再按下方版本补充调整。当前组件用法以 [Tigercat Skill](../skills/tigercat/SKILL.md) 为准；历史版本的兼容说明不适用于 3.0。
 
+## v3.0.2
+
+本次是 3.0.1 的复查修复，调用方式不用改。
+
 ## v3.0.1
 
 键盘抓取 TaskBoard 列时，播报改用 `columnGrabAnnouncementText`，占位符是 `{column}`、`{position}`、`{count}`。en-US 为 `{column}. Position {position} of {count}.`，不再把列名填进卡片模板的 From / to。自定义 `grabAnnouncementText` 仍只用于卡片。

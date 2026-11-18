@@ -11,7 +11,7 @@ Vue 3 UI components for [Tigercat](https://github.com/expcat/Tigercat) - A Tailw
 
 ## Installation
 
-These commands install the current **3.0.1** release and match this documentation. The preview channel `@next` is not this 3.0.1 documentation. Keep core on the same version. Current versions and setup are in the [root README](https://github.com/expcat/Tigercat/blob/main/README.md#快速开始).
+These commands install the current **3.0.2** release and match this documentation. The preview channel `@next` is not this 3.0.2 documentation. Keep core on the same version. Current versions and setup are in the [root README](https://github.com/expcat/Tigercat/blob/main/README.md#快速开始).
 
 ```bash
 pnpm add @expcat/tigercat-vue @expcat/tigercat-core

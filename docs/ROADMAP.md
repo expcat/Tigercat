@@ -8,7 +8,7 @@ tasks: 0 条 Review 发现 + 0 条证据任务
 verified-date: 2026-11-18
 -->
 
-当前正式版本是 `3.0.1`。这一阶段不加新组件，只做两件事：修掉 2026-11-05 全项目 Review 查出的问题，补上当时没采到的浏览器证据。
+当前正式版本是 `3.0.2`。这一阶段不加新组件，只做两件事：修掉 2026-11-05 全项目 Review 查出的问题，补上当时没采到的浏览器证据。
 
 本文件是目录和入口，任务在 [plan/](plan/00-scope.md) 下。完成记录在 [CHANGELOG.md](../CHANGELOG.md)。从 2.x 改到 3.0 的调用点在 [MIGRATION-3.0.md](MIGRATION-3.0.md)，预览版间迁移与历史档案在 [MIGRATION.md](MIGRATION.md)。组件维护规则见 [Tigercat Skill](../skills/tigercat/SKILL.md)。
 
@@ -17,7 +17,7 @@ verified-date: 2026-11-18
 - Review 覆盖 185 个公开组件、841 个 Demo 和 7 份项目专题，共 564 条发现。已完成条目移入 [CHANGELOG.md](../CHANGELOG.md)，剩 0 条：P1 0、P2 0、P3 0。W10-FIX1 已补齐 React SplitButton 与 Vue TimePicker 的键盘修复，定向自动门禁与双端无头 Chromium 复验通过。W10-FIX2 已关闭 T05、T06、T07、T08、T14、T15、T19、T21、T22、T25。W10-FIX3 已关闭 T03、T04、T09、T17、T20、T23、T26。W10-FIX4 已关闭 T10、T11、T12、T13、T16、T18、T24。
 - 审查不再等待证据。3364 个视口格在 W10-G7 后没有 blocked。视觉 pass 3070、finding 174、fail 19、partial 101；键盘 pass 3042、finding 144、fail 24、partial 130、not-applicable 24。E06 已于 2026-11-17 关闭：用户接受读屏证据缺口。最佳可得证据是 hover 96 格 248 图，以及 17 个 P1 的 AX / 键盘证据；真实 VoiceOver / NVDA 输出仍缺，缺口保留登记。
 
-`v3.0.1` 标签之后的本地 `main` 已实现 34 条复查发现（P1 0、P2 30、P3 4）。FIX-04 曾挡住声明式 Dropdown 的 Tab 关闭，后续提交 `3c34e371c` 已恢复该行为。在该提交上运行 `pnpm format:check`、`pnpm types:check` 和 `pnpm test`，三项退出码均为 0。这批修复尚未发布、未打标签，当前版本号为 `3.0.1`。[变更记录](../CHANGELOG.md#unreleased)
+34 条复查发现已包含在 `3.0.2`。终态门禁通过后再创建标签并推送。[变更记录](../CHANGELOG.md#v3022026-11-18)
 
 ## 计划
 
