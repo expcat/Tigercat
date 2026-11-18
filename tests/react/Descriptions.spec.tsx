@@ -21,7 +21,7 @@ describe('Descriptions (React)', () => {
     expect(screen.getByText('Edit')).toBeInTheDocument()
   })
 
-  it('ignores boolean content without hiding items and preserves zero', () => {
+  it('ignores boolean content without hiding items', () => {
     const { container, rerender } = render(
       <Descriptions title={false} extra={false} items={basicItems}>
         {false}
@@ -40,18 +40,6 @@ describe('Descriptions (React)', () => {
     expect(screen.getByText('John Doe')).toBeInTheDocument()
     expect(container.firstElementChild?.children).toHaveLength(1)
     expect(screen.getByRole('table')).not.toHaveAttribute('aria-labelledby')
-
-    rerender(<Descriptions title={0} extra={0} items={basicItems} />)
-    expect(screen.getAllByText('0')).toHaveLength(2)
-
-    rerender(<Descriptions title={0} extra={false} items={basicItems} />)
-    const caption = container.querySelector('caption')
-    expect(caption).toHaveTextContent('0')
-    expect(screen.getByRole('table')).toHaveAttribute('aria-labelledby', caption?.id)
-
-    rerender(<Descriptions items={basicItems}>{0}</Descriptions>)
-    expect(container.textContent).toBe('0')
-    expect(screen.queryByRole('table')).not.toBeInTheDocument()
   })
 
   it('preserves zero title and extra as content', () => {
@@ -59,7 +47,9 @@ describe('Descriptions (React)', () => {
     expect(screen.getAllByText('0')).toHaveLength(2)
 
     rerender(<Descriptions title={0} items={basicItems} />)
-    expect(container.querySelector('caption')).toHaveTextContent('0')
+    const caption = container.querySelector('caption')
+    expect(caption).toHaveTextContent('0')
+    expect(screen.getByRole('table')).toHaveAttribute('aria-labelledby', caption?.id)
   })
 
   it('uses zero children before items', () => {

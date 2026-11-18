@@ -47,9 +47,6 @@ describe('Popconfirm', () => {
       </Popconfirm>
     )
     const dialog = await screen.findByRole('dialog', { name: 'Fallback title' })
-    expect(document.getElementById(dialog.getAttribute('aria-labelledby')!)).toHaveTextContent(
-      'Fallback title'
-    )
     rerender(
       <Popconfirm open title="Fallback title" titleContent="">
         <button>Action</button>

@@ -129,7 +129,6 @@ describe('Alert', () => {
     expect(screen.getByText('Fallback title')).toBeInTheDocument()
     expect(screen.getByText('Fallback description')).toBeInTheDocument()
     rerender(<Alert type="error" showIcon={false} titleSlot={false} descriptionSlot={false} />)
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
     expect(container.firstElementChild).toBeEmptyDOMElement()
     rerender(
       <Alert

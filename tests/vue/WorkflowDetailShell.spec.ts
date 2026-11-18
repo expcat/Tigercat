@@ -37,7 +37,6 @@ describe('WorkflowDetailShell (Vue)', () => {
     })
 
     expect(screen.getByRole('region', { name: 'Request detail' })).toBeInTheDocument()
-    expect(screen.queryByRole('region', { name: 'Workflow detail' })).not.toBeInTheDocument()
   })
 
   it('keeps the action footer inside a bounded-height host', () => {

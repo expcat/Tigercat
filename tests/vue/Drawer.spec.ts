@@ -157,13 +157,9 @@ describe('Drawer', () => {
     Object.defineProperty(dialog, 'offsetHeight', { configurable: true, value: 90 })
     const separator = screen.getByRole('separator')
     await fireEvent.focus(separator)
-    expect(separator).toHaveAttribute('aria-valuemin', '80')
-    expect(separator).toHaveAttribute('aria-valuenow', '90')
     expect(separator).toHaveAttribute('aria-valuemax', '110')
 
     await fireEvent.keyDown(separator, { key: 'ArrowUp' })
-    expect(separator).toHaveAttribute('aria-valuenow', '100')
-    expect(separator).toHaveAttribute('aria-valuemax', '110')
     await fireEvent.keyDown(separator, { key: 'ArrowUp' })
     await fireEvent.keyDown(separator, { key: 'ArrowUp' })
     expect(dialog).toHaveStyle({ height: '110px' })

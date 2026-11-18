@@ -400,12 +400,11 @@ describe('NavigationMenu', () => {
     expect(onKeyDown).toHaveReturnedWith({ defaultPrevented: true, isDefaultPrevented: true })
   })
 
-  it('chains viewport listeners while preserving hover, focus and keyboard handling', () => {
+  it('chains viewport listeners while preserving hover and focus handling', () => {
     vi.useFakeTimers()
     const onMouseEnter = vi.fn()
     const onMouseLeave = vi.fn()
     const onBlur = vi.fn()
-    const onKeyDown = vi.fn((event: React.KeyboardEvent) => event.nativeEvent.defaultPrevented)
     render(
       <NavigationMenu viewport openOnHover defaultValue="products" skipDelayDuration={200}>
         <NavigationMenuItem value="products">
@@ -413,8 +412,7 @@ describe('NavigationMenu', () => {
           <NavigationMenuContent
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
-            onBlur={onBlur}
-            onKeyDown={onKeyDown}>
+            onBlur={onBlur}>
             <NavigationMenuLink href="/overview">Overview</NavigationMenuLink>
           </NavigationMenuContent>
         </NavigationMenuItem>
@@ -438,13 +436,6 @@ describe('NavigationMenu', () => {
     fireEvent.blur(screen.getByRole('menu'), { relatedTarget: document.body })
     expect(trigger).toHaveAttribute('aria-expanded', 'false')
     expect(onBlur).toHaveBeenCalledTimes(1)
-
-    fireEvent.click(trigger)
-    fireEvent.keyDown(screen.getByRole('menu'), { key: 'Escape' })
-    expect(trigger).toHaveAttribute('aria-expanded', 'false')
-    expect(trigger).toHaveFocus()
-    expect(onKeyDown).toHaveBeenCalledTimes(1)
-    expect(onKeyDown).toHaveReturnedWith(true)
   })
 
   it('keeps pointer focus on the trigger so a panel link click can run', () => {

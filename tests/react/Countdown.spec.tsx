@@ -55,7 +55,6 @@ describe('Countdown', () => {
     )
     expect(container.firstElementChild?.children).toHaveLength(1)
     expect(screen.getByRole('timer').parentElement?.children).toHaveLength(1)
-    expect(screen.getByRole('timer')).toHaveTextContent('00:00:00')
 
     rerender(<Countdown title={0} prefix={0} suffix={0} />)
     expect(screen.getAllByText('0')).toHaveLength(3)

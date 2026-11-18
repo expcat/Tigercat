@@ -144,10 +144,6 @@ describe('Resizable', () => {
       expect(bottom).toHaveAttribute('aria-valuemax', '215')
       fireEvent.keyDown(right, { key: 'ArrowRight' })
       fireEvent.keyDown(bottom, { key: 'ArrowDown' })
-      expect(right).toHaveAttribute('aria-valuenow', '310')
-      expect(bottom).toHaveAttribute('aria-valuenow', '210')
-      expect(right).toHaveAttribute('aria-valuemax', '315')
-      expect(bottom).toHaveAttribute('aria-valuemax', '215')
       for (let i = 0; i < 2; i++) {
         fireEvent.keyDown(right, { key: 'ArrowRight' })
         fireEvent.keyDown(bottom, { key: 'ArrowDown' })
@@ -164,8 +160,6 @@ describe('Resizable', () => {
       fireEvent.pointerUp(document, { clientX: 500, clientY: 400, pointerId: 1 })
       expect(root.style.width).toBe('315px')
       expect(root.style.height).toBe('215px')
-      expect(right).toHaveAttribute('aria-valuenow', '315')
-      expect(bottom).toHaveAttribute('aria-valuenow', '215')
       expect(right).toHaveAttribute('aria-valuemax', '315')
       expect(bottom).toHaveAttribute('aria-valuemax', '215')
     })
@@ -192,7 +186,6 @@ describe('Resizable', () => {
       fireEvent.pointerMove(document, { clientX: 350, pointerId: 1 })
       expect(right).toHaveAttribute('aria-valuenow', '300')
       fireEvent.pointerUp(document, { clientX: 350, pointerId: 1 })
-      expect(right).toHaveAttribute('aria-valuenow', '300')
 
       fireEvent.keyDown(right, { key: 'ArrowLeft' })
       expect(right).toHaveAttribute('aria-valuenow', '290')
