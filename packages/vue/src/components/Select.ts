@@ -49,6 +49,7 @@ import {
   getSelectVirtualWindow,
   getSelectActiveAlignScrollTop,
   createSelectScrollScheduler,
+  getAnchoredOverlayTabTarget,
   focusAfterPaint,
   selectRowGroupLabel,
   shouldVirtualizeSelectList,
@@ -528,8 +529,19 @@ export const Select = defineComponent({
           return
         case 'close':
           if (event.key === 'Tab') {
-            // Let native Tab move focus before closing unmounts a searchable input.
-            setTimeout(closeDropdown, 0)
+            const trigger = triggerRef.value
+            const dropdown = dropdownRef.value
+            const tabTarget = getAnchoredOverlayTabTarget(trigger, dropdown, event.shiftKey)
+            // Wait for native Tab, then move focus out of the dropdown before it unmounts.
+            setTimeout(() => {
+              if (
+                tabTarget !== trigger &&
+                dropdown?.contains(dropdown.ownerDocument.activeElement)
+              ) {
+                tabTarget?.focus()
+              }
+              closeDropdown()
+            }, 0)
           } else {
             event.preventDefault()
             closeDropdown()

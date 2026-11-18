@@ -117,6 +117,41 @@ describe('Select', () => {
     }
   )
 
+  it('tabs past the popup of a searchable multiple select before closing', async () => {
+    const rect = vi
+      .spyOn(HTMLElement.prototype, 'getBoundingClientRect')
+      .mockReturnValue(new DOMRect(20, 20, 240, 32))
+    try {
+      const user = userEvent.setup()
+      const popupContainer = ref<HTMLElement | null>(null)
+      const { findByRole, getByRole, queryByRole } = render(() =>
+        h('div', [
+          h(Select, {
+            options: testOptions,
+            searchable: true,
+            multiple: true,
+            getPopupContainer: () => popupContainer.value,
+            'aria-label': 'Tab select'
+          }),
+          h('div', { ref: popupContainer }),
+          h('button', { type: 'button' }, 'After')
+        ])
+      )
+      await user.click(getByRole('combobox'))
+      expect(popupContainer.value).toContainElement(
+        await findByRole('button', { name: 'Select filtered' })
+      )
+      await waitFor(() => expect(getByRole('combobox')).toHaveFocus())
+
+      await user.tab()
+
+      await waitFor(() => expect(queryByRole('listbox', { hidden: true })).not.toBeInTheDocument())
+      expect(getByRole('button', { name: 'After' })).toHaveFocus()
+    } finally {
+      rect.mockRestore()
+    }
+  })
+
   it('creates from the search query on a virtual list', async () => {
     const onCreate = vi.fn()
     const onChange = vi.fn()
