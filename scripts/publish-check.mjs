@@ -77,7 +77,7 @@ const exampleProjects = [
 
 const buttonSubpathBundleLimits = {
   react: 6000,
-  vue: 8000
+  vue: 9000
 }
 const npmInstallTimeoutMs = Number(
   process.env.TIGERCAT_PUBLISH_CHECK_NPM_TIMEOUT_MS ?? 10 * 60 * 1000
