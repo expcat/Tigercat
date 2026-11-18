@@ -96,6 +96,53 @@ describe('Resizable', () => {
       expect((events[0][0] as { width: number }).width).toBe(300 + RESIZE_KEYBOARD_STEP)
     })
 
+    it('keeps the container maximum fixed and clamps keyboard and pointer resizing to it', async () => {
+      const host = document.createElement('div')
+      Object.defineProperties(host, {
+        clientWidth: { value: 315 },
+        clientHeight: { value: 215 }
+      })
+      document.body.appendChild(host)
+      const { container } = render(Resizable, {
+        props: { defaultWidth: 300, defaultHeight: 200, minWidth: 100, minHeight: 80 },
+        container: host
+      })
+      await fireEvent(window, new Event('resize'))
+      const root = container.firstElementChild as HTMLElement
+      const right = handle(container, 'right')
+      const bottom = handle(container, 'bottom')
+      expect(right).toHaveAttribute('aria-valuemin', '100')
+      expect(bottom).toHaveAttribute('aria-valuemin', '80')
+      expect(right).toHaveAttribute('aria-valuemax', '315')
+      expect(bottom).toHaveAttribute('aria-valuemax', '215')
+      await fireEvent.keyDown(right, { key: 'ArrowRight' })
+      await fireEvent.keyDown(bottom, { key: 'ArrowDown' })
+      expect(right).toHaveAttribute('aria-valuenow', '310')
+      expect(bottom).toHaveAttribute('aria-valuenow', '210')
+      expect(right).toHaveAttribute('aria-valuemax', '315')
+      expect(bottom).toHaveAttribute('aria-valuemax', '215')
+      for (let i = 0; i < 2; i++) {
+        await fireEvent.keyDown(right, { key: 'ArrowRight' })
+        await fireEvent.keyDown(bottom, { key: 'ArrowDown' })
+      }
+      expect(right).toHaveAttribute('aria-valuenow', '315')
+      expect(bottom).toHaveAttribute('aria-valuenow', '215')
+      await fireEvent.pointerDown(handle(container, 'bottom-right'), {
+        clientX: 315,
+        clientY: 215,
+        button: 0,
+        pointerId: 1
+      })
+      await fireEvent.pointerMove(document, { clientX: 500, clientY: 400, pointerId: 1 })
+      await fireEvent.pointerUp(document, { clientX: 500, clientY: 400, pointerId: 1 })
+      expect(root.style.width).toBe('315px')
+      expect(root.style.height).toBe('215px')
+      expect(right).toHaveAttribute('aria-valuenow', '315')
+      expect(bottom).toHaveAttribute('aria-valuenow', '215')
+      expect(right).toHaveAttribute('aria-valuemax', '315')
+      expect(bottom).toHaveAttribute('aria-valuemax', '215')
+    })
+
     it('locks ratio from the bottom handle', async () => {
       const { container, emitted } = renderResizable({
         handles: ['bottom'],
@@ -153,11 +200,11 @@ describe('Resizable', () => {
   })
 
   describe('Accessibility', () => {
-    it('sets an explicit aria-valuemax for the current size when no maximum is configured', () => {
+    it('uses the viewport maximum when no container size or maximum is configured', () => {
       const { container } = renderResizable()
       const right = handle(container, 'right')
       expect(right.getAttribute('aria-valuenow')).toBe('300')
-      expect(right.getAttribute('aria-valuemax')).toBe('300')
+      expect(right.getAttribute('aria-valuemax')).toBe(String(window.innerWidth))
     })
 
     it('reports inline style width and height on the handles', () => {

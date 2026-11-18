@@ -14,6 +14,7 @@ import {
   getResizeKeyboardDelta,
   getResizableLabels,
   isSplitterRtl,
+  measureResizableBounds,
   mergeResizableBoxStyle,
   resizableBaseClasses,
   reportedResizableSize,
@@ -94,6 +95,15 @@ export const Resizable = forwardRef<HTMLDivElement, ResizableProps>(function Res
   const [offset, setOffset] = useState({ x: 0, y: 0 })
   const [draggingHandle, setDraggingHandle] = useState<ResizeHandlePosition | null>(null)
   const rootRef = useRef<HTMLDivElement | null>(null)
+  const [availableBounds, setAvailableBounds] = useState(() => measureResizableBounds(null))
+  const resolvedMaxWidth = resizableAriaValueMax(
+    maxWidth,
+    Math.max(minWidth, availableBounds.width)
+  )
+  const resolvedMaxHeight = resizableAriaValueMax(
+    maxHeight,
+    Math.max(minHeight, availableBounds.height)
+  )
   const dragSessionRef = useRef<DocumentDragSession | null>(null)
   const dragRef = useRef<{
     handle: ResizeHandlePosition
@@ -122,6 +132,14 @@ export const Resizable = forwardRef<HTMLDivElement, ResizableProps>(function Res
   }, [])
 
   useEffect(() => cleanupDragSession, [cleanupDragSession])
+
+  useEffect(() => {
+    const updateBounds = () => setAvailableBounds(measureResizableBounds(rootRef.current))
+    const view = rootRef.current?.ownerDocument.defaultView
+    updateBounds()
+    view?.addEventListener('resize', updateBounds)
+    return () => view?.removeEventListener('resize', updateBounds)
+  }, [])
 
   const commitSize = useCallback(
     (
@@ -203,8 +221,8 @@ export const Resizable = forwardRef<HTMLDivElement, ResizableProps>(function Res
               aspectRatio: resolveResizableAspectRatio(lockAspectRatio, drag.startW, drag.startH),
               minWidth,
               minHeight,
-              maxWidth,
-              maxHeight
+              maxWidth: resolvedMaxWidth,
+              maxHeight: resolvedMaxHeight
             }
           )
           commitSize(
@@ -240,8 +258,8 @@ export const Resizable = forwardRef<HTMLDivElement, ResizableProps>(function Res
                     ),
                     minWidth,
                     minHeight,
-                    maxWidth,
-                    maxHeight
+                    maxWidth: resolvedMaxWidth,
+                    maxHeight: resolvedMaxHeight
                   }
                 )
             commitSize(
@@ -266,8 +284,8 @@ export const Resizable = forwardRef<HTMLDivElement, ResizableProps>(function Res
       commitSize,
       disabled,
       lockAspectRatio,
-      maxHeight,
-      maxWidth,
+      resolvedMaxHeight,
+      resolvedMaxWidth,
       measureBox,
       minHeight,
       minWidth,
@@ -288,8 +306,8 @@ export const Resizable = forwardRef<HTMLDivElement, ResizableProps>(function Res
         aspectRatio: resolveResizableAspectRatio(lockAspectRatio, box.width, box.height),
         minWidth,
         minHeight,
-        maxWidth,
-        maxHeight
+        maxWidth: resolvedMaxWidth,
+        maxHeight: resolvedMaxHeight
       })
       if (jumped) {
         e.preventDefault()
@@ -312,8 +330,8 @@ export const Resizable = forwardRef<HTMLDivElement, ResizableProps>(function Res
           aspectRatio: resolveResizableAspectRatio(lockAspectRatio, box.width, box.height),
           minWidth,
           minHeight,
-          maxWidth,
-          maxHeight
+          maxWidth: resolvedMaxWidth,
+          maxHeight: resolvedMaxHeight
         }
       )
       commitSize(next, handle, box.width, box.height, offset.x, offset.y, 'keyboard')
@@ -323,8 +341,8 @@ export const Resizable = forwardRef<HTMLDivElement, ResizableProps>(function Res
       commitSize,
       disabled,
       lockAspectRatio,
-      maxHeight,
-      maxWidth,
+      resolvedMaxHeight,
+      resolvedMaxWidth,
       measureBox,
       minHeight,
       minWidth,
@@ -369,7 +387,7 @@ export const Resizable = forwardRef<HTMLDivElement, ResizableProps>(function Res
         const usesHeight = pos === 'top' || pos === 'bottom'
         const valueNow = Math.round(usesHeight ? reportedHeight : reportedWidth)
         const valueMin = usesHeight ? minHeight : minWidth
-        const valueMax = resizableAriaValueMax(usesHeight ? maxHeight : maxWidth, valueNow)
+        const valueMax = usesHeight ? resolvedMaxHeight : resolvedMaxWidth
         const handleName = formatResizableHandleLabel(labels.handleAriaLabel, pos)
         return (
           <div

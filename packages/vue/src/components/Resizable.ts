@@ -1,4 +1,4 @@
-import { defineComponent, h, ref, computed, onBeforeUnmount, PropType } from 'vue'
+import { defineComponent, h, ref, computed, onMounted, onBeforeUnmount, PropType } from 'vue'
 import {
   applyResizeJump,
   applyResizeSize,
@@ -15,6 +15,7 @@ import {
   getResizeHandleOrientation,
   getResizeKeyboardDelta,
   isSplitterRtl,
+  measureResizableBounds,
   mergeResizableBoxStyle,
   mergeStyleValues,
   resizableBaseClasses,
@@ -86,6 +87,16 @@ export const Resizable = defineComponent({
     const offsetY = ref(0)
     const draggingHandle = ref<ResizeHandlePosition | null>(null)
     const rootRef = ref<HTMLElement | null>(null)
+    const availableBounds = ref(measureResizableBounds(null))
+    const resolvedMaxWidth = computed(() =>
+      resizableAriaValueMax(props.maxWidth, Math.max(props.minWidth, availableBounds.value.width))
+    )
+    const resolvedMaxHeight = computed(() =>
+      resizableAriaValueMax(
+        props.maxHeight,
+        Math.max(props.minHeight, availableBounds.value.height)
+      )
+    )
     let dragSession: DocumentDragSession | null = null
     const startMouseX = ref(0)
     const startMouseY = ref(0)
@@ -156,8 +167,8 @@ export const Resizable = defineComponent({
       aspectRatio: resolveResizableAspectRatio(props.lockAspectRatio, baseWidth, baseHeight),
       minWidth: props.minWidth,
       minHeight: props.minHeight,
-      maxWidth: props.maxWidth,
-      maxHeight: props.maxHeight
+      maxWidth: resolvedMaxWidth.value,
+      maxHeight: resolvedMaxHeight.value
     })
 
     const onPointerDown = (handle: ResizeHandlePosition, e: PointerEvent) => {
@@ -255,7 +266,15 @@ export const Resizable = defineComponent({
       commitSize(next, handle, box.width, box.height, 'keyboard')
     }
 
+    const updateBounds = () => {
+      availableBounds.value = measureResizableBounds(rootRef.value)
+    }
+    onMounted(() => {
+      updateBounds()
+      rootRef.value?.ownerDocument.defaultView?.addEventListener('resize', updateBounds)
+    })
     onBeforeUnmount(() => {
+      rootRef.value?.ownerDocument.defaultView?.removeEventListener('resize', updateBounds)
       cleanupDragSession()
     })
 
@@ -274,10 +293,7 @@ export const Resizable = defineComponent({
           'aria-orientation': getResizeHandleOrientation(pos),
           'aria-valuenow': valueNow,
           'aria-valuemin': usesHeight ? props.minHeight : props.minWidth,
-          'aria-valuemax': resizableAriaValueMax(
-            usesHeight ? props.maxHeight : props.maxWidth,
-            valueNow
-          ),
+          'aria-valuemax': usesHeight ? resolvedMaxHeight.value : resolvedMaxWidth.value,
           tabindex: props.disabled ? -1 : 0,
           onPointerdown: (e: PointerEvent) => onPointerDown(pos, e),
           onKeydown: (e: KeyboardEvent) => onKeyDown(pos, e)

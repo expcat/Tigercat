@@ -505,12 +505,32 @@ export function reportedResizableSize(
   return readResizableCssPx(styleValue) ?? 0
 }
 
-/**
- * Focusable separators need an explicit maximum.
- * A finite max is that constraint. With none, resize math is unbounded, so the
- * current value is the ceiling instead of WAI-ARIA's implicit 100.
- */
-export function resizableAriaValueMax(configured: number | undefined, valueNow: number): number {
+/** Measure the containing space, falling back to the viewport before layout is available. */
+export function measureResizableBounds(element: HTMLElement | null): {
+  width: number
+  height: number
+} {
+  const doc = element?.ownerDocument ?? (typeof document !== 'undefined' ? document : undefined)
+  const view = doc?.defaultView
+  return {
+    width:
+      element?.parentElement?.clientWidth ||
+      doc?.documentElement.clientWidth ||
+      view?.innerWidth ||
+      0,
+    height:
+      element?.parentElement?.clientHeight ||
+      doc?.documentElement.clientHeight ||
+      view?.innerHeight ||
+      0
+  }
+}
+
+/** Use the same finite ceiling for ARIA and resize math. */
+export function resizableAriaValueMax(
+  configured: number | undefined,
+  availableMaximum: number
+): number {
   if (configured !== undefined && Number.isFinite(configured)) return configured
-  return valueNow
+  return availableMaximum
 }

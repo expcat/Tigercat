@@ -12,10 +12,17 @@ import {
   resizableHandlePositionStyles,
   getResizeKeyboardDelta,
   getResizeHandleOrientation,
+  resizableAriaValueMax,
   RESIZE_KEYBOARD_STEP
 } from '@expcat/tigercat-core'
 
 describe('resizable-utils', () => {
+  it('uses configured finite maxima or the available resize boundary', () => {
+    expect(resizableAriaValueMax(400, 600)).toBe(400)
+    expect(resizableAriaValueMax(undefined, 600)).toBe(600)
+    expect(resizableAriaValueMax(Infinity, 600)).toBe(600)
+  })
+
   describe('defaultResizeHandles', () => {
     it('should have default handles', () => {
       expect(defaultResizeHandles).toEqual(['right', 'bottom', 'bottom-right'])
