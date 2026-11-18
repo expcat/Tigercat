@@ -142,6 +142,37 @@ describe('Carousel', () => {
       expect(screen.getAllByRole('button', { name: /Go to slide/ })).toHaveLength(3)
       expect(screen.getByRole('status')).toHaveTextContent('Slide 1 of 3')
     })
+
+    it('keeps the clamped index when slides shrink and grow again', async () => {
+      const items = ref(['Slide 1', 'Slide 2', 'Slide 3'])
+      render({
+        setup() {
+          return () => {
+            const content = items.value.map((item) => h('div', { key: item }, item))
+            return h(Carousel, { defaultCurrentIndex: 2, speed: 0 }, () => content)
+          }
+        }
+      })
+      expect(screen.getByRole('status')).toHaveTextContent('Slide 3 of 3')
+
+      items.value = ['Slide 1', 'Slide 2']
+      await nextTick()
+
+      expect(screen.getByRole('status')).toHaveTextContent('Slide 2 of 2')
+      expect(screen.getByRole('button', { name: 'Go to slide 2' })).toHaveAttribute(
+        'aria-current',
+        'true'
+      )
+
+      items.value = ['Slide 1', 'Slide 2', 'Slide 3']
+      await nextTick()
+
+      expect(screen.getByRole('status')).toHaveTextContent('Slide 2 of 3')
+      expect(screen.getByRole('button', { name: 'Go to slide 2' })).toHaveAttribute(
+        'aria-current',
+        'true'
+      )
+    })
   })
 
   describe('Navigation', () => {

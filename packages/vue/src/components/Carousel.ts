@@ -315,7 +315,7 @@ export const Carousel = defineComponent({
       const count = slideCount.value
       const current = currentIndex.value
       const clampedIndex = clampSlideIndex(index, count)
-      if (clampedIndex === current) return
+      if (clampedIndex === (isControlled.value ? current : internalCurrentIndex.value)) return
 
       emit('before-change', current, clampedIndex)
       // Controlled carousels re-plan from the prop watcher once the parent
@@ -445,6 +445,7 @@ export const Carousel = defineComponent({
         const clamped = clampSlideIndex(requested, count)
         if (clamped !== requested) {
           requestedIndex.value = clamped
+          if (!isControlled.value) internalCurrentIndex.value = clamped
           goTo(clamped, 'goto')
         }
         if (!wrapping.value) {
