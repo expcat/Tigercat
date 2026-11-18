@@ -173,6 +173,32 @@ describe('ImageAnnotation', () => {
     expect(document.activeElement).toHaveAccessibleName('Door, Rectangle annotation')
   })
 
+  it('notifies caller keydown once after moving shape focus', async () => {
+    const annotations: CoreImageAnnotation[] = [
+      { id: 'first', type: 'rectangle', x: 0.1, y: 0.1, width: 0.2, height: 0.2 },
+      { id: 'second', type: 'ellipse', x: 0.4, y: 0.2, width: 0.2, height: 0.2 }
+    ]
+    const onKeydown = vi.fn((event: KeyboardEvent) => ({
+      defaultPrevented: event.defaultPrevented,
+      activeElement: document.activeElement
+    }))
+    const { getAllByRole } = await renderLoadedAnnotation({
+      props: { src: '/scene.jpg', modelValue: annotations },
+      attrs: { onKeydown }
+    })
+    const shapes = getAllByRole('option')
+    shapes[0].focus()
+
+    await fireEvent.keyDown(shapes[0], { key: 'ArrowRight' })
+
+    expect(document.activeElement).toBe(shapes[1])
+    expect(onKeydown).toHaveBeenCalledTimes(1)
+    expect(onKeydown).toHaveReturnedWith({
+      defaultPrevented: true,
+      activeElement: shapes[1]
+    })
+  })
+
   it('selects an annotation with Enter/Space on its shape (C20-3)', async () => {
     const annotations: CoreImageAnnotation[] = [
       { id: 'face', type: 'rectangle', x: 0.1, y: 0.1, width: 0.2, height: 0.2, label: 'Face' }

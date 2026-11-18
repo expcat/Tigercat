@@ -544,7 +544,6 @@ export function ImageAnnotation({
           event.key === 'ArrowUp'
         ) {
           event.preventDefault()
-          event.stopPropagation()
           const delta =
             event.key === 'ArrowRight' || event.key === 'ArrowDown'
               ? isRtl
