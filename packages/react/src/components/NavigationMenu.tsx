@@ -579,6 +579,9 @@ export const NavigationMenuContent: React.FC<NavigationMenuContentProps> = ({
         }}
         onKeyDown={(event) => {
           handleKeyDown(event)
+          if (event.nativeEvent.defaultPrevented && !event.defaultPrevented) {
+            event.preventDefault()
+          }
           divProps.onKeyDown?.(event)
         }}>
         {panelChildren}

@@ -375,6 +375,31 @@ describe('NavigationMenu', () => {
     expect(trigger).toHaveFocus()
   })
 
+  it('reports Escape as prevented to the viewport panel keydown listener', () => {
+    const onKeyDown = vi.fn((event: React.KeyboardEvent<HTMLDivElement>) => ({
+      defaultPrevented: event.defaultPrevented,
+      isDefaultPrevented: event.isDefaultPrevented()
+    }))
+    render(
+      <NavigationMenu viewport defaultValue="products">
+        <NavigationMenuItem value="products">
+          <NavigationMenuTrigger>Products</NavigationMenuTrigger>
+          <NavigationMenuContent onKeyDown={onKeyDown}>
+            <NavigationMenuLink href="/overview">Overview</NavigationMenuLink>
+          </NavigationMenuContent>
+        </NavigationMenuItem>
+      </NavigationMenu>
+    )
+    const trigger = screen.getByRole('menuitem', { name: 'Products' })
+    const link = screen.getByRole('menuitem', { name: 'Overview' })
+    link.focus()
+    fireEvent.keyDown(link, { key: 'Escape' })
+
+    expect(trigger).toHaveAttribute('aria-expanded', 'false')
+    expect(trigger).toHaveFocus()
+    expect(onKeyDown).toHaveReturnedWith({ defaultPrevented: true, isDefaultPrevented: true })
+  })
+
   it('chains viewport listeners while preserving hover, focus and keyboard handling', () => {
     vi.useFakeTimers()
     const onMouseEnter = vi.fn()
