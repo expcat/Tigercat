@@ -260,7 +260,7 @@ export const List = defineComponent({
       if (content.length > 0) meta.push(h('div', { class: listItemContentClasses }, content))
       return [
         meta.length > 0 ? h('div', { class: listItemMetaClasses }, meta) : null,
-        item.extra != null
+        item.extra != null && typeof item.extra !== 'boolean'
           ? h(
               'div',
               {

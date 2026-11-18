@@ -123,22 +123,20 @@ export const Descriptions = defineComponent({
 
     const column = computed(() => resolveResponsiveValue(props.column, containerWidth.value, 3))
     const rows = computed(() => groupItemsIntoRows(props.items, column.value))
+    const hasExtra = computed(() => props.extra != null && typeof props.extra !== 'boolean')
     const labelledBy = computed(() => (props.title != null || slots.title ? titleId : undefined))
     const useCaption = computed(() =>
       Boolean(
         props.items.length > 0 &&
         props.title != null &&
-        props.extra == null &&
+        !hasExtra.value &&
         !slots.extra &&
         (props.layout === 'horizontal' || props.bordered)
       )
     )
     const showHeader = computed(() =>
       Boolean(
-        props.extra != null ||
-        slots.extra ||
-        slots.title ||
-        (props.title != null && !useCaption.value)
+        hasExtra.value || slots.extra || slots.title || (props.title != null && !useCaption.value)
       )
     )
 
@@ -341,7 +339,7 @@ export const Descriptions = defineComponent({
                     slots.title?.() ?? props.title
                   )
                 : null,
-              props.extra != null || slots.extra
+              hasExtra.value || slots.extra
                 ? h(
                     'div',
                     { class: descriptionsExtraClasses },

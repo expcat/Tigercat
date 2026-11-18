@@ -38,6 +38,23 @@ describe('Descriptions (Vue)', () => {
     expect(container.querySelector('caption')).toHaveTextContent('0')
   })
 
+  it('omits boolean extra containers and preserves zero', async () => {
+    const { container, rerender } = render(Descriptions, {
+      props: { extra: false, items: basicItems }
+    })
+    expect(screen.getByText('John Doe')).toBeInTheDocument()
+    expect(container.firstElementChild?.children).toHaveLength(1)
+
+    await rerender({ title: 0 })
+    const caption = container.querySelector('caption')
+    expect(caption).toHaveTextContent('0')
+    expect(screen.getByRole('table')).toHaveAttribute('aria-labelledby', caption?.id)
+    expect(container.firstElementChild?.children).toHaveLength(1)
+
+    await rerender({ extra: 0 })
+    expect(screen.getAllByText('0')).toHaveLength(2)
+  })
+
   it('preserves root attributes and styles with the default slot', () => {
     const { container } = render(Descriptions, {
       props: { style: { color: 'red' } },

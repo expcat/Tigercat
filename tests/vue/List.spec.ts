@@ -27,6 +27,18 @@ describe('List', () => {
     expect(screen.getByText('Description 1')).toBeInTheDocument()
   })
 
+  it('omits boolean extra containers and preserves zero', async () => {
+    const { rerender } = render(List, {
+      props: { dataSource: [{ id: 1, title: 'Item', extra: false }] }
+    })
+    expect(screen.getByText('Item')).toBeInTheDocument()
+    expect(screen.getByRole('listitem').children).toHaveLength(1)
+
+    await rerender({ dataSource: [{ id: 1, title: 'Item', extra: 0 }] })
+    expect(screen.getByText('0')).toBeInTheDocument()
+    expect(screen.getByRole('listitem').children).toHaveLength(2)
+  })
+
   it('renders empty state', () => {
     render(List, {
       props: {

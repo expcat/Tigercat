@@ -41,6 +41,20 @@ describe('List', () => {
     expect(screen.getByText('Footer')).toBeInTheDocument()
   })
 
+  it('omits boolean header, footer, and extra containers and preserves zero', () => {
+    const { container, rerender } = render(
+      <List dataSource={[{ id: 1, title: 'Item', extra: false }]} header={false} footer={false} />
+    )
+    expect(container.firstElementChild?.children).toHaveLength(1)
+    expect(screen.getByRole('listitem').children).toHaveLength(1)
+    expect(screen.getByText('Item')).toBeInTheDocument()
+
+    rerender(<List dataSource={[{ id: 1, title: 'Item', extra: 0 }]} header={0} footer={0} />)
+    expect(screen.getAllByText('0')).toHaveLength(3)
+    expect(container.firstElementChild?.children).toHaveLength(3)
+    expect(screen.getByRole('listitem').children).toHaveLength(2)
+  })
+
   it('isolates mounted row controls while loading and restores them afterwards', async () => {
     const user = userEvent.setup()
     const onItemClick = vi.fn()

@@ -49,6 +49,20 @@ describe('Countdown', () => {
     expect(screen.getByText('left')).toBeInTheDocument()
   })
 
+  it('omits boolean title, prefix, and suffix containers and preserves zero', () => {
+    const { container, rerender } = render(
+      <Countdown title={false} prefix={false} suffix={false} />
+    )
+    expect(container.firstElementChild?.children).toHaveLength(1)
+    expect(screen.getByRole('timer').parentElement?.children).toHaveLength(1)
+    expect(screen.getByRole('timer')).toHaveTextContent('00:00:00')
+
+    rerender(<Countdown title={0} prefix={0} suffix={0} />)
+    expect(screen.getAllByText('0')).toHaveLength(3)
+    expect(container.firstElementChild?.children).toHaveLength(2)
+    expect(screen.getByRole('timer').parentElement?.children).toHaveLength(3)
+  })
+
   it('applies className and forwards attributes', () => {
     const { container } = render(<Countdown className="custom-countdown" data-testid="countdown" />)
     expect(container.querySelector('.custom-countdown')).toBeInTheDocument()

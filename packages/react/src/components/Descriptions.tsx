@@ -85,14 +85,18 @@ export const Descriptions = forwardRef<HTMLDivElement, DescriptionsProps>(functi
     [columnProp, containerWidth]
   )
 
-  if (children != null && items.length > 0) {
+  const hasChildren = children != null && typeof children !== 'boolean'
+  const hasTitle = title != null && typeof title !== 'boolean'
+  const hasExtra = extra != null && typeof extra !== 'boolean'
+
+  if (hasChildren && items.length > 0) {
     devWarn(
       'Descriptions.children',
       '[Tigercat] Descriptions received both items and children. Children are used.'
     )
   }
   const rows = groupItemsIntoRows(items, column)
-  const labelledBy = title != null ? titleId : undefined
+  const labelledBy = hasTitle ? titleId : undefined
   const rootClasses = classNames(getDescriptionsClasses(size, bordered), className)
 
   const setRootRef = (node: HTMLDivElement | null) => {
@@ -101,7 +105,7 @@ export const Descriptions = forwardRef<HTMLDivElement, DescriptionsProps>(functi
     else if (ref) ref.current = node
   }
 
-  if (children != null) {
+  if (hasChildren) {
     return (
       <div ref={setRootRef} data-tiger-descriptions="" className={rootClasses} {...props}>
         {children}
@@ -239,19 +243,19 @@ export const Descriptions = forwardRef<HTMLDivElement, DescriptionsProps>(functi
   }
 
   const useCaption =
-    items.length > 0 && title != null && extra == null && (layout === 'horizontal' || bordered)
-  const showHeader = extra != null || (title != null && !useCaption)
+    items.length > 0 && hasTitle && !hasExtra && (layout === 'horizontal' || bordered)
+  const showHeader = hasExtra || (hasTitle && !useCaption)
 
   return (
     <div ref={setRootRef} className={rootClasses} {...props}>
       {showHeader ? (
         <div className={descriptionsHeaderClasses}>
-          {title != null ? (
+          {hasTitle ? (
             <div className={descriptionsTitleClasses} id={titleId}>
               {title}
             </div>
           ) : null}
-          {extra != null ? <div className={descriptionsExtraClasses}>{extra}</div> : null}
+          {hasExtra ? <div className={descriptionsExtraClasses}>{extra}</div> : null}
         </div>
       ) : null}
       {layout === 'horizontal' ? renderHorizontal() : renderVertical()}

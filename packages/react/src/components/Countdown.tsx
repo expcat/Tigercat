@@ -150,13 +150,19 @@ export const Countdown: React.FC<CountdownProps> = ({
       role={ariaLabel ? 'group' : rest.role}
       aria-label={ariaLabel ?? rest['aria-label']}
       data-remaining-ratio={String(countdownRemainingRatio(remaining, total))}>
-      {title != null ? <div className={getCountdownTitleClasses(size)}>{title}</div> : null}
+      {title != null && typeof title !== 'boolean' ? (
+        <div className={getCountdownTitleClasses(size)}>{title}</div>
+      ) : null}
       <div className={countdownValueWrapperClasses}>
-        {prefix != null ? <span className={countdownPrefixClasses}>{prefix}</span> : null}
+        {prefix != null && typeof prefix !== 'boolean' ? (
+          <span className={countdownPrefixClasses}>{prefix}</span>
+        ) : null}
         <span className={getCountdownValueClasses(size)} role="timer" aria-label={formatted}>
           {formatted}
         </span>
-        {suffix != null ? <span className={countdownSuffixClasses}>{suffix}</span> : null}
+        {suffix != null && typeof suffix !== 'boolean' ? (
+          <span className={countdownSuffixClasses}>{suffix}</span>
+        ) : null}
       </div>
     </div>
   )
