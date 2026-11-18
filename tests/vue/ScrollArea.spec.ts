@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, fireEvent } from '@testing-library/vue'
+import { render, fireEvent, waitFor } from '@testing-library/vue'
 import { h, ref } from 'vue'
 import { ScrollArea } from '@expcat/tigercat-vue/ScrollArea'
 import type { ScrollAreaInstance } from '@expcat/tigercat-core'
@@ -101,6 +101,24 @@ describe('ScrollArea', () => {
       )
       expect(container.querySelector('[data-scroll-area-scrollbar="x"]')).not.toBeNull()
       expect(container.querySelector('[data-scroll-area-scrollbar="y"]')).toBeNull()
+    })
+
+    it('recomputes both thumb sizes when scrollbarSize changes after mount', async () => {
+      const { container, rerender } = await renderOverflowing(
+        { axis: 'both', scrollbarSize: 'sm' },
+        { scrollWidth: 400, clientWidth: 200, scrollHeight: 400, clientHeight: 200 }
+      )
+      const thumbY = container.querySelector('[data-scroll-area-thumb="y"]') as HTMLElement
+      const thumbX = container.querySelector('[data-scroll-area-thumb="x"]') as HTMLElement
+      expect(thumbY.style.height).toBe('97px')
+      expect(thumbX.style.width).toBe('97px')
+
+      await rerender({ scrollbarSize: 'lg' })
+
+      await waitFor(() => {
+        expect(thumbY.style.height).toBe('93px')
+        expect(thumbX.style.width).toBe('93px')
+      })
     })
   })
 

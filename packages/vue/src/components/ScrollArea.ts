@@ -296,7 +296,13 @@ export const ScrollArea = defineComponent({
       window.clearTimeout(scrollTimer)
     })
     watch(
-      () => [props.axis, props.minThumbSize],
+      () => [
+        props.axis,
+        props.minThumbSize,
+        props.nativeBars,
+        props.scrollbar,
+        props.scrollbarSize
+      ],
       () => {
         void nextTick(syncState)
       }
