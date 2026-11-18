@@ -109,6 +109,11 @@ describe('Timeline (React)', () => {
     expect(screen.getByText('Loading...')).toBeInTheDocument()
   })
 
+  it('keeps default pending text when pendingContent is false', () => {
+    render(<Timeline pending pendingContent={false} />)
+    expect(screen.getByText('Loading...')).toBeInTheDocument()
+  })
+
   it('uses ConfigProvider timeline locale for default pending content', () => {
     render(
       <ConfigProvider locale={zhCN}>
@@ -153,6 +158,18 @@ describe('Timeline (React)', () => {
       await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)))
     })
     expect(screen.getByRole('status').textContent ?? '').not.toContain('[object Object]')
+  })
+
+  it('does not announce completion when pendingContent becomes an element', async () => {
+    const { rerender } = render(<Timeline pending />)
+    await act(async () => {
+      await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)))
+    })
+    rerender(<Timeline pending pendingContent={<div>Visible pending</div>} />)
+    await act(async () => {
+      await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)))
+    })
+    expect(screen.getByRole('status')).not.toHaveTextContent('Update finished')
   })
 
   it('supports reverse order', () => {

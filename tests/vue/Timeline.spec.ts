@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/vue'
-import { h } from 'vue'
+import { h, nextTick, ref } from 'vue'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { Timeline } from '@expcat/tigercat-vue/Timeline'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
@@ -168,6 +168,23 @@ describe('Timeline (Vue)', () => {
     })
     await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)))
     expect(screen.getByRole('status').textContent).not.toBe('Loading...')
+  })
+
+  it('does not announce completion when a pending slot replaces default content', async () => {
+    const customPending = ref(false)
+    render({
+      render: () =>
+        h(
+          Timeline,
+          { pending: true },
+          customPending.value ? { pending: () => h('div', {}, 'Visible pending') } : undefined
+        )
+    })
+    await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)))
+    customPending.value = true
+    await nextTick()
+    await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)))
+    expect(screen.getByRole('status')).not.toHaveTextContent('Update finished')
   })
 
   it('supports reverse order', () => {

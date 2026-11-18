@@ -87,14 +87,15 @@ export const Timeline: React.FC<TimelineProps> = ({
     mergedLocale?.timeline?.pendingText,
     mergedLocale?.common?.loadingText
   )
+  const hasPendingContent = pendingContent != null && pendingContent !== false
   const pendingSignature = !pending
     ? ''
     : typeof pendingContent === 'string'
       ? pendingContent
-      : pendingContent == null
+      : !hasPendingContent
         ? pendingText
         : ''
-  const pendingSeen = useRef<string | null>(null)
+  const pendingSeen = useRef({ pending: false, signature: '' })
   const liveRef = useRef<ReturnType<typeof manageLiveRegion> | null>(null)
   useEffect(() => {
     const region = manageLiveRegion('polite')
@@ -106,15 +107,14 @@ export const Timeline: React.FC<TimelineProps> = ({
   }, [])
   useEffect(() => {
     const previous = pendingSeen.current
-    if (previous === pendingSignature) return
-    pendingSeen.current = pendingSignature
+    pendingSeen.current = { pending, signature: pendingSignature }
     if (!liveRef.current) return
-    if (previous === null && !pendingSignature) return
-    if (pendingSignature) liveRef.current.announce(pendingSignature)
-    else if (previous) {
+    if (pendingSignature && previous.signature !== pendingSignature) {
+      liveRef.current.announce(pendingSignature)
+    } else if (previous.pending && !pending) {
       liveRef.current.announce(mergedLocale?.timeline?.pendingReplacedText || 'Update finished')
     }
-  }, [mergedLocale?.timeline?.pendingReplacedText, pendingSignature])
+  }, [mergedLocale?.timeline?.pendingReplacedText, pending, pendingSignature])
 
   const containerClasses = useMemo(
     () => classNames(getTimelineContainerClasses(mode), timelineListClasses, className),
@@ -241,7 +241,11 @@ export const Timeline: React.FC<TimelineProps> = ({
       <li key="pending" className={itemClasses} aria-busy="true">
         {rail}
         <div className={contentClasses}>
-          {pendingContent ?? <div className={timelineDescriptionClasses}>{pendingText}</div>}
+          {hasPendingContent ? (
+            pendingContent
+          ) : (
+            <div className={timelineDescriptionClasses}>{pendingText}</div>
+          )}
         </div>
       </li>
     )

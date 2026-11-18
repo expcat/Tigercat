@@ -1,4 +1,4 @@
-import { computed, defineComponent, h, onBeforeUnmount, PropType, ref, watch } from 'vue'
+import { computed, defineComponent, h, onBeforeUnmount, PropType, watch } from 'vue'
 import {
   EMPTY_TIMELINE_ITEMS,
   classNames,
@@ -106,17 +106,13 @@ export const Timeline = defineComponent({
     const pendingSignature = computed(() =>
       props.pending && !slots.pending ? pendingText.value : ''
     )
-    const pendingSeen = ref<string | null>(null)
     const liveRegion = manageLiveRegion('polite')
     watch(
-      pendingSignature,
-      (signature) => {
-        const previous = pendingSeen.value
-        if (previous === signature) return
-        pendingSeen.value = signature
-        if (previous === null && !signature) return
-        if (signature) liveRegion.announce(signature)
-        else if (previous) {
+      [() => props.pending, pendingSignature],
+      ([pending, signature], [previousPending, previousSignature]) => {
+        if (signature && previousSignature !== signature) {
+          liveRegion.announce(signature)
+        } else if (previousPending && !pending) {
           liveRegion.announce(
             mergedLocale.value?.timeline?.pendingReplacedText || 'Update finished'
           )
