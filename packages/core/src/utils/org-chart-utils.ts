@@ -306,12 +306,15 @@ export function computeOrgChartLayout(
 
 export const layoutOrgChart = computeOrgChartLayout
 
-export function nextOrgChartNodeIndex(
+export function nextOrgChartNodeIndex<
+  T extends Pick<OrgChartLayoutNode, 'id' | 'parentId' | 'depth' | 'x' | 'y'>
+>(
   index: number,
   key: string,
-  nodes: readonly Pick<OrgChartLayoutNode, 'id' | 'parentId' | 'depth' | 'x' | 'y'>[],
+  nodes: readonly T[],
   orientation: OrgChartDirection = 'vertical',
-  direction: 'ltr' | 'rtl' = 'ltr'
+  direction: 'ltr' | 'rtl' = 'ltr',
+  isAvailable: (node: T) => boolean = () => true
 ): number {
   const current = nodes[index]
   if (!current) return index
@@ -325,11 +328,13 @@ export function nextOrgChartNodeIndex(
     .slice()
     .sort((a, b) => (orientation === 'horizontal' ? a.y - b.y : a.x - b.x))
   const siblingIndex = ordered.findIndex((node) => node.id === current.id)
-  const previous = siblingIndex > 0 ? ordered[siblingIndex - 1] : undefined
-  const next = siblingIndex >= 0 ? ordered[siblingIndex + 1] : undefined
+  const previous =
+    siblingIndex > 0 ? ordered.slice(0, siblingIndex).reverse().find(isAvailable) : undefined
+  const next = siblingIndex >= 0 ? ordered.slice(siblingIndex + 1).find(isAvailable) : undefined
   const firstChild = children
     .slice()
-    .sort((a, b) => (orientation === 'horizontal' ? a.y - b.y : a.x - b.x))[0]
+    .sort((a, b) => (orientation === 'horizontal' ? a.y - b.y : a.x - b.x))
+    .find(isAvailable)
   const parent = nodes.find((node) => String(node.id) === parentKey)
 
   const towardParent =
@@ -349,7 +354,7 @@ export function nextOrgChartNodeIndex(
           : key === towardNext
             ? next
             : undefined
-  if (!target) return index
+  if (!target || !isAvailable(target)) return index
   const nextIndex = nodes.findIndex((node) => node.id === target.id)
   return nextIndex < 0 ? index : nextIndex
 }

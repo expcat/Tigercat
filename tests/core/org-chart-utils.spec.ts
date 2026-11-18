@@ -5,6 +5,7 @@ import {
   getOrgChartNodeAriaLabel,
   getOrgChartNodeClipId,
   getOrgChartNodeMarkerGeometry,
+  nextOrgChartNodeIndex,
   normalizeOrgChartData,
   orgChartNodeLabelClasses,
   orgChartNodeRectClasses,
@@ -65,6 +66,24 @@ describe('org-chart-utils', () => {
       'ops->support',
       'ops->finance'
     ])
+  })
+
+  it('skips a disabled first child when moving down', () => {
+    const layout = computeOrgChartLayout({
+      ...orgData,
+      children: orgData.children?.map((node, index) => ({ ...node, disabled: index === 0 }))
+    })
+
+    const next = nextOrgChartNodeIndex(
+      0,
+      'ArrowDown',
+      layout.nodes,
+      'vertical',
+      'ltr',
+      (node) => !node.node.disabled
+    )
+
+    expect(layout.nodes[next].id).toBe('ops')
   })
 
   it('returns empty layout for empty forests', () => {

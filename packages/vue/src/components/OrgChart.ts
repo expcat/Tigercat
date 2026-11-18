@@ -197,10 +197,10 @@ export const OrgChart = defineComponent({
         event.key,
         layout.value.nodes,
         props.orientation,
-        direction.value
+        direction.value,
+        isInteractiveNode
       )
-      const target = layout.value.nodes[next]
-      if (next === node.index || !target || !isInteractiveNode(target)) return
+      if (next === node.index) return
       event.preventDefault()
       focusedIndex.value = next
       const nextEl = (event.currentTarget as Element | null)?.parentElement?.children[next]

@@ -98,6 +98,25 @@ describe('OrgChart', () => {
     expect(sibling).toHaveAttribute('tabindex', '-1')
   })
 
+  it('moves focus past a disabled first child when moving down', async () => {
+    const disabledData: OrgChartNode = {
+      ...data,
+      children: data.children?.map((node, index) => ({ ...node, disabled: index === 0 }))
+    }
+    const { getByRole } = render(OrgChart, { props: { data: disabledData, selectable: true } })
+    const root = getByRole('button', { name: 'Ada, CEO, Platform' })
+    const disabledChild = getByRole('group', { name: 'Lin, Engineering' })
+    const availableChild = getByRole('button', { name: 'Mira, Operations' })
+
+    root.focus()
+    await fireEvent.keyDown(root, { key: 'ArrowDown' })
+
+    expect(document.activeElement).toBe(availableChild)
+    expect(root).toHaveAttribute('tabindex', '-1')
+    expect(disabledChild).not.toHaveAttribute('tabindex')
+    expect(availableChild).toHaveAttribute('tabindex', '0')
+  })
+
   it('lays horizontal nodes from right to left when ConfigProvider is rtl', () => {
     const nodeX = (container: HTMLElement, name: string) => {
       const node = [...container.querySelectorAll('[data-org-chart-nodes="true"] > g')].find(

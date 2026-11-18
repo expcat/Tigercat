@@ -167,9 +167,15 @@ export function OrgChart({
       return
     }
     if (!isChartNavigationKey(event.key)) return
-    const next = nextOrgChartNodeIndex(node.index, event.key, layout.nodes, orientation, direction)
-    const target = layout.nodes[next]
-    if (next === node.index || !target || !isInteractiveNode(target)) return
+    const next = nextOrgChartNodeIndex(
+      node.index,
+      event.key,
+      layout.nodes,
+      orientation,
+      direction,
+      isInteractiveNode
+    )
+    if (next === node.index) return
     event.preventDefault()
     setFocusedIndex(next)
     const nextEl = (event.currentTarget as Element | null)?.parentElement?.children[next]
