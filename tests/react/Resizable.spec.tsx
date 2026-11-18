@@ -2,14 +2,15 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi } from 'vitest'
-import { render, fireEvent } from '@testing-library/react'
+import { describe, it, expect, onTestFinished, vi } from 'vitest'
+import { act, render, fireEvent } from '@testing-library/react'
 import React from 'react'
 import { Resizable } from '@expcat/tigercat-react/Resizable'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 import { expectNoA11yViolations } from '../utils/a11y-helpers'
+import { MockResizeObserver } from '../utils/mock-observers'
 import { RESIZE_KEYBOARD_STEP } from '@expcat/tigercat-core'
 
 function renderResizable(props: Record<string, unknown> = {}) {
@@ -167,6 +168,37 @@ describe('Resizable', () => {
       expect(bottom).toHaveAttribute('aria-valuenow', '215')
       expect(right).toHaveAttribute('aria-valuemax', '315')
       expect(bottom).toHaveAttribute('aria-valuemax', '215')
+    })
+
+    it('remeasures when its parent shrinks and clamps pointer and keyboard resizing', () => {
+      MockResizeObserver.reset()
+      vi.stubGlobal('ResizeObserver', MockResizeObserver)
+      onTestFinished(() => {
+        vi.unstubAllGlobals()
+      })
+      let parentWidth = 500
+      const host = document.body.appendChild(document.createElement('div'))
+      Object.defineProperty(host, 'clientWidth', { get: () => parentWidth })
+      const { container } = render(<Resizable defaultWidth={290} />, { container: host })
+      const right = handle(container, 'right')
+      expect(right).toHaveAttribute('aria-valuemax', '500')
+      fireEvent.pointerDown(right, { clientX: 290, button: 0, pointerId: 1 })
+
+      parentWidth = 300
+      const observer = MockResizeObserver.instances[0]
+      act(() => observer?.trigger(300, 400))
+      expect(right).toHaveAttribute('aria-valuemax', '300')
+      expect(observer.observe).toHaveBeenCalledWith(host)
+      fireEvent.pointerMove(document, { clientX: 350, pointerId: 1 })
+      expect(right).toHaveAttribute('aria-valuenow', '300')
+      fireEvent.pointerUp(document, { clientX: 350, pointerId: 1 })
+      expect(right).toHaveAttribute('aria-valuenow', '300')
+
+      fireEvent.keyDown(right, { key: 'ArrowLeft' })
+      expect(right).toHaveAttribute('aria-valuenow', '290')
+      fireEvent.keyDown(right, { key: 'ArrowRight' })
+      fireEvent.keyDown(right, { key: 'ArrowRight' })
+      expect(right).toHaveAttribute('aria-valuenow', '300')
     })
 
     it('shrinks width with ArrowRight on the end handle in rtl', () => {

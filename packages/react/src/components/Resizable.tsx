@@ -16,6 +16,7 @@ import {
   isSplitterRtl,
   measureResizableBounds,
   mergeResizableBoxStyle,
+  observeSize,
   resizableBaseClasses,
   reportedResizableSize,
   resizableAriaValueMax,
@@ -96,14 +97,16 @@ export const Resizable = forwardRef<HTMLDivElement, ResizableProps>(function Res
   const [draggingHandle, setDraggingHandle] = useState<ResizeHandlePosition | null>(null)
   const rootRef = useRef<HTMLDivElement | null>(null)
   const [availableBounds, setAvailableBounds] = useState(() => measureResizableBounds(null))
-  const resolvedMaxWidth = resizableAriaValueMax(
-    maxWidth,
-    Math.max(minWidth, availableBounds.width)
+  const availableBoundsRef = useRef(availableBounds)
+  const getResizeMaxima = useCallback(
+    (bounds: ReturnType<typeof measureResizableBounds>) => ({
+      maxWidth: resizableAriaValueMax(maxWidth, Math.max(minWidth, bounds.width)),
+      maxHeight: resizableAriaValueMax(maxHeight, Math.max(minHeight, bounds.height))
+    }),
+    [maxHeight, maxWidth, minHeight, minWidth]
   )
-  const resolvedMaxHeight = resizableAriaValueMax(
-    maxHeight,
-    Math.max(minHeight, availableBounds.height)
-  )
+  const { maxWidth: resolvedMaxWidth, maxHeight: resolvedMaxHeight } =
+    getResizeMaxima(availableBounds)
   const dragSessionRef = useRef<DocumentDragSession | null>(null)
   const dragRef = useRef<{
     handle: ResizeHandlePosition
@@ -134,11 +137,21 @@ export const Resizable = forwardRef<HTMLDivElement, ResizableProps>(function Res
   useEffect(() => cleanupDragSession, [cleanupDragSession])
 
   useEffect(() => {
-    const updateBounds = () => setAvailableBounds(measureResizableBounds(rootRef.current))
+    const updateBounds = () => {
+      const next = measureResizableBounds(rootRef.current)
+      const previous = availableBoundsRef.current
+      if (next.width === previous.width && next.height === previous.height) return
+      availableBoundsRef.current = next
+      setAvailableBounds(next)
+    }
     const view = rootRef.current?.ownerDocument.defaultView
     updateBounds()
+    const stopObserving = observeSize(rootRef.current?.parentElement, updateBounds)
     view?.addEventListener('resize', updateBounds)
-    return () => view?.removeEventListener('resize', updateBounds)
+    return () => {
+      stopObserving()
+      view?.removeEventListener('resize', updateBounds)
+    }
   }, [])
 
   const commitSize = useCallback(
@@ -221,8 +234,7 @@ export const Resizable = forwardRef<HTMLDivElement, ResizableProps>(function Res
               aspectRatio: resolveResizableAspectRatio(lockAspectRatio, drag.startW, drag.startH),
               minWidth,
               minHeight,
-              maxWidth: resolvedMaxWidth,
-              maxHeight: resolvedMaxHeight
+              ...getResizeMaxima(availableBoundsRef.current)
             }
           )
           commitSize(
@@ -258,8 +270,7 @@ export const Resizable = forwardRef<HTMLDivElement, ResizableProps>(function Res
                     ),
                     minWidth,
                     minHeight,
-                    maxWidth: resolvedMaxWidth,
-                    maxHeight: resolvedMaxHeight
+                    ...getResizeMaxima(availableBoundsRef.current)
                   }
                 )
             commitSize(
@@ -283,9 +294,8 @@ export const Resizable = forwardRef<HTMLDivElement, ResizableProps>(function Res
       cleanupDragSession,
       commitSize,
       disabled,
+      getResizeMaxima,
       lockAspectRatio,
-      resolvedMaxHeight,
-      resolvedMaxWidth,
       measureBox,
       minHeight,
       minWidth,
@@ -300,15 +310,15 @@ export const Resizable = forwardRef<HTMLDivElement, ResizableProps>(function Res
     (handle: ResizeHandlePosition, e: React.KeyboardEvent) => {
       if (disabled) return
       const box = measureBox()
-      const jumped = applyResizeJump(e.key, handle, box.width, box.height, axis, {
+      const resizeOptions = {
         rtl,
         lockAspectRatio: lockAspectRatio === true || typeof lockAspectRatio === 'string',
         aspectRatio: resolveResizableAspectRatio(lockAspectRatio, box.width, box.height),
         minWidth,
         minHeight,
-        maxWidth: resolvedMaxWidth,
-        maxHeight: resolvedMaxHeight
-      })
+        ...getResizeMaxima(availableBoundsRef.current)
+      }
+      const jumped = applyResizeJump(e.key, handle, box.width, box.height, axis, resizeOptions)
       if (jumped) {
         e.preventDefault()
         commitSize(jumped, handle, box.width, box.height, offset.x, offset.y, 'keyboard')
@@ -324,15 +334,7 @@ export const Resizable = forwardRef<HTMLDivElement, ResizableProps>(function Res
         delta.deltaX,
         delta.deltaY,
         axis,
-        {
-          rtl,
-          lockAspectRatio: lockAspectRatio === true || typeof lockAspectRatio === 'string',
-          aspectRatio: resolveResizableAspectRatio(lockAspectRatio, box.width, box.height),
-          minWidth,
-          minHeight,
-          maxWidth: resolvedMaxWidth,
-          maxHeight: resolvedMaxHeight
-        }
+        resizeOptions
       )
       commitSize(next, handle, box.width, box.height, offset.x, offset.y, 'keyboard')
     },
@@ -340,9 +342,8 @@ export const Resizable = forwardRef<HTMLDivElement, ResizableProps>(function Res
       axis,
       commitSize,
       disabled,
+      getResizeMaxima,
       lockAspectRatio,
-      resolvedMaxHeight,
-      resolvedMaxWidth,
       measureBox,
       minHeight,
       minWidth,

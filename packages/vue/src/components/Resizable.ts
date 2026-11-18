@@ -18,6 +18,7 @@ import {
   measureResizableBounds,
   mergeResizableBoxStyle,
   mergeStyleValues,
+  observeSize,
   resizableBaseClasses,
   reportedResizableSize,
   resizableAriaValueMax,
@@ -269,11 +270,14 @@ export const Resizable = defineComponent({
     const updateBounds = () => {
       availableBounds.value = measureResizableBounds(rootRef.value)
     }
+    let stopObservingBounds: (() => void) | undefined
     onMounted(() => {
       updateBounds()
+      stopObservingBounds = observeSize(rootRef.value?.parentElement, updateBounds)
       rootRef.value?.ownerDocument.defaultView?.addEventListener('resize', updateBounds)
     })
     onBeforeUnmount(() => {
+      stopObservingBounds?.()
       rootRef.value?.ownerDocument.defaultView?.removeEventListener('resize', updateBounds)
       cleanupDragSession()
     })
