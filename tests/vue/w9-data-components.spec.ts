@@ -54,6 +54,20 @@ describe('W9 vue data components', () => {
     expect(view.container.querySelector('[aria-live="polite"]')?.textContent).toContain('1')
   })
 
+  it('emits notification bell read changes once', async () => {
+    const onItemReadChange = vi.fn()
+    const items = [{ id: '1', title: 'One', read: false }]
+    const view = render(NotificationBell, {
+      props: { items, onItemReadChange }
+    })
+
+    await fireEvent.click(view.getByRole('button', { name: '1 unread' }))
+    await fireEvent.click(await view.findByRole('button', { name: 'Mark as read' }))
+
+    expect(onItemReadChange).toHaveBeenCalledTimes(1)
+    expect(onItemReadChange).toHaveBeenCalledWith(items[0], true)
+  })
+
   it('updates the notification bell live text when the unread count or locale changes', async () => {
     const view = render(NotificationBell, {
       props: {

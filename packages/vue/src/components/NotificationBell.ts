@@ -100,7 +100,6 @@ export const NotificationBell = defineComponent({
                   items: props.items,
                   locale: mergeTigerLocale(config.value.locale, props.locale),
                   onItemReadChange: (item: NotificationItem, nextRead: boolean) => {
-                    props.onItemReadChange?.(item, nextRead)
                     emit('item-read-change', item, nextRead)
                   }
                 })
