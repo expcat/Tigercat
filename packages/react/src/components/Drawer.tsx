@@ -223,7 +223,7 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
   const [layerId, setLayerId] = useState<number | null>(null)
   const [stackedZ, setStackedZ] = useState<number | undefined>(undefined)
 
-  const writingDirection = mergedLocale?.direction === 'rtl' ? 'rtl' : 'ltr'
+  const writingDirection: 'ltr' | 'rtl' = mergedLocale?.direction === 'rtl' ? 'rtl' : 'ltr'
   const resolvedPlacement = resolveDrawerPlacement(placement, writingDirection)
   const isHorizontal = resolvedPlacement === 'left' || resolvedPlacement === 'right'
   const readResizeLength = useCallback(
