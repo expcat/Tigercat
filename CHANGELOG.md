@@ -2,6 +2,31 @@
 
 本文档记录 Tigercat UI 组件库的所有版本变更。
 
+## Unreleased
+
+- **Mentions 受控输入（Vue）**：父组件拒绝更新时，输入框恢复显示 `modelValue`，后续编辑仍发出 `update:modelValue`。
+- **Select Tab 焦点（Vue）**：按 Tab 关闭选项列表后，焦点留在下一个控件。
+- **TagsInput 拖放（React）**：忽略从组件外拖入的内容，仍可拖动已有标签排序。
+- **Dropdown 与 ContextMenu 子菜单键盘（React / Vue）**：每层声明式子菜单只处理本层的方向键，按反向键关闭当前层并将焦点交还触发项。
+- **导航与图表原生监听（React / Vue）**：React ContextMenuSub、双端 NavigationMenu viewport 内容、ChartLegend 和 GaugeChart 先执行内部处理，再调用用户传入的同名原生监听。
+- **Drawer、Popconfirm 与 Alert 空内容和尺寸（React / Vue）**：React Drawer、Popconfirm 和 Alert 把自定义内容里的 `false` 当作空内容。双端 Drawer 分隔条的 `aria-valuemax` 表示容器上限，方向键调整尺寸时停在该上限。
+- **Popover 数字标题（React）**：标题为 `0` 时显示 `0`，不再发出缺少标题的警告。
+- **WorkflowDetailShell 根名称（Vue）**：保留调用方传入的原生 `aria-label`。
+- **NotificationCenter 分组已读（React / Vue）**：分组时，「全部已读」按钮只在当前组有未读条目时可用，点击后只标记该组的未读条目。
+- **NotificationBell 已读事件（Vue）**：每次条目已读状态变化只触发一次 `item-read-change`。
+- **ScrollArea 滑块尺寸（Vue）**：轨道配置变化后立即重算滑块的尺寸和位置。
+- **Resizable 尺寸上限（React / Vue）**：未设置上限时用容器的可用尺寸作为最大值，方向键或指针调整到该尺寸即停止。
+- **Splitter 折叠尺寸（React / Vue）**：非受控面板折叠后保持折叠状态并记住折叠前的尺寸，展开时恢复该尺寸。
+- **Descriptions、List 与 Countdown 空内容（React / Vue）**：双端 Descriptions 与 List、React Countdown 收到 `false` 时略过对应的空容器，传入数值 `0` 时仍显示 `0`。
+- **Carousel 轮播项索引（Vue）**：非受控 Carousel 的轮播项减少后再增加时，保留调整后的索引，不跳回旧索引。
+- **Table 网格焦点（React / Vue）**：虚拟表格的 grid 方向键能跨过当前渲染窗口，非虚拟表格按 ArrowRight 时焦点随活动单元格同步移动。
+- **Timeline 等待文案与播报（React / Vue）**：React `pendingContent={false}` 显示默认等待文案。双端在仍等待时切换到自定义节点，不播报完成。
+- **OrgChart 方向键（React / Vue）**：方向键导航跳过禁用节点。
+- **图表键盘、名称与属性（React / Vue / 文档）**：隐藏的图表项退出 roving tabindex，ScatterChart 隐藏点在入场动画期间仍不可见。AreaChart、BarChart 和 SankeyChart 无标题时使用本地化名称。React SankeyChart 和 WaterfallChart 转发根属性，双端都接受组件级 `locale` 和 `labels`。文档将 SankeyChart 的 `padding` 默认值写为 `16`，WaterfallChart 的 `width`、`padding`、`responsive` 分别写为 `480`、`24`、`true`。
+- **PrintLayout 页高与页眉页脚（React / Vue）**：页面高度支持按 `mm`、`cm`、`in`、`px`、`pt`、`pc` 换算。React `headerRender={false}` 和 `footerRender={false}` 显示各自的后备文本。
+- **ImageAnnotation 方向键监听（React / Vue）**：方向键完成内部移动后继续传给调用方监听，Enter 和 Delete 仍停止传播。
+- **Dropdown 声明式菜单 Tab 关闭（React / Vue）**：按 Tab 时，即使内部焦点层已将事件标为 `defaultPrevented`，菜单仍会关闭。
+
 ## v3.0.1（2026-11-17）
 
 - **读屏证据缺口（审查文档，E06）**：2026-11-17 用户接受缺口，E06 关闭。最佳可得证据是 hover 96 格 248 图，以及 17 个 P1 的 AX / 键盘证据。真实 VoiceOver / NVDA 输出仍缺，缺口与证据链接保留登记。证据任务剩 0 条。
