@@ -243,7 +243,6 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
       return slot === 'expand' ? expandToggleCell : selectionCell
     }
 
-    let dataColumnIndex = 0
     const rowNode = (
       <tr
         key={key}
@@ -260,7 +259,7 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
         }
         tabIndex={grid ? -1 : hasRowControls ? undefined : index === activeRowIndex ? 0 : -1}
         onKeyDown={
-          hasRowControls
+          grid || hasRowControls
             ? undefined
             : (e) => {
                 if (e.target !== e.currentTarget) return
@@ -318,8 +317,7 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
             )
           }
           const column = entry.column
-          const columnIndex = dataColumnIndex
-          dataColumnIndex += 1
+          const columnIndex = ctx.displayColumns.indexOf(column)
           const dataKey = column.dataKey || column.key
           const cellValue = record[dataKey]
 

@@ -6,7 +6,6 @@ import {
   onBeforeUnmount,
   onMounted,
   onUpdated,
-  nextTick,
   ref,
   useId,
   watch,
@@ -93,16 +92,25 @@ export const Table = defineComponent({
     const measuredRowHeights = ref<Record<number, number>>({})
     const measuredContainerSize = ref({ width: 0, height: 0 })
     const virtualScrollerRef = ref<HTMLElement | null>(null)
-    const pendingVirtualFocusIndex = ref<number | null>(null)
-    watch(pendingVirtualFocusIndex, async (index) => {
-      if (index == null) return
-      await nextTick()
-      const row = virtualScrollerRef.value?.querySelector(
-        `tr[data-tiger-table-page-index="${index}"]`
-      )
-      ;(row as HTMLElement | null)?.focus()
-      pendingVirtualFocusIndex.value = null
-    })
+    const pendingVirtualFocus = ref<{ row: number; column?: number } | null>(null)
+    watch(
+      pendingVirtualFocus,
+      (position) => {
+        if (!position) return
+        const { row, column } = position
+        const target = tableRef.value?.querySelector<HTMLElement>(
+          column == null
+            ? `tr[data-tiger-table-page-index="${row}"]`
+            : `[data-tiger-grid-cell="${row}-${column}"]`
+        )
+        if (target) {
+          target.focus()
+          if (column != null) gridCell.value = { row, column }
+        }
+        pendingVirtualFocus.value = null
+      },
+      { flush: 'post' }
+    )
     const virtualClientHeight = ref(0)
     const columnScrollLeft = ref(0)
     const uncontrolledCardViewport = ref(false)
@@ -442,14 +450,14 @@ export const Table = defineComponent({
             resolvedProps.overscan
           )
         : undefined
-      const focusVirtualRow = (index: number, edge: 'down' | 'up') => {
+      const focusVirtualRow = (index: number, edge: 'down' | 'up', column?: number) => {
         const target =
           edge === 'down'
             ? Math.max(0, (index + 1) * declaredRowHeight - virtualViewport)
             : index * declaredRowHeight
         if (virtualScrollerRef.value) virtualScrollerRef.value.scrollTop = target
         ctx.virtualScrollTop.value = target
-        pendingVirtualFocusIndex.value = index
+        pendingVirtualFocus.value = { row: index, column }
       }
       const columnSlice = virtualizeMiddleColumns({
         columns: ctx.displayColumns.value,
@@ -551,12 +559,45 @@ export const Table = defineComponent({
                   return
                 }
                 event.preventDefault()
-                tableRef.value
-                  ?.querySelector<HTMLElement>(
-                    `[data-tiger-grid-cell="${next.row}-${next.column}"]`
-                  )
-                  ?.focus()
-                gridCell.value = next
+                const cell = tableRef.value?.querySelector<HTMLElement>(
+                  `[data-tiger-grid-cell="${next.row}-${next.column}"]`
+                )
+                if (cell) {
+                  cell.focus()
+                  gridCell.value = next
+                } else {
+                  if (
+                    virtualWindow &&
+                    (next.row < virtualWindow.startIndex || next.row > virtualWindow.endIndex)
+                  ) {
+                    focusVirtualRow(
+                      next.row,
+                      next.row > gridCell.value.row ? 'down' : 'up',
+                      next.column
+                    )
+                  }
+                  if (
+                    columnSlice.active &&
+                    !columnEntries?.some(
+                      (entry) =>
+                        entry.kind === 'column' &&
+                        entry.column === ctx.displayColumns.value[next.column]
+                    )
+                  ) {
+                    const offset = ctx.displayColumns.value
+                      .slice(0, next.column)
+                      .reduce(
+                        (total, column) =>
+                          total + (column.fixed ? 0 : parseWidthToPx(column.width)),
+                        0
+                      )
+                    const target = config.value.direction === 'rtl' ? -offset : offset
+                    const scroller = effectiveVirtual ? virtualScrollerRef.value : wrapperRef.value
+                    if (scroller) scroller.scrollLeft = target
+                    columnScrollLeft.value = target
+                    pendingVirtualFocus.value = next
+                  }
+                }
               }
             : undefined,
           class: classNames(

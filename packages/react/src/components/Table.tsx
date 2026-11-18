@@ -451,27 +451,36 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
       overscan
     ]
   )
-  const [pendingVirtualFocusIndex, setPendingVirtualFocusIndex] = useState<number | null>(null)
+  const [pendingVirtualFocus, setPendingVirtualFocus] = useState<{
+    row: number
+    column?: number
+  } | null>(null)
   const focusVirtualRow = useCallback(
-    (index: number, edge: 'down' | 'up') => {
+    (index: number, edge: 'down' | 'up', column?: number) => {
       const target =
         edge === 'down'
           ? Math.max(0, (index + 1) * declaredRowHeight - virtualViewport)
           : index * declaredRowHeight
       if (virtualScrollerRef.current) virtualScrollerRef.current.scrollTop = target
       setVirtualScrollTop(target)
-      setPendingVirtualFocusIndex(index)
+      setPendingVirtualFocus({ row: index, column })
     },
     [declaredRowHeight, virtualViewport]
   )
   useEffect(() => {
-    if (pendingVirtualFocusIndex == null) return
-    const row = virtualScrollerRef.current?.querySelector(
-      `tr[data-tiger-table-page-index="${pendingVirtualFocusIndex}"]`
+    if (!pendingVirtualFocus) return
+    const { row, column } = pendingVirtualFocus
+    const target = tableRef.current?.querySelector<HTMLElement>(
+      column == null
+        ? `tr[data-tiger-table-page-index="${row}"]`
+        : `[data-tiger-grid-cell="${row}-${column}"]`
     )
-    ;(row as HTMLElement | null)?.focus()
-    setPendingVirtualFocusIndex(null)
-  }, [pendingVirtualFocusIndex])
+    if (target) {
+      target.focus()
+      if (column != null) setGridCell({ row, column })
+    }
+    setPendingVirtualFocus(null)
+  }, [pendingVirtualFocus])
   const shouldObserveGeometry =
     effectiveVirtual ||
     columnLockable ||
@@ -568,10 +577,39 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
             (next.row !== gridCell.row || next.column !== gridCell.column)
           ) {
             event.preventDefault()
-            tableRef.current
-              ?.querySelector<HTMLElement>(`[data-tiger-grid-cell="${next.row}-${next.column}"]`)
-              ?.focus()
-            setGridCell(next)
+            const cell = tableRef.current?.querySelector<HTMLElement>(
+              `[data-tiger-grid-cell="${next.row}-${next.column}"]`
+            )
+            if (cell) {
+              cell.focus()
+              setGridCell(next)
+            } else {
+              if (
+                virtualWindow &&
+                (next.row < virtualWindow.startIndex || next.row > virtualWindow.endIndex)
+              ) {
+                focusVirtualRow(next.row, next.row > gridCell.row ? 'down' : 'up', next.column)
+              }
+              if (
+                columnSlice.active &&
+                !columnEntries?.some(
+                  (entry) =>
+                    entry.kind === 'column' && entry.column === ctx.displayColumns[next.column]
+                )
+              ) {
+                const offset = ctx.displayColumns
+                  .slice(0, next.column)
+                  .reduce(
+                    (total, column) => total + (column.fixed ? 0 : parseWidthToPx(column.width)),
+                    0
+                  )
+                const target = config.direction === 'rtl' ? -offset : offset
+                const scroller = effectiveVirtual ? virtualScrollerRef.current : wrapperRef.current
+                if (scroller) scroller.scrollLeft = target
+                setColumnScrollLeft(target)
+                setPendingVirtualFocus(next)
+              }
+            }
           }
         }
         ;(props as React.TableHTMLAttributes<HTMLTableElement>).onKeyDown?.(event)

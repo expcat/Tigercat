@@ -247,7 +247,6 @@ export function renderTableBody(
     const bodyEntries =
       (props as TableInternalProps & { columnEntries?: TableColumnRenderEntry[] }).columnEntries ??
       getTableColumnRenderEntries(ctx.displayColumns.value)
-    let dataColumnIndex = 0
     bodyEntries.forEach((entry) => {
       if (entry.kind === 'spacer') {
         cells.push(
@@ -260,8 +259,7 @@ export function renderTableBody(
         return
       }
       const column = entry.column
-      const columnIndex = dataColumnIndex
-      dataColumnIndex += 1
+      const columnIndex = ctx.displayColumns.value.indexOf(column)
       const dataKey = column.dataKey || column.key
       const cellValue = record[dataKey]
 
@@ -444,31 +442,32 @@ export function renderTableBody(
             : index === (props.activeRowIndex ?? 0)
               ? 0
               : -1,
-        onKeydown: hasRowControls
-          ? undefined
-          : (e: KeyboardEvent) => {
-              if (e.target !== e.currentTarget) return
-              if (isActivationKey(e) && props.interactiveRows) {
+        onKeydown:
+          props.grid || hasRowControls
+            ? undefined
+            : (e: KeyboardEvent) => {
+                if (e.target !== e.currentTarget) return
+                if (isActivationKey(e) && props.interactiveRows) {
+                  e.preventDefault()
+                  ctx.handleRowClick(record, sourceIndex, key)
+                  return
+                }
+                if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return
                 e.preventDefault()
-                ctx.handleRowClick(record, sourceIndex, key)
-                return
+                const next = e.key === 'ArrowDown' ? index + 1 : index - 1
+                if (next < 0 || next >= ctx.paginatedData.value.length) return
+                props.onActiveRowIndex?.(next)
+                const row = (e.currentTarget as HTMLElement).parentElement?.querySelector(
+                  `tr[data-tiger-table-page-index="${next}"]`
+                ) as HTMLElement | null
+                if (row) {
+                  row.focus()
+                  return
+                }
+                if (props.virtualWindow) {
+                  props.onVirtualRowFocus?.(next, e.key === 'ArrowDown' ? 'down' : 'up')
+                }
               }
-              if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return
-              e.preventDefault()
-              const next = e.key === 'ArrowDown' ? index + 1 : index - 1
-              if (next < 0 || next >= ctx.paginatedData.value.length) return
-              props.onActiveRowIndex?.(next)
-              const row = (e.currentTarget as HTMLElement).parentElement?.querySelector(
-                `tr[data-tiger-table-page-index="${next}"]`
-              ) as HTMLElement | null
-              if (row) {
-                row.focus()
-                return
-              }
-              if (props.virtualWindow) {
-                props.onVirtualRowFocus?.(next, e.key === 'ArrowDown' ? 'down' : 'up')
-              }
-            }
       },
       cells
     )

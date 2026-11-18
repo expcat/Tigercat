@@ -1363,6 +1363,61 @@ describe('Table', () => {
       expect(body).toEqual(['a|1', 'a|2', 'b|1'])
     })
 
+    it('moves grid focus and tabindex across virtual row and column windows', () => {
+      const wide: TableColumn[] = Array.from({ length: 8 }, (_, index) => ({
+        key: `c${index}`,
+        title: `C${index}`,
+        width: 100
+      }))
+      const rows = Array.from({ length: 8 }, (_, index) => ({
+        id: index,
+        ...Object.fromEntries(wide.map((column) => [column.key, `${column.key}-${index}`]))
+      }))
+      const { container } = render(
+        <Table
+          columns={wide}
+          dataSource={rows}
+          pagination={false}
+          grid
+          virtual
+          virtualHeight={80}
+          virtualItemHeight={40}
+          virtualizeColumns
+          width={200}
+          overscan={0}
+        />
+      )
+      const table = container.querySelector('table')!
+      const scroller = table.parentElement!
+      const start = container.querySelector<HTMLElement>('[data-tiger-grid-cell="0-0"]')!
+      start.focus()
+      fireEvent.keyDown(start, { key: 'ArrowRight' })
+      const edge = container.querySelector<HTMLElement>('[data-tiger-grid-cell="0-1"]')!
+      expect(edge).toHaveFocus()
+      expect(edge).toHaveAttribute('tabindex', '0')
+      expect(container.querySelector('[data-tiger-grid-cell="0-2"]')).toBeNull()
+
+      fireEvent.keyDown(edge, { key: 'ArrowRight' })
+      const nextColumn = container.querySelector<HTMLElement>('[data-tiger-grid-cell="0-2"]')!
+      expect(nextColumn).toHaveTextContent('c2-0')
+      expect(nextColumn).toHaveFocus()
+      expect(nextColumn).toHaveAttribute('tabindex', '0')
+      expect(scroller.scrollLeft).toBeGreaterThan(0)
+
+      fireEvent.keyDown(nextColumn, { key: 'ArrowDown' })
+      const lastRow = container.querySelector<HTMLElement>('[data-tiger-grid-cell="1-2"]')!
+      expect(lastRow).toHaveFocus()
+      expect(container.querySelector('[data-tiger-grid-cell="2-2"]')).toBeNull()
+      fireEvent.keyDown(lastRow, { key: 'ArrowDown' })
+      const nextRow = container.querySelector<HTMLElement>('[data-tiger-grid-cell="2-2"]')!
+      expect(nextRow).toHaveTextContent('c2-2')
+      expect(nextRow).toHaveFocus()
+      expect(nextRow).toHaveAttribute('tabindex', '0')
+      expect(lastRow).toHaveAttribute('tabindex', '-1')
+      expect(table.querySelectorAll('td[tabindex="0"]')).toHaveLength(1)
+      expect(scroller.scrollTop).toBeGreaterThan(0)
+    })
+
     it('moves grid focus or the active descendant to the next cell on ArrowRight', () => {
       const { container } = render(
         <Table
