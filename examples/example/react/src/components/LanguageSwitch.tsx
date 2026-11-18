@@ -11,7 +11,7 @@ export interface LanguageSwitchProps {
 }
 
 export const LanguageSwitch: React.FC<LanguageSwitchProps> = ({ value, onChange }) => {
-  const handleChange = (next: string | number | (string | number)[] | undefined) => {
+  const handleChange = (next: string | number | (string | number)[] | null | undefined) => {
     const v = Array.isArray(next) ? next[0] : next
     if (isDemoLang(v)) onChange(v)
   }
@@ -22,6 +22,7 @@ export const LanguageSwitch: React.FC<LanguageSwitchProps> = ({ value, onChange 
         {demoChrome(value).language}
       </span>
       <Select
+        multiple={false}
         aria-label={demoChrome(value).language}
         value={value}
         onChange={handleChange}

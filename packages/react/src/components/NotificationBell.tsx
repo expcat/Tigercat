@@ -3,11 +3,9 @@ import {
   formatW9Label,
   getW9DataLabels,
   mergeTigerLocale,
-  type TigerLocale,
   notificationItemsPendingRead,
   resolveButtonClasses,
-  type NotificationBellProps as CoreNotificationBellProps,
-  type NotificationItem
+  type NotificationBellProps as CoreNotificationBellProps
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './tiger-config'
 import { Badge } from './Badge'

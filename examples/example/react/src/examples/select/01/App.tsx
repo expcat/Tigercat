@@ -9,11 +9,18 @@ const options = [
 ]
 
 export default function App() {
-  const [value, setValue] = useState<string | number | undefined>('standard')
+  const [value, setValue] = useState<string | number | null | undefined>('standard')
 
   return (
     <FormItem label="套餐" className="w-full max-w-sm">
-      <Select value={value} onChange={setValue} options={options} clearable size="lg" />
+      <Select
+        multiple={false}
+        value={value}
+        onChange={setValue}
+        options={options}
+        clearable
+        size="lg"
+      />
     </FormItem>
   )
 }

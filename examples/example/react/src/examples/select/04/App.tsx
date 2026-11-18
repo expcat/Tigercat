@@ -19,11 +19,12 @@ const groupedOptions = [
 ]
 
 export default function App() {
-  const [value, setValue] = useState<string | number | undefined>(undefined)
+  const [value, setValue] = useState<string | number | null | undefined>(undefined)
   const [loading, setLoading] = useState(false)
 
   return (
     <Select
+      multiple={false}
       value={value}
       onChange={setValue}
       options={groupedOptions}

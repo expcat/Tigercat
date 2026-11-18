@@ -5,7 +5,7 @@ import { Select } from '@expcat/tigercat-react/Select'
 
 export default function App() {
   const [open, setOpen] = useState(false)
-  const [assignee, setAssignee] = useState<string | number>('alice')
+  const [assignee, setAssignee] = useState<string | number | null>('alice')
 
   return (
     <>
@@ -24,6 +24,7 @@ export default function App() {
           <label className="block space-y-1 text-sm">
             <span>负责人</span>
             <Select
+              multiple={false}
               value={assignee}
               options={[
                 { label: 'Alice', value: 'alice' },

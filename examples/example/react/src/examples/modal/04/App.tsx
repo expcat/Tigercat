@@ -9,7 +9,7 @@ export default function App() {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
-  const [project, setProject] = useState<string | number>('website')
+  const [project, setProject] = useState<string | number | null>('website')
   const [dueDate, setDueDate] = useState<Date | null>(null)
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
@@ -57,6 +57,7 @@ export default function App() {
           <label className="block space-y-1 text-sm">
             <span>项目（浮层自动使用 Modal layer）</span>
             <Select
+              multiple={false}
               value={project}
               options={[
                 { label: '网站改版', value: 'website' },

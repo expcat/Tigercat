@@ -9,10 +9,11 @@ const cities = [
 ]
 
 export default function App() {
-  const [value, setValue] = useState<string | number | undefined>(undefined)
+  const [value, setValue] = useState<string | number | null | undefined>(undefined)
 
   return (
     <Select
+      multiple={false}
       value={value}
       onChange={setValue}
       options={cities}

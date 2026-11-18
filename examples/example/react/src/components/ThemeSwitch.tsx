@@ -13,7 +13,7 @@ export interface ThemeSwitchProps {
 }
 
 const ThemeSwitch: React.FC<ThemeSwitchProps> = ({ lang = 'zh-CN', value, onChange }) => {
-  const handleThemeChange = (next: string | number | (string | number)[] | undefined) => {
+  const handleThemeChange = (next: string | number | (string | number)[] | null | undefined) => {
     const themeValue = String(Array.isArray(next) ? next[0] : next)
     if (themeValue) onChange(resolveDemoTheme(themeValue))
   }
@@ -29,6 +29,7 @@ const ThemeSwitch: React.FC<ThemeSwitchProps> = ({ lang = 'zh-CN', value, onChan
         {demoChrome(lang).theme}
       </span>
       <Select
+        multiple={false}
         aria-label={demoChrome(lang).theme}
         value={value}
         onChange={handleThemeChange}
