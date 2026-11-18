@@ -510,12 +510,12 @@ export const Dropdown = defineComponent({
     const typeahead = createTypeaheadHighlight()
 
     const handleMenuKeyDown = (event: KeyboardEvent) => {
-      if (event.defaultPrevented) return
       if (event.key === 'Tab') {
         skipRestore.value = true
         setVisible(false)
         return
       }
+      if (event.defaultPrevented) return
       if (isTextEditingTarget(event.target)) return
       if (parentMenu) {
         const dir =

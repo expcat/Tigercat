@@ -300,12 +300,12 @@ export const Dropdown = forwardRef<HTMLElement, DropdownProps>(function Dropdown
 
   const handleMenuKeyDown = useCallback(
     (event: React.KeyboardEvent) => {
-      if (event.defaultPrevented) return
       if (event.key === 'Tab') {
         skipRestoreRef.current = true
         setVisible(false)
         return
       }
+      if (event.defaultPrevented) return
       if (isTextEditingTarget(event.target)) return
       if (floatingRef.current) {
         handleMenuNavigation(floatingRef.current, event.nativeEvent)
