@@ -93,6 +93,39 @@ describe('Drawer', () => {
     expect(separator).toHaveAttribute('aria-valuemax', '110')
   })
 
+  it('resizes to the new viewport limit during an active drag', () => {
+    const previousWidth = window.innerWidth
+    Object.defineProperty(window, 'innerWidth', { configurable: true, value: 500 })
+    try {
+      render(<Drawer open placement="left" width={320} resizable fullscreenOnMobile={false} />)
+      const dialog = screen.getByRole('dialog')
+      Object.defineProperty(dialog, 'offsetWidth', { configurable: true, value: 320 })
+      const separator = screen.getByRole('separator')
+
+      expect(separator).toHaveAttribute('aria-valuemax', '500')
+      fireEvent.pointerDown(separator, { button: 0, clientX: 316 })
+      fireEvent.pointerMove(window, { clientX: 499 })
+      expect(dialog).toHaveStyle({ width: '500px' })
+
+      Object.defineProperty(window, 'innerWidth', { configurable: true, value: 900 })
+      fireEvent.resize(window)
+      expect(separator).toHaveAttribute('aria-valuemin', '80')
+      expect(separator).toHaveAttribute('aria-valuemax', '900')
+
+      fireEvent.pointerMove(window, { clientX: 796 })
+      expect(dialog).toHaveStyle({ width: '800px' })
+      expect(separator).toHaveAttribute('aria-valuenow', '800')
+
+      fireEvent.pointerMove(window, { clientX: 899 })
+      expect(dialog).toHaveStyle({ width: '900px' })
+      expect(separator).toHaveAttribute('aria-valuenow', '900')
+      expect(separator).toHaveAttribute('aria-valuemax', '900')
+    } finally {
+      fireEvent.pointerUp(window)
+      Object.defineProperty(window, 'innerWidth', { configurable: true, value: previousWidth })
+    }
+  })
+
   it('falls back from false or empty headers and keeps numeric zero as the title', () => {
     const { rerender } = render(<Drawer open title="Fallback title" header={false} />)
     const dialog = screen.getByRole('dialog', { name: 'Fallback title' })

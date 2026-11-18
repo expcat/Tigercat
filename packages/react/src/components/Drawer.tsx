@@ -234,20 +234,23 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
         : (dialogRef.current?.offsetHeight ?? 240)),
     [isHorizontal, resizedLength]
   )
-  const measureResizeRange = useCallback(() => {
+  const readMaxResizeLength = useCallback(() => {
     const root = rootRef.current
     const viewport = root?.ownerDocument.defaultView
-    const maximum = Math.max(
+    return Math.max(
       80,
       isHorizontal
         ? root?.clientWidth || viewport?.innerWidth || 0
         : root?.clientHeight || viewport?.innerHeight || 0
     )
+  }, [isHorizontal])
+  const measureResizeRange = useCallback(() => {
+    const maximum = readMaxResizeLength()
     const current = Math.min(maximum, Math.max(80, readResizeLength()))
     setMaxResizeLength(maximum)
     setMeasuredLength(current)
     if (resizedLength != null) setResizedLength(current)
-  }, [isHorizontal, readResizeLength, resizedLength])
+  }, [readMaxResizeLength, readResizeLength, resizedLength])
   useLayoutEffect(() => {
     if (!open || !resizable) return
     measureResizeRange()
@@ -571,7 +574,9 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
                   pointer.clientX - startX,
                   pointer.clientY - startY
                 )
-                setResizedLength(Math.min(maxResizeLength, Math.max(80, start + delta)))
+                const maximum = readMaxResizeLength()
+                setMaxResizeLength(maximum)
+                setResizedLength(Math.min(maximum, Math.max(80, start + delta)))
               }
               const end = () => {
                 setResizing(false)
