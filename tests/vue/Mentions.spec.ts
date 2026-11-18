@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import { defineComponent, h } from 'vue'
+import { defineComponent, h, ref } from 'vue'
 import { render, fireEvent, screen, waitFor } from '@testing-library/vue'
 import { Mentions } from '@expcat/tigercat-vue/Mentions'
 import { Form } from '@expcat/tigercat-vue/Form'
@@ -76,6 +76,43 @@ describe('Mentions', () => {
     expect(textarea).toHaveValue('keep-more')
   })
 
+  it('restores suggestions after the parent rejects a paste', async () => {
+    const updates: string[] = []
+    const Wrapper = defineComponent({
+      setup() {
+        const modelValue = ref('keep')
+        return () =>
+          h(Mentions, {
+            modelValue: modelValue.value,
+            options: defaultOptions,
+            'onUpdate:modelValue': (value: string) => {
+              updates.push(value)
+              if (value !== 'keep @al') modelValue.value = value
+            }
+          })
+      }
+    })
+    const { getByRole, queryByRole } = render(Wrapper)
+    const textarea = getByRole('textbox') as HTMLTextAreaElement
+    await openMention(textarea, 'keep @b')
+    expect(textarea).toHaveValue('keep @b')
+    expect(getByRole('option', { name: 'Bob' })).toBeInTheDocument()
+
+    textarea.setRangeText('al', 'keep @'.length, textarea.value.length, 'end')
+    await fireEvent(
+      textarea,
+      new InputEvent('input', { bubbles: true, inputType: 'insertFromPaste' })
+    )
+    expect(textarea).toHaveValue('keep @b')
+    expect(queryByRole('option', { name: 'Alice' })).not.toBeInTheDocument()
+
+    const bob = getByRole('option', { name: 'Bob' })
+    await fireEvent.mouseDown(bob)
+    await fireEvent.click(bob)
+    expect(updates).toEqual(['keep @b', 'keep @al', 'keep @bob '])
+    expect(textarea).toHaveValue('keep @bob ')
+  })
+
   it('does not reset to defaultValue on rerender', async () => {
     const { getByRole, rerender } = render(Mentions, {
       props: { options: defaultOptions, defaultValue: 'start ' }
@@ -115,13 +152,15 @@ describe('Mentions', () => {
     const { getByRole, getByText, emitted } = render(Mentions, {
       props: {
         options: defaultOptions,
-        modelValue: 'hello ',
+        modelValue: 'hello @al there',
         'aria-label': 'Members'
       }
     })
     const textarea = getByRole('textbox') as HTMLTextAreaElement
-    await openMention(textarea, 'hello @al', 9)
+    await openMention(textarea, 'hello @al there', 9)
     await screen.findByRole('listbox')
+    textarea.value = 'hello @al'
+    textarea.setSelectionRange(9, 9)
     await fireEvent.mouseDown(getByText('Alice'))
     await fireEvent.click(getByText('Alice'))
     expect(emitted()['update:modelValue']?.at(-1)).toEqual(['hello @alice '])

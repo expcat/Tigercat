@@ -290,10 +290,12 @@ export const Mentions = defineComponent({
       if (controlled) {
         nextTick(() => {
           const shown = currentValue.value
+          const textarea = textareaRef.value
           liveText.value = shown
-          if (textareaRef.value && textareaRef.value.value !== shown) {
-            textareaRef.value.value = shown
+          if (textarea && textarea.value !== shown) {
+            textarea.value = shown
           }
+          if (shown !== next && !dismissed.value) syncFromField(textarea)
         })
       }
       if (caret !== undefined) {
@@ -334,6 +336,7 @@ export const Mentions = defineComponent({
       }
       mentionStartPos.value = -1
       mentionEndPos.value = -1
+      mentionSnapshot.value = null
       query.value = ''
       setOpen(false)
       activeIndex.value = -1
