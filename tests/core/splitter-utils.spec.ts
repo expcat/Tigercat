@@ -391,6 +391,20 @@ describe('splitter-utils', () => {
       expect(dropped.ratios[0]).toBeCloseTo(0.3)
       expect(dropped.sizesKey).toBeUndefined()
     })
+
+    it('redistributes space among open panes as the count changes', () => {
+      const initial = { ratios: [0, 0.25, 0.75], sizesKey: undefined }
+      const expanded = reconcileSplitterRatios(initial, 4, undefined, 0, [200])
+      expect(expanded.ratios).toEqual([0, 1 / 6, 1 / 2, 1 / 3])
+
+      const collapsed = { ratios: panePixelsToRatios([0, 0, 0], true), sizesKey: undefined }
+      expect(collapsed.ratios).toEqual([0, 0, 0])
+      const reduced = reconcileSplitterRatios(collapsed, 2, undefined, 0, [100, 200])
+      expect(reduced.ratios).toEqual([0, 0])
+      expect(reconcileSplitterRatios(reduced, 3, undefined, 0, [100, 200]).ratios).toEqual([
+        0, 0, 1
+      ])
+    })
   })
 
   describe('projectControlledPaneSizes', () => {

@@ -280,6 +280,7 @@ export interface SplitterRatioState {
 
 /**
  * Update stored ratios when the `sizes` *values* or pane count change.
+ * When the pane count changes, keep collapsed panes at zero and align only the open panes.
  * A new array with the same values does not reset a drag.
  * Dropping `sizes` keeps the last ratios.
  */
@@ -287,10 +288,15 @@ export function reconcileSplitterRatios(
   state: SplitterRatioState,
   paneCount: number,
   sizes: (number | string)[] | undefined,
-  available = 0
+  available = 0,
+  collapsedPrevious?: readonly (number | string | null)[]
 ): SplitterRatioState {
   const sizesKey = serializePaneSizes(sizes)
-  if (paneCount <= 0) return { ratios: [], sizesKey }
+  if (paneCount <= 0) {
+    return state.ratios.length === 0 && sizesKey === state.sizesKey
+      ? state
+      : { ratios: [], sizesKey }
+  }
 
   const sizesChanged = sizesKey !== state.sizesKey
   const countChanged = state.ratios.length !== paneCount
@@ -300,6 +306,22 @@ export function reconcileSplitterRatios(
   }
 
   if (countChanged) {
+    if (sizesKey === undefined && collapsedPrevious) {
+      const openRatios = state.ratios
+        .slice(0, paneCount)
+        .filter((_, index) => collapsedPrevious[index] == null)
+      const closedCount = collapsedPrevious.filter(
+        (size, index) => index < paneCount && size != null
+      ).length
+      const openCount = paneCount - closedCount
+      const weights = openRatios.some((ratio) => ratio > 0) ? openRatios : []
+      const aligned = alignPaneRatios(weights, openCount)
+      let openIndex = 0
+      const ratios = Array.from({ length: paneCount }, (_, index) =>
+        collapsedPrevious[index] == null ? aligned[openIndex++] : 0
+      )
+      return { ratios, sizesKey }
+    }
     return { ratios: alignPaneRatios(state.ratios, paneCount), sizesKey }
   }
 
@@ -408,13 +430,16 @@ export function classifySplitterSize(size: number | string | undefined): {
 export function normalizeSplitterBounds(
   paneCount: number,
   min?: number | number[],
-  max?: number | number[]
+  max?: number | number[],
+  collapsedPrevious?: readonly (number | string | null)[]
 ): { mins: number[]; maxes: Array<number | undefined> } {
   const mins = Array.from({ length: paneCount }, (_, index) => {
+    if (collapsedPrevious?.[index] != null) return 0
     const raw = Array.isArray(min) ? min[index] : min
     return raw != null && Number.isFinite(raw) ? Math.max(0, raw) : 0
   })
   const maxes = Array.from({ length: paneCount }, (_, index) => {
+    if (collapsedPrevious?.[index] != null) return 0
     const raw = Array.isArray(max) ? max[index] : max
     return raw != null && Number.isFinite(raw) ? Math.max(0, raw) : undefined
   })
@@ -676,9 +701,9 @@ export function projectControlledPaneSizes(
   return rebalancePercentSizes(projected as string[])
 }
 
-export function panePixelsToRatios(sizes: number[]): number[] {
+export function panePixelsToRatios(sizes: number[], preserveZeros = false): number[] {
   const percentages = sizesToPercentages(sizes)
-  if (percentages.every((value) => value === 0)) {
+  if (!preserveZeros && percentages.every((value) => value === 0)) {
     const count = sizes.length
     return count > 0 ? Array.from({ length: count }, () => 1 / count) : []
   }

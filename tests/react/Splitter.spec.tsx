@@ -240,6 +240,40 @@ describe('Splitter', () => {
       )
     })
 
+    it('keeps collapsed panes at zero when an uncontrolled pane is added', () => {
+      stubElementSize(608)
+      const renderPanes = (count: number) => (
+        <Splitter collapsible min={40}>
+          {Array.from({ length: count }, (_, index) => (
+            <div key={index}>Pane {index + 1}</div>
+          ))}
+        </Splitter>
+      )
+      const { container, rerender } = render(renderPanes(2))
+      const widths = () =>
+        Array.from(container.querySelectorAll<HTMLElement>('[data-pane-index]'), (pane) =>
+          parseFloat(pane.style.width)
+        )
+      const collapsed = () =>
+        Array.from(container.querySelectorAll('[data-collapsed]'), (pane) =>
+          pane.getAttribute('data-pane-index')
+        )
+      const collapse = (index: number) =>
+        fireEvent.click(paneBox(container, index).querySelector('button') as HTMLElement)
+
+      collapse(0)
+      expect(widths()).toEqual([0, 604])
+      expect(collapsed()).toEqual(['0'])
+
+      rerender(renderPanes(3))
+      expect(widths()).toEqual([0, 300, 300])
+      expect(collapsed()).toEqual(['0'])
+
+      collapse(1)
+      expect(widths()).toEqual([0, 0, 600])
+      expect(collapsed()).toEqual(['0', '1'])
+    })
+
     it('restores an unspecified pane after collapse', () => {
       const { container } = render(
         <Splitter sizes={['30%']} collapsible>

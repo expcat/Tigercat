@@ -164,7 +164,13 @@ export const Splitter = defineComponent({
       )
     )
 
-    const boundsFor = (count: number) => normalizeSplitterBounds(count, props.min, props.max)
+    const boundsFor = (count: number) =>
+      normalizeSplitterBounds(
+        count,
+        props.min,
+        props.max,
+        props.sizes == null ? collapsedPrevious.value : undefined
+      )
     const getMins = (count: number) => boundsFor(count).mins
     const getMaxes = (count: number) => boundsFor(count).maxes
 
@@ -196,7 +202,10 @@ export const Splitter = defineComponent({
       )
       const key = sizesKey.value
       override.value = { key, sizes: projected }
-      ratioState.value = { ratios: panePixelsToRatios(nextPixels), sizesKey: key }
+      ratioState.value = {
+        ratios: panePixelsToRatios(nextPixels, props.sizes == null),
+        sizesKey: key
+      }
       emit('update:sizes', projected)
       emit('resize', { index, sizes: nextPixels })
       if (phase === 'end' || phase === 'keyboard') {
@@ -267,12 +276,33 @@ export const Splitter = defineComponent({
     return () => {
       const nodes: ReturnType<typeof h>[] = []
       const panes = collectPanes()
+      const uncontrolledCollapsed = props.sizes == null ? collapsedPrevious.value : undefined
+      if (uncontrolledCollapsed && uncontrolledCollapsed.length > panes.length) {
+        collapsedPrevious.value = uncontrolledCollapsed.slice(0, panes.length)
+      }
+      if (
+        uncontrolledCollapsed &&
+        override.value &&
+        override.value.key === sizesKey.value &&
+        override.value.sizes.length !== panes.length
+      ) {
+        override.value = null
+      }
+      if (
+        uncontrolledCollapsed &&
+        draggingIndex.value >= 0 &&
+        startSizes.value.length !== panes.length
+      ) {
+        cleanupDragSession()
+        draggingIndex.value = -1
+      }
       const available = splitterContentSize(containerSize.value, panes.length, props.gutterSize)
       const reconciled = reconcileSplitterRatios(
         ratioState.value,
         panes.length,
         props.sizes,
-        available
+        available,
+        uncontrolledCollapsed
       )
       if (reconciled !== ratioState.value) ratioState.value = reconciled
       if (props.sizes && props.sizes.length !== panes.length && panes.length > 0) {
@@ -316,7 +346,10 @@ export const Splitter = defineComponent({
         )
         const key = sizesKey.value
         override.value = { key, sizes: nextSizes }
-        ratioState.value = { ratios: panePixelsToRatios(nextPixels), sizesKey: key }
+        ratioState.value = {
+          ratios: panePixelsToRatios(nextPixels, props.sizes == null),
+          sizesKey: key
+        }
         emit(
           'update:sizes',
           projectControlledPaneSizes(props.sizes, nextPixels, containerSize.value, props.gutterSize)
