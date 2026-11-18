@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useId, useRef, useState } from 'react'
+import React, { forwardRef, useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import {
   SHAKE_CLASS,
   TIGER_CHROME_ATTR,
@@ -28,6 +28,9 @@ import { useFormItemControlContext } from './FormItemContext'
 import { useInputGroupContext } from './InputGroup'
 import { Icon } from './Icon'
 import { Tag } from './Tag'
+
+const TAG_DRAG_TYPE = 'application/x-tigercat-tags-input'
+let nextDragId = 0
 
 export interface TagsInputProps
   extends
@@ -104,7 +107,7 @@ export const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(function T
 
   const containerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement | null>(null)
-  const draggingRef = useRef(false)
+  const dragRef = useRef<{ id: string; tag: string; index: number } | null>(null)
   const mountedRef = useRef(false)
   const setInputRefs = (node: HTMLInputElement | null) => {
     inputRef.current = node
@@ -133,6 +136,13 @@ export const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(function T
   }, [status, shakeTrigger])
 
   const isInteractive = !effectiveDisabled && !isReadOnly
+
+  useLayoutEffect(() => {
+    const drag = dragRef.current
+    if (drag && (!isInteractive || tags[drag.index] !== drag.tag)) {
+      dragRef.current = null
+    }
+  }, [isInteractive, tags])
 
   const commitCandidates = (candidates: string[], pendingFallback?: string) => {
     const result = commitTagCandidates(tags, candidates, {
@@ -306,23 +316,27 @@ export const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(function T
             role="listitem"
             draggable={isInteractive}
             onDragStart={(event) => {
-              if (!isInteractive) return
-              draggingRef.current = true
-              event.dataTransfer?.setData('text/plain', String(index))
+              if (!isInteractive || !event.dataTransfer) return
+              const dragId = `${uid}-${++nextDragId}`
+              event.dataTransfer.setData(TAG_DRAG_TYPE, dragId)
+              dragRef.current = { id: dragId, tag, index }
             }}
             onDragEnd={() => {
-              draggingRef.current = false
+              dragRef.current = null
             }}
             onDragOver={(event) => event.preventDefault()}
             onDrop={(event) => {
               event.preventDefault()
-              if (!draggingRef.current || !isInteractive) return
-              draggingRef.current = false
-              const fromText = event.dataTransfer?.getData('text/plain') ?? ''
-              if (!/^\d+$/.test(fromText)) return
-              const from = Number(fromText)
-              if (!Number.isInteger(from)) return
-              setTags(moveTag(tags, from, index))
+              const drag = dragRef.current
+              if (
+                !isInteractive ||
+                !drag ||
+                event.dataTransfer?.getData(TAG_DRAG_TYPE) !== drag.id
+              ) {
+                return
+              }
+              dragRef.current = null
+              if (tags[drag.index] === drag.tag) setTags(moveTag(tags, drag.index, index))
             }}>
             <Tag
               size={effectiveSize === 'lg' ? 'md' : 'sm'}

@@ -164,7 +164,6 @@ describe('TagsInput', () => {
       items.forEach((item) => expect(item).toHaveAttribute('draggable', 'true'))
       const dataTransfer = new DataTransfer()
       fireEvent.dragStart(items[0], { dataTransfer })
-      expect(dataTransfer.getData('text/plain')).toBe('0')
       fireEvent.dragOver(items[2], { dataTransfer })
       fireEvent.drop(items[2], { dataTransfer })
       expect(onChange).toHaveBeenCalledExactlyOnceWith(['b', 'c', 'a'])
@@ -183,6 +182,24 @@ describe('TagsInput', () => {
         expect(onChange).not.toHaveBeenCalled()
         expect(getAllByRole('listitem').map((item) => item.textContent)).toEqual(['a', 'b', 'c'])
       }
+    })
+
+    it('ignores external text after a controlled update removes the dragged tag', () => {
+      const onChange = vi.fn()
+      const { getAllByRole, rerender } = render(
+        <TagsInput value={['a', 'b', 'c']} onChange={onChange} />
+      )
+      const [source] = getAllByRole('listitem')
+      fireEvent.dragStart(source, { dataTransfer: new DataTransfer() })
+      rerender(<TagsInput value={['b', 'c']} onChange={onChange} />)
+      expect(source).not.toBeInTheDocument()
+
+      const dataTransfer = new DataTransfer()
+      dataTransfer.setData('text/plain', '0')
+      fireEvent.drop(getAllByRole('listitem')[1], { dataTransfer })
+
+      expect(onChange).not.toHaveBeenCalled()
+      expect(getAllByRole('listitem').map((item) => item.textContent)).toEqual(['b', 'c'])
     })
 
     it('ignores drops when the instance becomes read-only during a drag', () => {
