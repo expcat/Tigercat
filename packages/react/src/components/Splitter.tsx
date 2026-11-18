@@ -376,7 +376,7 @@ export const Splitter = forwardRef<HTMLDivElement, SplitterProps>(function Split
                     const availableNow = splitterContentSize(containerSize, paneCount, gutterSize)
                     const source =
                       (override && override.key === sizesKey ? override.sizes : controlledSizes) ??
-                      []
+                      panePixels
                     const stored = collapsedPrevious[i]
                     const nextSizes = source.slice()
                     if (stored == null) {
@@ -395,7 +395,9 @@ export const Splitter = forwardRef<HTMLDivElement, SplitterProps>(function Split
                         return copy
                       })
                     }
-                    const nextPixels = nextSizes.map((size) => parsePaneSize(size, availableNow))
+                    const nextPixels = Array.from(nextSizes, (size, index) =>
+                      size == null ? (panePixels[index] ?? 0) : parsePaneSize(size, availableNow)
+                    )
                     setOverride({ key: sizesKey, sizes: nextSizes })
                     setRatioState({ ratios: panePixelsToRatios(nextPixels), sizesKey })
                     onSizesChange?.(

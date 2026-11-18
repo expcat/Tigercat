@@ -182,6 +182,32 @@ describe('Splitter', () => {
   })
 
   describe('Collapsible panes', () => {
+    it('keeps the first uncontrolled pane collapsed and restores its size', async () => {
+      const { container } = render(Splitter, {
+        props: { collapsible: true },
+        slots: { default: () => [h('div', 'A'), h('div', 'B')] }
+      })
+      await waitFor(() => {
+        expect(parseFloat(paneBox(container, 0).style.width)).toBe(400)
+      })
+      const before = [0, 1].map((index) => parseFloat(paneBox(container, index).style.width))
+      expect(before).toEqual([400, 400])
+      const collapse = () =>
+        container.querySelector('[data-tiger-splitter-collapse="0"]') as HTMLElement
+
+      await fireEvent.click(collapse())
+      expect(paneBox(container, 0)).toHaveAttribute('data-collapsed')
+      expect(parseFloat(paneBox(container, 0).style.width)).toBe(0)
+      expect(parseFloat(paneBox(container, 1).style.width)).toBe(800)
+      expect(gutter(container)).toHaveAttribute('aria-valuenow', '0')
+
+      await fireEvent.click(collapse())
+      expect(paneBox(container, 0)).not.toHaveAttribute('data-collapsed')
+      expect([0, 1].map((index) => parseFloat(paneBox(container, index).style.width))).toEqual(
+        before
+      )
+    })
+
     it('restores an unspecified pane after collapse', async () => {
       const { container } = renderSplitter({ sizes: ['30%'], collapsible: true })
       await waitFor(() => {

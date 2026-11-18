@@ -215,6 +215,31 @@ describe('Splitter', () => {
   })
 
   describe('Collapsible panes', () => {
+    it('keeps the first uncontrolled pane collapsed and restores its size', () => {
+      const { container } = render(
+        <Splitter collapsible>
+          <div>A</div>
+          <div>B</div>
+        </Splitter>
+      )
+      const before = [0, 1].map((index) => parseFloat(paneBox(container, index).style.width))
+      expect(before).toEqual([400, 400])
+      const collapse = () =>
+        container.querySelector('[data-tiger-splitter-collapse="0"]') as HTMLElement
+
+      fireEvent.click(collapse())
+      expect(paneBox(container, 0)).toHaveAttribute('data-collapsed')
+      expect(parseFloat(paneBox(container, 0).style.width)).toBe(0)
+      expect(parseFloat(paneBox(container, 1).style.width)).toBe(800)
+      expect(gutter(container)).toHaveAttribute('aria-valuenow', '0')
+
+      fireEvent.click(collapse())
+      expect(paneBox(container, 0)).not.toHaveAttribute('data-collapsed')
+      expect([0, 1].map((index) => parseFloat(paneBox(container, index).style.width))).toEqual(
+        before
+      )
+    })
+
     it('restores an unspecified pane after collapse', () => {
       const { container } = render(
         <Splitter sizes={['30%']} collapsible>

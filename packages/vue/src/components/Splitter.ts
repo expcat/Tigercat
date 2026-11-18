@@ -298,7 +298,7 @@ export const Splitter = defineComponent({
         const source =
           (override.value && override.value.key === sizesKey.value
             ? override.value.sizes
-            : props.sizes) ?? []
+            : props.sizes) ?? pixels
         const stored = collapsedPrevious.value[index]
         const nextSizes = source.slice()
         if (stored == null) {
@@ -311,7 +311,9 @@ export const Splitter = defineComponent({
           collapsedPrevious.value = collapsedPrevious.value.slice()
           collapsedPrevious.value[index] = null
         }
-        const nextPixels = nextSizes.map((size) => parsePaneSize(size, available))
+        const nextPixels = Array.from(nextSizes, (size, index) =>
+          size == null ? (pixels[index] ?? 0) : parsePaneSize(size, available)
+        )
         const key = sizesKey.value
         override.value = { key, sizes: nextSizes }
         ratioState.value = { ratios: panePixelsToRatios(nextPixels), sizesKey: key }
