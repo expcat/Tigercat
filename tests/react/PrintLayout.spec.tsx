@@ -62,6 +62,38 @@ describe('PrintLayout', () => {
     expect(screen.queryByText('text')).not.toBeInTheDocument()
   })
 
+  it('omits false headers and footers, falls back to text, and preserves zero', () => {
+    const { container, rerender } = render(
+      <PrintLayout showHeader showFooter headerRender={false} footerRender={false}>
+        content
+      </PrintLayout>
+    )
+    expect(container.querySelector('thead')).not.toBeInTheDocument()
+    expect(container.querySelector('tfoot')).not.toBeInTheDocument()
+
+    rerender(
+      <PrintLayout
+        showHeader
+        showFooter
+        headerRender={false}
+        footerRender={false}
+        headerText="Fallback header"
+        footerText="Fallback footer">
+        content
+      </PrintLayout>
+    )
+    expect(container.querySelector('thead')).toHaveTextContent('Fallback header')
+    expect(container.querySelector('tfoot')).toHaveTextContent('Fallback footer')
+
+    rerender(
+      <PrintLayout showHeader showFooter headerRender={0} footerRender={0}>
+        content
+      </PrintLayout>
+    )
+    expect(container.querySelector('thead')).toHaveTextContent('0')
+    expect(container.querySelector('tfoot')).toHaveTextContent('0')
+  })
+
   it('does not render header when showHeader is false', () => {
     render(
       <PrintLayout showHeader={false} headerText="Hidden">
@@ -168,6 +200,17 @@ describe('PrintLayout', () => {
     const preview = container.querySelector('[data-tiger-print-preview]')
     expect(preview?.className ?? '').toContain('print:hidden')
     expect(preview?.querySelectorAll('[data-page-number]').length ?? 0).toBeGreaterThanOrEqual(2)
+  })
+
+  it('previews three pages for a 1000px page height and 500mm of content', () => {
+    const { container } = render(
+      <PrintLayout pageWidth="210mm" pageHeight="1000px" bind={{ contentHeightMm: 500 }}>
+        content
+      </PrintLayout>
+    )
+    expect(
+      container.querySelectorAll('[data-tiger-print-preview] [data-page-number]')
+    ).toHaveLength(3)
   })
 })
 

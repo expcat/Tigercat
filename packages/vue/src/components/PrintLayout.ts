@@ -39,6 +39,15 @@ import {
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './tiger-config'
 
+const printUnitMm: Record<string, number> = {
+  mm: 1,
+  cm: 10,
+  in: 25.4,
+  px: 25.4 / 96,
+  pt: 25.4 / 72,
+  pc: 25.4 / 6
+}
+
 const PrintLayoutShowPageBreaksKey: InjectionKey<ComputedRef<boolean>> = Symbol(
   'tigerPrintShowPageBreaks'
 )
@@ -120,6 +129,8 @@ export const PrintLayout = defineComponent({
     return () => {
       const header = props.showHeader ? (slots.header?.() ?? props.headerText) : null
       const footer = props.showFooter ? (slots.footer?.() ?? props.footerText) : null
+      const pageHeightMm =
+        Number.parseFloat(box.value.height) * printUnitMm[box.value.height.slice(-2)]
 
       return h(
         'div',
@@ -139,7 +150,7 @@ export const PrintLayout = defineComponent({
                 { class: 'print:hidden', 'data-tiger-print-preview': '' },
                 paginatePrintPreview({
                   contentHeightMm: props.bind.contentHeightMm ?? 0,
-                  pageHeightMm: props.bind.pageHeightMm ?? Number.parseFloat(box.value.height),
+                  pageHeightMm: props.bind.pageHeightMm ?? pageHeightMm,
                   marginMm: props.bind.marginMm ?? Number.parseFloat(PRINT_LAYOUT_MARGIN),
                   manualBreaks: props.bind.manualBreaks
                 }).map((page) =>

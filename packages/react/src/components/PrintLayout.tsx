@@ -31,6 +31,15 @@ import {
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './tiger-config'
 
+const printUnitMm: Record<string, number> = {
+  mm: 1,
+  cm: 10,
+  in: 25.4,
+  px: 25.4 / 96,
+  pt: 25.4 / 72,
+  pc: 25.4 / 6
+}
+
 const PrintLayoutContext = React.createContext<{
   showPageBreaks: boolean
   printBreaks: boolean
@@ -106,8 +115,17 @@ export const PrintLayout = forwardRef<PrintLayoutInstance, PrintLayoutProps>(fun
     []
   )
 
-  const header = showHeader ? (headerRender ?? headerText) : null
-  const footer = showFooter ? (footerRender ?? footerText) : null
+  const header = showHeader
+    ? headerRender != null && typeof headerRender !== 'boolean'
+      ? headerRender
+      : headerText
+    : null
+  const footer = showFooter
+    ? footerRender != null && typeof footerRender !== 'boolean'
+      ? footerRender
+      : footerText
+    : null
+  const pageHeightMm = Number.parseFloat(box.height) * printUnitMm[box.height.slice(-2)]
 
   return (
     <PrintLayoutContext.Provider value={{ showPageBreaks, printBreaks, locale }}>
@@ -123,7 +141,7 @@ export const PrintLayout = forwardRef<PrintLayoutInstance, PrintLayoutProps>(fun
           <div className="print:hidden" data-tiger-print-preview="">
             {paginatePrintPreview({
               contentHeightMm: bind.contentHeightMm ?? 0,
-              pageHeightMm: bind.pageHeightMm ?? Number.parseFloat(box.height),
+              pageHeightMm: bind.pageHeightMm ?? pageHeightMm,
               marginMm: bind.marginMm ?? Number.parseFloat(PRINT_LAYOUT_MARGIN),
               manualBreaks: bind.manualBreaks
             }).map((page) => (
@@ -134,7 +152,7 @@ export const PrintLayout = forwardRef<PrintLayoutInstance, PrintLayoutProps>(fun
           </div>
         ) : null}
         <table className="w-full border-collapse">
-          {header != null ? (
+          {header != null && typeof header !== 'boolean' ? (
             <thead>
               <tr>
                 <th className={printLayoutHeaderClasses}>{header}</th>
@@ -146,7 +164,7 @@ export const PrintLayout = forwardRef<PrintLayoutInstance, PrintLayoutProps>(fun
               <td className="tiger-print-content">{children}</td>
             </tr>
           </tbody>
-          {footer != null ? (
+          {footer != null && typeof footer !== 'boolean' ? (
             <tfoot>
               <tr>
                 <td className={printLayoutFooterClasses}>{footer}</td>

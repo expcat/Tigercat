@@ -153,6 +153,16 @@ describe('PrintLayout', () => {
     expect(preview?.className ?? '').toContain('print:hidden')
     expect(preview?.querySelectorAll('[data-page-number]').length ?? 0).toBeGreaterThanOrEqual(2)
   })
+
+  it('previews three pages for a 1000px page height and 500mm of content', () => {
+    const { container } = render(PrintLayout, {
+      props: { pageWidth: '210mm', pageHeight: '1000px', bind: { contentHeightMm: 500 } },
+      slots: { default: 'content' }
+    })
+    expect(
+      container.querySelectorAll('[data-tiger-print-preview] [data-page-number]')
+    ).toHaveLength(3)
+  })
 })
 
 describe('PrintPageBreak', () => {
