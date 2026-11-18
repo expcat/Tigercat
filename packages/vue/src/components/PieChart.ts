@@ -238,10 +238,10 @@ export const PieChart = defineComponent({
     return () => {
       const laid = slices.value
       const r = radii.value
-      const visualActive = laid.findIndex(
-        (slice) =>
-          slice.index === (focusedIndex.value ?? activeIndex.value ?? resolvedHoveredIndex.value)
+      const visibleIndexes = new Set(
+        laid.filter((slice) => !isLegendIndexHidden(slice.index)).map((slice) => slice.index)
       )
+      const rovingIndex = focusedIndex.value ?? activeIndex.value ?? resolvedHoveredIndex.value
       const centerParts = [props.centerValue, props.centerLabel].filter(
         (part) => part !== undefined
       )
@@ -249,20 +249,20 @@ export const PieChart = defineComponent({
         .filter(Boolean)
         .join(' ')
 
-      const handleSliceKeyDown = (event: KeyboardEvent, visualIndex: number) => {
+      const handleSliceKeyDown = (event: KeyboardEvent, index: number) => {
         if (isChartNavigationKey(event.key)) {
           event.preventDefault()
-          const nextVisual = nextChartRovingIndex(visualIndex, event.key, laid.length)
-          const next = laid[nextVisual]
-          focusedIndex.value = next.index
+          const next = nextChartRovingIndex(index, event.key, visibleIndexes)
+          if (next === undefined) return
+          focusedIndex.value = next
           const node = (event.currentTarget as SVGElement).ownerSVGElement?.querySelector(
-            `[data-pie-slice][data-index="${next.index}"]`
+            `[data-pie-slice][data-index="${next}"]`
           )
           if (node instanceof SVGElement) node.focus()
-          handleMouseEnter(next.index, event)
+          handleMouseEnter(next, event)
           return
         }
-        handleKeyDown(event, laid[visualIndex].index)
+        handleKeyDown(event, index)
       }
 
       const chart = h(
@@ -314,7 +314,7 @@ export const PieChart = defineComponent({
                     h('circle', { cx: r.cx, cy: r.cy, r: r.innerRadius })
                   ])
                 : null
-            const sliceNodes = laid.map((slice, visualIndex) => {
+            const sliceNodes = laid.map((slice) => {
               const isEmphasized = activeIndex.value === slice.index
               const ariaLabel = formatChartTemplate(labels.value.sliceAriaLabel, {
                 label: sliceName(slice.datum, slice.index),
@@ -347,8 +347,8 @@ export const PieChart = defineComponent({
                     'data-pie-slice': 'true',
                     'data-index': slice.index,
                     tabindex:
-                      interactive.value && !isLegendIndexHidden(slice.index)
-                        ? chartMarkTabIndex(visualIndex, visualActive < 0 ? null : visualActive)
+                      interactive.value && visibleIndexes.has(slice.index)
+                        ? chartMarkTabIndex(slice.index, rovingIndex, visibleIndexes)
                         : undefined,
                     role: interactive.value ? 'button' : undefined,
                     'aria-hidden': interactive.value ? undefined : true,
@@ -381,7 +381,7 @@ export const PieChart = defineComponent({
                       : () => handleClick(slice.index),
                     onKeydown: isLegendIndexHidden(slice.index)
                       ? undefined
-                      : (e: KeyboardEvent) => handleSliceKeyDown(e, visualIndex)
+                      : (e: KeyboardEvent) => handleSliceKeyDown(e, slice.index)
                   })
                 ]
               )

@@ -401,7 +401,22 @@ export interface WaterfallDatum {
 
 export interface WaterfallChartProps extends BaseChartProps {
   data: WaterfallDatum[]
+  /**
+   * Chart width.
+   * @default 480
+   */
+  width?: number
   height?: number
+  /**
+   * Chart padding without extra axis spacing.
+   * @default 24
+   */
+  padding?: ChartPadding
+  /**
+   * Whether the SVG should observe its container and resize responsively.
+   * @default true
+   */
+  responsive?: boolean
   colors?: { increase?: string; decrease?: string; total?: string }
 }
 
@@ -429,6 +444,12 @@ export interface SankeyChartProps extends BaseChartProps {
    * @default 280
    */
   height?: number
+
+  /**
+   * Chart padding without extra axis spacing.
+   * @default 16
+   */
+  padding?: ChartPadding
 
   /**
    * Whether the SVG should observe its container and resize responsively.

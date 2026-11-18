@@ -1,11 +1,13 @@
-import { defineComponent, h, ref, type PropType } from 'vue'
+import { computed, defineComponent, h, ref, type PropType } from 'vue'
 import {
   downloadChartSvg,
-  getW9DataLabels,
   getChartLabels,
+  mergeTigerLocale,
   resolveButtonClasses,
   layoutWaterfall,
   type ChartPadding,
+  type TigerLocale,
+  type TigerLocaleChart,
   type WaterfallChartProps as CoreWaterfallChartProps,
   type WaterfallDatum
 } from '@expcat/tigercat-core'
@@ -35,18 +37,22 @@ export const WaterfallChart = defineComponent({
     },
     title: { type: String, default: undefined },
     desc: { type: String, default: undefined },
+    locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
+    labels: { type: Object as PropType<Partial<TigerLocaleChart>>, default: undefined },
     className: { type: String, default: undefined },
     responsive: { type: Boolean, default: true }
   },
   setup(props, { attrs }) {
     const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const labels = computed(() => getChartLabels(mergedLocale.value, props.labels))
     const hostRef = ref<HTMLElement | null>(null)
     const exportChart = () => {
       const svg = hostRef.value?.querySelector('svg')
       if (svg instanceof SVGSVGElement) downloadChartSvg(svg, 'waterfall')
     }
     return () => {
-      const labels = getChartLabels(config.value.locale)
+      const ariaLabel = attrs['aria-label']
       const laid = layoutWaterfall(props.data)
       const samples = laid.flatMap((bar) => [bar.y0, bar.y1])
       const min = Math.min(0, ...samples, 0)
@@ -60,7 +66,7 @@ export const WaterfallChart = defineComponent({
             class: resolveButtonClasses({ variant: 'outline', size: 'sm' }),
             onClick: exportChart
           },
-          getW9DataLabels(config.value.locale).exportChart
+          labels.value.exportText
         ),
         h(
           ChartCanvas,
@@ -69,7 +75,9 @@ export const WaterfallChart = defineComponent({
             height: props.height,
             title: props.title,
             desc: props.desc,
-            'aria-label': props.title ? undefined : labels.waterfallChartAriaLabel,
+            'aria-label':
+              (typeof ariaLabel === 'string' && ariaLabel) ||
+              (props.title ? undefined : labels.value.waterfallChartAriaLabel),
             responsive: props.responsive,
             padding: props.padding
           },

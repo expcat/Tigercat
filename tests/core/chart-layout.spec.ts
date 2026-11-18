@@ -19,7 +19,11 @@ import {
   layoutRadar,
   layoutScatterPoints,
   resolvePieRadii,
+  chartMarkTabIndex,
   nextChartPointRef,
+  nextChartRovingIndex,
+  nextChartTreeRovingIndex,
+  nextTreeMapNodeIndex,
   reverseSvgPath,
   scatterPointDisplayLabel,
   stackSeriesData
@@ -429,6 +433,23 @@ describe('chart point roving', () => {
       seriesIndex: 1,
       pointIndex: 0
     })
+  })
+
+  it('uses visible mark indexes for the tab stop and arrows', () => {
+    const visibleIndexes = new Set([1, 4])
+    expect(chartMarkTabIndex(1, 0, visibleIndexes)).toBe(0)
+    expect(chartMarkTabIndex(4, 0, visibleIndexes)).toBe(-1)
+    expect(chartMarkTabIndex(4, 4, visibleIndexes)).toBe(0)
+    expect(nextChartRovingIndex(1, 'ArrowRight', visibleIndexes)).toBe(4)
+    expect(nextChartRovingIndex(0, 'ArrowRight', visibleIndexes)).toBe(1)
+    expect(nextChartRovingIndex(0, 'ArrowRight', new Set<number>())).toBeUndefined()
+
+    const visibleNodes = [
+      { index: 4, parentIndex: null, x: 0, y: 0, w: 10, h: 10 },
+      { index: 5, parentIndex: 4, x: 2, y: 2, w: 6, h: 6 }
+    ]
+    expect(nextChartTreeRovingIndex(4, 'ArrowDown', visibleNodes, nextTreeMapNodeIndex)).toBe(5)
+    expect(nextChartTreeRovingIndex(5, 'ArrowUp', visibleNodes, nextTreeMapNodeIndex)).toBe(4)
   })
 })
 

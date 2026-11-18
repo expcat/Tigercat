@@ -1,4 +1,4 @@
-import React, { useId, useMemo } from 'react'
+import React, { useId, useMemo, useState } from 'react'
 import {
   classNames,
   createBandScale,
@@ -134,6 +134,7 @@ export const BarChart: React.FC<BarChartProps> = ({
   )
   const interactive = hoverable || selectable || Boolean(onBarClick)
   const corner = resolveBarCornerRadius(barRadius)
+  const [focusedIndex, setFocusedIndex] = useState<number | null>(null)
 
   const {
     tooltipPosition,
@@ -263,21 +264,24 @@ export const BarChart: React.FC<BarChartProps> = ({
 
   const shouldShowXAxis = showAxis && showXAxis
   const shouldShowYAxis = showAxis && showYAxis
-  const visualActive = bars.findIndex((bar) => bar.index === (activeIndex ?? resolvedHoveredIndex))
+  const visibleIndexes = new Set(
+    bars.filter((bar) => !isLegendIndexHidden(bar.index)).map((bar) => bar.index)
+  )
+  const rovingIndex = focusedIndex ?? activeIndex ?? resolvedHoveredIndex
 
-  const handleBarKeyDown = (event: React.KeyboardEvent<SVGRectElement>, visualIndex: number) => {
+  const handleBarKeyDown = (event: React.KeyboardEvent<SVGRectElement>, index: number) => {
+    if (!visibleIndexes.has(index)) return
     if (isChartNavigationKey(event.key)) {
       event.preventDefault()
-      const nextVisual = nextChartRovingIndex(visualIndex, event.key, bars.length)
-      const next = bars[nextVisual]
-      const node = event.currentTarget.parentElement?.querySelector(
-        `[data-bar-index="${next.index}"]`
-      )
+      const next = nextChartRovingIndex(index, event.key, visibleIndexes)
+      if (next === undefined) return
+      setFocusedIndex(next)
+      const node = event.currentTarget.parentElement?.querySelector(`[data-bar-index="${next}"]`)
       if (node instanceof SVGElement) node.focus()
-      handleMouseEnter(next.index, event)
+      handleMouseEnter(next, event)
       return
     }
-    handleKeyDown(event, bars[visualIndex].index)
+    handleKeyDown(event, index)
   }
 
   const chart = (
@@ -288,6 +292,7 @@ export const BarChart: React.FC<BarChartProps> = ({
       responsive={responsive}
       title={title}
       desc={desc}
+      aria-label={rest['aria-label'] || (title ? undefined : labels.barChartAriaLabel)}
       onResolvedSizeChange={onResolvedSizeChange}>
       {gradient && (
         <defs>
@@ -340,7 +345,7 @@ export const BarChart: React.FC<BarChartProps> = ({
         />
       )}
       <ChartSeries data={data} type="bar">
-        {bars.map((bar, visualIndex) => (
+        {bars.map((bar) => (
           <rect
             key={`bar-${bar.index}`}
             x={bar.x}
@@ -365,8 +370,8 @@ export const BarChart: React.FC<BarChartProps> = ({
                 : undefined
             }
             tabIndex={
-              interactive && !isLegendIndexHidden(bar.index)
-                ? chartMarkTabIndex(visualIndex, visualActive < 0 ? null : visualActive)
+              interactive && visibleIndexes.has(bar.index)
+                ? chartMarkTabIndex(bar.index, rovingIndex, visibleIndexes)
                 : undefined
             }
             role={interactive ? 'button' : undefined}
@@ -381,7 +386,7 @@ export const BarChart: React.FC<BarChartProps> = ({
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleClick(bar.index)}
-            onKeyDown={(e) => handleBarKeyDown(e, visualIndex)}
+            onKeyDown={(e) => handleBarKeyDown(e, bar.index)}
           />
         ))}
       </ChartSeries>

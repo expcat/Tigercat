@@ -97,6 +97,24 @@ describe('ScatterChart', () => {
       { x: 55, y: 75 }
     ]
 
+    it('keeps animated points hidden when their legend item is toggled off', async () => {
+      const { container } = renderWithProps(ScatterChart, {
+        data: diamondData,
+        animated: true,
+        showLegend: true,
+        selectable: true,
+        ...defaultSize
+      })
+      const [first, second] = container.querySelectorAll('[data-point-index]')
+      await waitFor(() => expect(first).toHaveClass('tiger-scatter-entrance'))
+
+      await fireEvent.click(container.querySelector('[data-legend-item]')!)
+
+      expect(first).toHaveAttribute('opacity', '0')
+      expect(first).not.toHaveClass('tiger-scatter-entrance')
+      expect(second).toHaveClass('tiger-scatter-entrance')
+    })
+
     it('keeps distinct SVG translates for animated diamond points', async () => {
       const { container } = renderWithProps(ScatterChart, {
         data: diamondData,

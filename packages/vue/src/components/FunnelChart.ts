@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, PropType, useId } from 'vue'
+import { defineComponent, computed, h, PropType, ref, useId } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -170,24 +170,30 @@ export const FunnelChart = defineComponent({
       )
     )
 
+    const focusedIndex = ref<number | null>(null)
+
     return () => {
       const segs = segments.value
-      const visualActive = segs.findIndex(
-        (segment) => segment.index === (activeIndex.value ?? resolvedHoveredIndex.value)
+      const visibleIndexes = new Set(
+        segs
+          .filter((segment) => !isLegendIndexHidden(segment.index))
+          .map((segment) => segment.index)
       )
-      const handleSegmentKeyDown = (event: KeyboardEvent, visualIndex: number) => {
+      const rovingIndex = focusedIndex.value ?? activeIndex.value ?? resolvedHoveredIndex.value
+      const handleSegmentKeyDown = (event: KeyboardEvent, index: number) => {
         if (isChartNavigationKey(event.key)) {
           event.preventDefault()
-          const nextVisual = nextChartRovingIndex(visualIndex, event.key, segs.length)
-          const next = segs[nextVisual]
+          const next = nextChartRovingIndex(index, event.key, visibleIndexes)
+          if (next === undefined) return
+          focusedIndex.value = next
           const node = (event.currentTarget as SVGElement).parentElement?.querySelector(
-            `[data-funnel-segment][data-index="${next.index}"]`
+            `[data-funnel-segment][data-index="${next}"]`
           )
           if (node instanceof SVGElement) node.focus()
-          handleMouseEnter(next.index, event)
+          handleMouseEnter(next, event)
           return
         }
-        handleKeyDown(event, segs[visualIndex].index)
+        handleKeyDown(event, index)
       }
       const chart = h(
         ChartCanvas,
@@ -234,7 +240,7 @@ export const FunnelChart = defineComponent({
             h(
               'g',
               { 'data-series-type': 'funnel' },
-              segs.map((seg, visualIndex) =>
+              segs.map((seg) =>
                 h('path', {
                   key: `seg-${seg.index}`,
                   d: seg.path,
@@ -253,8 +259,8 @@ export const FunnelChart = defineComponent({
                   'data-funnel-segment': '',
                   'data-index': seg.index,
                   tabindex:
-                    interactive.value && !isLegendIndexHidden(seg.index)
-                      ? chartMarkTabIndex(visualIndex, visualActive < 0 ? null : visualActive)
+                    interactive.value && visibleIndexes.has(seg.index)
+                      ? chartMarkTabIndex(seg.index, rovingIndex, visibleIndexes)
                       : undefined,
                   role: interactive.value ? 'button' : undefined,
                   'aria-hidden': interactive.value ? undefined : true,
@@ -278,7 +284,7 @@ export const FunnelChart = defineComponent({
                     : () => handleClick(seg.index),
                   onKeydown: isLegendIndexHidden(seg.index)
                     ? undefined
-                    : (e: KeyboardEvent) => handleSegmentKeyDown(e, visualIndex)
+                    : (e: KeyboardEvent) => handleSegmentKeyDown(e, seg.index)
                 })
               )
             ),

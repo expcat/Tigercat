@@ -279,26 +279,27 @@ export const PieChart: React.FC<PieChartProps> = ({
     [resolvedHoveredIndex, data, tooltipFormatter, total, sliceName]
   )
 
-  const visualActive = slices.findIndex(
-    (slice) => slice.index === (focusedIndex ?? activeIndex ?? resolvedHoveredIndex)
+  const visibleIndexes = new Set(
+    slices.filter((slice) => !isLegendIndexHidden(slice.index)).map((slice) => slice.index)
   )
+  const rovingIndex = focusedIndex ?? activeIndex ?? resolvedHoveredIndex
   const centerParts = [centerValue, centerLabel].filter((part) => part !== undefined)
   const resolvedDesc = [desc, ...centerParts.map((part) => String(part))].filter(Boolean).join(' ')
 
-  const handleSliceKeyDown = (event: React.KeyboardEvent<SVGPathElement>, visualIndex: number) => {
+  const handleSliceKeyDown = (event: React.KeyboardEvent<SVGPathElement>, index: number) => {
     if (isChartNavigationKey(event.key)) {
       event.preventDefault()
-      const nextVisual = nextChartRovingIndex(visualIndex, event.key, slices.length)
-      const next = slices[nextVisual]
-      setFocusedIndex(next.index)
+      const next = nextChartRovingIndex(index, event.key, visibleIndexes)
+      if (next === undefined) return
+      setFocusedIndex(next)
       const node = event.currentTarget.ownerSVGElement?.querySelector(
-        `[data-pie-slice][data-index="${next.index}"]`
+        `[data-pie-slice][data-index="${next}"]`
       )
       if (node instanceof SVGElement) node.focus()
-      handleMouseEnter(next.index, event)
+      handleMouseEnter(next, event)
       return
     }
-    handleKeyDown(event, slices[visualIndex].index)
+    handleKeyDown(event, index)
   }
 
   const chart = (
@@ -334,7 +335,7 @@ export const PieChart: React.FC<PieChartProps> = ({
           <circle cx={radii.cx} cy={radii.cy} r={radii.innerRadius} />
         </clipPath>
       )}
-      {slices.map((slice, visualIndex) => {
+      {slices.map((slice) => {
         const isEmphasized = activeIndex === slice.index
         const ariaLabel = formatChartTemplate(labels.sliceAriaLabel, {
           label: sliceName(slice.datum, slice.index),
@@ -367,8 +368,8 @@ export const PieChart: React.FC<PieChartProps> = ({
               data-pie-slice="true"
               data-index={slice.index}
               tabIndex={
-                interactive && !isLegendIndexHidden(slice.index)
-                  ? chartMarkTabIndex(visualIndex, visualActive < 0 ? null : visualActive)
+                interactive && visibleIndexes.has(slice.index)
+                  ? chartMarkTabIndex(slice.index, rovingIndex, visibleIndexes)
                   : undefined
               }
               role={interactive ? 'button' : undefined}
@@ -399,7 +400,7 @@ export const PieChart: React.FC<PieChartProps> = ({
               onKeyDown={
                 isLegendIndexHidden(slice.index)
                   ? undefined
-                  : (e) => handleSliceKeyDown(e, visualIndex)
+                  : (e) => handleSliceKeyDown(e, slice.index)
               }
             />
           </g>

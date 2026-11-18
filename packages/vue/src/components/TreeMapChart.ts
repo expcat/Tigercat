@@ -10,6 +10,7 @@ import {
   chartLegendOrientationFromPosition,
   getCartesianChartShellClasses,
   chartMarkTabIndex,
+  nextChartTreeRovingIndex,
   nextTreeMapNodeIndex,
   isChartNavigationKey,
   getChartLabels,
@@ -182,29 +183,31 @@ export const TreeMapChart = defineComponent({
       })
     })
 
-    const handleNodeKeyDown = (event: KeyboardEvent, visualIndex: number) => {
-      const current = nodes.value
-      if (isChartNavigationKey(event.key)) {
-        event.preventDefault()
-        const nextVisual = nextTreeMapNodeIndex(visualIndex, event.key, current)
-        const next = current[nextVisual]
-        focusedIndex.value = next.index
-        const node = (event.currentTarget as Element | null)?.parentElement?.querySelector(
-          `[data-treemap-node][data-index="${next.index}"]`
-        )
-        if (node instanceof SVGElement) node.focus()
-        handleMouseEnter(next.index, event)
-        return
-      }
-      handleKeyDown(event, current[visualIndex].index)
-    }
-
     return () => {
       const current = nodes.value
-      const visualActive = current.findIndex(
-        (node) =>
-          node.index === (focusedIndex.value ?? activeIndex.value ?? resolvedHoveredIndex.value)
-      )
+      const visibleNodes = current.filter((node) => !isNodeHidden(node))
+      const visibleIndexes = new Set(visibleNodes.map((node) => node.index))
+      const rovingIndex = focusedIndex.value ?? activeIndex.value ?? resolvedHoveredIndex.value
+      const handleNodeKeyDown = (event: KeyboardEvent, index: number) => {
+        if (isChartNavigationKey(event.key)) {
+          event.preventDefault()
+          const next = nextChartTreeRovingIndex(
+            index,
+            event.key,
+            visibleNodes,
+            nextTreeMapNodeIndex
+          )
+          if (next === undefined) return
+          focusedIndex.value = next
+          const node = (event.currentTarget as Element | null)?.parentElement?.querySelector(
+            `[data-treemap-node][data-index="${next}"]`
+          )
+          if (node instanceof SVGElement) node.focus()
+          handleMouseEnter(next, event)
+          return
+        }
+        handleKeyDown(event, index)
+      }
       const chart = h(
         ChartCanvas,
         {
@@ -259,8 +262,9 @@ export const TreeMapChart = defineComponent({
             h(
               'g',
               { 'data-series-type': 'treemap' },
-              current.flatMap((node, visualIndex) => {
-                const opacity = isNodeHidden(node)
+              current.flatMap((node) => {
+                const hidden = !visibleIndexes.has(node.index)
+                const opacity = hidden
                   ? 0
                   : getChartElementOpacity(node.index, activeIndex.value, {
                       activeOpacity: props.activeOpacity,
@@ -283,7 +287,7 @@ export const TreeMapChart = defineComponent({
                     rx: props.nodeRadius,
                     fill: props.gradient ? `url(#${gradientPrefix}-${node.index})` : node.color,
                     opacity,
-                    'pointer-events': isNodeHidden(node) ? 'none' : undefined,
+                    'pointer-events': hidden ? 'none' : undefined,
                     'data-treemap-node': '',
                     'data-index': node.index,
                     class: classNames(
@@ -291,28 +295,28 @@ export const TreeMapChart = defineComponent({
                       treemapNodeTransitionClasses
                     ),
                     tabindex:
-                      interactive.value && !isNodeHidden(node)
-                        ? chartMarkTabIndex(visualIndex, visualActive < 0 ? null : visualActive)
+                      interactive.value && !hidden
+                        ? chartMarkTabIndex(node.index, rovingIndex, visibleIndexes)
                         : undefined,
                     role: interactive.value ? 'button' : undefined,
                     'aria-hidden': interactive.value ? undefined : true,
                     'aria-label': interactive.value ? ariaLabel : undefined,
-                    onMouseenter: isNodeHidden(node)
+                    onMouseenter: hidden
                       ? undefined
                       : (e: MouseEvent) => handleMouseEnter(node.index, e),
-                    onMousemove: isNodeHidden(node) ? undefined : handleMouseMove,
-                    onMouseleave: isNodeHidden(node) ? undefined : handleMouseLeave,
+                    onMousemove: hidden ? undefined : handleMouseMove,
+                    onMouseleave: hidden ? undefined : handleMouseLeave,
                     onFocus:
-                      interactive.value && !isNodeHidden(node)
+                      interactive.value && !hidden
                         ? (e: FocusEvent) => {
                             focusedIndex.value = node.index
                             handleMouseEnter(node.index, e)
                           }
                         : undefined,
-                    onClick: isNodeHidden(node) ? undefined : () => handleClick(node.index),
-                    onKeydown: isNodeHidden(node)
+                    onClick: hidden ? undefined : () => handleClick(node.index),
+                    onKeydown: hidden
                       ? undefined
-                      : (e: KeyboardEvent) => handleNodeKeyDown(e, visualIndex)
+                      : (e: KeyboardEvent) => handleNodeKeyDown(e, node.index)
                   })
                 ]
                 if (props.showLabels && node.showLabel) {
@@ -323,7 +327,7 @@ export const TreeMapChart = defineComponent({
                         key: `label-${node.index}`,
                         x: node.x + node.w / 2,
                         y: node.y + Math.min(14, node.h / 2),
-                        opacity: isNodeHidden(node) ? 0 : undefined,
+                        opacity: hidden ? 0 : undefined,
                         fill: node.labelFill,
                         class: 'pointer-events-none select-none',
                         'text-anchor': 'middle',

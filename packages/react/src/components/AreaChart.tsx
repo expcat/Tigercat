@@ -370,6 +370,7 @@ export const AreaChart: React.FC<AreaChartProps> = ({
       responsive={responsive}
       title={title}
       desc={desc}
+      aria-label={rest['aria-label'] || (title ? undefined : labels.areaChartAriaLabel)}
       onResolvedSizeChange={onResolvedSizeChange}>
       {(gradient || strokeGradient || pointGradient) && (
         <defs>

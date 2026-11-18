@@ -23,8 +23,8 @@ description: Compact generated Tigercat Charts props reference
 
 - `width?`: `number`; default `480`. Chart width.
 - `height?`: `number`; default `280`. Chart height.
+- `padding?`: `ChartPadding`; default `16`. Chart padding without extra axis spacing.
 - `responsive?`: `boolean`; default `true`. Whether the SVG should observe its container and resize responsively.
-- `padding?`: `ChartPadding`; default `{ top: 24, right: 24, bottom: 52, left: 52 }`. Chart padding. Default leaves room for ChartAxis labels (`labelOffset` 28 + tick + dy).
 - `title?`: `string`; default `-`. Accessible title for the SVG
 - `desc?`: `string`; default `-`. Accessible description for the SVG
 - `className?`: `string`; default `-`. Additional CSS classes

@@ -35,6 +35,29 @@ describe('PieChart', () => {
     }
   )
 
+  it('keeps a tab stop and skips legend-hidden slices with arrow keys', async () => {
+    const { container } = renderWithProps(PieChart, {
+      data: [...data, { label: 'Plums', value: 20 }, { label: 'Cherries', value: 10 }],
+      selectable: true,
+      showLegend: true,
+      showTooltip: false,
+      ...defaultSize
+    })
+    const legendItems = container.querySelectorAll('[data-legend-item]')
+    await fireEvent.click(legendItems[0])
+    await fireEvent.click(legendItems[2])
+
+    const [, firstVisible, , lastVisible] =
+      container.querySelectorAll<SVGElement>('[data-pie-slice]')
+    const tabStops = () => [...container.querySelectorAll('[data-pie-slice][tabindex="0"]')]
+    expect(tabStops()).toEqual([firstVisible])
+
+    firstVisible.focus()
+    await fireEvent.keyDown(firstVisible, { key: 'ArrowRight' })
+    expect(document.activeElement).toBe(lastVisible)
+    expect(tabStops()).toEqual([lastVisible])
+  })
+
   it('renders slices', () => {
     const { container } = renderWithProps(PieChart, {
       data: [{ value: 40 }, { value: 30 }, { value: 20 }],

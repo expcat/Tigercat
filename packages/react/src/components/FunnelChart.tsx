@@ -1,4 +1,4 @@
-import React, { useCallback, useId, useMemo } from 'react'
+import React, { useCallback, useId, useMemo, useState } from 'react'
 import {
   classNames,
   funnelLayerRatios,
@@ -190,26 +190,28 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
       ),
     [resolvedHoveredIndex, data, tooltipFormatter, stageMetrics]
   )
-  const visualActive = segments.findIndex(
-    (segment) => segment.index === (activeIndex ?? resolvedHoveredIndex)
+  const [focusedIndex, setFocusedIndex] = useState<number | null>(null)
+  const visibleIndexes = new Set(
+    segments
+      .filter((segment) => !isLegendIndexHidden(segment.index))
+      .map((segment) => segment.index)
   )
+  const rovingIndex = focusedIndex ?? activeIndex ?? resolvedHoveredIndex
 
-  const handleSegmentKeyDown = (
-    event: React.KeyboardEvent<SVGPathElement>,
-    visualIndex: number
-  ) => {
+  const handleSegmentKeyDown = (event: React.KeyboardEvent<SVGPathElement>, index: number) => {
     if (isChartNavigationKey(event.key)) {
       event.preventDefault()
-      const nextVisual = nextChartRovingIndex(visualIndex, event.key, segments.length)
-      const next = segments[nextVisual]
+      const next = nextChartRovingIndex(index, event.key, visibleIndexes)
+      if (next === undefined) return
+      setFocusedIndex(next)
       const node = event.currentTarget.parentElement?.querySelector(
-        `[data-funnel-segment][data-index="${next.index}"]`
+        `[data-funnel-segment][data-index="${next}"]`
       )
       if (node instanceof SVGElement) node.focus()
-      handleMouseEnter(next.index, event)
+      handleMouseEnter(next, event)
       return
     }
-    handleKeyDown(event, segments[visualIndex].index)
+    handleKeyDown(event, index)
   }
 
   const chart = (
@@ -240,7 +242,7 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
         </defs>
       )}
       <g data-series-type="funnel">
-        {segments.map((seg, visualIndex) => {
+        {segments.map((seg) => {
           const opacity = isLegendIndexHidden(seg.index)
             ? 0
             : getChartElementOpacity(seg.index, activeIndex, {
@@ -261,8 +263,8 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
               data-funnel-segment=""
               data-index={seg.index}
               tabIndex={
-                interactive && !isLegendIndexHidden(seg.index)
-                  ? chartMarkTabIndex(visualIndex, visualActive < 0 ? null : visualActive)
+                interactive && visibleIndexes.has(seg.index)
+                  ? chartMarkTabIndex(seg.index, rovingIndex, visibleIndexes)
                   : undefined
               }
               role={interactive ? 'button' : undefined}
@@ -289,7 +291,7 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
               onKeyDown={
                 isLegendIndexHidden(seg.index)
                   ? undefined
-                  : (e) => handleSegmentKeyDown(e, visualIndex)
+                  : (e) => handleSegmentKeyDown(e, seg.index)
               }
             />
           )

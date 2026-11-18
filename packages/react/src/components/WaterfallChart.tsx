@@ -1,8 +1,8 @@
-import { useRef } from 'react'
+import { useRef, type HTMLAttributes, type ReactElement } from 'react'
 import {
   downloadChartSvg,
-  getW9DataLabels,
   getChartLabels,
+  mergeTigerLocale,
   resolveButtonClasses,
   layoutWaterfall,
   type WaterfallChartProps as CoreWaterfallChartProps,
@@ -11,7 +11,10 @@ import {
 import { useTigerConfig } from './tiger-config'
 import { ChartCanvas } from './ChartCanvas'
 
-export type WaterfallChartProps = CoreWaterfallChartProps
+export interface WaterfallChartProps
+  extends
+    CoreWaterfallChartProps,
+    Omit<HTMLAttributes<HTMLDivElement>, keyof CoreWaterfallChartProps> {}
 
 const KIND_COLOR: Record<WaterfallDatum['kind'], string> = {
   increase: 'var(--tiger-success, #16a34a)',
@@ -27,11 +30,15 @@ export function WaterfallChart({
   colors,
   title,
   desc,
+  locale,
+  labels: labelsOverride,
   className,
-  responsive = true
-}: WaterfallChartProps) {
+  responsive = true,
+  ...rest
+}: WaterfallChartProps): ReactElement {
   const config = useTigerConfig()
-  const labels = getChartLabels(config.locale)
+  const mergedLocale = mergeTigerLocale(config.locale, locale)
+  const labels = getChartLabels(mergedLocale, labelsOverride)
   const hostRef = useRef<HTMLDivElement>(null)
   const laid = layoutWaterfall(data)
   const samples = laid.flatMap((bar) => [bar.y0, bar.y1])
@@ -43,19 +50,19 @@ export function WaterfallChart({
     if (svg instanceof SVGSVGElement) downloadChartSvg(svg, 'waterfall')
   }
   return (
-    <div ref={hostRef} className={className}>
+    <div {...rest} ref={hostRef} className={className}>
       <button
         type="button"
         className={resolveButtonClasses({ variant: 'outline', size: 'sm' })}
         onClick={exportChart}>
-        {getW9DataLabels(config.locale).exportChart}
+        {labels.exportText}
       </button>
       <ChartCanvas
         width={width}
         height={height}
         title={title}
         desc={desc}
-        aria-label={title ? undefined : labels.waterfallChartAriaLabel}
+        aria-label={rest['aria-label'] || (title ? undefined : labels.waterfallChartAriaLabel)}
         responsive={responsive}
         padding={padding}>
         {(ctx) => {

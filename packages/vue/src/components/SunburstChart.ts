@@ -11,6 +11,7 @@ import {
   getCartesianChartShellClasses,
   chartMarkTabIndex,
   isChartNavigationKey,
+  nextChartTreeRovingIndex,
   nextSunburstArcIndex,
   getChartLabels,
   mergeTigerLocale,
@@ -176,21 +177,6 @@ export const SunburstChart = defineComponent({
       })
     })
 
-    const handleArcKeyDown = (event: KeyboardEvent, index: number) => {
-      if (isChartNavigationKey(event.key)) {
-        event.preventDefault()
-        const next = nextSunburstArcIndex(index, event.key, arcs.value)
-        focusedIndex.value = next
-        const node = (event.currentTarget as Element | null)?.parentElement?.querySelector(
-          `[data-sunburst-arc][data-index="${next}"]`
-        )
-        if (node instanceof SVGElement) node.focus()
-        handleMouseEnter(next, event)
-        return
-      }
-      handleKeyDown(event, index)
-    }
-
     // Legend toggles only list root arcs; a hidden root hides its descendants.
     const isArcHidden = (arc: (typeof arcs.value)[number]): boolean => {
       let current: (typeof arcs.value)[number] | null = arc
@@ -203,10 +189,24 @@ export const SunburstChart = defineComponent({
 
     return () => {
       const current = arcs.value
-      const visualActive = current.findIndex(
-        (arc) =>
-          arc.index === (focusedIndex.value ?? activeIndex.value ?? resolvedHoveredIndex.value)
-      )
+      const visibleArcs = current.filter((arc) => !isArcHidden(arc))
+      const visibleIndexes = new Set(visibleArcs.map((arc) => arc.index))
+      const rovingIndex = focusedIndex.value ?? activeIndex.value ?? resolvedHoveredIndex.value
+      const handleArcKeyDown = (event: KeyboardEvent, index: number) => {
+        if (isChartNavigationKey(event.key)) {
+          event.preventDefault()
+          const next = nextChartTreeRovingIndex(index, event.key, visibleArcs, nextSunburstArcIndex)
+          if (next === undefined) return
+          focusedIndex.value = next
+          const node = (event.currentTarget as Element | null)?.parentElement?.querySelector(
+            `[data-sunburst-arc][data-index="${next}"]`
+          )
+          if (node instanceof SVGElement) node.focus()
+          handleMouseEnter(next, event)
+          return
+        }
+        handleKeyDown(event, index)
+      }
       const chart = h(
         ChartCanvas,
         {
@@ -253,12 +253,13 @@ export const SunburstChart = defineComponent({
                 )
               : null,
             h('g', { 'data-series-type': 'sunburst' }, [
-              ...current.map((arc, visualIndex) =>
-                h('path', {
+              ...current.map((arc) => {
+                const hidden = !visibleIndexes.has(arc.index)
+                return h('path', {
                   key: `arc-${arc.index}`,
                   d: arc.path,
                   fill: props.gradient ? `url(#${gradientPrefix}-${arc.index})` : arc.color,
-                  opacity: isArcHidden(arc)
+                  opacity: hidden
                     ? 0
                     : getChartElementOpacity(arc.index, activeIndex.value, {
                         activeOpacity: props.activeOpacity,
@@ -266,7 +267,7 @@ export const SunburstChart = defineComponent({
                       }),
                   stroke: 'var(--tiger-surface)',
                   'stroke-width': 1,
-                  'pointer-events': isArcHidden(arc) ? 'none' : undefined,
+                  'pointer-events': hidden ? 'none' : undefined,
                   'data-sunburst-arc': '',
                   'data-index': arc.index,
                   class: classNames(
@@ -274,8 +275,8 @@ export const SunburstChart = defineComponent({
                     sunburstArcTransitionClasses
                   ),
                   tabindex:
-                    interactive.value && !isArcHidden(arc)
-                      ? chartMarkTabIndex(visualIndex, visualActive < 0 ? null : visualActive)
+                    interactive.value && !hidden
+                      ? chartMarkTabIndex(arc.index, rovingIndex, visibleIndexes)
                       : undefined,
                   role: interactive.value ? 'button' : undefined,
                   'aria-hidden': interactive.value ? undefined : true,
@@ -286,24 +287,24 @@ export const SunburstChart = defineComponent({
                         percent: arc.percent.toFixed(1)
                       })
                     : undefined,
-                  onMouseenter: isArcHidden(arc)
+                  onMouseenter: hidden
                     ? undefined
                     : (e: MouseEvent) => handleMouseEnter(arc.index, e),
-                  onMousemove: isArcHidden(arc) ? undefined : handleMouseMove,
-                  onMouseleave: isArcHidden(arc) ? undefined : handleMouseLeave,
+                  onMousemove: hidden ? undefined : handleMouseMove,
+                  onMouseleave: hidden ? undefined : handleMouseLeave,
                   onFocus:
-                    interactive.value && !isArcHidden(arc)
+                    interactive.value && !hidden
                       ? (e: FocusEvent) => {
                           focusedIndex.value = arc.index
                           handleMouseEnter(arc.index, e)
                         }
                       : undefined,
-                  onClick: isArcHidden(arc) ? undefined : () => handleClick(arc.index),
-                  onKeydown: isArcHidden(arc)
+                  onClick: hidden ? undefined : () => handleClick(arc.index),
+                  onKeydown: hidden
                     ? undefined
                     : (e: KeyboardEvent) => handleArcKeyDown(e, arc.index)
                 })
-              ),
+              }),
               ...(props.showLabels
                 ? current
                     .filter((arc) => arc.showLabel)
@@ -314,7 +315,7 @@ export const SunburstChart = defineComponent({
                           key: `label-${arc.index}`,
                           x: arc.labelX,
                           y: arc.labelY,
-                          opacity: isArcHidden(arc) ? 0 : undefined,
+                          opacity: visibleIndexes.has(arc.index) ? undefined : 0,
                           fill: arc.labelFill,
                           class: 'text-xs pointer-events-none select-none',
                           'text-anchor': 'middle',

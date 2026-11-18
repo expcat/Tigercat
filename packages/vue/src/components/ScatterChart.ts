@@ -281,6 +281,13 @@ export const ScatterChart = defineComponent({
     )
 
     return () => {
+      const visibleIndexes = new Set(
+        points.value
+          .filter((point) => !isLegendIndexHidden(point.index))
+          .map((point) => point.index)
+      )
+      const rovingIndex = focusedIndex.value ?? activeIndex.value
+
       // Radial gradient defs for depth effect
       const defs = props.gradient
         ? h(
@@ -373,18 +380,16 @@ export const ScatterChart = defineComponent({
                 {
                   default: () =>
                     points.value.map((point, visualIndex) => {
+                      const hidden = !visibleIndexes.has(point.index)
                       const interactive =
                         props.hoverable ||
                         props.selectable ||
                         typeof props.onPointClick === 'function'
                       const filterStyle = point.isHovered ? getScatterHoverShadow() : undefined
                       const animDelay =
-                        props.animated && mounted.value
+                        props.animated && mounted.value && !hidden
                           ? `${Math.min(visualIndex * SCATTER_ENTRANCE_STAGGER_MS, SCATTER_ENTRANCE_STAGGER_MAX_MS)}ms`
                           : undefined
-                      const visualActive = points.value.findIndex(
-                        (item) => item.index === (focusedIndex.value ?? activeIndex.value ?? 0)
-                      )
                       const styleStr = {
                         ...chartSeriesColorStyle(point.color),
                         ...(filterStyle ? { filter: filterStyle } : {}),
@@ -393,8 +398,8 @@ export const ScatterChart = defineComponent({
 
                       const shared = {
                         fill: point.fill,
-                        opacity: isLegendIndexHidden(point.index) ? 0 : point.opacity,
-                        'pointer-events': isLegendIndexHidden(point.index) ? 'none' : undefined,
+                        opacity: hidden ? 0 : point.opacity,
+                        'pointer-events': hidden ? 'none' : undefined,
                         stroke: props.pointBorderColor,
                         'stroke-width': props.pointBorderWidth,
                         class: classNames(
@@ -404,8 +409,8 @@ export const ScatterChart = defineComponent({
                         ),
                         style: styleStr || undefined,
                         tabindex:
-                          interactive && !isLegendIndexHidden(point.index)
-                            ? chartMarkTabIndex(visualIndex, visualActive < 0 ? 0 : visualActive)
+                          interactive && !hidden
+                            ? chartMarkTabIndex(point.index, rovingIndex, visibleIndexes)
                             : undefined,
                         role: interactive ? 'button' : undefined,
                         'aria-hidden': interactive ? undefined : true,
@@ -423,20 +428,17 @@ export const ScatterChart = defineComponent({
                         onMouseleave: handleMouseLeave,
                         onClick: () => handleClick(point.index),
                         onKeydown: (e: KeyboardEvent) => {
+                          if (hidden) return
                           if (isChartNavigationKey(e.key)) {
                             e.preventDefault()
-                            const nextVisual = nextChartRovingIndex(
-                              visualIndex,
-                              e.key,
-                              points.value.length
-                            )
-                            const next = points.value[nextVisual]
-                            focusedIndex.value = next.index
+                            const next = nextChartRovingIndex(point.index, e.key, visibleIndexes)
+                            if (next === undefined) return
+                            focusedIndex.value = next
                             const node = (
                               e.currentTarget as SVGElement
-                            ).ownerSVGElement?.querySelector(`[data-point-index="${next.index}"]`)
+                            ).ownerSVGElement?.querySelector(`[data-point-index="${next}"]`)
                             if (node instanceof SVGElement) node.focus()
-                            handleMouseEnter(next.index, e)
+                            handleMouseEnter(next, e)
                             return
                           }
                           handleKeyDown(e, point.index)

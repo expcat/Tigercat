@@ -5,6 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { act, fireEvent } from '@testing-library/react'
 import { AreaChart } from '@expcat/tigercat-react/AreaChart'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { renderWithProps, expectNoA11yViolations } from '../utils/render-helpers-react'
 
 const basicData = [
@@ -16,6 +17,11 @@ const basicData = [
 const defaultSize = { width: 300, height: 200 }
 
 describe('AreaChart', () => {
+  it('names an untitled area chart from the zh-CN locale', () => {
+    const { container } = renderWithProps(AreaChart, { data: basicData, locale: zhCN })
+    expect(container.querySelector('svg')).toHaveAccessibleName('面积图')
+  })
+
   it('renders area path', () => {
     const { container } = renderWithProps(AreaChart, {
       data: basicData,

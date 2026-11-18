@@ -10,6 +10,7 @@ import {
   getCartesianChartShellClasses,
   chartMarkTabIndex,
   isChartNavigationKey,
+  nextChartTreeRovingIndex,
   nextSunburstArcIndex,
   getChartLabels,
   mergeTigerLocale,
@@ -177,14 +178,24 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
       percent: arc.percent.toFixed(1)
     })
   }, [resolvedHoveredIndex, arcs, tooltipFormatter, labels.sunburstTooltip])
-  const visualActive = arcs.findIndex(
-    (arc) => arc.index === (focusedIndex ?? activeIndex ?? resolvedHoveredIndex)
-  )
+  // Legend toggles only list root arcs; a hidden root hides its descendants.
+  const isArcHidden = (arc: (typeof arcs)[number]): boolean => {
+    let current: (typeof arcs)[number] | null = arc
+    while (current) {
+      if (isLegendIndexHidden(current.index)) return true
+      current = current.parentIndex === null ? null : (arcs[current.parentIndex] ?? null)
+    }
+    return false
+  }
+  const visibleArcs = arcs.filter((arc) => !isArcHidden(arc))
+  const visibleIndexes = new Set(visibleArcs.map((arc) => arc.index))
+  const rovingIndex = focusedIndex ?? activeIndex ?? resolvedHoveredIndex
 
   const handleArcKeyDown = (event: React.KeyboardEvent<SVGPathElement>, index: number) => {
     if (isChartNavigationKey(event.key)) {
       event.preventDefault()
-      const next = nextSunburstArcIndex(index, event.key, arcs)
+      const next = nextChartTreeRovingIndex(index, event.key, visibleArcs, nextSunburstArcIndex)
+      if (next === undefined) return
       setFocusedIndex(next)
       const node = event.currentTarget.parentElement?.querySelector(
         `[data-sunburst-arc][data-index="${next}"]`
@@ -194,16 +205,6 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
       return
     }
     handleKeyDown(event, index)
-  }
-
-  // Legend toggles only list root arcs; a hidden root hides its descendants.
-  const isArcHidden = (arc: (typeof arcs)[number]): boolean => {
-    let current: (typeof arcs)[number] | null = arc
-    while (current) {
-      if (isLegendIndexHidden(current.index)) return true
-      current = current.parentIndex === null ? null : (arcs[current.parentIndex] ?? null)
-    }
-    return false
   }
 
   const chart = (
@@ -234,8 +235,9 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
         </defs>
       )}
       <g data-series-type="sunburst">
-        {arcs.map((arc, visualIndex) => {
-          const opacity = isArcHidden(arc)
+        {arcs.map((arc) => {
+          const hidden = !visibleIndexes.has(arc.index)
+          const opacity = hidden
             ? 0
             : getChartElementOpacity(arc.index, activeIndex, {
                 activeOpacity,
@@ -254,31 +256,31 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
               opacity={opacity}
               stroke="var(--tiger-surface)"
               strokeWidth={1}
-              pointerEvents={isArcHidden(arc) ? 'none' : undefined}
+              pointerEvents={hidden ? 'none' : undefined}
               data-sunburst-arc=""
               data-index={arc.index}
               className={classNames(interactive && 'cursor-pointer', sunburstArcTransitionClasses)}
               tabIndex={
-                interactive && !isArcHidden(arc)
-                  ? chartMarkTabIndex(visualIndex, visualActive < 0 ? null : visualActive)
+                interactive && !hidden
+                  ? chartMarkTabIndex(arc.index, rovingIndex, visibleIndexes)
                   : undefined
               }
               role={interactive ? 'button' : undefined}
               aria-hidden={interactive ? undefined : true}
               aria-label={interactive ? ariaLabel : undefined}
-              onMouseEnter={isArcHidden(arc) ? undefined : (e) => handleMouseEnter(arc.index, e)}
-              onMouseMove={isArcHidden(arc) ? undefined : handleMouseMove}
-              onMouseLeave={isArcHidden(arc) ? undefined : handleMouseLeave}
+              onMouseEnter={hidden ? undefined : (e) => handleMouseEnter(arc.index, e)}
+              onMouseMove={hidden ? undefined : handleMouseMove}
+              onMouseLeave={hidden ? undefined : handleMouseLeave}
               onFocus={
-                interactive && !isArcHidden(arc)
+                interactive && !hidden
                   ? (e) => {
                       setFocusedIndex(arc.index)
                       handleMouseEnter(arc.index, e)
                     }
                   : undefined
               }
-              onClick={isArcHidden(arc) ? undefined : () => handleClick(arc.index)}
-              onKeyDown={isArcHidden(arc) ? undefined : (e) => handleArcKeyDown(e, arc.index)}
+              onClick={hidden ? undefined : () => handleClick(arc.index)}
+              onKeyDown={hidden ? undefined : (e) => handleArcKeyDown(e, arc.index)}
             />
           )
         })}
@@ -290,7 +292,7 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
                   key={`label-${arc.index}`}
                   x={arc.labelX}
                   y={arc.labelY}
-                  opacity={isArcHidden(arc) ? 0 : undefined}
+                  opacity={visibleIndexes.has(arc.index) ? undefined : 0}
                   fill={arc.labelFill}
                   className="text-xs pointer-events-none select-none"
                   textAnchor="middle"

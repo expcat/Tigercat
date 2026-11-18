@@ -293,6 +293,10 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
   const shouldShowXAxis = showAxis && showXAxis
   const shouldShowYAxis = showAxis && showYAxis
   const interactive = hoverable || selectable || Boolean(onPointClick)
+  const visibleIndexes = new Set(
+    points.filter((point) => !isLegendIndexHidden(point.index)).map((point) => point.index)
+  )
+  const rovingIndex = focusedIndex ?? activeIndex
 
   const chart = (
     <ChartCanvas
@@ -356,18 +360,16 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
       )}
       <ChartSeries data={data} type="scatter">
         {points.map((point, visualIndex) => {
+          const hidden = !visibleIndexes.has(point.index)
           const filterStyle = point.isHovered ? getScatterHoverShadow() : undefined
           const animDelay =
-            animated && mounted
+            animated && mounted && !hidden
               ? `${Math.min(visualIndex * SCATTER_ENTRANCE_STAGGER_MS, SCATTER_ENTRANCE_STAGGER_MAX_MS)}ms`
               : undefined
-          const visualActive = points.findIndex(
-            (item) => item.index === (focusedIndex ?? activeIndex ?? 0)
-          )
           const sharedProps = {
             fill: point.fill,
-            opacity: isLegendIndexHidden(point.index) ? 0 : point.opacity,
-            pointerEvents: isLegendIndexHidden(point.index) ? ('none' as const) : undefined,
+            opacity: hidden ? 0 : point.opacity,
+            pointerEvents: hidden ? ('none' as const) : undefined,
             stroke: pointBorderColor,
             strokeWidth: pointBorderWidth,
             className: classNames(
@@ -381,8 +383,8 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
               ...(animDelay ? { animationDelay: animDelay } : {})
             } as React.CSSProperties,
             tabIndex:
-              interactive && !isLegendIndexHidden(point.index)
-                ? chartMarkTabIndex(visualIndex, visualActive < 0 ? 0 : visualActive)
+              interactive && !hidden
+                ? chartMarkTabIndex(point.index, rovingIndex, visibleIndexes)
                 : undefined,
             role: interactive ? ('button' as const) : undefined,
             'aria-hidden': interactive ? undefined : true,
@@ -400,16 +402,17 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
             onMouseLeave: handleMouseLeave,
             onClick: () => handleClick(point.index),
             onKeyDown: (e: React.KeyboardEvent) => {
+              if (hidden) return
               if (isChartNavigationKey(e.key)) {
                 e.preventDefault()
-                const nextVisual = nextChartRovingIndex(visualIndex, e.key, points.length)
-                const next = points[nextVisual]
-                setFocusedIndex(next.index)
+                const next = nextChartRovingIndex(point.index, e.key, visibleIndexes)
+                if (next === undefined) return
+                setFocusedIndex(next)
                 const node = (e.currentTarget as SVGElement).ownerSVGElement?.querySelector(
-                  `[data-point-index="${next.index}"]`
+                  `[data-point-index="${next}"]`
                 )
                 if (node instanceof SVGElement) node.focus()
-                handleMouseEnter(next.index, e)
+                handleMouseEnter(next, e)
                 return
               }
               handleKeyDown(e, point.index)

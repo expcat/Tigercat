@@ -1,8 +1,9 @@
-import { useRef } from 'react'
+import { useRef, type HTMLAttributes, type ReactElement } from 'react'
 import {
   downloadChartSvg,
   getCartesianChartShellClasses,
-  getW9DataLabels,
+  getChartLabels,
+  mergeTigerLocale,
   resolveButtonClasses,
   layoutSankey,
   readPageWritingDirection,
@@ -11,7 +12,8 @@ import {
 import { useTigerConfig } from './tiger-config'
 import { ChartCanvas } from './ChartCanvas'
 
-export type SankeyChartProps = CoreSankeyChartProps
+export interface SankeyChartProps
+  extends CoreSankeyChartProps, Omit<HTMLAttributes<HTMLDivElement>, keyof CoreSankeyChartProps> {}
 
 export function SankeyChart({
   nodes,
@@ -21,10 +23,15 @@ export function SankeyChart({
   padding = 16,
   title,
   desc,
+  locale,
+  labels: labelsOverride,
   className,
-  responsive = true
-}: SankeyChartProps) {
+  responsive = true,
+  ...rest
+}: SankeyChartProps): ReactElement {
   const config = useTigerConfig()
+  const mergedLocale = mergeTigerLocale(config.locale, locale)
+  const labels = getChartLabels(mergedLocale, labelsOverride)
   const hostRef = useRef<HTMLDivElement>(null)
   const direction = readPageWritingDirection() === 'rtl' ? 'rtl' : 'ltr'
   const exportChart = () => {
@@ -33,6 +40,7 @@ export function SankeyChart({
   }
   return (
     <div
+      {...rest}
       ref={hostRef}
       className={getCartesianChartShellClasses({
         showLegend: false,
@@ -43,13 +51,14 @@ export function SankeyChart({
         type="button"
         className={resolveButtonClasses({ variant: 'outline', size: 'sm' })}
         onClick={exportChart}>
-        {getW9DataLabels(config.locale).exportChart}
+        {labels.exportText}
       </button>
       <ChartCanvas
         width={width}
         height={height}
         title={title}
         desc={desc}
+        aria-label={rest['aria-label'] || (title ? undefined : labels.chartAriaLabel)}
         responsive={responsive}
         padding={padding}>
         {(ctx) => {

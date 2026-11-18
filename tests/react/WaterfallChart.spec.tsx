@@ -3,8 +3,10 @@ import { render } from '@testing-library/react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { WaterfallChart } from '@expcat/tigercat-react/WaterfallChart'
+import { SankeyChart } from '@expcat/tigercat-react/SankeyChart'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { enUS } from '@expcat/tigercat-core/locales/en-US'
 import type { WaterfallChartProps } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
@@ -52,5 +54,29 @@ describe('WaterfallChart', () => {
       </ConfigProvider>
     )
     expect(container.querySelector('svg')).toHaveAttribute('aria-label', '瀑布图')
+  })
+
+  it('forwards native attributes to the root', () => {
+    const { container } = render(<WaterfallChart {...props} id="balance" data-source="sales" />)
+    expect(container.firstElementChild).toHaveAttribute('id', 'balance')
+    expect(container.firstElementChild).toHaveAttribute('data-source', 'sales')
+  })
+
+  it('uses component locale and label overrides for chart and export names', () => {
+    const { getByRole } = render(
+      <ConfigProvider locale={enUS}>
+        <WaterfallChart
+          {...props}
+          title={undefined}
+          locale={zhCN}
+          labels={{ waterfallChartAriaLabel: '销售瀑布图' }}
+        />
+        <SankeyChart nodes={[]} links={[]} locale={zhCN} labels={{ exportText: '下载流向图' }} />
+      </ConfigProvider>
+    )
+    expect(getByRole('group', { name: '销售瀑布图' })).toBeInTheDocument()
+    expect(getByRole('button', { name: '导出图表' })).toBeInTheDocument()
+    expect(getByRole('group', { name: '图表' })).toBeInTheDocument()
+    expect(getByRole('button', { name: '下载流向图' })).toBeInTheDocument()
   })
 })

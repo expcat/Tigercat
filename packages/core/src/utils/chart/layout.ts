@@ -47,11 +47,53 @@ export function isFiniteNumber(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value)
 }
 
-export function nextChartRovingIndex(current: number, key: string, count: number): number {
-  if (count <= 0) return 0
-  if (key === 'ArrowRight' || key === 'ArrowDown') return Math.min(count - 1, current + 1)
+export function nextChartRovingIndex(
+  current: number,
+  key: string,
+  visibleIndexes: ReadonlySet<number>
+): number | undefined
+export function nextChartRovingIndex(current: number, key: string, count: number): number
+export function nextChartRovingIndex(
+  current: number,
+  key: string,
+  candidates: number | ReadonlySet<number>
+): number | undefined {
+  if (typeof candidates !== 'number') {
+    const indexes = [...candidates]
+    const position = indexes.indexOf(current)
+    return position < 0 ? indexes[0] : indexes[nextChartRovingIndex(position, key, indexes.length)]
+  }
+  if (candidates <= 0) return 0
+  if (key === 'ArrowRight' || key === 'ArrowDown') return Math.min(candidates - 1, current + 1)
   if (key === 'ArrowLeft' || key === 'ArrowUp') return Math.max(0, current - 1)
   return current
+}
+
+export function nextChartTreeRovingIndex<
+  T extends { index: number; parentIndex: number | null; childIndices?: readonly number[] }
+>(
+  current: number,
+  key: string,
+  visible: readonly T[],
+  navigate: (position: number, key: string, candidates: readonly T[]) => number
+): number | undefined {
+  const positions = new Map(visible.map((mark, position) => [mark.index, position]))
+  const position = positions.get(current)
+  if (position === undefined) return visible[0]?.index
+
+  // The tree navigators expect parent and child indices to address array positions.
+  const candidates = visible.map((mark, index) => ({
+    ...mark,
+    index,
+    parentIndex: mark.parentIndex === null ? null : (positions.get(mark.parentIndex) ?? null),
+    ...(mark.childIndices && {
+      childIndices: mark.childIndices.flatMap((child) => {
+        const childPosition = positions.get(child)
+        return childPosition === undefined ? [] : [childPosition]
+      })
+    })
+  }))
+  return visible[navigate(position, key, candidates)]?.index
 }
 
 export function isNumericChartDomain(values: unknown[]): boolean {
@@ -167,9 +209,17 @@ export function nextChartPointRef(
   return flat[nextChartRovingIndex(from, key, flat.length)] ?? null
 }
 
-export function chartMarkTabIndex(index: number, activeIndex: number | null): number {
-  if (activeIndex === null) return index === 0 ? 0 : -1
-  return activeIndex === index ? 0 : -1
+export function chartMarkTabIndex(
+  index: number,
+  activeIndex: number | null,
+  visibleIndexes?: ReadonlySet<number>
+): number {
+  if (!visibleIndexes) return index === (activeIndex ?? 0) ? 0 : -1
+  const tabStop =
+    activeIndex !== null && visibleIndexes.has(activeIndex)
+      ? activeIndex
+      : visibleIndexes.values().next().value
+  return index === tabStop ? 0 : -1
 }
 
 export function findNearestPointIndex(

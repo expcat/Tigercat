@@ -9,6 +9,7 @@ import {
   chartLegendOrientationFromPosition,
   getCartesianChartShellClasses,
   chartMarkTabIndex,
+  nextChartTreeRovingIndex,
   nextTreeMapNodeIndex,
   isChartNavigationKey,
   getChartLabels,
@@ -191,24 +192,24 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
       percent
     })
   }, [resolvedHoveredIndex, nodes, tooltipFormatter, rootTotal, labels.treemapTooltip])
-  const visualActive = nodes.findIndex(
-    (node) => node.index === (focusedIndex ?? activeIndex ?? resolvedHoveredIndex)
-  )
+  const visibleNodes = nodes.filter((node) => !isNodeHidden(node))
+  const visibleIndexes = new Set(visibleNodes.map((node) => node.index))
+  const rovingIndex = focusedIndex ?? activeIndex ?? resolvedHoveredIndex
 
-  const handleNodeKeyDown = (event: React.KeyboardEvent<SVGRectElement>, visualIndex: number) => {
+  const handleNodeKeyDown = (event: React.KeyboardEvent<SVGRectElement>, index: number) => {
     if (isChartNavigationKey(event.key)) {
       event.preventDefault()
-      const nextVisual = nextTreeMapNodeIndex(visualIndex, event.key, nodes)
-      const next = nodes[nextVisual]
-      setFocusedIndex(next.index)
+      const next = nextChartTreeRovingIndex(index, event.key, visibleNodes, nextTreeMapNodeIndex)
+      if (next === undefined) return
+      setFocusedIndex(next)
       const node = event.currentTarget.parentElement?.querySelector(
-        `[data-treemap-node][data-index="${next.index}"]`
+        `[data-treemap-node][data-index="${next}"]`
       )
       if (node instanceof SVGElement) node.focus()
-      handleMouseEnter(next.index, event)
+      handleMouseEnter(next, event)
       return
     }
-    handleKeyDown(event, nodes[visualIndex].index)
+    handleKeyDown(event, index)
   }
 
   const chart = (
@@ -243,8 +244,9 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
         ))}
       </defs>
       <g data-series-type="treemap">
-        {nodes.map((node, visualIndex) => {
-          const opacity = isNodeHidden(node)
+        {nodes.map((node) => {
+          const hidden = !visibleIndexes.has(node.index)
+          const opacity = hidden
             ? 0
             : getChartElementOpacity(node.index, activeIndex, {
                 activeOpacity,
@@ -266,7 +268,7 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
                 rx={nodeRadius}
                 fill={gradient ? `url(#${gradientPrefix}-${node.index})` : node.color}
                 opacity={opacity}
-                pointerEvents={isNodeHidden(node) ? 'none' : undefined}
+                pointerEvents={hidden ? 'none' : undefined}
                 data-treemap-node=""
                 data-index={node.index}
                 className={classNames(
@@ -274,36 +276,32 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
                   treemapNodeTransitionClasses
                 )}
                 tabIndex={
-                  interactive && !isNodeHidden(node)
-                    ? chartMarkTabIndex(visualIndex, visualActive < 0 ? null : visualActive)
+                  interactive && !hidden
+                    ? chartMarkTabIndex(node.index, rovingIndex, visibleIndexes)
                     : undefined
                 }
                 role={interactive ? 'button' : undefined}
                 aria-hidden={interactive ? undefined : true}
                 aria-label={interactive ? ariaLabel : undefined}
-                onMouseEnter={
-                  isNodeHidden(node) ? undefined : (e) => handleMouseEnter(node.index, e)
-                }
-                onMouseMove={isNodeHidden(node) ? undefined : handleMouseMove}
-                onMouseLeave={isNodeHidden(node) ? undefined : handleMouseLeave}
+                onMouseEnter={hidden ? undefined : (e) => handleMouseEnter(node.index, e)}
+                onMouseMove={hidden ? undefined : handleMouseMove}
+                onMouseLeave={hidden ? undefined : handleMouseLeave}
                 onFocus={
-                  interactive && !isNodeHidden(node)
+                  interactive && !hidden
                     ? (e) => {
                         setFocusedIndex(node.index)
                         handleMouseEnter(node.index, e)
                       }
                     : undefined
                 }
-                onClick={isNodeHidden(node) ? undefined : () => handleClick(node.index)}
-                onKeyDown={
-                  isNodeHidden(node) ? undefined : (e) => handleNodeKeyDown(e, visualIndex)
-                }
+                onClick={hidden ? undefined : () => handleClick(node.index)}
+                onKeyDown={hidden ? undefined : (e) => handleNodeKeyDown(e, node.index)}
               />
               {showLabels && node.showLabel && (
                 <text
                   x={node.x + node.w / 2}
                   y={node.y + Math.min(14, node.h / 2)}
-                  opacity={isNodeHidden(node) ? 0 : undefined}
+                  opacity={hidden ? 0 : undefined}
                   fill={node.labelFill}
                   className="pointer-events-none select-none"
                   textAnchor="middle"

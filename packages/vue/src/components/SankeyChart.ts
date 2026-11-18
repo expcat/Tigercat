@@ -1,17 +1,20 @@
-import { defineComponent, h, ref, type PropType } from 'vue'
+import { computed, defineComponent, h, ref, type PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
   downloadChartSvg,
   getCartesianChartShellClasses,
-  getW9DataLabels,
+  getChartLabels,
+  mergeTigerLocale,
   resolveButtonClasses,
   layoutSankey,
   readPageWritingDirection,
   type ChartPadding,
   type SankeyChartProps as CoreSankeyChartProps,
   type SankeyLink,
-  type SankeyNode
+  type SankeyNode,
+  type TigerLocale,
+  type TigerLocaleChart
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './tiger-config'
 import { ChartCanvas } from './ChartCanvas'
@@ -30,11 +33,15 @@ export const SankeyChart = defineComponent({
     padding: { type: [Number, Object] as PropType<ChartPadding>, default: 16 },
     title: { type: String, default: undefined },
     desc: { type: String, default: undefined },
+    locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
+    labels: { type: Object as PropType<Partial<TigerLocaleChart>>, default: undefined },
     className: { type: String, default: undefined },
     responsive: { type: Boolean, default: true }
   },
   setup(props, { attrs }) {
     const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const labels = computed(() => getChartLabels(mergedLocale.value, props.labels))
     const hostRef = ref<HTMLElement | null>(null)
     const exportChart = () => {
       const svg = hostRef.value?.querySelector('svg')
@@ -42,6 +49,7 @@ export const SankeyChart = defineComponent({
     }
     return () => {
       const direction = readPageWritingDirection() === 'rtl' ? 'rtl' : 'ltr'
+      const ariaLabel = attrs['aria-label']
       return h(
         'div',
         {
@@ -61,7 +69,7 @@ export const SankeyChart = defineComponent({
               class: resolveButtonClasses({ variant: 'outline', size: 'sm' }),
               onClick: exportChart
             },
-            getW9DataLabels(config.value.locale).exportChart
+            labels.value.exportText
           ),
           h(
             ChartCanvas,
@@ -70,6 +78,9 @@ export const SankeyChart = defineComponent({
               height: props.height,
               title: props.title,
               desc: props.desc,
+              'aria-label':
+                (typeof ariaLabel === 'string' && ariaLabel) ||
+                (props.title ? undefined : labels.value.chartAriaLabel),
               responsive: props.responsive,
               padding: props.padding
             },

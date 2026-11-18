@@ -1,7 +1,7 @@
 import React from 'react'
-import { render } from '@testing-library/react'
+import { fireEvent, render } from '@testing-library/react'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { SankeyChart } from '@expcat/tigercat-react/SankeyChart'
 import type { SankeyChartProps } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
@@ -46,5 +46,24 @@ describe('SankeyChart', () => {
   it('follows the container width when responsive is omitted', () => {
     const { container } = render(<SankeyChart nodes={props.nodes} links={props.links} />)
     expect(container.firstElementChild).toHaveClass('w-full')
+  })
+
+  it('forwards native attributes and events to the root', () => {
+    const onClick = vi.fn()
+    const { container } = render(
+      <SankeyChart
+        {...props}
+        id="flow"
+        data-source="sales"
+        style={{ opacity: 0.8 }}
+        onClick={onClick}
+      />
+    )
+    const root = container.firstElementChild!
+    expect(root).toHaveAttribute('id', 'flow')
+    expect(root).toHaveAttribute('data-source', 'sales')
+    expect(root).toHaveStyle({ opacity: '0.8' })
+    fireEvent.click(root)
+    expect(onClick).toHaveBeenCalledOnce()
   })
 })

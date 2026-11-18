@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, PropType, useId } from 'vue'
+import { defineComponent, computed, h, PropType, ref, useId } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -263,6 +263,7 @@ export const BarChart = defineComponent({
       () => props.hoverable || props.selectable || typeof props.onBarClick === 'function'
     )
     const corner = computed(() => resolveBarCornerRadius(props.barRadius))
+    const focusedIndex = ref<number | null>(null)
 
     const {
       tooltipPosition,
@@ -375,21 +376,25 @@ export const BarChart = defineComponent({
     )
 
     return () => {
-      const visualActive = bars.value.findIndex(
-        (bar) => bar.index === (activeIndex.value ?? resolvedHoveredIndex.value)
+      const visibleIndexes = new Set(
+        bars.value.filter((bar) => !isLegendIndexHidden(bar.index)).map((bar) => bar.index)
       )
-      const handleBarKeyDown = (event: KeyboardEvent, visualIndex: number) => {
+      const rovingIndex = focusedIndex.value ?? activeIndex.value ?? resolvedHoveredIndex.value
+      const ariaLabel = attrs['aria-label']
+      const handleBarKeyDown = (event: KeyboardEvent, index: number) => {
+        if (!visibleIndexes.has(index)) return
         if (isChartNavigationKey(event.key)) {
           event.preventDefault()
-          const nextVisual = nextChartRovingIndex(visualIndex, event.key, bars.value.length)
-          const next = bars.value[nextVisual]
+          const next = nextChartRovingIndex(index, event.key, visibleIndexes)
+          if (next === undefined) return
+          focusedIndex.value = next
           const current = event.currentTarget as SVGElement
-          const node = current.parentElement?.querySelector(`[data-bar-index="${next.index}"]`)
+          const node = current.parentElement?.querySelector(`[data-bar-index="${next}"]`)
           if (node instanceof SVGElement) node.focus()
-          handleMouseEnter(next.index, event)
+          handleMouseEnter(next, event)
           return
         }
-        handleKeyDown(event, bars.value[visualIndex].index)
+        handleKeyDown(event, index)
       }
 
       const gradientDefs = props.gradient
@@ -459,6 +464,9 @@ export const BarChart = defineComponent({
           responsive: props.responsive,
           title: props.title,
           desc: props.desc,
+          'aria-label':
+            (typeof ariaLabel === 'string' && ariaLabel) ||
+            (props.title ? undefined : labels.value.barChartAriaLabel),
           onResolvedSizeChange
         },
         {
@@ -507,7 +515,7 @@ export const BarChart = defineComponent({
                 },
                 {
                   default: () =>
-                    bars.value.map((bar, visualIndex) =>
+                    bars.value.map((bar) =>
                       h('rect', {
                         key: `bar-${bar.index}`,
                         x: bar.x,
@@ -525,8 +533,8 @@ export const BarChart = defineComponent({
                         ),
                         style: corner.value.style,
                         tabindex:
-                          interactive.value && !isLegendIndexHidden(bar.index)
-                            ? chartMarkTabIndex(visualIndex, visualActive < 0 ? null : visualActive)
+                          interactive.value && visibleIndexes.has(bar.index)
+                            ? chartMarkTabIndex(bar.index, rovingIndex, visibleIndexes)
                             : undefined,
                         role: interactive.value ? 'button' : undefined,
                         'aria-hidden': interactive.value ? undefined : true,
@@ -538,7 +546,7 @@ export const BarChart = defineComponent({
                         onMousemove: handleMouseMove,
                         onMouseleave: handleMouseLeave,
                         onClick: () => handleClick(bar.index),
-                        onKeydown: (e: KeyboardEvent) => handleBarKeyDown(e, visualIndex)
+                        onKeydown: (e: KeyboardEvent) => handleBarKeyDown(e, bar.index)
                       })
                     )
                 }

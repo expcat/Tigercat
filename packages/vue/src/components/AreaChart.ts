@@ -470,6 +470,7 @@ export const AreaChart = defineComponent({
       const pointClickable = typeof props.onPointClick === 'function'
       const trackPointHover = props.showTooltip || props.hoverable
       const reversedSeriesData = [...seriesData.value].reverse()
+      const ariaLabel = attrs['aria-label']
 
       const chart = h(
         ChartCanvas,
@@ -480,6 +481,9 @@ export const AreaChart = defineComponent({
           responsive: props.responsive,
           title: props.title,
           desc: props.desc,
+          'aria-label':
+            (typeof ariaLabel === 'string' && ariaLabel) ||
+            (props.title ? undefined : labels.value.areaChartAriaLabel),
           onResolvedSizeChange
         },
         {

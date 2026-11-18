@@ -3,8 +3,10 @@ import { h } from 'vue'
 import { renderToString } from 'vue/server-renderer'
 import { describe, expect, it } from 'vitest'
 import { WaterfallChart } from '@expcat/tigercat-vue/WaterfallChart'
+import { SankeyChart } from '@expcat/tigercat-vue/SankeyChart'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { enUS } from '@expcat/tigercat-core/locales/en-US'
 import type { WaterfallChartProps } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
@@ -50,5 +52,30 @@ describe('WaterfallChart', () => {
         h(ConfigProvider, { locale: zhCN }, () => h(WaterfallChart, { ...props, title: undefined }))
     })
     expect(container.querySelector('svg')).toHaveAttribute('aria-label', '瀑布图')
+  })
+
+  it('uses component locale and label overrides for chart and export names', () => {
+    const { container, getByRole } = render({
+      render: () =>
+        h(ConfigProvider, { locale: enUS }, () => [
+          h(WaterfallChart, {
+            ...props,
+            title: undefined,
+            locale: zhCN,
+            labels: { waterfallChartAriaLabel: '销售瀑布图' }
+          }),
+          h(SankeyChart, {
+            nodes: [],
+            links: [],
+            locale: zhCN,
+            labels: { exportText: '下载流向图' }
+          })
+        ])
+    })
+    expect(getByRole('group', { name: '销售瀑布图' })).toBeInTheDocument()
+    expect(getByRole('button', { name: '导出图表' })).toBeInTheDocument()
+    expect(getByRole('group', { name: '图表' })).toBeInTheDocument()
+    expect(getByRole('button', { name: '下载流向图' })).toBeInTheDocument()
+    expect(container.querySelector('[locale], [labels]')).toBeNull()
   })
 })

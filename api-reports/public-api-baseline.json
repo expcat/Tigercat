@@ -3409,6 +3409,7 @@
       "MAX_RADAR_LEVELS",
       "MAX_UPLOAD_CHUNKS",
       "measureNavigationIndicator",
+      "measureResizableBounds",
       "measureSplitterContainer",
       "measureTabIndicatorBox",
       "measureTableResizeSnapshot",
@@ -3583,6 +3584,7 @@
       "nextChartPointRef",
       "nextChartRovingIndex",
       "nextChartSelectedIndex",
+      "nextChartTreeRovingIndex",
       "nextCheckedFromTreeRow",
       "nextCommentLikeState",
       "nextCommentRevealedCount",
@@ -8276,7 +8278,7 @@
     },
     "SankeyChartProps": {
       "extends": ["BaseChartProps"],
-      "props": ["height", "links", "nodes", "responsive", "width"]
+      "props": ["height", "links", "nodes", "padding", "responsive", "width"]
     },
     "ScatterChartProps": {
       "extends": [
@@ -9141,7 +9143,7 @@
     },
     "WaterfallChartProps": {
       "extends": ["BaseChartProps"],
-      "props": ["colors", "data", "height"]
+      "props": ["colors", "data", "height", "padding", "responsive", "width"]
     },
     "WatermarkProps": {
       "extends": [],
