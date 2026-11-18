@@ -342,7 +342,7 @@ export const ChatWindow = defineComponent({
           messages.value[messages.value.length - 1]?.content
         ] as const,
       () => {
-        requestAnimationFrame(applyScrollPlan)
+        requestAnimationFrame(() => applyScrollPlan())
       }
     )
 

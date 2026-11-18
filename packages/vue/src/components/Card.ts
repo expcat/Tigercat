@@ -238,7 +238,7 @@ export const Card = defineComponent({
           activation.link.stretch
             ? mainChildren.filter((child) => child != null)
             : titleLivesInLink
-              ? headerNode
+              ? (headerNode ?? undefined)
               : titleText || undefined
         )
 

@@ -133,7 +133,7 @@ export const ImagePreview = defineComponent({
     })
 
     const transform = ref<GestureTransform>(restTransform())
-    const index = ref(props.currentIndex)
+    const index = ref(0)
     const dragging = ref(false)
     const rootRef = ref<HTMLElement | null>(null)
     let gestureSession: ReturnType<typeof createLightboxGestureSession> | null = null
@@ -157,7 +157,10 @@ export const ImagePreview = defineComponent({
       () => [isOpen.value, props.currentIndex, resolved.value.length] as const,
       ([open, current, length]) => {
         if (!open) return
-        index.value = clampLightboxIndex(current, length)
+        index.value = clampLightboxIndex(
+          typeof current === 'number' && Number.isFinite(current) ? current : 0,
+          length
+        )
         resetTransform()
       },
       { immediate: true }
