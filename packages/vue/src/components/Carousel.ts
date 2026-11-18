@@ -448,13 +448,19 @@ export const Carousel = defineComponent({
           if (!isControlled.value) internalCurrentIndex.value = clamped
           goTo(clamped, 'goto')
         }
+        if (!isControlled.value && pendingTransition) {
+          // Cancel the CSS transition while rebasing the track to the new window.
+          pendingTransition = null
+          wrapping.value = false
+          snapPending.value = true
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              if (!pendingTransition) snapPending.value = false
+            })
+          })
+        }
         if (!wrapping.value) {
-          baseIndex.value = getCarouselWindowStart(
-            currentIndex.value,
-            count,
-            perView.value,
-            looping.value
-          )
+          baseIndex.value = windowStart.value
           trackOffset.value = 0
         }
       },

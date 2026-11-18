@@ -173,6 +173,49 @@ describe('Carousel', () => {
         'true'
       )
     })
+
+    it('cancels an in-flight transition when slides shrink and grow again', async () => {
+      const items = ref(['A', 'B', 'C'])
+      const { container } = render({
+        setup() {
+          return () => {
+            const content = items.value.map((item) => h('div', { key: item }, item))
+            return h(Carousel, { speed: 500 }, () => content)
+          }
+        }
+      })
+      const track = container.querySelector('[data-tiger-carousel-track]') as HTMLElement
+
+      expect(screen.getByRole('status')).toHaveTextContent('Slide 1 of 3')
+      await fireEvent.click(screen.getByRole('button', { name: 'Go to slide 3' }))
+      expect(screen.getByRole('status')).toHaveTextContent('Slide 3 of 3')
+      expect(track.style.transform).toBe('translate3d(-200%, 0, 0)')
+
+      items.value = ['A', 'B']
+      await nextTick()
+
+      expect(screen.getByRole('status')).toHaveTextContent('Slide 2 of 2')
+      expect(track.style.transform).toBe('translate3d(0%, 0, 0)')
+      expect(track.firstElementChild).toHaveTextContent('B')
+      expect(track).toHaveClass('tiger-carousel-track-instant')
+
+      items.value = ['A', 'B', 'C']
+      await nextTick()
+
+      expect(screen.getByRole('status')).toHaveTextContent('Slide 2 of 3')
+      expect(track.style.transform).toBe('translate3d(0%, 0, 0)')
+      expect(track.firstElementChild).toHaveTextContent('B')
+
+      vi.advanceTimersByTime(32)
+      await nextTick()
+      expect(track).not.toHaveClass('tiger-carousel-track-instant')
+
+      await fireEvent.transitionEnd(track)
+
+      expect(screen.getByRole('status')).toHaveTextContent('Slide 2 of 3')
+      expect(track.style.transform).toBe('translate3d(0%, 0, 0)')
+      expect(track.firstElementChild).toHaveTextContent('B')
+    })
   })
 
   describe('Navigation', () => {
